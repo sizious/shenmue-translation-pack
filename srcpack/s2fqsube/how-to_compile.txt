@@ -1,0 +1,5 @@
+To compile s2fqsube, you'll need:
+
+- Delphi 7 or superior (XML units needed)
+- JCL/JVCL components: http://homepages.codegear.com/jedi/jvcl/
+- DFF Lib: http://www.delphiforfun.org/Programs/Library/Default.htm
