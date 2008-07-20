@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{e7dfe28d-5de8-48bf-a3bc-2edc10d466f8}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+    <DCC_DependencyCheckOutputName>..\bin\s2fqsube.exe</DCC_DependencyCheckOutputName>
+    <MainSource>s2fqsube.dpr</MainSource>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_ExeOutput>..\bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\obj</DCC_DcuOutput>
+    <DCC_ObjOutput>..\obj</DCC_ObjOutput>
+    <DCC_HppOutput>..\obj</DCC_HppOutput>
+    <DCC_Define>RELEASE</DCC_Define>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_ExeOutput>..\bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\obj</DCC_DcuOutput>
+    <DCC_ObjOutput>..\obj</DCC_ObjOutput>
+    <DCC_HppOutput>..\obj</DCC_HppOutput>
+    <DCC_Define>DEBUG</DCC_Define>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="RunParams">/c</Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">2</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue II Free Quest Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.2.0</VersionInfoKeys><VersionInfoKeys Name="InternalName">s2fqsube</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2002, 2008</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">s2fqsube.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue II Free Quest Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">Thanks to Manic. Shenmue Master Project 5.</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">s2fqsube.dpr</Source></Source><Excluded_Packages>
+      
+      
+      <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
+    </Excluded_Packages></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
+  <ItemGroup>
+    <DelphiCompile Include="s2fqsube.dpr">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="engine\charscnt.pas" />
+    <DCCReference Include="engine\charsutil.pas" />
+    <DCCReference Include="engine\scnfedit.pas" />
+    <DCCReference Include="engine\scnfscan.pas" />
+    <DCCReference Include="engine\scnfutil.pas" />
+    <DCCReference Include="main.pas">
+      <Form>frmMain</Form>
+    </DCCReference>
+    <DCCReference Include="multitrd.pas">
+      <Form>frmMultiTranslation</Form>
+    </DCCReference>
+    <DCCReference Include="scandir.pas">
+      <Form>frmDirScan</Form>
+    </DCCReference>
+    <DCCReference Include="seldir.pas">
+      <Form>frmSelectDir</Form>
+    </DCCReference>
+    <DCCReference Include="utils.pas" />
+  </ItemGroup>
+</Project>
