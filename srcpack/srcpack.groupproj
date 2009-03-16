@@ -1,0 +1,84 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{ba04441e-6bba-40c1-90bc-4800ab5c7176}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="AFS Utils\src\afsutils_v2.dproj" />
+    <Projects Include="AiO Subtitles Editor\src\shen_aio_subseditor_v1.dproj" />
+    <Projects Include="Free Quest Subtitles Editor\src\s2fqsube.dproj" />
+    <Projects Include="IDX Creator\idx_creator_v2.dproj" />
+    <Projects Include="idxcreator_shen1\src\idxcreator_shenmue_v2.dproj" />
+    <Projects Include="SPR Utils\sprutils_v2.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="afsutils_v2">
+    <MSBuild Projects="AFS Utils\src\afsutils_v2.dproj" Targets="" />
+  </Target>
+  <Target Name="afsutils_v2:Clean">
+    <MSBuild Projects="AFS Utils\src\afsutils_v2.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="afsutils_v2:Make">
+    <MSBuild Projects="AFS Utils\src\afsutils_v2.dproj" Targets="Make" />
+  </Target>
+  <Target Name="shen_aio_subseditor_v1">
+    <MSBuild Projects="AiO Subtitles Editor\src\shen_aio_subseditor_v1.dproj" Targets="" />
+  </Target>
+  <Target Name="shen_aio_subseditor_v1:Clean">
+    <MSBuild Projects="AiO Subtitles Editor\src\shen_aio_subseditor_v1.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="shen_aio_subseditor_v1:Make">
+    <MSBuild Projects="AiO Subtitles Editor\src\shen_aio_subseditor_v1.dproj" Targets="Make" />
+  </Target>
+  <Target Name="s2fqsube">
+    <MSBuild Projects="Free Quest Subtitles Editor\src\s2fqsube.dproj" Targets="" />
+  </Target>
+  <Target Name="s2fqsube:Clean">
+    <MSBuild Projects="Free Quest Subtitles Editor\src\s2fqsube.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="s2fqsube:Make">
+    <MSBuild Projects="Free Quest Subtitles Editor\src\s2fqsube.dproj" Targets="Make" />
+  </Target>
+  <Target Name="idx_creator_v2">
+    <MSBuild Projects="IDX Creator\idx_creator_v2.dproj" Targets="" />
+  </Target>
+  <Target Name="idx_creator_v2:Clean">
+    <MSBuild Projects="IDX Creator\idx_creator_v2.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="idx_creator_v2:Make">
+    <MSBuild Projects="IDX Creator\idx_creator_v2.dproj" Targets="Make" />
+  </Target>
+  <Target Name="idxcreator_shenmue_v2">
+    <MSBuild Projects="idxcreator_shen1\src\idxcreator_shenmue_v2.dproj" Targets="" />
+  </Target>
+  <Target Name="idxcreator_shenmue_v2:Clean">
+    <MSBuild Projects="idxcreator_shen1\src\idxcreator_shenmue_v2.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="idxcreator_shenmue_v2:Make">
+    <MSBuild Projects="idxcreator_shen1\src\idxcreator_shenmue_v2.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sprutils_v2">
+    <MSBuild Projects="SPR Utils\sprutils_v2.dproj" Targets="" />
+  </Target>
+  <Target Name="sprutils_v2:Clean">
+    <MSBuild Projects="SPR Utils\sprutils_v2.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sprutils_v2:Make">
+    <MSBuild Projects="SPR Utils\sprutils_v2.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="afsutils_v2;shen_aio_subseditor_v1;s2fqsube;idx_creator_v2;idxcreator_shenmue_v2;sprutils_v2" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="afsutils_v2:Clean;shen_aio_subseditor_v1:Clean;s2fqsube:Clean;idx_creator_v2:Clean;idxcreator_shenmue_v2:Clean;sprutils_v2:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="afsutils_v2:Make;shen_aio_subseditor_v1:Make;s2fqsube:Make;idx_creator_v2:Make;idxcreator_shenmue_v2:Make;sprutils_v2:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
