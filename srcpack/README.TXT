@@ -1,3 +1,7 @@
+SHENMUE TRANSLATION PACK
+########################
+
+
 ENGLISH:
 - Additional components required for compilation:
 	* DFF Library -> http://www.delphiforfun.org/Programs/Library/Default.htm
