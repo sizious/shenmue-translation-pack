@@ -34,6 +34,7 @@ type
     Options1: TMenuItem;
     editFileCnt: TEdit;
     lblFileCnt: TLabel;
+    Masscreation1: TMenuItem;
     procedure Close1Click(Sender: TObject);
     procedure Addfiles1Click(Sender: TObject);
     procedure Addfiles2Click(Sender: TObject);
@@ -47,6 +48,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ImportXMLlist1Click(Sender: TObject);
+    procedure Masscreation1Click(Sender: TObject);
   private
     { Déclarations privées }
     procedure ReloadList;
@@ -56,6 +58,7 @@ type
     procedure AddDirToList(FilePath: String);
     procedure QueueCreation(FileName: TFileName);
     function MsgBox(const Text: string; const Caption: string; Flags: Integer): Integer;
+    procedure QueueMassCreation(SourceDir: string);
   public
     { Déclarations publiques }
   end;
@@ -86,7 +89,7 @@ end;
 
 procedure tfrmCreator.LoadXMLList(FileName: TFileName);
 begin
-  if ImportListFromXML(FileName) then begin
+  if ImportListFromXML(FileName, createMainList) then begin
     ReloadList;
   end;
 end;
@@ -113,6 +116,51 @@ begin
     until (FindNext(SR) <> 0);
     FindClose(SR);
   end;
+end;
+
+procedure TfrmCreator.Masscreation1Click(Sender: TObject);
+begin
+  JvBrowseFolder2.Title := 'Mass extract to...';
+  JvBrowseFolder2.Options := [odStatusAvailable,odNewDialogStyle];
+  if JvBrowseFolder2.Execute then
+    QueueMassCreation(JvBrowseFolder2.Directory);
+end;
+
+{$WARN SYMBOL_PLATFORM OFF}
+
+procedure TfrmCreator.QueueMassCreation(SourceDir: string);
+var
+  Result: Integer;
+  fName: String;
+
+  CurrDir: string;
+  SearchRec: TSearchRec;
+  
+begin
+  SourceDir := IncludeTrailingPathDelimiter(SourceDir);
+
+  Result := FindFirst(SourceDir + '*.*', faDirectory + faHidden + faSysFile, SearchRec);
+  while (Result = 0) do begin
+   if (SearchRec.Name <> '.') and (SearchRec.Name <> '..') and ((SearchRec.Attr and faDirectory) > 0) then begin
+      CurrDir := IncludeTrailingPathDelimiter(SourceDir) + SearchRec.Name;
+
+      // Checking if we have the XML to create the AFS
+      FName := IncludeTrailingPathDelimiter(CurrDir) + ExtractFileName(CurrDir) + '_list.xml';
+      if FileExists(FName) then begin
+        ImportListFromXML(FName, createMainList);
+        Self.QueueCreation(CurrDir + '.afs');
+      end;
+
+      // Exploring next folder
+      QueueMassCreation(CurrDir);
+
+      Application.ProcessMessages;
+    end;
+
+    Result := FindNext(SearchRec);
+  end;
+  
+  FindClose(SearchRec);// libération de la mémoire
 end;
 
 function TfrmCreator.MsgBox(const Text: string; const Caption: string; Flags: Integer): Integer;
