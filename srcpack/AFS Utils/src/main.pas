@@ -8,8 +8,8 @@ uses
   JvBrowseFolder, StrUtils;
 
 const
-  APP_VERSION = '2.01';
-  COMPIL_DATE_TIME = 'July 19, 2008 @02:00 PM';
+  APP_VERSION = '2.1';
+  COMPIL_DATE_TIME = 'March 17, 2009 @00:36 AM';
 
 type
   TfrmMain = class(TForm)
@@ -321,7 +321,7 @@ end;
 
 procedure TfrmMain.About1Click(Sender: TObject);
 begin
-  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
+  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+COMPIL_DATE_TIME+#13#10+'Updated by [big_fury]SiZiOUS', 'Information', MB_ICONINFORMATION);
 end;
 
 procedure TfrmMain.Searchfilestoselect1Click(Sender: TObject);

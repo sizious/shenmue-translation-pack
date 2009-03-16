@@ -3,14 +3,14 @@ unit xmlutil;
 interface
 
 uses
-  SysUtils;
+  SysUtils, AfsCreate;
 
 procedure SaveListToXML(FileName: TFileName);
-function ImportListFromXML(FileName: TFileName): Boolean;
+function ImportListFromXML(FileName: TFileName; var TargetFilesList: TFileList): Boolean;
 
 implementation
 uses XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX,
-  afscreate, afsextract;
+  afsextract;
 
 procedure SaveListToXML(FileName: TFileName);
 var
@@ -70,7 +70,7 @@ begin
 
 end;
 
-function ImportListFromXML(FileName: TFileName): Boolean;
+function ImportListFromXML(FileName: TFileName; var TargetFilesList: TFileList): Boolean;
 var
   XMLDoc: IXMLDocument;
   CurrentNode, LoopNode: IXMLNode;
@@ -94,6 +94,9 @@ begin
     XMLDoc.LoadFromFile(FileName);
     if XMLDoc.DocumentElement.NodeName <> 'afsutils' then Exit;
 
+    // Clean TFileList
+    TargetFilesList.ClearVar;
+    
     //Input directory
     CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('inputdir');
     xmlDir := CurrentNode.NodeValue;
@@ -110,7 +113,7 @@ begin
         end;
 
         if FileExists(xmlDir+xmlFile) then begin
-          createMainList.AddFile(xmlDir+xmlFile);
+          TargetFilesList.AddFile(xmlDir+xmlFile);
         end;
       end;
     end;

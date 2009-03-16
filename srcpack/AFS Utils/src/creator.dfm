@@ -30,8 +30,6 @@ object frmCreator: TfrmCreator
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Files list'
     TabOrder = 0
-    ExplicitWidth = 329
-    ExplicitHeight = 289
     DesignSize = (
       291
       342)
@@ -55,8 +53,6 @@ object frmCreator: TfrmCreator
       MultiSelect = True
       PopupMenu = PopupMenu2
       TabOrder = 0
-      ExplicitWidth = 313
-      ExplicitHeight = 233
     end
     object editFileCnt: TEdit
       Left = 210
@@ -68,8 +64,6 @@ object frmCreator: TfrmCreator
       ReadOnly = True
       TabOrder = 1
       Text = '0'
-      ExplicitLeft = 248
-      ExplicitTop = 256
     end
   end
   object StatusBar1: TStatusBar
@@ -81,8 +75,6 @@ object frmCreator: TfrmCreator
       item
         Width = 50
       end>
-    ExplicitTop = 310
-    ExplicitWidth = 345
   end
   object MainMenu2: TMainMenu
     Left = 24
@@ -130,11 +122,15 @@ object frmCreator: TfrmCreator
         Caption = 'Delete all files...'
         OnClick = Deleteallfiles1Click
       end
+      object Masscreation1: TMenuItem
+        Caption = '&Mass creation...'
+        OnClick = Masscreation1Click
+      end
       object N3: TMenuItem
         Caption = '-'
       end
       object Options1: TMenuItem
-        Caption = 'Options'
+        Caption = '&Options...'
         OnClick = Options1Click
       end
     end
