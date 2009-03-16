@@ -120,7 +120,7 @@ end;
 
 procedure TfrmCreator.Masscreation1Click(Sender: TObject);
 begin
-  JvBrowseFolder2.Title := 'Mass extract to...';
+  JvBrowseFolder2.Title := 'Mass create from...';
   JvBrowseFolder2.Options := [odStatusAvailable,odNewDialogStyle];
   if JvBrowseFolder2.Execute then
     QueueMassCreation(JvBrowseFolder2.Directory);

@@ -124,6 +124,7 @@ object frmCreator: TfrmCreator
       end
       object Masscreation1: TMenuItem
         Caption = '&Mass creation...'
+        ShortCut = 113
         OnClick = Masscreation1Click
       end
       object N3: TMenuItem
@@ -131,6 +132,7 @@ object frmCreator: TfrmCreator
       end
       object Options1: TMenuItem
         Caption = '&Options...'
+        ShortCut = 121
         OnClick = Options1Click
       end
     end
