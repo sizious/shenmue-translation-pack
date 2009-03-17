@@ -2,8 +2,8 @@ program idx_creator_v2;
 
 uses
   Forms,
-  Unit1 in 'Unit1.pas' {Form1},
-  variables in 'variables.pas';
+  variables in 'variables.pas',
+  main in 'main.pas' {Form1};
 
 {$R *.res}
 
