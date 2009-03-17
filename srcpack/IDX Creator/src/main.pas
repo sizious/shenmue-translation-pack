@@ -19,10 +19,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, cStreams, ComCtrls, UIntList, ExtCtrls;
+  Dialogs, StdCtrls, cStreams, ComCtrls, UIntList, ExtCtrls, XPMan;
 
 type
-  TForm1 = class(TForm)
+  TfrmMain = class(TForm)
     GroupBox1: TGroupBox;
     CreateIdxBt: TButton;
     OpenDialog1: TOpenDialog;
@@ -35,6 +35,7 @@ type
     ProgressBar1: TProgressBar;
     Panel1: TPanel;
     StatusBar1: TStatusBar;
+    XPManifest1: TXPManifest;
     procedure BrowseAfsBtClick(Sender: TObject);
     procedure BrowseIdxBtClick(Sender: TObject);
     procedure CreateIdxBtClick(Sender: TObject);
@@ -47,7 +48,7 @@ type
   end;
 
 var
-  Form1: TForm1;
+  frmMain: TfrmMain;
 
 implementation
 uses variables;
@@ -67,7 +68,7 @@ begin
         Result := Copy(s, 1, pos(substr, s)-1);
 end;
 
-procedure TForm1.create_idx_file(input_afs:String; output_idx:String);
+procedure TfrmMain.create_idx_file(input_afs:String; output_idx:String);
 var fafs, fidx:TFileStream; buffer:String;
 i, i2, int_buffer, total_files, list_offset, current_offset, srf_size:Integer;
 file_begin, file_end, temp_int:Integer; Check:Boolean;
@@ -346,7 +347,7 @@ begin
         fafs.Free;
 end;
 
-procedure TForm1.BrowseAfsBtClick(Sender: TObject);
+procedure TfrmMain.BrowseAfsBtClick(Sender: TObject);
 begin
         OpenDialog1.Filter := 'AFS file (*.afs)|*.afs';
 
@@ -356,7 +357,7 @@ begin
         end;
 end;
 
-procedure TForm1.BrowseIdxBtClick(Sender: TObject);
+procedure TfrmMain.BrowseIdxBtClick(Sender: TObject);
 begin
         SaveDialog1.Filter := 'IDX file (*.idx)|*.idx';
         SaveDialog1.DefaultExt := 'idx';
@@ -367,7 +368,7 @@ begin
         end;
 end;
 
-procedure TForm1.CreateIdxBtClick(Sender: TObject);
+procedure TfrmMain.CreateIdxBtClick(Sender: TObject);
 begin
         if (input_afs_txt.Text <> '') and (output_idx_txt.Text <> '') then
         begin

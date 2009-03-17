@@ -1,4 +1,4 @@
-object Form1: TForm1
+object frmMain: TfrmMain
   Left = 361
   Top = 124
   BorderIcons = [biSystemMenu, biMinimize]
@@ -7,10 +7,10 @@ object Form1: TForm1
   ClientHeight = 202
   ClientWidth = 329
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   PixelsPerInch = 96
@@ -110,5 +110,9 @@ object Form1: TForm1
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 48
     Top = 48
+  end
+  object XPManifest1: TXPManifest
+    Left = 78
+    Top = 46
   end
 end
