@@ -1,0 +1,34 @@
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
+
+1 VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 2,1,0,29
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040C04E4"
+        BEGIN
+            VALUE "CompanyName", "Created by [big_fury]SiZiOUS\0"
+            VALUE "FileDescription", "IDX Creator - Console\0"
+            VALUE "FileVersion", "1.0.0.0\0"
+            VALUE "InternalName", "IDXMAKER\0"
+            VALUE "LegalCopyright", "© Copyleft 2002-2009\0"
+            VALUE "LegalTrademarks", "Shenmue is copyrighted SEGA © 1999, 2001\0"
+            VALUE "OriginalFilename", "idxmaker.exe\0"
+            VALUE "ProductName", "IDX Creator - Console\0"
+            VALUE "ProductVersion", "2.1.0.0\0"
+            VALUE "Comments", "http://sbibuilder.shorturl.com/\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation",  0x040C 0x04E4
+    END
+END
+
