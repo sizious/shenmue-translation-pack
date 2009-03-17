@@ -23,7 +23,7 @@ uses
 
 const
   APP_VERSION = '2.1';
-  COMPIL_DATE_TIME = 'March 17, 2008 @04:51PM';
+  COMPIL_DATE_TIME = 'March 17, 2008 @06:28PM';
 
 type
   TGameVersion = (gvShenmue, gvShenmue2);
