@@ -12,14 +12,15 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  main, s2idx, progress, Math, Forms;
+  {$IFNDEF APPTYPE_CONSOLE}Main, Forms, Math, progress, {$ENDIF} s2idx;
 
-var
-  fProgressWindow: TfrmProgress;
 
 //------------------------------------------------------------------------------
 
 {$IFNDEF APPTYPE_CONSOLE}
+
+var
+  fProgressWindow: TfrmProgress;
 
 procedure S2IDX_OnStart(const MaxFiles: Integer);
 begin

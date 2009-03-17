@@ -1,5 +1,7 @@
 IDX Creator
+###########
 
 v2.1: IDX Creator for Shenmue and IDX Creator (for Shenmue II) merged in the same application.
+      Added the console version (v1.0) of IDX Creator (only for Shenmue II at this time sorry).
 
 v2.0.1: Initial Manic release
