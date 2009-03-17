@@ -8,6 +8,7 @@
     <Projects Include="AiO Subtitles Editor\src\shen_aio_subseditor_v1.dproj" />
     <Projects Include="Free Quest Subtitles Editor\src\s2fqsube.dproj" />
     <Projects Include="IDX Creator\src\idxcreator.dproj" />
+    <Projects Include="IDX Creator\src\idxmaker.dproj" />
     <Projects Include="SPR Utils\src\sprutils_v2.dproj" />
   </ItemGroup>
   <ProjectExtensions>
@@ -61,14 +62,23 @@
   <Target Name="idxcreator:Make">
     <MSBuild Projects="IDX Creator\src\idxcreator.dproj" Targets="Make" />
   </Target>
+  <Target Name="idxmaker">
+    <MSBuild Projects="IDX Creator\src\idxmaker.dproj" Targets="" />
+  </Target>
+  <Target Name="idxmaker:Clean">
+    <MSBuild Projects="IDX Creator\src\idxmaker.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="idxmaker:Make">
+    <MSBuild Projects="IDX Creator\src\idxmaker.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="afsutils_v2;shen_aio_subseditor_v1;s2fqsube;sprutils_v2;idxcreator" />
+    <CallTarget Targets="afsutils_v2;shen_aio_subseditor_v1;s2fqsube;sprutils_v2;idxcreator;idxmaker" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="afsutils_v2:Clean;shen_aio_subseditor_v1:Clean;s2fqsube:Clean;sprutils_v2:Clean;idxcreator:Clean" />
+    <CallTarget Targets="afsutils_v2:Clean;shen_aio_subseditor_v1:Clean;s2fqsube:Clean;sprutils_v2:Clean;idxcreator:Clean;idxmaker:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="afsutils_v2:Make;shen_aio_subseditor_v1:Make;s2fqsube:Make;sprutils_v2:Make;idxcreator:Make" />
+    <CallTarget Targets="afsutils_v2:Make;shen_aio_subseditor_v1:Make;s2fqsube:Make;sprutils_v2:Make;idxcreator:Make;idxmaker:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
