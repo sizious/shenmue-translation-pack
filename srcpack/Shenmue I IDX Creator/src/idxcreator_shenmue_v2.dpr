@@ -10,7 +10,8 @@ uses
   UIdxTemplateCreation in 'engine\UIdxTemplateCreation.pas',
   UIdxCreation in 'engine\UIdxCreation.pas',
   progress in 'progress.pas' {frmProgress},
-  xmlutils in 'engine\xmlutils.pas';
+  xmlutils in 'engine\xmlutils.pas',
+  s2idx in 'engine\s2idx.pas';
 
 {$R *.res}
 
