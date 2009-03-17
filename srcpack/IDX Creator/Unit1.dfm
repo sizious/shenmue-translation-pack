@@ -79,8 +79,6 @@ object Form1: TForm1
     Top = 160
     Width = 177
     Height = 17
-    Min = 0
-    Max = 100
     Smooth = True
     TabOrder = 3
   end
@@ -102,7 +100,6 @@ object Form1: TForm1
       item
         Width = 50
       end>
-    SimplePanel = False
   end
   object OpenDialog1: TOpenDialog
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
@@ -113,5 +110,9 @@ object Form1: TForm1
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 48
     Top = 48
+  end
+  object XPManifest1: TXPManifest
+    Left = 8
+    Top = 154
   end
 end

@@ -19,7 +19,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, cStreams, ComCtrls, UIntList, ExtCtrls;
+  Dialogs, StdCtrls, cStreams, ComCtrls, UIntList, ExtCtrls, XPMan;
 
 type
   TForm1 = class(TForm)
@@ -35,6 +35,7 @@ type
     ProgressBar1: TProgressBar;
     Panel1: TPanel;
     StatusBar1: TStatusBar;
+    XPManifest1: TXPManifest;
     procedure BrowseAfsBtClick(Sender: TObject);
     procedure BrowseIdxBtClick(Sender: TObject);
     procedure CreateIdxBtClick(Sender: TObject);
