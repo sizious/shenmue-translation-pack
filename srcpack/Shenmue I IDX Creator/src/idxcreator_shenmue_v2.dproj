@@ -33,6 +33,7 @@
     <DelphiCompile Include="idxcreator_shenmue_v2.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="engine\s2idx.pas" />
     <DCCReference Include="engine\UAfsStruct.pas" />
     <DCCReference Include="engine\UIdxCreation.pas" />
     <DCCReference Include="engine\UIdxStruct.pas" />
