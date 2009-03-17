@@ -1,0 +1,5 @@
+IDX Creator
+
+v2.1: IDX Creator for Shenmue and IDX Creator (for Shenmue II) merged in the same application.
+
+v2.0.1: Initial Manic release
