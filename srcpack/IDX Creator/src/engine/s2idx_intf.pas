@@ -1,11 +1,16 @@
+//    This file is part of IDX Creator.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with IDX Creator.  If not, see <http://www.gnu.org/licenses/>.
+
 unit s2idx_intf;
 
 interface
 
 uses
-  SysUtils;
+  Windows, SysUtils;
   
-procedure CreateShenmue2Idx(const ModifiedAFS, OutputIDX: string);
+function CreateShenmue2Idx(const ModifiedAFS, OutputIDX: string): Boolean;
 
 //------------------------------------------------------------------------------
 implementation
@@ -69,7 +74,7 @@ end;
 
 procedure S2IDX_OnStatus(const Message: string);
 begin
-  WriteLn(Message);
+  WriteLn('[i] ', Message);
 end;
 
 procedure S2IDX_OnProgress();
@@ -86,20 +91,26 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure CreateShenmue2Idx(const ModifiedAFS, OutputIDX: string);
+function CreateShenmue2Idx(const ModifiedAFS, OutputIDX: string): Boolean;
 var
   S2IDXCreator: TS2IDXCreator;
   
 begin
+  Result := False;
   S2IDXCreator := TS2IDXCreator.Create;
   try
     S2IDXCreator.OnStart := S2IDX_OnStart;
     S2IDXCreator.OnStatus := S2IDX_OnStatus;
     S2IDXCreator.OnProgress := S2IDX_OnProgress;
     S2IDXCreator.OnCompleted := S2IDX_OnCompleted;
-    S2IDXCreator.MakeIDX(ModifiedAFS, OutputIDX);
+    try
+      Result := S2IDXCreator.MakeIDX(ModifiedAFS, OutputIDX);
+    except
+      Result := False;
+    end;
   finally
     S2IDXCreator.Free;
+    if not Result then if FileExists(OutputIDX) then DeleteFile(OutputIDX);    
   end;
 end;
 

@@ -1,14 +1,14 @@
-//    This file is part of IDX Creator for Shenmue.
+//    This file is part of IDX Creator.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with IDX Creator for Shenmue.  If not, see <http://www.gnu.org/licenses/>.
+//    along with IDX Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 unit UIdxTemplateCreation;
 
 interface
 
 uses
-  Classes, SysUtils, Forms, Math, progress;
+  Classes, SysUtils, Math {$IFNDEF APPTYPE_CONSOLE}, Forms, progress{$ENDIF};
 
 type
   TIdxTemplateCreation = class(TThread)
@@ -18,17 +18,21 @@ type
     fNewAfsName: TFileName;
     fOldIdxName: TFileName;
     fOldAfsName: TFileName;
-    fProgressCount: Integer;
+    fProgressCount: Integer; //Used to track creation progress
+    {$IFNDEF APPTYPE_CONSOLE}
     fCurrentTask: String;
     fProgressWindow: TfrmProgress;
+    {$ENDIF}
     function VerifyCount(const OldIdxCount, OldAfsCount, NewAfsCount: Integer): Boolean;
-    procedure SyncPercentage;
     procedure SyncCurrentTask(const Task: String);
+    {$IFNDEF APPTYPE_CONSOLE}
+    procedure SyncPercentage;
     procedure SyncDefaultFormValue;
     procedure UpdatePercentage;
     procedure UpdateCurrentTask;
     procedure UpdateDefaultFormValue;
     procedure CancelBtnClick(Sender: TObject);
+    {$ENDIF}
     procedure RaiseError;
     procedure CloseThread(Sender: TObject);
   protected
@@ -54,7 +58,7 @@ begin
   fOldIdxName := OldIdxFileName;
   fOldAfsName := OldAfsFileName;
 
-  fProgressWindow := TfrmProgress.Create(nil);
+  {$IFNDEF APPTYPE_CONSOLE}fProgressWindow := TfrmProgress.Create(nil);{$ENDIF}
   ThreadTerminated := False;
   ErrorRaised := False;
   OnTerminate := CloseThread;
@@ -68,85 +72,100 @@ var
   i, j, subNum, subOffset, lastSrf: Integer;
   srfNum: Word;
 begin
-  //Creating instance and loading files
-  oldIdx := TIdxStruct.Create;
-  oldIdx.LoadFromFile(fOldIdxName);
-  oldAfs := TAfsStruct.Create;
-  oldAfs.LoadFromFile(fOldAfsName);
-  newAfs := TAfsStruct.Create;
-  newAfs.LoadFromFile(fNewAfsName);
+  oldIdx := nil;
+  oldSrf := nil;
+  oldAfs := nil;
+  newAfs := nil;
+  newSrf := nil;
+  try
+    try
+      //Creating instance and loading files
+      oldIdx := TIdxStruct.Create;
+      oldIdx.LoadFromFile(fOldIdxName);
+      oldAfs := TAfsStruct.Create;
+      oldAfs.LoadFromFile(fOldAfsName);
+      newAfs := TAfsStruct.Create;
+      newAfs.LoadFromFile(fNewAfsName);
 
-  //newIdx is a copy of the old one that will be updated
-  newIdx := TIdxStruct.Create;
-  oldIdx.CopyTo(newIdx);
+      //newIdx is a copy of the old one that will be updated
+      newIdx := TIdxStruct.Create;
+      oldIdx.CopyTo(newIdx);
 
-  //Creating new instance of TSrfStruct
-  oldSrf := TSrfStruct.Create;
-  newSrf := TsrfStruct.Create;
+      //Creating new instance of TSrfStruct
+      oldSrf := TSrfStruct.Create;
+      newSrf := TsrfStruct.Create;
 
-  if not VerifyCount(oldIdx.Count+oldIdx.SrfCount, oldAfs.Count, newAfs.Count) then begin
-    RaiseError;
-  end
-  else begin
-    fProgressCount := oldIdx.Count;
-    SyncDefaultFormValue;
-  end;
+      if not VerifyCount(oldIdx.Count+oldIdx.SrfCount, oldAfs.Count, newAfs.Count) then begin
+        RaiseError;
+      end
+      else begin
+        fProgressCount := oldIdx.Count;
+        {$IFNDEF APPTYPE_CONSOLE}SyncDefaultFormValue;{$ENDIF}
+      end;
 
-  lastSrf := -1;
-  subNum := -1;
-  for i := 0 to oldIdx.Count - 1 do begin
-    if not Terminated then begin
-      srfNum := oldIdx.Items[i].LinkedSrf;
-      subOffset := oldIdx.Items[i].SubOffset;
+      lastSrf := -1;
+      subNum := -1;
+      for i := 0 to oldIdx.Count - 1 do begin
+        if not Terminated then begin
+          srfNum := oldIdx.Items[i].LinkedSrf;
+          subOffset := oldIdx.Items[i].SubOffset;
 
-      if (srfNum <= oldAfs.Count) then begin
-        //Loading original and new SRF
-        if srfNum <> lastSrf then begin
-          oldSrf.LoadFromFile(oldAfs.FileName, oldAfs.Items[srfNum].Offset, oldAfs.Items[srfNum].Size);
-          newSrf.LoadFromFile(newAfs.FileName, newAfs.Items[srfNum].Offset, newAfs.Items[srfNum].Size);
-        end;
+          if (srfNum <= oldAfs.Count) then begin
+            //Loading original and new SRF
+            if srfNum <> lastSrf then begin
+              oldSrf.LoadFromFile(oldAfs.FileName, oldAfs.Items[srfNum].Offset, oldAfs.Items[srfNum].Size);
+              newSrf.LoadFromFile(newAfs.FileName, newAfs.Items[srfNum].Offset, newAfs.Items[srfNum].Size);
+            end;
 
-        //Finding new offset
-        for j := 0 to oldSrf.Count - 1 do begin
-          if subOffset = oldSrf.Items[j].Offset then begin
-            subNum := j;
-            Break;
+            //Finding new offset
+            for j := 0 to oldSrf.Count - 1 do begin
+              if subOffset = oldSrf.Items[j].Offset then begin
+                subNum := j;
+                Break;
+              end;
+            end;
+
+            //Updating newIdx
+            SyncCurrentTask('Updating IDX... entry #'+IntToStr(i));
+            if subNum <> -1 then begin
+              subOffset := newSrf.Items[subNum].Offset;
+              newIdx.Items[i].SubOffset := subOffset;
+            end
+            else begin
+              RaiseError;
+            end;
           end;
-        end;
 
-        //Updating newIdx
-        SyncCurrentTask('Updating IDX... entry #'+IntToStr(i));
-        if subNum <> -1 then begin
-          subOffset := newSrf.Items[subNum].Offset;
-          newIdx.Items[i].SubOffset := subOffset;
+          //Keeping SRF number and updating form
+          lastSrf := srfNum;
+          {$IFNDEF APPTYPE_CONSOLE}SyncPercentage;{$ENDIF}
         end
         else begin
-          RaiseError;
+          Break;
         end;
       end;
-    
-      //Keeping SRF number and updating form
-      lastSrf := srfNum;
-      SyncPercentage;
-    end
-    else begin
-      Break;
+
+      //Saving new IDX
+      if not Terminated then begin
+        SyncCurrentTask('Saving new IDX...');
+        newIdx.SaveToFile(fNewIdxName);
+      end;
+
+    except
+      RaiseError;
     end;
+
+  finally
+    //Freeing main var
+    oldSrf.Free;
+    newSrf.Free;
+    oldIdx.Free;
+    oldAfs.Free;
+    newIdx.Free;
+    newAfs.Free;
   end;
 
-  //Saving new IDX
-  if not Terminated then begin
-    SyncCurrentTask('Saving new IDX...');
-    newIdx.SaveToFile(fNewIdxName);
-  end;
-
-  //Freeing main var
-  oldSrf.Free;
-  newSrf.Free;
-  oldIdx.Free;
-  oldAfs.Free;
-  newIdx.Free;
-  newAfs.Free;
+  {$IFDEF APPTYPE_CONSOLE}CloseThread(Self);{$ENDIF}
 end;
 
 function TIdxTemplateCreation.VerifyCount(const OldIdxCount, OldAfsCount, NewAfsCount: Integer): Boolean;
@@ -160,15 +179,21 @@ begin
   end;
 end;
 
+procedure TIdxTemplateCreation.SyncCurrentTask(const Task: string);
+begin
+  {$IFNDEF APPTYPE_CONSOLE}
+  fCurrentTask := Task;
+  Synchronize(UpdateCurrentTask);
+  {$ELSE}
+  WriteLn('[i] ', Task);
+  {$ENDIF}
+end;
+
+{$IFNDEF APPTYPE_CONSOLE}
+
 procedure TIdxTemplateCreation.SyncPercentage;
 begin
   Synchronize(UpdatePercentage);
-end;
-
-procedure TIdxTemplateCreation.SyncCurrentTask(const Task: string);
-begin
-  fCurrentTask := Task;
-  Synchronize(UpdateCurrentTask);
 end;
 
 procedure TIdxTemplateCreation.SyncDefaultFormValue;
@@ -210,6 +235,8 @@ begin
   Terminate;
 end;
 
+{$ENDIF}
+
 procedure TIdxTemplateCreation.RaiseError;
 begin
   ErrorRaised := True;
@@ -218,9 +245,11 @@ end;
 
 procedure TIdxTemplateCreation.CloseThread(Sender: TObject);
 begin
+  {$IFNDEF APPTYPE_CONSOLE}
   if Assigned(fProgressWindow) then begin
     fProgressWindow.Release;
   end;
+  {$ENDIF}
   ThreadTerminated := True;
 end;
 

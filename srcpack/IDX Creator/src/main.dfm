@@ -5080,9 +5080,10 @@ object frmMain: TfrmMain
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 8
-    Top = 63
+    Top = 59
     Width = 377
     Height = 85
+    Caption = '    '
     TabOrder = 0
     object lblOldIdx: TLabel
       Left = 8
@@ -5133,7 +5134,7 @@ object frmMain: TfrmMain
   end
   object templateChkBox: TCheckBox
     Left = 20
-    Top = 54
+    Top = 56
     Width = 121
     Height = 17
     Caption = 'Create with template'
@@ -5148,9 +5149,9 @@ object frmMain: TfrmMain
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 154
+    Top = 152
     Width = 377
-    Height = 81
+    Height = 83
     Caption = ' Needed files: '
     TabOrder = 2
     object lblModAfs: TLabel
@@ -5229,10 +5230,10 @@ object frmMain: TfrmMain
   end
   object rgGame: TRadioGroup
     Left = 8
-    Top = 5
+    Top = 8
     Width = 377
     Height = 44
-    Caption = ' Select game to generate the proper IDX format:  '
+    Caption = 'Select the game to generate the proper IDX format : '
     Columns = 2
     ItemIndex = 0
     Items.Strings = (
@@ -5250,5 +5251,10 @@ object frmMain: TfrmMain
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Left = 260
     Top = 248
+  end
+  object appEvents: TApplicationEvents
+    OnException = appEventsException
+    Left = 198
+    Top = 246
   end
 end

@@ -15,7 +15,7 @@
  ### SHENMUE TRANSLATION PACK ################################################
  
  
- ### HOW TO COMPILE ##########################################################
+ ### COMMENT COMPILER ########################################################
   
  Composants additionnels requis pour la compilation:
 	* DFF Library -> http://www.delphiforfun.org/Programs/Library/Default.htm

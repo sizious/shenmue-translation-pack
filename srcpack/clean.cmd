@@ -49,7 +49,7 @@ goto CLEAN
 REM "Shenmue I IDX Creator"
 :NEXT_4
 set SECTION_NEXT_INDEX=5
-set SECTION_NAME="Shenmue I IDX Creator"
+set SECTION_NAME="Model Objects Editor"
 goto CLEAN
 
 REM "SPR Utils"

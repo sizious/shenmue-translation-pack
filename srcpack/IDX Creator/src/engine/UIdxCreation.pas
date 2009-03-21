@@ -1,14 +1,15 @@
-//    This file is part of IDX Creator for Shenmue.
+//    This file is part of IDX Creator.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with IDX Creator for Shenmue.  If not, see <http://www.gnu.org/licenses/>.
+//    along with IDX Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 unit UIdxCreation;
 
 interface
 
 uses
-  Classes, SysUtils, Forms, Math, progress, UAfsStruct, UIdxStruct, USrfStruct;
+  Windows, SysUtils, Classes, Messages, Math, UAfsStruct, UIdxStruct, USrfStruct
+  {$IFNDEF APPTYPE_CONSOLE}, Forms, progress{$ENDIF};
 
 type
   TIdxCreation = class(TThread)
@@ -16,20 +17,24 @@ type
     { Déclarations privées }
     fModAfsName: TFileName;
     fNewIdxName: TFileName;
+    fProgressCount: Integer; //Used to track creation progress
+    {$IFNDEF APPTYPE_CONSOLE}
     fCurrentTask: String;
-    fProgressCount: Integer;
     fProgressWindow: TfrmProgress;
+    {$ENDIF}
     procedure CreateIdx(var AfsStruct: TAfsStruct; var IdxStruct: TIdxStruct;
                         var SrfStruct: TSrfStruct; const Reversed: Boolean);
     function VerifyOrder(var AfsStruct: TAfsStruct): Boolean;
     function DeleteSubStr(Str, SubStr: String): String;
-    procedure SyncPercentage;
     procedure SyncCurrentTask(const Task: String);
+    {$IFNDEF APPTYPE_CONSOLE}
+    procedure SyncPercentage;
     procedure SyncDefaultFormValue;
     procedure UpdatePercentage;
     procedure UpdateCurrentTask;
     procedure UpdateDefaultFormValue;
     procedure CancelBtnClick(Sender: TObject);
+    {$ENDIF}
     procedure CloseThread(Sender: TObject);
   protected
     procedure Execute; override;
@@ -48,7 +53,7 @@ begin
 
   fModAfsName := AfsFileName;
   fNewIdxName := IdxFileName;
-  fProgressWindow := TfrmProgress.Create(nil);
+  {$IFNDEF APPTYPE_CONSOLE}fProgressWindow := TfrmProgress.Create(nil);{$ENDIF}
 
   ThreadTerminated := False;
   ErrorRaised := False;
@@ -61,33 +66,45 @@ var
   newIdx: TIdxStruct;
   newSrf: TSrfStruct;
   reversedOrder: Boolean;
+
 begin
-  //Creating instance and loading files if needed
-  newAfs := TAfsStruct.Create;
-  newAfs.LoadFromFile(fModAfsName);
-  newIdx := TIdxStruct.Create;
-  newSrf := TSrfStruct.Create;
+  try
 
-  fProgressCount := newAfs.Count;
-  if fProgressCount > 0 then begin
-    SyncDefaultFormValue;
-    //Verifying file order
-    reversedOrder := VerifyOrder(newAfs);
-    CreateIdx(newAfs, newIdx, newSrf, reversedOrder);
+    try
+      //Creating instance and loading files if needed
+      newAfs := TAfsStruct.Create;
+      newAfs.LoadFromFile(fModAfsName);
+      newIdx := TIdxStruct.Create;
+      newSrf := TSrfStruct.Create;
 
-    if not Terminated then begin
-      SyncCurrentTask('Saving new IDX...');
-      newIdx.SaveToFile(fNewIdxName);
+      fProgressCount := newAfs.Count;
+      if fProgressCount > 0 then begin
+        {$IFNDEF APPTYPE_CONSOLE}SyncDefaultFormValue;{$ENDIF}
+        //Verifying file order
+        reversedOrder := VerifyOrder(newAfs);
+        CreateIdx(newAfs, newIdx, newSrf, reversedOrder);
+
+        if not Terminated then begin
+          SyncCurrentTask('Saving new IDX...');
+          newIdx.SaveToFile(fNewIdxName);
+        end;
+      end
+      else begin
+        ErrorRaised := True;
+        Terminate;
+      end;
+
+    except
+      ErrorRaised := True;
     end;
-  end
-  else begin
-    ErrorRaised := True;
-    Terminate;
+
+  finally
+    newAfs.Free;
+    newIdx.Free;
+    newSrf.Free;
   end;
 
-  newAfs.Free;
-  newIdx.Free;
-  newSrf.Free;
+  {$IFDEF APPTYPE_CONSOLE}CloseThread(Self);{$ENDIF}
 end;
 
 procedure TIdxCreation.CreateIdx(var AfsStruct: TAfsStruct;
@@ -164,7 +181,7 @@ begin
         subCount := 0;
       end;
     end;
-    SyncPercentage;
+    {$IFNDEF APPTYPE_CONSOLE}SyncPercentage;{$ENDIF}
   end;
 end;
 
@@ -190,15 +207,21 @@ begin
   end;
 end;
 
+procedure TIdxCreation.SyncCurrentTask(const Task: string);
+begin
+  {$IFNDEF APPTYPE_CONSOLE}
+  fCurrentTask := Task;
+  Synchronize(UpdateCurrentTask);
+  {$ELSE}
+  WriteLn('[i] ', Task);
+  {$ENDIF}
+end;
+
+{$IFNDEF APPTYPE_CONSOLE}
+
 procedure TIdxCreation.SyncPercentage;
 begin
   Synchronize(UpdatePercentage);
-end;
-
-procedure TIdxCreation.SyncCurrentTask(const Task: string);
-begin
-  fCurrentTask := Task;
-  Synchronize(UpdateCurrentTask);
 end;
 
 procedure TIdxCreation.SyncDefaultFormValue;
@@ -240,11 +263,15 @@ begin
   Terminate;
 end;
 
+{$ENDIF}
+
 procedure TIdxCreation.CloseThread(Sender: TObject);
 begin
+  {$IFNDEF APPTYPE_CONSOLE}
   if Assigned(fProgressWindow) then begin
     fProgressWindow.Release;
   end;
+  {$ENDIF}
   ThreadTerminated := True;
 end;
 
