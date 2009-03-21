@@ -1,17 +1,17 @@
-//    This file is part of IDX Creator for Shenmue.
+//    This file is part of IDX Creator.
 //
-//    IDX Creator for Shenmue is free software: you can redistribute it and/or modify
+//    IDX Creator is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
 //    the Free Software Foundation, either version 3 of the License, or
 //    (at your option) any later version.
 //
-//    IDX Creator for Shenmue is distributed in the hope that it will be useful,
+//    IDX Creator is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //    GNU General Public License for more details.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with IDX Creator for Shenmue.  If not, see <http://www.gnu.org/licenses/>.
+//    along with IDX Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 unit main;
 
@@ -19,11 +19,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, AppEvnts;
 
 const
-  APP_VERSION = '2.1';
-  COMPIL_DATE_TIME = 'March 17, 2008 @06:28PM';
+  APP_VERSION = '2.2';
+  COMPIL_DATE_TIME = 'March 20, 2009 @00:01AM';
 
 type
   TGameVersion = (gvShenmue, gvShenmue2);
@@ -50,6 +50,7 @@ type
     StatusBar1: TStatusBar;
     cbConfig: TCheckBox;
     rgGame: TRadioGroup;
+    appEvents: TApplicationEvents;
     procedure btBrowseOldIdxClick(Sender: TObject);
     procedure btBrowseOldAfsClick(Sender: TObject);
     procedure btBrowseModAfsClick(Sender: TObject);
@@ -59,6 +60,7 @@ type
     procedure btGoClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure rgGameClick(Sender: TObject);
+    procedure appEventsException(Sender: TObject; E: Exception);
   private
     { Déclarations privées }
     fOldAfsName, fOldIdxName, fModAfsName, fNewIdxName: TFileName;
@@ -73,6 +75,7 @@ type
   public
     { Déclarations publiques }
     procedure StatusChange(const Text: String);
+    function MsgBox(Message, Caption: string; Flags: Integer): Integer;
     property GameVersion: TGameVersion read fGameVersion write SetGameVersion;
   end;
 
@@ -87,6 +90,11 @@ procedure TfrmMain.GroupBoxActivation(const Activated: Boolean);
 begin
   GroupBox1.Enabled := Activated;
   GroupBox2.Enabled := Activated;
+end;
+
+function TfrmMain.MsgBox(Message, Caption: string; Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Message), PChar(Caption), Flags);
 end;
 
 procedure TfrmMain.TemplateActivation(const Activated: Boolean);
@@ -162,6 +170,7 @@ var
 begin
   Result := False;
   idxThread := TIdxCreation.Create(fModAfsName, fNewIdxName);
+
   repeat
     Application.ProcessMessages;
   until (idxThread.ThreadTerminated);
@@ -191,10 +200,10 @@ begin
 
     //Modifying form
     if threadCompleted then begin
-      StatusChange('New IDX saved to '+ExtractFileName(fNewIdxName));
+      StatusChange('Creation completed for '+ExtractFileName(fNewIdxName) + ' !');
     end
     else begin
-       StatusChange('Error during creation...');
+       StatusChange('"'+ExtractFileName(fModAfsName)+'" is not a valid Shenmue I AFS file. IDX creation stopped...');
     end;
     GroupBoxActivation(True);
   end
@@ -216,6 +225,16 @@ begin
   with templateChkBox do begin
     TemplateActivation(Checked);
   end;
+end;
+
+procedure TfrmMain.appEventsException(Sender: TObject; E: Exception);
+begin
+  MsgBox
+  (
+    'Unhandled exception message: "' + StringReplace(E.Message, #13#10, ' ', [rfReplaceAll]) + '".',
+    'Error',
+    MB_ICONERROR
+  );
 end;
 
 procedure TfrmMain.btBrowseModAfsClick(Sender: TObject);

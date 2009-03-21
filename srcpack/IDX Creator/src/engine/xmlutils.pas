@@ -1,7 +1,7 @@
-//    This file is part of IDX Creator for Shenmue.
+//    This file is part of IDX Creator.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with IDX Creator for Shenmue.  If not, see <http://www.gnu.org/licenses/>.
+//    along with IDX Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 unit xmlutils;
 

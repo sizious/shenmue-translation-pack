@@ -1,6 +1,9 @@
 IDX Creator
 ###########
 
+v2.2: Fixing bugs in "IDX Creator" (Win32 GUI version) when handling incorrect AFS files.
+      Fixing bugs and adding Shenmue I IDX creation support to IDX Maker (Console version). Thanks to Manic for this.
+
 v2.1: "IDX Creator for Shenmue" and "IDX Creator" (for Shenmue II) merged in the same application: "IDX Creator".
       Added the console version (v1.0, based on the new core v2.1 form "IDX Creator") (only for Shenmue II at this time sorry).
 
