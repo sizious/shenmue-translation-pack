@@ -1,6 +1,0 @@
-AFS Utils Changes
-#################
-
-2.1: Added a "Mass Creation" option (FamilyGuy request)
-
-2.01: Initial Manic release
