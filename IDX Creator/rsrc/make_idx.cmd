@@ -31,5 +31,5 @@ pause
 exit
 :ERROR
 ECHO.
-ECHO You must enter 1 or 2 !
+ECHO You must enter 1, 2 or 3 !
 goto start
