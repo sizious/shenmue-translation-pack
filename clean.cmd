@@ -58,9 +58,26 @@ set SECTION_NEXT_INDEX=6
 set SECTION_NAME="SPR Utils"
 goto CLEAN
 
-REM EXIT
 :NEXT_6
+echo [i] Cleaning up "Shenmue Subtitles Preview"...
+cd "Shenmue Subtitles Preview"
+call clean.cmd
+goto NEXT_7
+
+:NEXT_7
+set SECTION_NEXT_INDEX=8
+set SECTION_NAME="AiO Free Quest Subtitles Editor\Editor"
+goto CLEAN
+
+:NEXT_8
+set SECTION_NEXT_INDEX=9
+set SECTION_NAME="AiO Free Quest Subtitles Editor\Converter"
+goto CLEAN
+
 REM ADD NEW PROJECTS HERE
+
+REM EXIT
+:NEXT_9
 GOTO END
 
 :END
