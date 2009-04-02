@@ -1,5 +1,5 @@
 IDX Creator
-###########
+~~~~~~~~~~~
 
 [ I. DESCRIPTION ]
 

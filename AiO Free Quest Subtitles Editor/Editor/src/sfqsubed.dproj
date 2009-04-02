@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{e7dfe28d-5de8-48bf-a3bc-2edc10d466f8}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+    <DCC_DependencyCheckOutputName>..\bin\sfqsubed.exe</DCC_DependencyCheckOutputName>
+    <MainSource>sfqsubed.dpr</MainSource>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_ExeOutput>..\bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\obj</DCC_DcuOutput>
+    <DCC_ObjOutput>..\obj</DCC_ObjOutput>
+    <DCC_HppOutput>..\obj</DCC_HppOutput>
+    <DCC_Define>RELEASE</DCC_Define>
+    <DCC_UnitSearchPath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_UnitSearchPath>
+    <DCC_ResourcePath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_ResourcePath>
+    <DCC_ObjPath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_ObjPath>
+    <DCC_IncludePath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
+    <DCC_ExeOutput>..\bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\obj</DCC_DcuOutput>
+    <DCC_ObjOutput>..\obj</DCC_ObjOutput>
+    <DCC_HppOutput>..\obj</DCC_HppOutput>
+    <DCC_Define>DEBUG</DCC_Define>
+    <DCC_UnitSearchPath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_UnitSearchPath>
+    <DCC_ResourcePath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_ResourcePath>
+    <DCC_ObjPath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_ObjPath>
+    <DCC_IncludePath>C:\Program Files\CodeGear\RAD Studio\5.0\lib\DFFLib</DCC_IncludePath>
+    <DCC_Optimize>False</DCC_Optimize>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="RunParams">/c</Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">2</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">16</VersionInfo><VersionInfo Name="Build">543</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue AiO Free Quest Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="FileVersion">2.0.16.543</VersionInfoKeys><VersionInfoKeys Name="InternalName">s2fqsube</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2002, 2009</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">sfqsubed.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue AiO Free Quest Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">2.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">Thanks to Manic for his help. Shenmue Master Project 5. http://shenmuesubs.sourceforge.net/</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">sfqsubed.dpr</Source></Source><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
+    </Excluded_Packages></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
+  <ItemGroup>
+    <DelphiCompile Include="sfqsubed.dpr">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <RcCompile Include="..\..\..\Shenmue Subtitles Preview\src\font.rc">
+      <Form>..\..\..\Shenmue Subtitles Preview\src\font.res</Form>
+    </RcCompile>
+    <DCCReference Include="..\..\..\Shenmue Subtitles Preview\src\oldskool_font_mapper.pas" />
+    <DCCReference Include="..\..\..\Shenmue Subtitles Preview\src\oldskool_font_vcl.pas" />
+    <DCCReference Include="..\..\..\Shenmue Subtitles Preview\src\viewer.pas">
+      <Form>frmSubsPreview</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\..\Shenmue Subtitles Preview\src\viewer_intf.pas" />
+    <DCCReference Include="engine\batch\subsexp.pas" />
+    <DCCReference Include="engine\batch\subsimp.pas" />
+    <DCCReference Include="engine\charscnt.pas" />
+    <DCCReference Include="engine\charslst.pas" />
+    <DCCReference Include="engine\common.pas" />
+    <DCCReference Include="engine\fileslst.pas" />
+    <DCCReference Include="engine\multitrd\multiscan.pas" />
+    <DCCReference Include="engine\multitrd\multitrad.pas" />
+    <DCCReference Include="engine\npcinfo.pas" />
+    <DCCReference Include="engine\scnfedit.pas" />
+    <DCCReference Include="engine\scnfscan.pas" />
+    <DCCReference Include="engine\scnfutil.pas" />
+    <DCCReference Include="fileinfo.pas">
+      <Form>frmFileInfo</Form>
+    </DCCReference>
+    <DCCReference Include="main.pas">
+      <Form>frmMain</Form>
+    </DCCReference>
+    <DCCReference Include="massimp.pas">
+      <Form>frmMassImport</Form>
+    </DCCReference>
+    <DCCReference Include="multitrd.pas">
+      <Form>frmMultiTranslation</Form>
+    </DCCReference>
+    <DCCReference Include="progress.pas">
+      <Form>frmProgress</Form>
+    </DCCReference>
+    <DCCReference Include="seldir.pas">
+      <Form>frmSelectDir</Form>
+    </DCCReference>
+    <DCCReference Include="utils.pas" />
+    <DCCReference Include="vistaui.pas" />
+    <DCCReference Include="warning.pas">
+      <Form>frmWarning</Form>
+    </DCCReference>
+  </ItemGroup>
+</Project>
