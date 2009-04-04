@@ -438,11 +438,17 @@ end;
 function TSrfStruct.AddMarker(const Text: string): String;
 begin
   Result := StringReplace(Text, sLineBreak, LINE_BREAK, [rfReplaceAll]);
+
+  // Adding '...'
+  // Result := StringReplace(Result, '=@', '...', [rfReplaceAll]);
 end;
 
 function TSrfStruct.RemoveMarker(const Text: string): String;
 begin
   Result := StringReplace(Text, LINE_BREAK, sLineBreak, [rfReplaceAll]);
+
+  // Removing '...'
+  // Result := StringReplace(Result, '...', '=@', [rfReplaceAll]);
 end;
 
 function TSrfStruct.NullByteLength(const Size: Integer): Integer;
