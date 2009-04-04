@@ -104,6 +104,7 @@ type
     procedure miSubsPreviewClick(Sender: TObject);
     procedure ProjectHome1Click(Sender: TObject);
     procedure lvSubClick(Sender: TObject);
+    procedure lvSubKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Déclarations privées }
     SrfList: TStringList;
@@ -261,6 +262,12 @@ begin
   if (lvSub.Items.Count > 0) and (lvSub.ItemIndex >= 0) then begin
     FillSingleInfo(lvSub.ItemIndex);
   end;
+end;
+
+procedure TfrmMain.lvSubKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  lvSubClick(Self);
 end;
 
 procedure TfrmMain.LoadSrf(const FileName: TFileName);
