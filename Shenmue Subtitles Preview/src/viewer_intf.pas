@@ -75,7 +75,7 @@ end;
 
 procedure TSubtitlesPreviewWindow.Hide;
 begin
-  frmSubsPreview.Close;
+  if IsVisible then frmSubsPreview.Close;
 end;
 
 function TSubtitlesPreviewWindow.IsVisible: Boolean;
@@ -94,9 +94,9 @@ end;
 
 procedure TSubtitlesPreviewWindow.Show(Subtitle: string);
 begin
-  Update(Subtitle);
-  frmSubsPreview.FormStyle := fsNormal;
+  frmSubsPreview.FormStyle := fsStayOnTop;
   frmSubsPreview.Show;
+  Update(Subtitle);
 end;
 
 procedure TSubtitlesPreviewWindow.Update(Subtitle: string);
@@ -110,6 +110,8 @@ var
   i: Integer;
 
 begin
+  if not IsVisible then Exit;
+  
   if SubTitle = '' then begin
     Clear;
     Exit;

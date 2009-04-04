@@ -20,11 +20,11 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, ComCtrls, StdCtrls, ExtCtrls, USrfStructAiO, JvBaseDlg,
-  JvBrowseFolder;
+  JvBrowseFolder, Viewer_Intf, ShellApi;
 
 const
-  APP_VERSION = '1.01';
-  COMPIL_DATE_TIME = 'August 6, 2008 @02:00 PM';
+  APP_VERSION = '1.1a';
+  COMPIL_DATE_TIME = 'April 4, 2009 @05:55PM';
 
 type
   TfrmMain = class(TForm)
@@ -60,7 +60,6 @@ type
     editGame: TEdit;
     editHeader: TEdit;
     editSubCnt: TEdit;
-    lbSub: TListBox;
     editChId: TEdit;
     lblChId: TLabel;
     memoLineCnt: TMemo;
@@ -76,12 +75,18 @@ type
     Closeselectedfile2: TMenuItem;
     Selectedfile1: TMenuItem;
     Massexportation1: TMenuItem;
+    View1: TMenuItem;
+    miSubsPreview: TMenuItem;
+    N5: TMenuItem;
+    ProjectHome1: TMenuItem;
+    lvSub: TListView;
+    mOldSub: TMemo;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure lbMainClick(Sender: TObject);
     procedure Openfiles1Click(Sender: TObject);
-    procedure lbSubClick(Sender: TObject);
     procedure memoTextChange(Sender: TObject);
     procedure Closeselectedfile1Click(Sender: TObject);
     procedure Closeallfiles1Click(Sender: TObject);
@@ -96,12 +101,16 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Selectedfile1Click(Sender: TObject);
     procedure Massexportation1Click(Sender: TObject);
+    procedure miSubsPreviewClick(Sender: TObject);
+    procedure ProjectHome1Click(Sender: TObject);
+    procedure lvSubClick(Sender: TObject);
   private
     { Déclarations privées }
     SrfList: TStringList;
     SrfStruct: TSrfStruct;
     fModified: Boolean;
     fNoEdit: Boolean;
+    fEnableSubtitlesPreview: Boolean;
     function MsgBox(const Text, Caption: String; Flags: Integer): Integer;
     procedure MenuActivation(const Activated: Boolean);
     procedure StatusChange(const Text: String; const PanelNum: Integer);
@@ -118,13 +127,18 @@ type
     procedure CountChars(const Text: String);
     procedure AddExtension(var FileName: TFileName; const Extension: String);
     procedure SaveModification;
+    procedure SetEnableSubtitlesPreview(const Value: Boolean);
+  protected
+    procedure PreviewerWindowCloseEvent(Sender: TObject);
   public
     { Déclarations publiques }
+    property EnableSubtitlesPreview: Boolean read fEnableSubtitlesPreview write SetEnableSubtitlesPreview;
   end;
 
 var
   frmMain: TfrmMain;
-
+  Previewer: TSubtitlesPreviewWindow;
+  
 implementation
 uses charsutils, subutils;
 {$R *.dfm}
@@ -151,6 +165,11 @@ begin
   Closeselectedfile2.Enabled := Activated;
 end;
 
+procedure TfrmMain.miSubsPreviewClick(Sender: TObject);
+begin
+  EnableSubtitlesPreview := not miSubsPreview.Checked;
+end;
+
 procedure TfrmMain.StatusChange(const Text: string; const PanelNum: Integer);
 begin
   StatusBar1.Panels[PanelNum].Text := Text;
@@ -167,6 +186,16 @@ begin
   end;
 end;
 
+procedure TfrmMain.SetEnableSubtitlesPreview(const Value: Boolean);
+begin
+  fEnableSubtitlesPreview := Value;
+  miSubsPreview.Checked := Value;
+  if Value then begin
+    Previewer.Show(memoText.Text)
+  end else
+    Previewer.Hide;
+end;
+
 procedure TfrmMain.SetGlobalMenu;
 var
   Activated: Boolean;
@@ -181,9 +210,10 @@ begin
   editGame.Clear;
   editHeader.Clear;
   editSubCnt.Clear;
-  lbSub.Clear;
+  lvSub.Clear;
   editChId.Clear;
   memoText.Clear;
+  mOldSub.Clear;
   memoLineCnt.Clear;
   editFileCnt.Text := IntToStr(lbMain.Count);
   memoText.Enabled := False;
@@ -226,6 +256,13 @@ begin
   end;
 end;
 
+procedure TfrmMain.lvSubClick(Sender: TObject);
+begin
+  if (lvSub.Items.Count > 0) and (lvSub.ItemIndex >= 0) then begin
+    FillSingleInfo(lvSub.ItemIndex);
+  end;
+end;
+
 procedure TfrmMain.LoadSrf(const FileName: TFileName);
 begin
   SrfStruct.LoadFromFile(FileName);
@@ -250,7 +287,11 @@ begin
 
   editSubCnt.Text := IntToStr(SrfStruct.Count);
   for i := 0 to SrfStruct.Count - 1 do begin
-    lbSub.Items.Add('Subtitle #'+IntToStr(i+1));
+    with lvSub.Items.Add do begin
+      Caption := IntToStr(i+1);
+      SubItems.Add(SrfStruct.Items[i].CharName);
+      SubItems.Add(SrfStruct.Items[i].Text);
+    end;
   end;
 end;
 
@@ -271,8 +312,10 @@ begin
   if SrfEntry.Editable then begin
     memoText.Text := SrfEntry.Text;
     memoText.Enabled := True;
+    mOldSub.Text := SrfEntry.Text;
     fNoEdit := False;
     CountChars(memoText.Text);
+    Previewer.Update(memoText.Text);
   end
   else begin
     memoText.Text := 'No editable subtitle...';
@@ -283,11 +326,21 @@ end;
 
 procedure TfrmMain.PostImport;
 begin
-  if (lbSub.Count > 0) and (lbSub.ItemIndex >= 0) then begin
-    memoText.Text := SrfStruct.Items[lbSub.ItemIndex].Text;
+  if (lvSub.Items.Count > 0) and (lvSub.ItemIndex >= 0) then begin
+    memoText.Text := SrfStruct.Items[lvSub.ItemIndex].Text;
     CountChars(memoText.Text);
   end;
   SetModified(True);
+end;
+
+procedure TfrmMain.PreviewerWindowCloseEvent(Sender: TObject);
+begin
+  Self.miSubsPreview.Checked := False;
+end;
+
+procedure TfrmMain.ProjectHome1Click(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'http://shenmuesubs.sourceforge.net/', '', '', SW_SHOWNORMAL);
 end;
 
 procedure TfrmMain.MassExport(const Directory: string; const FilterIndex: Integer);
@@ -346,7 +399,7 @@ end;
 
 procedure TfrmMain.About1Click(Sender: TObject);
 begin
-  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
+  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+'Updated by [big_fury]SiZiOUS'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
 end;
 
 procedure TfrmMain.ShenmueI1Click(Sender: TObject);
@@ -500,21 +553,27 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SaveModification;
+
+  Previewer.Free;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  DataDir: TFileName;
+
 begin
   SrfList := TStringList.Create;
   SrfStruct := TSrfStruct.Create;
-
+  DataDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)+'\data');
+  
   //Accentuated characters list
   with ShenmueI1 do begin
-    SrfStruct.CharactersListOne := ExtractFilePath(Application.ExeName)+'chars_list_one.csv';
+    SrfStruct.CharactersListOne := DataDir + 'chars_list_one.csv';
     Enabled := SrfStruct.LoadCharsList(gvShenmueOne);
     Checked := Enabled;
   end;
   with ShenmueII1 do begin
-    SrfStruct.CharactersListTwo := ExtractFilePath(Application.ExeName)+'chars_list_two.csv';
+    SrfStruct.CharactersListTwo := DataDir + 'chars_list_two.csv';
     Enabled := SrfStruct.LoadCharsList(gvShenmueTwo);
     Checked := Enabled;
   end;
@@ -522,7 +581,14 @@ begin
   MenuActivation(False);
   SetModified(False);
   ClearInfos;
-  Caption := 'Shenmue AiO Subtitles Editor v'+APP_VERSION;
+  Caption := Application.Title + ' v' + APP_VERSION;
+  Application.Title := Caption;
+
+  Previewer := TSubtitlesPreviewWindow.Create;
+  Previewer.OnWindowClosed := PreviewerWindowCloseEvent;
+
+  Constraints.MinHeight := Height;
+  Constraints.MinWidth := Width;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -540,19 +606,16 @@ begin
   end;
 end;
 
-procedure TfrmMain.lbSubClick(Sender: TObject);
-begin
-  if (lbSub.Count > 0) and (lbSub.ItemIndex >= 0) then begin
-    FillSingleInfo(lbSub.ItemIndex);
-  end;
-end;
-
 procedure TfrmMain.memoTextChange(Sender: TObject);
 begin
   if not fNoEdit then begin
-    SrfStruct.Items[lbSub.ItemIndex].Text := memoText.Text;
+    SrfStruct.Items[lvSub.ItemIndex].Text := memoText.Text;
+    lvSub.Items[lvSub.ItemIndex].SubItems[1] := memoText.Text;
     CountChars(memoText.Text);
     SetModified(True);
+
+    if Previewer.IsVisible then
+      Previewer.Update(memoText.Text);
   end;
 end;
 

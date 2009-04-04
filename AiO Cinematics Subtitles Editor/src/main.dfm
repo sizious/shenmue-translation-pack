@@ -116,40 +116,48 @@ object frmMain: TfrmMain
     end
     object lblSubList: TLabel
       Left = 11
-      Top = 152
+      Top = 180
       Width = 61
       Height = 13
+      Anchors = [akLeft, akBottom]
       Caption = 'Subtitles list:'
     end
     object lblText: TLabel
       Left = 11
-      Top = 324
-      Width = 26
+      Top = 380
+      Width = 48
       Height = 13
-      Anchors = [akLeft]
-      Caption = 'Text:'
-      ExplicitTop = 261
+      Anchors = [akLeft, akBottom]
+      Caption = 'New text:'
     end
     object lblChId: TLabel
       Left = 11
-      Top = 211
+      Top = 271
       Width = 66
       Height = 13
+      Anchors = [akLeft, akBottom]
       Caption = 'Character ID:'
     end
     object lblLineCnt: TLabel
       Left = 11
-      Top = 433
+      Top = 441
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
       Caption = 'Lines count:'
-      ExplicitTop = 342
+    end
+    object Label1: TLabel
+      Left = 11
+      Top = 314
+      Width = 43
+      Height = 13
+      Anchors = [akLeft, akBottom]
+      Caption = 'Old text:'
     end
     object editGame: TEdit
-      Left = 144
+      Left = 96
       Top = 24
-      Width = 225
+      Width = 273
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
@@ -157,9 +165,9 @@ object frmMain: TfrmMain
       TabOrder = 0
     end
     object editHeader: TEdit
-      Left = 144
+      Left = 96
       Top = 56
-      Width = 225
+      Width = 273
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
@@ -167,52 +175,41 @@ object frmMain: TfrmMain
       TabOrder = 1
     end
     object editSubCnt: TEdit
-      Left = 144
+      Left = 96
       Top = 88
-      Width = 225
+      Width = 273
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
       ReadOnly = True
       TabOrder = 2
     end
-    object lbSub: TListBox
-      Left = 144
-      Top = 120
-      Width = 225
-      Height = 81
-      Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 13
-      TabOrder = 3
-      OnClick = lbSubClick
-    end
     object editChId: TEdit
-      Left = 144
-      Top = 208
-      Width = 225
+      Left = 96
+      Top = 268
+      Width = 273
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
+      Anchors = [akLeft, akRight, akBottom]
+      Color = clBtnFace
+      ReadOnly = True
+      TabOrder = 3
+    end
+    object memoLineCnt: TMemo
+      Left = 96
+      Top = 428
+      Width = 273
+      Height = 41
+      Anchors = [akLeft, akRight, akBottom]
       Color = clBtnFace
       ReadOnly = True
       TabOrder = 4
     end
-    object memoLineCnt: TMemo
-      Left = 144
-      Top = 408
-      Width = 225
-      Height = 52
-      Anchors = [akLeft, akRight, akBottom]
-      Color = clBtnFace
-      ReadOnly = True
-      ScrollBars = ssVertical
-      TabOrder = 5
-    end
     object memoText: TMemo
-      Left = 144
-      Top = 240
-      Width = 225
-      Height = 161
-      Anchors = [akLeft, akTop, akRight, akBottom]
+      Left = 96
+      Top = 362
+      Width = 273
+      Height = 60
+      Anchors = [akLeft, akRight, akBottom]
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
@@ -220,7 +217,51 @@ object frmMain: TfrmMain
       Font.Style = []
       ParentFont = False
       ScrollBars = ssHorizontal
+      TabOrder = 5
+      WordWrap = False
+      OnChange = memoTextChange
+    end
+    object lvSub: TListView
+      Left = 96
+      Top = 115
+      Width = 273
+      Height = 147
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      Columns = <
+        item
+          Caption = '#'
+          Width = 40
+        end
+        item
+          Caption = 'CharID'
+        end
+        item
+          AutoSize = True
+          Caption = 'Text'
+        end>
+      ColumnClick = False
+      ReadOnly = True
+      RowSelect = True
       TabOrder = 6
+      ViewStyle = vsReport
+      OnClick = lvSubClick
+    end
+    object mOldSub: TMemo
+      Left = 96
+      Top = 295
+      Width = 273
+      Height = 61
+      Anchors = [akLeft, akRight, akBottom]
+      Color = clBtnFace
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssHorizontal
+      TabOrder = 7
       WordWrap = False
       OnChange = memoTextChange
     end
@@ -266,8 +307,31 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object Exit1: TMenuItem
-        Caption = 'Exit'
+        Caption = '&Quit'
+        ShortCut = 16465
         OnClick = Exit1Click
+      end
+    end
+    object View1: TMenuItem
+      Caption = '&View'
+      object miSubsPreview: TMenuItem
+        Caption = '&Subtitles preview...'
+        ShortCut = 114
+        OnClick = miSubsPreviewClick
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Enablecharactersmodification1: TMenuItem
+        Caption = 'Characters modification'
+        object ShenmueI1: TMenuItem
+          Caption = 'Shenmue I'
+          OnClick = ShenmueI1Click
+        end
+        object ShenmueII1: TMenuItem
+          Caption = 'Shenmue II'
+          OnClick = ShenmueII1Click
+        end
       end
     end
     object Tools1: TMenuItem
@@ -287,25 +351,20 @@ object frmMain: TfrmMain
         Caption = 'Import subtitles...'
         OnClick = Importsubtitles1Click
       end
-      object N3: TMenuItem
-        Caption = '-'
-      end
-      object Enablecharactersmodification1: TMenuItem
-        Caption = 'Characters modification'
-        object ShenmueI1: TMenuItem
-          Caption = 'Shenmue I'
-          OnClick = ShenmueI1Click
-        end
-        object ShenmueII1: TMenuItem
-          Caption = 'Shenmue II'
-          OnClick = ShenmueII1Click
-        end
-      end
     end
     object Help1: TMenuItem
       Caption = 'Help'
+      object ProjectHome1: TMenuItem
+        Caption = 'Project Home...'
+        ShortCut = 112
+        OnClick = ProjectHome1Click
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
       object About1: TMenuItem
         Caption = 'About'
+        ShortCut = 123
         OnClick = About1Click
       end
     end
