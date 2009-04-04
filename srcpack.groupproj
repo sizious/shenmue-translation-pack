@@ -10,6 +10,7 @@
     <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
     <Projects Include="IDX Creator\src\idxcreator.dproj" />
     <Projects Include="IDX Creator\src\idxmaker.dproj" />
+    <Projects Include="Models Textures Editor\src\mteditor.dproj" />
     <Projects Include="Shenmue Subtitles Preview\src\debug\preview.dproj" />
     <Projects Include="SPR Utils\src\sprutils_v2.dproj" />
   </ItemGroup>
@@ -91,14 +92,23 @@
   <Target Name="scinsube:Make">
     <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
+  <Target Name="mteditor">
+    <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="" />
+  </Target>
+  <Target Name="mteditor:Clean">
+    <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="mteditor:Make">
+    <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="afsutils_v2;sprutils_v2;idxcreator;idxmaker;sfqsubed;convert;preview;scinsube" />
+    <CallTarget Targets="afsutils_v2;sprutils_v2;idxcreator;idxmaker;sfqsubed;convert;preview;scinsube;mteditor" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="afsutils_v2:Clean;sprutils_v2:Clean;idxcreator:Clean;idxmaker:Clean;sfqsubed:Clean;convert:Clean;preview:Clean;scinsube:Clean" />
+    <CallTarget Targets="afsutils_v2:Clean;sprutils_v2:Clean;idxcreator:Clean;idxmaker:Clean;sfqsubed:Clean;convert:Clean;preview:Clean;scinsube:Clean;mteditor:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="afsutils_v2:Make;sprutils_v2:Make;idxcreator:Make;idxmaker:Make;sfqsubed:Make;convert:Make;preview:Make;scinsube:Make" />
+    <CallTarget Targets="afsutils_v2:Make;sprutils_v2:Make;idxcreator:Make;idxmaker:Make;sfqsubed:Make;convert:Make;preview:Make;scinsube:Make;mteditor:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
