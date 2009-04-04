@@ -10,6 +10,7 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Menu = MainMenu1
   OldCreateOrder = False
   Position = poScreenCenter
@@ -116,10 +117,10 @@ object frmMain: TfrmMain
     end
     object lblSubList: TLabel
       Left = 11
-      Top = 180
+      Top = 186
       Width = 61
       Height = 13
-      Anchors = [akLeft, akBottom]
+      Anchors = [akLeft]
       Caption = 'Subtitles list:'
     end
     object lblText: TLabel
@@ -245,6 +246,7 @@ object frmMain: TfrmMain
       TabOrder = 6
       ViewStyle = vsReport
       OnClick = lvSubClick
+      OnKeyUp = lvSubKeyUp
     end
     object mOldSub: TMemo
       Left = 96
