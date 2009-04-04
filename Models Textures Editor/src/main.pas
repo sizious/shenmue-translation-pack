@@ -46,6 +46,7 @@ type
     procedure bExportClick(Sender: TObject);
     procedure Opendirectory1Click(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -86,8 +87,6 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   frmMain.Caption := Application.Title + ' - v' + APP_VERSION + ' - (C)reated by [big_fury]SiZiOUS';
-  Application.Title := frmMain.Caption;
-
   Clear;
   ModelEditor := TModelTexturedEditor.Create;
   fFilesList := TFilesList.Create;
@@ -97,6 +96,11 @@ procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   fFilesList.Free;
   ModelEditor.Free;
+end;
+
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+  Application.Title := frmMain.Caption;
 end;
 
 procedure TfrmMain.lbFilesListClick(Sender: TObject);
