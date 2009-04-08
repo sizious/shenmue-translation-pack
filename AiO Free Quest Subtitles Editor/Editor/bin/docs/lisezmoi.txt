@@ -23,7 +23,7 @@
  
   Shenmue AiO Free Quest Subtitles Editor est un logiciel Open Source qui 
   permet de modifier les sous-titres des personnages non jouables (NPC) 
-  de la série Shenmue 2, incluant:
+  de la série Shenmue, incluant:
   
     - What's Shenmue (DC)
     - Shenmue I (DC)
