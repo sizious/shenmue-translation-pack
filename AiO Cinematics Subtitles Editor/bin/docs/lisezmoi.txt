@@ -1,0 +1,85 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                                           _________________________________
+ __| Shenmue AiO Cinematics Subtitles Editor |_________________________________
+
+  Version...: 1.1
+  Date......: 8 avril 2009
+ __               _____________________________________________________________
+ __| DESCRiPTiON |_____________________________________________________________
+ 
+  Shenmue AiO Cinematics Subtitles Editor est un logiciel Open Source qui 
+  permet de modifier les sous-titres des cinématiques se déroulant dans la 
+  série Shenmue, incluant:
+  
+    - What's Shenmue (DC)
+    - Shenmue I (DC)
+    - Shenmue II (DC / XBOX)
+
+  Si vous voulez traduire les sous-titres des personnages non-joueurs (NPC)
+  lorsque vous êtes dans le mode quête libre (Free Quest), utilisez l'éditeur 
+  "Shenmue AiO Free Quest Subtitles Editor" à la place de celui-ci.
+ __               _____________________________________________________________
+ __| UTiLISATION |_____________________________________________________________
+
+  Les fichiers des sous-titres des cinématiques sont localisés dans des 
+  fichiers AFS localisés dans le dossier 'SCENE\<DISC_NUM>\STREAM' de chaque
+  disque.
+   
+  Premièrement, vous devez extraire le contenu de chaque AFS concerné dans un 
+  dossier. Pour reconnaitre si un AFS est potentiellement à traduire, 
+  ouvrez-le avec AFS Utils. Si un fichier avec l'extension ".srf" est inclu 
+  dans l'AFS, c'est qu'il s'agit d'un fichier AFS concerné. Un autre indicateur
+  est la présence d'un fichier IDX (Index) portant le même nom que l'AFS.
+  
+  En effet, les fichiers SRF sont les sous-titres à traduire avec ce
+  logiciel. La structure d'un AFS à traduire est la suivante:
+  
+  - Plusieurs fichiers audio (".str" ou ".ahx")
+  - Un ou plusieurs fichiers ".srf"
+  
+  Une fois que vous avez terminé la traduction du SRF, enregistrez votre 
+  fichier SRF modifié à la place du fichier SRF original. Reconstruisez l'AFS 
+  ainsi modifié avec AFS Utils.
+  
+  Une fois que vous êtes en possession de l'AFS modifié, vous devez 
+  reconstruire le fichier IDX correspondant. Pour cela, utilisez IDX Creator.
+  
+  Vous avez désormais un fichier AFS traduit ainsi que son IDX correspondant,
+  vous pouvez les remplacer à la place des anciens fichiers du jeu.
+ __                 ___________________________________________________________
+ __| iNFO SOFTWARE |___________________________________________________________
+
+  Ce programme utilise des fichiers supplémentaires. Tous ces fichiers sont
+  situés dans le dossier "data".
+  
+  Structure of the "data" directory:
+    - chars_list_one.csv : Support des caractères accentués pour Shenmue I.
+	- chars_list_two.csv : Support des caractères accentués pour Shenmue II.
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge: https://sourceforge.net/projects/shenmuesubs/
+  Licence: http://www.gnu.org/licenses/gpl.html
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Code additionnel....: Manic
+  Tests Alpha/Beta....: Shendream, Sadako
+ _____________________________________________________________________[ FIN ]___

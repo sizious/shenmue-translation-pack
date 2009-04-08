@@ -23,7 +23,7 @@ uses
   JvBrowseFolder, Viewer_Intf, ShellApi;
 
 const
-  APP_VERSION = '1.1a';
+  APP_VERSION = '1.1';
   COMPIL_DATE_TIME = 'April 4, 2009 @05:55PM';
 
 type
@@ -131,6 +131,8 @@ type
     procedure SetEnableSubtitlesPreview(const Value: Boolean);
   protected
     procedure PreviewerWindowCloseEvent(Sender: TObject);
+    function SpecialEncodeText(const Subtitle: string; EncodeCR: Boolean): string;
+    function SpecialDecodeText(const Subtitle: string; DecodeCR: Boolean): string;
   public
     { Déclarations publiques }
     property EnableSubtitlesPreview: Boolean read fEnableSubtitlesPreview write SetEnableSubtitlesPreview;
@@ -297,7 +299,7 @@ begin
     with lvSub.Items.Add do begin
       Caption := IntToStr(i+1);
       SubItems.Add(SrfStruct.Items[i].CharName);
-      SubItems.Add(SrfStruct.Items[i].Text);
+      SubItems.Add(SpecialDecodeText(SrfStruct.Items[i].Text, True));
     end;
   end;
 end;
@@ -317,9 +319,9 @@ begin
   end;
 
   if SrfEntry.Editable then begin
-    memoText.Text := SrfEntry.Text;
+    memoText.Text := SpecialDecodeText(SrfEntry.Text, False);
     memoText.Enabled := True;
-    mOldSub.Text := SrfEntry.Text;
+    mOldSub.Text := memoText.Text;
     fNoEdit := False;
     CountChars(memoText.Text);
     Previewer.Update(memoText.Text);
@@ -334,7 +336,7 @@ end;
 procedure TfrmMain.PostImport;
 begin
   if (lvSub.Items.Count > 0) and (lvSub.ItemIndex >= 0) then begin
-    memoText.Text := SrfStruct.Items[lvSub.ItemIndex].Text;
+    memoText.Text := SpecialDecodeText(SrfStruct.Items[lvSub.ItemIndex].Text, False);
     CountChars(memoText.Text);
   end;
   SetModified(True);
@@ -423,6 +425,18 @@ begin
     Checked := not Checked;
     SrfStruct.UseCharsListTwo := Checked;
   end;
+end;
+
+function TfrmMain.SpecialDecodeText(const Subtitle: string; DecodeCR: Boolean): string;
+begin
+  Result := StringReplace(Subtitle, '=@', '...', [rfReplaceAll]);
+  if DecodeCR then Result := StringReplace(Result, #13#10, '<br>', [rfReplaceAll]);  
+end;
+
+function TfrmMain.SpecialEncodeText(const Subtitle: string; EncodeCR: Boolean): string;
+begin
+  Result := StringReplace(Subtitle, '...', '=@', [rfReplaceAll]);
+  if EncodeCR then Result := StringReplace(Result, '<br>', #13#10, [rfReplaceAll]);
 end;
 
 procedure TfrmMain.Save1Click(Sender: TObject);
@@ -616,8 +630,8 @@ end;
 procedure TfrmMain.memoTextChange(Sender: TObject);
 begin
   if not fNoEdit then begin
-    SrfStruct.Items[lvSub.ItemIndex].Text := memoText.Text;
-    lvSub.Items[lvSub.ItemIndex].SubItems[1] := memoText.Text;
+    SrfStruct.Items[lvSub.ItemIndex].Text := SpecialEncodeText(memoText.Text, False);
+    lvSub.Items[lvSub.ItemIndex].SubItems[1] := SpecialDecodeText(memoText.Text, True);
     CountChars(memoText.Text);
     SetModified(True);
 

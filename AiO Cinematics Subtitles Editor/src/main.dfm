@@ -117,7 +117,7 @@ object frmMain: TfrmMain
     end
     object lblSubList: TLabel
       Left = 11
-      Top = 186
+      Top = 188
       Width = 61
       Height = 13
       Anchors = [akLeft]
@@ -125,7 +125,7 @@ object frmMain: TfrmMain
     end
     object lblText: TLabel
       Left = 11
-      Top = 380
+      Top = 374
       Width = 48
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -133,7 +133,7 @@ object frmMain: TfrmMain
     end
     object lblChId: TLabel
       Left = 11
-      Top = 271
+      Top = 263
       Width = 66
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -141,7 +141,7 @@ object frmMain: TfrmMain
     end
     object lblLineCnt: TLabel
       Left = 11
-      Top = 441
+      Top = 433
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -149,7 +149,7 @@ object frmMain: TfrmMain
     end
     object Label1: TLabel
       Left = 11
-      Top = 314
+      Top = 308
       Width = 43
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -187,7 +187,7 @@ object frmMain: TfrmMain
     end
     object editChId: TEdit
       Left = 96
-      Top = 268
+      Top = 260
       Width = 273
       Height = 21
       Anchors = [akLeft, akRight, akBottom]
@@ -197,9 +197,9 @@ object frmMain: TfrmMain
     end
     object memoLineCnt: TMemo
       Left = 96
-      Top = 428
+      Top = 420
       Width = 273
-      Height = 41
+      Height = 49
       Anchors = [akLeft, akRight, akBottom]
       Color = clBtnFace
       ReadOnly = True
@@ -207,7 +207,7 @@ object frmMain: TfrmMain
     end
     object memoText: TMemo
       Left = 96
-      Top = 362
+      Top = 354
       Width = 273
       Height = 60
       Anchors = [akLeft, akRight, akBottom]
@@ -226,7 +226,7 @@ object frmMain: TfrmMain
       Left = 96
       Top = 115
       Width = 273
-      Height = 147
+      Height = 139
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = <
         item
@@ -250,7 +250,7 @@ object frmMain: TfrmMain
     end
     object mOldSub: TMemo
       Left = 96
-      Top = 295
+      Top = 287
       Width = 273
       Height = 61
       Anchors = [akLeft, akRight, akBottom]
