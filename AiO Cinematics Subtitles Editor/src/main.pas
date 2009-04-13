@@ -24,7 +24,7 @@ uses
 
 const
   APP_VERSION = '1.1';
-  COMPIL_DATE_TIME = 'April 4, 2009 @05:55PM';
+  COMPIL_DATE_TIME = 'April 8, 2009 @11:49PM';
 
 type
   TfrmMain = class(TForm)
