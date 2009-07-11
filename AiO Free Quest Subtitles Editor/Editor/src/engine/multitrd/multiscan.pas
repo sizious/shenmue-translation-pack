@@ -3,7 +3,7 @@ unit multiscan;
 interface
 
 uses
-  SysUtils, Classes, Forms, Math, DCL_Intf, HashMap;
+  SysUtils, Classes, Forms, Math, TextData; //, DCL_Intf, HashMap;
 
 type
   TMultiTranslationSubtitlesRetriever = class(TThread)
@@ -23,12 +23,16 @@ type
     procedure SyncUpdateProgressOperation;
     procedure SyncUpdateScnfFileList;
 
-    PROCEDURE TEST_METHOD;
+//    PROCEDURE TEST_METHOD;
+//    PROCEDURE CLEAR_COMBO;
   protected
     procedure Execute; override;
   public
     constructor Create(const BaseDir, FileList: string);
   end;
+
+var
+  MultiTranslationTextData: TMultiTranslationTextData;
 
 // -----------------------------------------------------------------------------
 implementation
@@ -38,7 +42,7 @@ uses
   Main, Progress, ScnfEdit;
 
 // -----------------------------------------------------------------------------
-{ TSCNFScanDirectory }
+{ TMultiTranslationSubtitlesRetriever }
 // -----------------------------------------------------------------------------
 
 constructor TMultiTranslationSubtitlesRetriever.Create(const BaseDir,
@@ -55,18 +59,24 @@ procedure TMultiTranslationSubtitlesRetriever.Execute;
 var
   i, j: Integer;
   BaseDir, FileName: TFileName;
-  hm: IStrMap;
   _tmp_scnf_edit: TSCNFEditor;
-  Key: string;
-  Value: TObject;
-  
+  Code, Text: string;
+  //FileName: TFileName;
+
+//  TEXTDATA_OBJ: TMultiTranslationTextData;
+
 begin
   BaseDir := IncludeTrailingPathDelimiter(frmMain.SelectedDirectory);
 
   fFilesList := TStringList.Create;
   fFilesList.Text := Self.fFileListParam;
 
-  hm := TStrHashMap.Create;
+//  SYNCHRONIZE(CLEAR_COMBO);
+
+//  hm := TStrHashMap.Create();
+//  TEXTDATA_OBJ := TMultiTranslationTextData.Create;
+  MultiTranslationTextData.Clear;
+
   _tmp_scnf_edit := TSCNFEditor.Create;
   try
     // scanning all found files
@@ -82,19 +92,41 @@ begin
       _tmp_scnf_edit.LoadFromFile(FileName);
 
       for j := 0 to _tmp_scnf_edit.Subtitles.Count - 1 do begin
-        Key := _tmp_scnf_edit.Subtitles[j].Text;
-        Value := nil;
-        if (not hm.ContainsKey(Key)) then begin
-          hm.PutValue(Key, Value);
-          {$IFDEF DEBUG} WriteLn('-> K: "', Key, '", V: "', '', '"'); {$ENDIF}
+        Text := _tmp_scnf_edit.Subtitles[j].Text;
+        Code := _tmp_scnf_edit.Subtitles[j].Code;
 
-          fStrBuf := Key;
-          Synchronize(TEST_METHOD);
+        if MultiTranslationTextData.PutSubtitleInfo(Text, Code, FileName) then begin
+
+ //       Value := nil;
+//        if (not hm.ContainsKey(Key)) then begin
+//          hm.PutValue(Key, Value);
+
+//          {$IFDEF DEBUG} WriteLn('-> K: "', Key, '", V: "', '', '"'); {$ENDIF}
+
+ //         fStrBuf := Key;
+ //         Synchronize(TEST_METHOD);
         end;
       end;
 
       UpdatePercentage;
     end;
+
+{    writeln('');writeln('');
+
+
+     writeln(TEXTDATA_OBJ.Subtitles[0]);
+
+    for i := 0 to TEXTDATA_OBJ.GetSubtitleInfo(TEXTDATA_OBJ.Subtitles[0]).Count - 1 do
+      writeln('FILE: ', extractfilename(TEXTDATA_OBJ.GetSubtitleInfo(TEXTDATA_OBJ.Subtitles[0]).Items[i].FileName), ' CODE: ', TEXTDATA_OBJ.GetSubtitleInfo(TEXTDATA_OBJ.Subtitles[0]).Items[i].Code);
+
+
+
+    TEXTDATA_OBJ.FREE;
+}
+
+    MultiTranslationTextData.Subtitles.Sort;
+
+
 
   finally
     fFilesList.Free;
@@ -144,9 +176,22 @@ begin
   frmMain.lbFilesList.Items.Add(fStrBuf);
 end;
 
+{
 procedure TMultiTranslationSubtitlesRetriever.TEST_METHOD;
 begin
   frmMain.cbSubs.Items.Add(fStrBuf);
 end;
 
+PROCEDURE TMultiTranslationSubtitlesRetriever.CLEAR_COMBO;
+begin
+  frmMain.cbSubs.Items.Clear;
+end;
+}
+
+initialization
+  MultiTranslationTextData := TMultiTranslationTextData.Create;
+
+finalization
+  MultiTranslationTextData.Free;
+  
 end.

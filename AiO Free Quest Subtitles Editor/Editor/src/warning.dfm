@@ -205,7 +205,7 @@ object frmWarning: TfrmWarning
   object Label4: TLabel
     Left = 44
     Top = 130
-    Width = 342
+    Width = 327
     Height = 26
     Caption = 
       'But don'#39't panic. Please follow the tutorial inside this release ' +
@@ -221,9 +221,15 @@ object frmWarning: TfrmWarning
   object Label5: TLabel
     Left = 44
     Top = 160
-    Width = 312
-    Height = 13
+    Width = 347
+    Height = 26
     Caption = 'If you have never used this editor before, you aren'#39't concerned.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
     WordWrap = True
   end
   object Label6: TLabel
@@ -253,7 +259,7 @@ object frmWarning: TfrmWarning
   end
   object cbUnderstood: TCheckBox
     Left = 44
-    Top = 183
+    Top = 187
     Width = 242
     Height = 17
     Caption = 'I understood. Don'#39't display this warning again.'

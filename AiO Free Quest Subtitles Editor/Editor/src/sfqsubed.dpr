@@ -29,7 +29,8 @@ uses
   viewer_intf in '..\..\..\Shenmue Subtitles Preview\src\viewer_intf.pas',
   oldskool_font_mapper in '..\..\..\Shenmue Subtitles Preview\src\oldskool_font_mapper.pas',
   oldskool_font_vcl in '..\..\..\Shenmue Subtitles Preview\src\oldskool_font_vcl.pas',
-  viewer in '..\..\..\Shenmue Subtitles Preview\src\viewer.pas' {frmSubsPreview};
+  viewer in '..\..\..\Shenmue Subtitles Preview\src\viewer.pas' {frmSubsPreview},
+  textdata in 'engine\multitrd\textdata.pas';
 
 {$R *.res}
 

@@ -175,6 +175,7 @@ begin
   Terminated := True;
   Close;
   frmMain.SetStatus('Ready');
+  frmMain.MultiTranslationFillControls;
 end;
 
 procedure TfrmProgress.BatchSubsExporterEndEvent(Sender: TObject);

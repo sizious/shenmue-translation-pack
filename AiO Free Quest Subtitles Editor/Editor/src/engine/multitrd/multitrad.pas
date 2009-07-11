@@ -1,3 +1,8 @@
+//    This file is part of Shenmue II Free Quest Subtitles Editor.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with Shenmue II Free Quest Subtitles Editor.  If not, see <http://www.gnu.org/licenses/>.
+
 unit multitrad;
 
 interface

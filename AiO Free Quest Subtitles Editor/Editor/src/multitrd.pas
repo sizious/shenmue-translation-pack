@@ -242,7 +242,7 @@ begin
   _scnf := TSCNFEditor.Create;
   try
     for i := 0 to frmMain.lbFilesList.Items.Count - 1 do begin
-      _filename := frmMain.GetTargetDirectory + frmMain.lbFilesList.Items[i];
+      _filename := frmMain.SelectedDirectory + frmMain.lbFilesList.Items[i];
       _scnf.LoadFromFile(_filename);
       for j := 0 to _scnf.Subtitles.Count - 1 do begin
       

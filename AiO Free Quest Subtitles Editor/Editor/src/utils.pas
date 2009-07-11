@@ -3,7 +3,7 @@ unit utils;
 interface
 
 uses
-  Windows, SysUtils, Variants, ShellApi;
+  Windows, SysUtils, Variants, ShellApi, ComCtrls;
 
 procedure SaveConfig;
 function LoadConfig: Boolean;
@@ -11,6 +11,7 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 function GetConfigFileName: TFileName;
+function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 
 //------------------------------------------------------------------------------
 implementation
@@ -192,6 +193,24 @@ begin
   ShellExecuteInfo.lpVerb := 'properties';
   ShellExecuteInfo.lpFile := PChar(FileName);
   ShellExecuteEx(@ShellExecuteInfo);
+end;
+
+//------------------------------------------------------------------------------
+
+function FindNode(Node: TTreeNode; Text: string): TTreeNode;
+var
+  i: Integer;
+
+begin
+  Result := nil;
+  if not Node.HasChildren then Exit;
+
+  for i := 0 to Node.Count - 1 do
+    if Node.Item[i].Text = Text then begin
+      Result := Node.Item[i];
+      Break;
+    end;
+
 end;
 
 //------------------------------------------------------------------------------
