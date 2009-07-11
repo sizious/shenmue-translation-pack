@@ -13,7 +13,8 @@
             /          \   /      //    //    //    _/    //
             \_________./__/      //____//___./\_________.//
                                       |  S H E N T R A D  |
- ### SHENMUE TRANSLATION PACK ################################################
+ __                            ________________________________________________
+ __| SHENMUE TRANSLATION PACK |________________________________________________
  
  Shenmue Translation Pack est un ensemble d'outil permettant de traduire la 
  série des jeux Shenmue dans la langue de votre choix.
@@ -23,12 +24,39 @@
  - Shenmue (DC)
  - Shenmue 2 (DC)
  - Shenmue 2X (XBOX)
+ __                   _________________________________________________________
+ __| CONTENU DU PACK |_________________________________________________________
  
- ### CONTENU DU PACK #########################################################
+ Actuellement ce pack contient un panel d'outils divers et variés:
  
- Actuellement
-
- ### COMMENT COMPILER ########################################################
+ * AFS Utils
+   Cet outil permet l'ouverture, la création et l'édition des archives AFS.
+   
+ * AiO Cinematics Subtitles Editor
+   Il s'agit de l'éditeur des sous-titres proprement dit. Cet éditeur est pour
+   les sous-titres au format SRF, présent dans les archives AFS.
+   
+ * AiO Free Quest Subtitles Editor
+   Cet éditeur est un éditeur de sous-titres dédié aux fichiers PAKS présent
+   dans l'archive HUMANS.AFS.
+   
+ * IDX Creator
+   IDX Creator permet de recréer les fichiers IDX qui vont de paire avec les
+   fichiers AFS contenant les SRF traduits.
+   
+ * Models Textures Editor
+   Cet outil permet d'éditer les textures MT5/MT6/MT7, dans le but de traduire
+   certains sprites.
+   
+ * Shenmue Subtitles Preview
+   Il ne s'agit pas d'un outil mais d'une bibliothèque utilisée dans les 
+   éditeurs de sous-titres. Cette bibliothèque permet la visualisation en temps
+   réel des sous-titres traduits afin d'apréhender le rendu.
+   
+ * SPR Utils
+   Cet outil est un éditeur de sprites au format SPR.
+ __                    ________________________________________________________
+ __| COMMENT COMPiLER |________________________________________________________
   
  Les outils ont entièrement été développés sous l'environnement CodeGear 
  Delphi RAD Studio 2007.
@@ -38,12 +66,23 @@
  Ouvrez-le fichier situé à la racine "srcpack.groupproj" dans Delphi 2007.
  
  Composants additionnels requis pour la compilation:
-	* DFF Library -> http://www.delphiforfun.org/Programs/Library/Default.htm
-	* Fundamentals Utilities Library -> http://fundementals.sourceforge.net/
-	
- ### CREDITS #################################################################
  
- Initiateur: Manic
- Coder / outils additionnels: SiZiOUS (http://sbibuilder.shorturl.com/)
- 
- ##################################################################### EOF ###
+ * DFF Library
+   http://www.delphiforfun.org/Programs/Library/Default.htm
+   
+ * Fundamentals Utilities Library
+   http://fundementals.sourceforge.net/unicode.htm
+   
+ * DCL
+   http://sourceforge.net/projects/dclx/
+   
+ * JVCL
+   http://www.delphi-jedi.org/	
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+  
+  Initiateur / Codeur............: Manic
+  Codeur / Outils additionnels...: [big_fury]SiZiOUS (sbibuilder.shorturl.com)
+  Alpha/Beta test................: Shendream, Sadako
+  Merci..........................: A tous les membres qui nous suivent.  
+ _____________________________________________________________________[ EOF ]___

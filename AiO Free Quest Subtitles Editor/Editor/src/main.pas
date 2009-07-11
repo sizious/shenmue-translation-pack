@@ -24,8 +24,8 @@ uses
   AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf;
 
 const
-  APP_VERSION = '2.0';
-  COMPIL_DATE_TIME = 'April 1, 2009 @09:55PM';
+  APP_VERSION = '2.1';
+  COMPIL_DATE_TIME = 'July 11, 2009 @01:41AM';
 
 type
   TfrmMain = class(TForm)
@@ -76,26 +76,13 @@ type
     eCharID: TEdit;
     tsMultiTrad: TTabSheet;
     Label10: TLabel;
-    Bevel1: TBevel;
     GroupBox2: TGroupBox;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label13: TLabel;
-    lSubs: TLabel;
-    Label14: TLabel;
-    mOldSub: TMemo;
-    eOldFirstLineLength: TEdit;
-    eOldSecondLineLength: TEdit;
-    cbSubs: TComboBox;
-    eCode: TEdit;
     GroupBox4: TGroupBox;
     Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
-    Memo1: TMemo;
     Edit1: TEdit;
     Edit2: TEdit;
-    bMultiTranslate: TButton;
     bRetrieveSubs: TButton;
     Panel2: TPanel;
     Label9: TLabel;
@@ -124,7 +111,7 @@ type
     Batchimportsubtitles1: TMenuItem;
     Batchexportsubtitles1: TMenuItem;
     N13: TMenuItem;
-    Reload1: TMenuItem;
+    miReloadDir: TMenuItem;
     ApplicationEvents: TApplicationEvents;
     bfdExportSubs: TJvBrowseForFolderDialog;
     mOldSubEd: TMemo;
@@ -148,6 +135,11 @@ type
     rbcgUnknow: TRadioButton;
     View1: TMenuItem;
     N15: TMenuItem;
+    miExportFilesList: TMenuItem;
+    tvMultiSubs: TTreeView;
+    Memo1: TMemo;
+    Memo2: TMemo;
+    bMultiTranslate: TButton;
     procedure Scandirectory1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -186,11 +178,12 @@ type
     procedure Opendirectory1Click(Sender: TObject);
     procedure miFileProperties2Click(Sender: TObject);
     procedure Batchexportsubtitles1Click(Sender: TObject);
-    procedure Reload1Click(Sender: TObject);
+    procedure miReloadDirClick(Sender: TObject);
     procedure Batchimportsubtitles1Click(Sender: TObject);
     procedure ApplicationEventsHint(Sender: TObject);
     procedure lbFilesListKeyPress(Sender: TObject; var Key: Char);
     procedure Website1Click(Sender: TObject);
+    procedure miExportFilesListClick(Sender: TObject);
   private
     { Déclarations privées }
     fTargetFileName: TFileName;
@@ -229,6 +222,7 @@ type
     procedure SetModified(const State: Boolean);
     procedure RetrieveSubtitles;
     procedure MultiTranslateSubtitles;
+    procedure MultiTranslationFillControls;
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property FileModified: Boolean read fFileModified;
@@ -258,7 +252,7 @@ implementation
 
 uses
   Progress, SelDir, MultiTrd, ScnfUtil, Utils, CharsCnt, CharsLst, FileInfo,
-  MassImp, Common, NPCInfo, VistaUI;
+  MassImp, Common, NPCInfo, VistaUI, TextData;
 
 {$R *.dfm}
 
@@ -429,6 +423,18 @@ end;
 procedure TfrmMain.Exit1Click(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmMain.miExportFilesListClick(Sender: TObject);
+begin
+  with sdMain do begin
+    FileName := ExtremeRight('\', Copy(SelectedDirectory, 1, Length(SelectedDirectory)-1)) + '_FilesList.txt';
+    Title := 'Export files list to...';
+    DefaultExt := 'txt';
+    Filter := 'Text Files (*.txt)|*.txt';
+    if Execute then
+      lbFilesList.Items.SaveToFile(FileName);
+  end;
 end;
 
 procedure TfrmMain.Exportsubtitles1Click(Sender: TObject);
@@ -663,7 +669,8 @@ begin
   // enable or not some menus
   miFileProperties.Enabled := (lbFilesList.ItemIndex <> -1);
   miFileProperties2.Enabled := miFileProperties.Enabled;
-  Reload1.Enabled := DirectoryExists(GetTargetDirectory);
+  miReloadDir.Enabled := DirectoryExists(SelectedDirectory);
+  miExportFilesList.Enabled := lbFilesList.Items.Count > 0;
 end;
 
 procedure TfrmMain.lbFilesListDblClick(Sender: TObject);
@@ -711,7 +718,7 @@ begin
   end;
 end;
 
-procedure TfrmMain.Reload1Click(Sender: TObject);
+procedure TfrmMain.miReloadDirClick(Sender: TObject);
 begin
   ScanDirectory(GetTargetDirectory);
 end;
@@ -922,6 +929,40 @@ begin
   Multitranslation1.Checked := frmMultiTranslation.Visible;
 end;
 
+procedure TfrmMain.MultiTranslationFillControls;
+var
+  i,j: Integer;
+  SubTitle, Code, FileName: string;
+  List: ISubtitleInfoList;
+  ParentNode, FileNode: TTreeNode;
+
+begin
+  AddDebug('Files list scanned successfully. ' + IntToStr(MultiTranslationTextData.Subtitles.Count) + ' subtitle(s) retrieved.');
+
+  for i := 0 to MultiTranslationTextData.Subtitles.Count - 1 do begin
+    SubTitle := MultiTranslationTextData.Subtitles[i];
+    List := MultiTranslationTextData.GetSubtitleInfo(SubTitle);
+
+    if List <> nil then begin
+    
+      ParentNode := tvMultiSubs.Items.Add(nil, SubTitle);
+
+      for j := 0 to List.Count - 1 do begin
+        FileName := ExtractFileName(List.Items[j].FileName);
+        Code := List.Items[j].Code;
+
+        FileNode := FindNode(ParentNode, FileName);
+        if FileNode = nil then
+          FileNode := tvMultiSubs.Items.AddChild(ParentNode, FileName);
+
+        tvMultiSubs.Items.AddChild(FileNode, Code);
+      end;
+
+    end;
+
+  end;
+end;
+
 procedure TfrmMain.Opendirectory1Click(Sender: TObject);
 var
   FName: string;
@@ -988,6 +1029,7 @@ begin
   // start the retrieving scanner thread
   SubsRetriever := TMultiTranslationSubtitlesRetriever.Create(SelectedDirectory, lbFilesList.Items.Text);
   frmProgress.Mode := pmMultiScan;
+//  SubsRetriever.OnCompleted := MultiTranslationFillControls;
 
   SubsRetriever.Resume;
 

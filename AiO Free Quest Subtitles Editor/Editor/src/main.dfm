@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = '< Title Generated >'
+  Caption = '< Title Generated > // Free Quest Editor'
   ClientHeight = 496
   ClientWidth = 572
   Color = clBtnFace
@@ -397,10 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Multi-translation'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)
@@ -414,160 +410,81 @@ object frmMain: TfrmMain
           ' files present in the list.'
         WordWrap = True
       end
-      object Bevel1: TBevel
-        Left = 3
-        Top = 304
-        Width = 400
-        Height = 2
-        Anchors = [akLeft, akRight, akBottom]
-      end
       object GroupBox2: TGroupBox
         Left = 3
         Top = 25
         Width = 401
-        Height = 134
-        Anchors = [akLeft, akTop, akRight]
-        Caption = ' Search this string : '
+        Height = 178
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Caption = ' Available strings : '
         TabOrder = 0
         DesignSize = (
           401
-          134)
-        object Label11: TLabel
-          Left = 165
-          Top = 109
-          Width = 91
-          Height = 13
-          Caption = 'Second line length:'
-        end
-        object Label12: TLabel
-          Left = 31
-          Top = 109
-          Width = 77
-          Height = 13
-          Caption = 'First line length:'
-        end
-        object Label13: TLabel
-          Left = 10
-          Top = 58
-          Width = 26
-          Height = 13
-          Caption = 'Text:'
-        end
-        object lSubs: TLabel
-          Left = 10
-          Top = 18
-          Width = 79
-          Height = 13
-          Caption = 'Current subtitle:'
-        end
-        object Label14: TLabel
-          Left = 309
-          Top = 109
-          Width = 29
-          Height = 13
-          Caption = 'Code:'
-        end
-        object mOldSub: TMemo
-          Left = 114
-          Top = 39
-          Width = 282
-          Height = 64
-          Anchors = [akLeft, akTop, akRight]
-          MaxLength = 89
+          178)
+        object tvMultiSubs: TTreeView
+          Left = 8
+          Top = 16
+          Width = 387
+          Height = 129
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          Indent = 19
           TabOrder = 0
-        end
-        object eOldFirstLineLength: TEdit
-          Left = 114
-          Top = 106
-          Width = 41
-          Height = 21
-          Color = clBtnFace
-          ReadOnly = True
-          TabOrder = 1
-          Text = '0'
-        end
-        object eOldSecondLineLength: TEdit
-          Left = 262
-          Top = 106
-          Width = 41
-          Height = 21
-          Color = clBtnFace
-          ReadOnly = True
-          TabOrder = 2
-          Text = '0'
-        end
-        object cbSubs: TComboBox
-          Left = 114
-          Top = 15
-          Width = 188
-          Height = 21
-          Style = csDropDownList
-          Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
-          TabOrder = 3
-        end
-        object eCode: TEdit
-          Left = 344
-          Top = 106
-          Width = 51
-          Height = 21
-          Color = clBtnFace
-          ReadOnly = True
-          TabOrder = 4
         end
       end
       object GroupBox4: TGroupBox
         Left = 3
-        Top = 162
+        Top = 208
         Width = 401
-        Height = 139
+        Height = 129
         Margins.Left = 0
         Margins.Top = 0
         Margins.Right = 0
         Margins.Bottom = 0
-        Anchors = [akLeft, akTop, akRight, akBottom]
+        Anchors = [akLeft, akRight, akBottom]
         Caption = ' Replace the string with : '
         TabOrder = 1
         DesignSize = (
           401
-          139)
+          129)
         object Label15: TLabel
-          Left = 10
-          Top = 36
+          Left = 9
+          Top = 40
           Width = 26
           Height = 13
           Caption = 'Text:'
         end
         object Label16: TLabel
-          Left = 33
-          Top = 116
+          Left = 8
+          Top = 102
           Width = 77
           Height = 13
           Anchors = [akLeft, akBottom]
           Caption = 'First line length:'
-          ExplicitTop = 88
+          ExplicitTop = 130
         end
         object Label17: TLabel
-          Left = 167
-          Top = 116
+          Left = 148
+          Top = 102
           Width = 91
           Height = 13
           Anchors = [akLeft, akBottom]
           Caption = 'Second line length:'
-          ExplicitTop = 88
-        end
-        object Memo1: TMemo
-          Left = 114
-          Top = 15
-          Width = 281
-          Height = 94
-          Anchors = [akLeft, akTop, akRight, akBottom]
-          MaxLength = 89
-          TabOrder = 0
+          ExplicitTop = 130
         end
         object Edit1: TEdit
-          Left = 114
-          Top = 113
+          Left = 91
+          Top = 99
+          Width = 41
+          Height = 21
+          Anchors = [akLeft, akBottom]
+          Color = clBtnFace
+          ReadOnly = True
+          TabOrder = 0
+          Text = '0'
+        end
+        object Edit2: TEdit
+          Left = 243
+          Top = 99
           Width = 41
           Height = 21
           Anchors = [akLeft, akBottom]
@@ -576,36 +493,51 @@ object frmMain: TfrmMain
           TabOrder = 1
           Text = '0'
         end
-        object Edit2: TEdit
-          Left = 262
-          Top = 113
-          Width = 41
-          Height = 21
-          Anchors = [akLeft, akBottom]
-          Color = clBtnFace
-          ReadOnly = True
+        object Memo1: TMemo
+          Left = 95
+          Top = 16
+          Width = 300
+          Height = 37
+          Anchors = [akLeft, akRight, akBottom]
+          Lines.Strings = (
+            'LINE1'
+            'LINE2')
+          MaxLength = 90
           TabOrder = 2
-          Text = '0'
+          OnChange = mSubTextChange
+        end
+        object Memo2: TMemo
+          Left = 95
+          Top = 56
+          Width = 300
+          Height = 37
+          Anchors = [akLeft, akRight, akBottom]
+          Lines.Strings = (
+            'LINE1'
+            'LINE2')
+          MaxLength = 90
+          TabOrder = 3
+          OnChange = mSubTextChange
+        end
+        object bMultiTranslate: TButton
+          Left = 304
+          Top = 99
+          Width = 90
+          Height = 25
+          Anchors = [akRight, akBottom]
+          Caption = 'Translate...'
+          TabOrder = 4
+          OnClick = bMultiTranslateClick
         end
       end
-      object bMultiTranslate: TButton
-        Left = 285
-        Top = 311
-        Width = 119
-        Height = 25
-        Anchors = [akRight, akBottom]
-        Caption = 'Translate...'
-        TabOrder = 2
-        OnClick = bMultiTranslateClick
-      end
       object bRetrieveSubs: TButton
-        Left = 307
-        Top = 38
-        Width = 93
+        Left = 11
+        Top = 174
+        Width = 388
         Height = 25
-        Anchors = [akTop, akRight]
+        Anchors = [akLeft, akRight, akBottom]
         Caption = 'Retrieve subs...'
-        TabOrder = 3
+        TabOrder = 2
         OnClick = bRetrieveSubsClick
       end
     end
@@ -825,8 +757,8 @@ object frmMain: TfrmMain
     Top = 32
   end
   object pmSubsSelect: TPopupMenu
-    Left = 382
-    Top = 180
+    Left = 44
+    Top = 300
     object Copy1: TMenuItem
       Caption = '&Copy'
       ShortCut = 16451
@@ -860,8 +792,8 @@ object frmMain: TfrmMain
       '|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save subtitles list to...'
-    Left = 412
-    Top = 180
+    Left = 12
+    Top = 300
   end
   object pmFilesList: TPopupMenu
     Left = 14
@@ -875,20 +807,24 @@ object frmMain: TfrmMain
     object N10: TMenuItem
       Caption = '-'
     end
-    object Locatefile1: TMenuItem
-      Caption = 'Locate file...'
-      OnClick = Locatefile1Click
-    end
     object Opendirectory1: TMenuItem
       Caption = 'Open directory...'
       OnClick = Opendirectory1Click
     end
+    object miExportFilesList: TMenuItem
+      Caption = '&Export files list...'
+      OnClick = miExportFilesListClick
+    end
+    object Locatefile1: TMenuItem
+      Caption = 'Locate file...'
+      OnClick = Locatefile1Click
+    end
     object N13: TMenuItem
       Caption = '-'
     end
-    object Reload1: TMenuItem
+    object miReloadDir: TMenuItem
       Caption = '&Refresh'
-      OnClick = Reload1Click
+      OnClick = miReloadDirClick
     end
   end
   object ApplicationEvents: TApplicationEvents
