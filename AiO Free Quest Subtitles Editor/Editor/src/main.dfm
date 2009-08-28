@@ -35,7 +35,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 0
-    ExplicitHeight = 365
     object lbFilesList: TListBox
       Left = 4
       Top = 17
@@ -49,7 +48,6 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnDblClick = lbFilesListDblClick
       OnKeyPress = lbFilesListKeyPress
-      ExplicitHeight = 317
     end
     object Panel2: TPanel
       Left = 4
@@ -59,7 +57,6 @@ object frmMain: TfrmMain
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitTop = 334
       DesignSize = (
         140
         27)
@@ -94,12 +91,8 @@ object frmMain: TfrmMain
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
-    ExplicitWidth = 407
-    ExplicitHeight = 365
     object tsEditor: TTabSheet
       Caption = '&Editor'
-      ExplicitWidth = 399
-      ExplicitHeight = 337
       DesignSize = (
         407
         339)
@@ -194,7 +187,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 0
         Text = '0'
-        ExplicitTop = 314
       end
       object eFirstLineLength: TEdit
         Left = 104
@@ -206,7 +198,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 1
         Text = '0'
-        ExplicitTop = 314
       end
       object mSubText: TMemo
         Left = 104
@@ -220,8 +211,6 @@ object frmMain: TfrmMain
         MaxLength = 90
         TabOrder = 2
         OnChange = mSubTextChange
-        ExplicitTop = 274
-        ExplicitWidth = 292
       end
       object eSubCount: TEdit
         Left = 368
@@ -233,7 +222,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 3
         Text = '100'
-        ExplicitTop = 314
       end
       object eCharID: TEdit
         Left = 230
@@ -243,7 +231,7 @@ object frmMain: TfrmMain
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 4
-        Text = '03E'
+        Text = '<CharID>'
       end
       object lvSubsSelect: TJvListView
         Left = 104
@@ -293,8 +281,6 @@ object frmMain: TfrmMain
         MaxLength = 90
         ReadOnly = True
         TabOrder = 6
-        ExplicitTop = 234
-        ExplicitWidth = 292
       end
       object rbMale: TRadioButton
         Left = 164
@@ -325,7 +311,6 @@ object frmMain: TfrmMain
         Caption = '(no face)'
         ParentBackground = False
         TabOrder = 9
-        ExplicitLeft = 296
         object iFace: TImage
           Left = 2
           Top = 2
@@ -385,7 +370,7 @@ object frmMain: TfrmMain
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 11
-        Text = 'FEX'
+        Text = '<VoiceID>'
       end
       object eGame: TEdit
         Left = 104
@@ -395,7 +380,7 @@ object frmMain: TfrmMain
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 12
-        Text = 'eGame'
+        Text = '<Game Version String>'
       end
       object rbcgUnknow: TRadioButton
         Left = 104
@@ -412,8 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Multi-translation'
       ImageIndex = 1
-      ExplicitWidth = 399
-      ExplicitHeight = 337
       DesignSize = (
         407
         339)
@@ -425,8 +408,6 @@ object frmMain: TfrmMain
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = ' Available strings : '
         TabOrder = 0
-        ExplicitWidth = 393
-        ExplicitHeight = 200
         DesignSize = (
           401
           202)
@@ -439,8 +420,6 @@ object frmMain: TfrmMain
           Caption = 'Clear...'
           TabOrder = 0
           OnClick = bMTClearClick
-          ExplicitLeft = 308
-          ExplicitTop = 172
         end
         object tvMultiSubs: TTreeView
           Left = 8
@@ -457,8 +436,6 @@ object frmMain: TfrmMain
           OnClick = tvMultiSubsClick
           OnContextPopup = tvMultiSubsContextPopup
           OnKeyUp = tvMultiSubsKeyUp
-          ExplicitWidth = 379
-          ExplicitHeight = 155
         end
         object bMTExpandAll: TButton
           Left = 156
@@ -469,8 +446,6 @@ object frmMain: TfrmMain
           Caption = 'Expand all'
           TabOrder = 2
           OnClick = bMTExpandAllClick
-          ExplicitLeft = 148
-          ExplicitTop = 172
         end
         object bMTCollapseAll: TButton
           Left = 236
@@ -481,8 +456,6 @@ object frmMain: TfrmMain
           Caption = 'Collapse all'
           TabOrder = 3
           OnClick = bMTCollapseAllClick
-          ExplicitLeft = 228
-          ExplicitTop = 172
         end
       end
       object GroupBox4: TGroupBox
@@ -497,8 +470,6 @@ object frmMain: TfrmMain
         Anchors = [akLeft, akRight, akBottom]
         Caption = ' Replace the string with : '
         TabOrder = 1
-        ExplicitTop = 206
-        ExplicitWidth = 393
         DesignSize = (
           401
           129)
@@ -562,7 +533,6 @@ object frmMain: TfrmMain
           MaxLength = 90
           ReadOnly = True
           TabOrder = 2
-          ExplicitWidth = 292
         end
         object mMTNewSub: TMemo
           Left = 95
@@ -576,7 +546,6 @@ object frmMain: TfrmMain
           MaxLength = 90
           TabOrder = 3
           OnChange = mMTNewSubChange
-          ExplicitWidth = 292
         end
         object bMultiTranslate: TButton
           Left = 306
@@ -588,7 +557,6 @@ object frmMain: TfrmMain
           Enabled = False
           TabOrder = 4
           OnClick = bMultiTranslateClick
-          ExplicitLeft = 298
         end
       end
       object bMTRetrieveSubs: TButton
@@ -600,8 +568,6 @@ object frmMain: TfrmMain
         Caption = 'Retrieve...'
         TabOrder = 2
         OnClick = bMTRetrieveSubsClick
-        ExplicitLeft = 70
-        ExplicitTop = 175
       end
     end
   end
@@ -619,8 +585,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 2
-    ExplicitTop = 371
-    ExplicitWidth = 558
     object mDebug: TMemo
       Left = 4
       Top = 16
@@ -631,7 +595,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       ScrollBars = ssBoth
       TabOrder = 0
-      ExplicitWidth = 550
     end
   end
   object sb: TStatusBar
@@ -652,8 +615,6 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
-    ExplicitTop = 475
-    ExplicitWidth = 564
   end
   object MainMenu: TMainMenu
     Left = 80
@@ -818,7 +779,7 @@ object frmMain: TfrmMain
       end
       object miFacesExtractor: TMenuItem
         Caption = 'Faces extractor...'
-        Hint = 'Extract faces from PAKF.'
+        Hint = 'Extract NPC faces textures from PAKF files.'
         ShortCut = 113
         OnClick = miFacesExtractorClick
       end

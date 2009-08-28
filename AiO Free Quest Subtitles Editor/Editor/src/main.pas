@@ -22,11 +22,11 @@ uses
   Dialogs, ComCtrls, StdCtrls, Menus, ScnfEdit, MultiScan, ExtCtrls, ScnfScan,
   MultiTrad, JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
   AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf, TextData,
-  JvComCtrls, ImgList, ViewUpd;
+  ImgList, ViewUpd;
 
 const
   APP_VERSION = '2.1';
-  COMPIL_DATE_TIME = 'August 10, 2009 @01:41AM';
+  COMPIL_DATE_TIME = 'August 29, 2009 @00:23AM';
 
 type
   TfrmMain = class(TForm)
@@ -244,6 +244,7 @@ type
     procedure SetEnableCharsMod(const Value: Boolean);
 //    procedure SetCanEnableCharsMod(const Value: Boolean);
   protected
+    procedure FreeApplication;
     procedure PreviewWindowClosedEvent(Sender: TObject);
     procedure SetModifiedIndicator(State: Boolean);
     procedure CheckIfSubLengthIsCorrect(const Value: Integer; Field: TEdit);
@@ -668,10 +669,9 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   CanDo: Integer;
-  HandleMenu: THandle;
   
 begin
-  // autosave
+  // To apply the auto save feature or not !
   if FileModified then
 
     // If Multi-Translation is used...
@@ -690,36 +690,26 @@ begin
                   end;
         end;
 
-    // Else we save as normal
-    end else
+
+    end else // ... else we save as normal
+
       if not SaveFileIfNeeded(True) then begin
         Action := caNone;
         Exit;
       end;
-      
-      (*if AutoSave then
-        miSaveClick(lbFilesList)
-      else begin
-        CanDo := MsgBox('Do you want to save file modifications ?', 'Save changes?', MB_YESNOCANCEL + MB_ICONWARNING);
-        case CanDo of
-           IDCANCEL : begin
-                        Action := caNone;
-                        Exit;
-                      end;
-           IDYES    : miSave.Click; // Save1Click(lbFilesList);
-        end;
-      end; *)
 
-  // Disabling the Close button (because freeing MultiTranslation view can be long)
-  miQuit.Enabled := False;
-  HandleMenu := GetSystemMenu(Handle, False);
-  EnableMenuItem(HandleMenu, SC_CLOSE, MF_DISABLED);
+  // Confirmation to exit if Multi-translation module in use.
+  if MultiTranslationInUse then begin
+    CanDo := MsgBox('You are currently using Multi-translation. Are you sure to exit ?',
+      'Please confirm!', MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
+    if CanDo = IDNO then begin
+      Action := caNone;
+      Exit;
+    end;
+  end;
 
-  // Free the Previewer
-  Previewer.Free;
-
-  // Free the MultiTranslation view
-  MultiTranslationFreeView;
+  // Clearing all garbage datas before exiting
+  FreeApplication;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -813,7 +803,7 @@ procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   // Saving configuration
   SaveConfig;
-
+  
   SCNFEditor.Free;
 //  WorkFilesList.Free;
 end;
@@ -821,6 +811,23 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   ApplicationEvents.Activate;
+end;
+
+procedure TfrmMain.FreeApplication;
+var
+  HandleMenu: THandle;
+  
+begin
+  // Disabling the Close button (because freeing MultiTranslation view can be long)
+  miQuit.Enabled := False;
+  HandleMenu := GetSystemMenu(Handle, False);
+  EnableMenuItem(HandleMenu, SC_CLOSE, MF_DISABLED);
+
+  // Free the Previewer
+  Previewer.Free;
+
+  // Free the MultiTranslation view
+  MultiTranslationFreeView;
 end;
 
 function TfrmMain.GetTargetDirectory: string;
