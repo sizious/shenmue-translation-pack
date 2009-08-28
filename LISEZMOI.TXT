@@ -66,23 +66,27 @@
  Ouvrez-le fichier situé à la racine "srcpack.groupproj" dans Delphi 2007.
  
  Composants additionnels requis pour la compilation:
+
+ * DCL
+   http://sourceforge.net/projects/dclx/
  
  * DFF Library
    http://www.delphiforfun.org/Programs/Library/Default.htm
    
  * Fundamentals Utilities Library
    http://fundementals.sourceforge.net/unicode.htm
-   
- * DCL
-   http://sourceforge.net/projects/dclx/
-   
+     
  * JVCL
-   http://www.delphi-jedi.org/	
+   http://www.delphi-jedi.org/
+
+ * PNG Image
+   http://?
  __           _________________________________________________________________
  __| CREDiTS |_________________________________________________________________
   
   Initiateur / Codeur............: Manic
   Codeur / Outils additionnels...: [big_fury]SiZiOUS (sbibuilder.shorturl.com)
-  Alpha/Beta test................: Shendream, Sadako
+  Alpha/Beta test................: Shendream, Sadako, Hiei-, Kogami-san, ...
   Merci..........................: A tous les membres qui nous suivent.  
+  URL............................: http://shenmuesubs.sourceforge.net/
  _____________________________________________________________________[ EOF ]___

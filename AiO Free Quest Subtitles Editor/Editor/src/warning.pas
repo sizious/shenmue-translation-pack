@@ -113,7 +113,6 @@ var
 
 begin
   if Value then Buf := MF_ENABLED else Buf := MF_DISABLED;
-
   bOK.Enabled := Value;
   HandleMenu := GetSystemMenu(Handle, False);
   EnableMenuItem(HandleMenu, SC_CLOSE, Buf);

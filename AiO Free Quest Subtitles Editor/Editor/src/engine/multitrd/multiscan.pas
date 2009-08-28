@@ -1,59 +1,92 @@
+(*
+
+  This unit was made to control the subtitles retriver process.
+  It uses the textdata unit to store each subtitle info.
+*)
+
 unit multiscan;
 
 interface
 
 uses
-  SysUtils, Classes, Forms, Math, TextData; //, DCL_Intf, HashMap;
+  SysUtils, Classes, Forms, Math, ComCtrls, TextData, CharsLst, ScnfUtil;
 
 type
   TMultiTranslationSubtitlesRetriever = class(TThread)
   private
+//    fBufNode: TTreeNode;
+    fStrBuf: string;
     fFilesList: TStringList;
     fIntBuf: Integer;
-    fStrBuf: string;
+    fStrCurrentOperation: string;
+    fStrSubtitle: string;
+    fSubtitleInfoList: ISubtitleInfoList;
     fBaseDir: string;
     fFileListParam: string;
+    fDecodeSubtitles: Boolean;
+    fCharsList: TSubsCharsList;
+//    fEnabled: Boolean;
 
     procedure InitializeProgressWindow(const FilesCount: Integer);
+    procedure AddDebug(const Text: string);
     procedure UpdatePercentage;
     procedure UpdateProgressOperation(const S: string);
+    procedure UpdateViewSubsList(const Subtitle: string;
+      DataInfo: ISubtitleInfoList);
+//    procedure ChangeUpdateMemoViewState(const Enabled: Boolean);
 
     // --- don't call directly ---
+    procedure SyncAddDebug;
     procedure SyncInitializeProgressWindow;
     procedure SyncUpdateProgressOperation;
-    procedure SyncUpdateScnfFileList;
-
-//    PROCEDURE TEST_METHOD;
-//    PROCEDURE CLEAR_COMBO;
+    procedure SyncUpdateViewSubsList;
+//    procedure SyncChangeUpdateMemoViewState;
+    
   protected
     procedure Execute; override;
+    property CharsList: TSubsCharsList read fCharsList write fCharsList;
   public
-    constructor Create(const BaseDir, FileList: string);
+    constructor Create(const BaseDir, FileList: string; DecodeSubtitles: Boolean);
   end;
-
-var
-  MultiTranslationTextData: TMultiTranslationTextData;
 
 // -----------------------------------------------------------------------------
 implementation
 // -----------------------------------------------------------------------------
 
 uses
-  Main, Progress, ScnfEdit;
+  Main, Progress, ScnfEdit, Utils, Common;
 
 // -----------------------------------------------------------------------------
 { TMultiTranslationSubtitlesRetriever }
 // -----------------------------------------------------------------------------
 
+(*procedure TMultiTranslationSubtitlesRetriever.ChangeUpdateMemoViewState(
+  const Enabled: Boolean);
+begin
+  fEnabled := Enabled;
+  Synchronize(SyncChangeUpdateMemoViewState);
+end;*)
+
+// -----------------------------------------------------------------------------
+
+procedure TMultiTranslationSubtitlesRetriever.AddDebug(const Text: string);
+begin
+  fStrBuf := Text;
+  Synchronize(SyncAddDebug);
+end;
+
 constructor TMultiTranslationSubtitlesRetriever.Create(const BaseDir,
-  FileList: string);
+  FileList: string; DecodeSubtitles: Boolean);
 begin
   FreeOnTerminate := True;
   fBaseDir := BaseDir;
   fFileListParam := FileList;
+  fDecodeSubtitles := DecodeSubtitles;
   
   inherited Create(True);
 end;
+
+// -----------------------------------------------------------------------------
 
 procedure TMultiTranslationSubtitlesRetriever.Execute;
 var
@@ -61,9 +94,10 @@ var
   BaseDir, FileName: TFileName;
   _tmp_scnf_edit: TSCNFEditor;
   Code, Text: string;
-  //FileName: TFileName;
-
-//  TEXTDATA_OBJ: TMultiTranslationTextData;
+  List: ISubtitleInfoList;
+(*  CharsList: TSubsCharsList;
+  CharsListFound: Boolean;
+  PrevGameVersion: TGameVersion;  *)
 
 begin
   BaseDir := IncludeTrailingPathDelimiter(frmMain.SelectedDirectory);
@@ -71,66 +105,76 @@ begin
   fFilesList := TStringList.Create;
   fFilesList.Text := Self.fFileListParam;
 
-//  SYNCHRONIZE(CLEAR_COMBO);
-
-//  hm := TStrHashMap.Create();
-//  TEXTDATA_OBJ := TMultiTranslationTextData.Create;
   MultiTranslationTextData.Clear;
 
+  //----------------------------------------------------------------------------
+  // BUILDING THE TEXT DATA LIST
+  //----------------------------------------------------------------------------
+
+  CharsList := TSubsCharsList.Create;
   _tmp_scnf_edit := TSCNFEditor.Create;
   try
     // scanning all found files
     InitializeProgressWindow(fFilesList.Count);
-    
+
+    // For each file found...
     for i := 0 to fFilesList.Count - 1 do begin
       if Terminated then Break;
       FileName := BaseDir + fFilesList[i];
-      
-      UpdateProgressOperation('Scanning ' + ExtractFileName(FileName) + '...');
 
-      // retrieve all subs from this file
+      UpdateProgressOperation('Scanning "' + ExtractFileName(FileName) + '"...');
+
+      // Retrieve all subs from this file
       _tmp_scnf_edit.LoadFromFile(FileName);
 
+      // Adding each subtitle of the file to the "database"
       for j := 0 to _tmp_scnf_edit.Subtitles.Count - 1 do begin
         Text := _tmp_scnf_edit.Subtitles[j].Text;
         Code := _tmp_scnf_edit.Subtitles[j].Code;
 
-        if MultiTranslationTextData.PutSubtitleInfo(Text, Code, FileName) then begin
-
- //       Value := nil;
-//        if (not hm.ContainsKey(Key)) then begin
-//          hm.PutValue(Key, Value);
-
-//          {$IFDEF DEBUG} WriteLn('-> K: "', Key, '", V: "', '', '"'); {$ENDIF}
-
- //         fStrBuf := Key;
- //         Synchronize(TEST_METHOD);
-        end;
+        MultiTranslationTextData.PutSubtitleInfo(Text, Code, FileName,
+          _tmp_scnf_edit.GameVersion);
       end;
 
       UpdatePercentage;
     end;
 
-{    writeln('');writeln('');
-
-
-     writeln(TEXTDATA_OBJ.Subtitles[0]);
-
-    for i := 0 to TEXTDATA_OBJ.GetSubtitleInfo(TEXTDATA_OBJ.Subtitles[0]).Count - 1 do
-      writeln('FILE: ', extractfilename(TEXTDATA_OBJ.GetSubtitleInfo(TEXTDATA_OBJ.Subtitles[0]).Items[i].FileName), ' CODE: ', TEXTDATA_OBJ.GetSubtitleInfo(TEXTDATA_OBJ.Subtitles[0]).Items[i].Code);
-
-
-
-    TEXTDATA_OBJ.FREE;
-}
-
     MultiTranslationTextData.Subtitles.Sort;
 
+    //----------------------------------------------------------------------------
+    // FILLING THE VIEW
+    //----------------------------------------------------------------------------
 
+    // Adding all infos to the TreeView
+    InitializeProgressWindow(MultiTranslationTextData.Subtitles.Count);
+    UpdateProgressOperation('Updating view with extracted datas...');
+//    PrevGameVersion := gvUndef;
+    
+    for i := 0 to MultiTranslationTextData.Subtitles.Count - 1 do begin
+      if Terminated then Break;
+      Text := MultiTranslationTextData.Subtitles[i];
+      List := MultiTranslationTextData.GetSubtitleInfo(Text);
+
+      // Loading the correct charslist
+      (*if not IsTheSameCharsList(PrevGameVersion, _tmp_scnf_edit.GameVersion) then begin
+        CharsListFound := CharsList.LoadFromFile(GetCorrectCharsList(_tmp_scnf_edit.GameVersion));
+        if CharsListFound then
+          CharsList.Active := fDecodeSubtitles
+        else
+          CharsList.Active := False;
+      end;
+      PrevGameVersion := _tmp_scnf_edit.GameVersion;*)
+
+//      UpdateViewSubsList(CharsList.DecodeSubtitle(Text), List);
+
+      UpdateViewSubsList(Text, List);
+      UpdatePercentage;
+    end;
 
   finally
     fFilesList.Free;
     _tmp_scnf_edit.Free;
+    CharsList.Free;
   end;
 end;
 
@@ -146,8 +190,18 @@ end;
 
 procedure TMultiTranslationSubtitlesRetriever.UpdateProgressOperation(const S: string);
 begin
-  fStrBuf := S;
+  fStrCurrentOperation := S;
   Synchronize(SyncUpdateProgressOperation);
+end;
+
+// -----------------------------------------------------------------------------
+
+procedure TMultiTranslationSubtitlesRetriever.UpdateViewSubsList(
+  const Subtitle: string; DataInfo: ISubtitleInfoList);
+begin
+  fStrSubtitle := Subtitle;
+  fSubtitleInfoList := DataInfo;
+  Synchronize(SyncUpdateViewSubsList);
 end;
 
 // -----------------------------------------------------------------------------
@@ -161,37 +215,152 @@ end;
 // DON'T CALL DIRECTLY THESES METHODS
 // -----------------------------------------------------------------------------
 
+(*procedure TMultiTranslationSubtitlesRetriever.SyncChangeUpdateMemoViewState;
+begin
+  if fEnabled then begin
+    frmMain.tvMultiSubs.OnChange := frmMain.tvMultiSubsChange;
+//    frmMain.mMTNewSub.OnChange := frmMain.mMTNewSubChange;
+  end else begin
+    frmMain.tvMultiSubs.OnChange := nil;
+//    frmMain.mMTNewSub.OnChange := nil;
+  end;
+end;
+*)
+
+// -----------------------------------------------------------------------------
+
+procedure TMultiTranslationSubtitlesRetriever.SyncAddDebug;
+begin
+  frmMain.AddDebug(fStrBuf);
+end;
+
 procedure TMultiTranslationSubtitlesRetriever.SyncInitializeProgressWindow;
 begin
   frmProgress.pbar.Max := fIntBuf;
+  frmProgress.pbar.Position := 0;
 end;
+
+// -----------------------------------------------------------------------------
 
 procedure TMultiTranslationSubtitlesRetriever.SyncUpdateProgressOperation;
 begin
-  frmProgress.lInfos.Caption := fStrBuf;
+  frmProgress.lInfos.Caption := fStrCurrentOperation;
 end;
 
-procedure TMultiTranslationSubtitlesRetriever.SyncUpdateScnfFileList;
+// -----------------------------------------------------------------------------
+
+procedure TMultiTranslationSubtitlesRetriever.SyncUpdateViewSubsList;
+var
+  RootNode, TranslatedNode, EntriesNode, Node: TTreeNode;
+  j: Integer;
+  Code, FileName: string;
+  GameVersion,
+  PrevGameVersion: TGameVersion;
+  CharsListProblematic, // true if in the same subtitle, 2 games types are present
+  CharsListFound: Boolean;
+
+  function NewNodeType(NodeViewType: TMultiTranslationNodeViewType;
+    GameVersion: TGameVersion): PMultiTranslationNodeType;
+  begin
+    Result := New(PMultiTranslationNodeType);
+    Result^.NodeViewType := NodeViewType;
+    Result^.GameVersion := GameVersion;
+  end;
+
+  procedure SetGameVersion(Node: TTreeNode; GameVersion: TGameVersion);
+  begin
+    PMultiTranslationNodeType(Node.Data)^.GameVersion := GameVersion;
+  end;
+
 begin
-  frmMain.lbFilesList.Items.Add(fStrBuf);
+  // Adding the original node
+  RootNode := frmMain.tvMultiSubs.Items.Add(nil, fStrSubtitle);
+  RootNode.Data := NewNodeType(nvtSubtitleKey, gvUndef);
+  RootNode.ImageIndex := 0;
+  RootNode.SelectedIndex := 0;
+
+  try
+    // Adding the NewSubtitle node
+    TranslatedNode := frmMain.tvMultiSubs.Items.AddChild(RootNode, MT_NOT_TRANSLATED_YET);
+    TranslatedNode.Data := NewNodeType(nvtSubTranslated, gvUndef);
+    TranslatedNode.ImageIndex := 6;
+    TranslatedNode.SelectedIndex := 6;
+
+    // Creating the Entries node if needed
+    EntriesNode := frmMain.tvMultiSubs.Items.AddChild(RootNode, 'Subtitles');
+    EntriesNode.Data := NewNodeType(nvtUndef, gvUndef);
+    EntriesNode.ImageIndex := 3;
+    EntriesNode.SelectedIndex := 3;
+
+    // Put plural or not...
+    Code := 'entry';
+    if fSubtitleInfoList.Count <> 1 then Code := 'entries';
+    EntriesNode.Text := EntriesNode.Text + ' (' +
+      IntToStr(fSubtitleInfoList.Count) + ' ' + Code + ')';
+
+    // Filling the "EntriesNode"
+    PrevGameVersion := gvUndef;
+    CharsListProblematic := False;   
+    for j := 0 to fSubtitleInfoList.Count - 1 do begin
+      FileName := ExtractFileName(fSubtitleInfoList.Items[j].FileName);
+      Code := fSubtitleInfoList.Items[j].Code;
+      GameVersion := fSubtitleInfoList.Items[j].GameVersion;
+
+      // Checks if for the SAME subtitles TWO charsets are used (Problem!
+      // How to determine the right charset??)
+      if (PrevGameVersion <> gvUndef) and (not CharsListProblematic) then
+        CharsListProblematic := not IsTheSameCharsList(PrevGameVersion, GameVersion);
+      PrevGameVersion := GameVersion;
+
+      // Adding the file node
+      Node := FindNode(EntriesNode, FileName);
+      if Node = nil then begin
+        Node := frmMain.tvMultiSubs.Items.AddChild(EntriesNode, FileName);
+        Node.Data := NewNodeType(nvtSourceFile, GameVersion);
+        Node.ImageIndex := 4;
+        Node.SelectedIndex := 4;
+      end;
+
+      // Adding the Sub code node
+      Node := frmMain.tvMultiSubs.Items.AddChild(Node, Code);
+      Node.Data := NewNodeType(nvtSubCode, gvUndef);
+      Node.ImageIndex := 5;
+      Node.SelectedIndex := 5;
+    end;
+
+    // Final: setting the GameVersion for the RootNode (SubKey) and TranslatedNode (TranslatedText)
+    if CharsListProblematic then begin
+      AddDebug('WARNING: Chars list problem for the subtitle "'
+        + fStrSubtitle + '" ! Two different game versions was detected, '
+        + 'so unable to multi-translate this item.');
+      RootNode.ImageIndex := 8;
+      RootNode.SelectedIndex := 8;
+    end else begin
+      SetGameVersion(RootNode, PrevGameVersion);
+      SetGameVersion(TranslatedNode, PrevGameVersion);
+
+      CharsListFound := CharsList.LoadFromFile(GetCorrectCharsList(PrevGameVersion));
+      if CharsListFound then
+        CharsList.Active := fDecodeSubtitles
+      else
+        CharsList.Active := False;
+      RootNode.Text := CharsList.DecodeSubtitle(RootNode.Text);
+    end;
+
+    RootNode.Selected := True;
+  except 
+    // nothing
+  end;
 end;
 
-{
-procedure TMultiTranslationSubtitlesRetriever.TEST_METHOD;
-begin
-  frmMain.cbSubs.Items.Add(fStrBuf);
-end;
-
-PROCEDURE TMultiTranslationSubtitlesRetriever.CLEAR_COMBO;
-begin
-  frmMain.cbSubs.Items.Clear;
-end;
-}
+// -----------------------------------------------------------------------------
 
 initialization
   MultiTranslationTextData := TMultiTranslationTextData.Create;
 
 finalization
   MultiTranslationTextData.Free;
+
+// -----------------------------------------------------------------------------
   
 end.

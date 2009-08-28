@@ -13,24 +13,28 @@ uses
 
 type
   TfrmSelectDir = class(TForm)
-    GroupBox1: TGroupBox;
-    eDirectory: TEdit;
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
-    Bevel1: TBevel;
-    Label1: TLabel;
+    gbDirectory: TGroupBox;
+    bBrowse: TButton;
+    bOK: TButton;
+    bCancel: TButton;
+    bvDelimiter: TBevel;
+    lInfo: TLabel;
     JvBrowseForFolderDialog: TJvBrowseForFolderDialog;
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    cbDirectory: TComboBox;
+    procedure bBrowseClick(Sender: TObject);
+    procedure bOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Déclarations privées }
+    procedure LoadPreviousPath;
+    procedure SavePreviousPath;
   public
     { Déclarations publiques }
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
     function GetSelectedDirectory: string;
+    procedure SetDefaultDirectory(const Directory: TFileName);
   end;
 
 var
@@ -40,22 +44,35 @@ implementation
 
 {$R *.dfm}
 
+uses
+  Utils;
+  
 { TfrmSelectDir }
 
-procedure TfrmSelectDir.Button1Click(Sender: TObject);
+procedure TfrmSelectDir.bBrowseClick(Sender: TObject);
 begin
   with JvBrowseForFolderDialog do begin
-    if DirectoryExists(eDirectory.Text) then Directory := eDirectory.Text;
-    if Execute then eDirectory.Text := Directory;
+    if DirectoryExists(cbDirectory.Text) then Directory := cbDirectory.Text;
+    if Execute then
+      cbDirectory.Text := IncludeTrailingPathDelimiter(Directory);
   end;
 end;
 
-procedure TfrmSelectDir.Button2Click(Sender: TObject);
+procedure TfrmSelectDir.bOKClick(Sender: TObject);
 begin
   if not DirectoryExists(GetSelectedDirectory) then begin
     MsgBox('Specified directory doesn''t exists.', 'Error', MB_ICONWARNING);
     ModalResult := mrNone;
+  end else begin
+    if cbDirectory.Items.IndexOf(GetSelectedDirectory) = -1 then
+      cbDirectory.Items.Add(GetSelectedDirectory); // adding to the list
   end;
+end;
+
+procedure TfrmSelectDir.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  // Saving the ComboBox list
+  SavePreviousPath;
 end;
 
 procedure TfrmSelectDir.FormKeyPress(Sender: TObject; var Key: Char);
@@ -68,18 +85,50 @@ end;
 
 procedure TfrmSelectDir.FormShow(Sender: TObject);
 begin
-  Self.eDirectory.SelectAll;
-  Self.eDirectory.SetFocus;
+  LoadPreviousPath;
+  
+  cbDirectory.SelectAll;
+  cbDirectory.SetFocus;
 end;
 
 function TfrmSelectDir.GetSelectedDirectory: string;
 begin
-  Result := eDirectory.Text;
+  Result := IncludeTrailingPathDelimiter(cbDirectory.Text);
+end;
+
+procedure TfrmSelectDir.LoadPreviousPath;
+var
+  i: Integer;
+  SL: TStringList;
+
+begin
+  if not FileExists(GetPreviousSelectedPathFileName) then Exit;
+  cbDirectory.Items.Clear;
+  
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(GetPreviousSelectedPathFileName);
+    for i := 0 to SL.Count - 1 do
+      if DirectoryExists(SL[i]) then
+        cbDirectory.Items.Add(SL[i]);
+  finally
+    SL.Free;
+  end;
 end;
 
 function TfrmSelectDir.MsgBox(Text, Caption: string; Flags: Integer): Integer;
 begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
+end;
+
+procedure TfrmSelectDir.SavePreviousPath;
+begin
+  cbDirectory.Items.SaveToFile(GetPreviousSelectedPathFileName);
+end;
+
+procedure TfrmSelectDir.SetDefaultDirectory(const Directory: TFileName);
+begin
+  cbDirectory.Text := Directory;
 end;
 
 end.

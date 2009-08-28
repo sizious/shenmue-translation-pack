@@ -26,7 +26,7 @@ type
     // --- don't call directly ---
     procedure SyncInitializeProgressWindow;
     procedure SyncUpdateProgressOperation;
-    procedure SyncUpdateScnfFileList;
+//    procedure SyncUpdateScnfFileList;
   protected
     procedure Execute; override;
   public
@@ -105,9 +105,9 @@ begin
   frmProgress.lInfos.Caption := fStrBuf;
 end;
 
-procedure TMultiTranslator.SyncUpdateScnfFileList;
+(*procedure TMultiTranslator.SyncUpdateScnfFileList;
 begin
   frmMain.lbFilesList.Items.Add(fStrBuf);
-end;
+end;*)
 
 end.

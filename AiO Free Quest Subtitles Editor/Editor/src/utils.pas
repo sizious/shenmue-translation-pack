@@ -1,3 +1,6 @@
+{
+  Some standard common utilities functions...
+}
 unit utils;
 
 interface
@@ -11,7 +14,9 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 function GetConfigFileName: TFileName;
+function GetPreviousSelectedPathFileName: TFileName;
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
+procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 
 //------------------------------------------------------------------------------
 implementation
@@ -24,7 +29,16 @@ const
   HexValues = '0123456789ABCDEF';
   
 var
+  AppDir: TFileName;
   ConfigFileName: TFileName;
+  PreviousSelectedPathFileName: TFileName;
+
+//------------------------------------------------------------------------------
+
+function GetPreviousSelectedPathFileName: TFileName;
+begin
+  Result := PreviousSelectedPathFileName;
+end;
 
 //------------------------------------------------------------------------------
 
@@ -215,7 +229,26 @@ end;
 
 //------------------------------------------------------------------------------
 
+procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
+var
+  P: TPoint;
+
+begin
+  if Index = 0 then begin
+//    ListView.Scroll(0, - MaxInt);
+    ListView.ItemIndex := 0;
+  end else begin
+    ListView.ItemIndex := Index - 1;
+    P := ListView.Selected.Position;
+    ListView.Scroll(0, P.Y);
+    ListView.ItemIndex := Index;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
 initialization
-  ConfigFileName := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'config.xml';
-  
+  AppDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
+  ConfigFileName := AppDir + 'config.xml';
+  PreviousSelectedPathFileName := AppDir + 'selpath.ini';
 end.

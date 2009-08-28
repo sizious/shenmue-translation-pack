@@ -12,7 +12,7 @@ uses
   Dialogs, ExtCtrls, ComCtrls, StdCtrls;
 
 type
-  TProgressMode = (pmSCNFScanner, pmMultiScan, pmBatchSubsExport);
+  TProgressMode = (pmSCNFScanner, pmMultiScan, pmBatchSubsExport, pmMultiViewUpdater);
 
   TfrmProgress = class(TForm)
     lInfos: TLabel;
@@ -24,13 +24,18 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Déclarations privées }
     fCurrentThread: TThread;
-    fAborted: Boolean;
+    fAbortQuery: Boolean;
     fTerminated: Boolean;
     fProgressMode: TProgressMode;
-    procedure MultiTranslatorEndEvent(Sender: TObject);
+    fAborted: Boolean;
+    procedure EndEventMultiTranslationViewUpdater(Sender: TObject);
+    procedure DirectoryScanningEndEvent(Sender: TObject);
+//    procedure MultiTranslatorEndEvent(Sender: TObject);
     procedure SetProgressMode(const Value: TProgressMode);
     procedure SubsRetrieverEndEvent(Sender: TObject);
     procedure BatchSubsExporterEndEvent(Sender: TObject);
@@ -42,8 +47,9 @@ type
     { Déclarations publiques }
     procedure Reset;
     procedure UpdateProgressBar;
-    procedure DirectoryScanningEndEvent(Sender: TObject);
+    function MsgBox(const Text, Title: string; Flags: Integer): Integer;
     property Aborted: Boolean read fAborted write fAborted;
+    property AbortQueryByCancelButton: Boolean read fAbortQuery write fAbortQuery;
     property Terminated: Boolean read fTerminated write fTerminated;
     property Mode: TProgressMode read fProgressMode write SetProgressMode;
   end;
@@ -56,12 +62,12 @@ implementation
 {$R *.dfm}
 
 uses
-  Main, Math, SubsExp;
+  Main, Math, SubsExp, MultiScan;
   
 procedure TfrmProgress.btnCancelClick(Sender: TObject);
 begin
   btnCancel.Enabled := False;
-  Aborted := True;
+  AbortQueryByCancelButton := True;
   Close;
 end;
 
@@ -69,22 +75,51 @@ procedure TfrmProgress.DirectoryScanningEndEvent(Sender: TObject);
 begin
   Terminated := True;
   Close;
+  
   frmMain.eFilesCount.Text := IntToStr(frmMain.lbFilesList.Count);
   if frmMain.lbFilesList.CanFocus then frmMain.lbFilesList.SetFocus;
-  frmMain.SetStatus('Ready');
+//  frmMain.SetStatus('Ready');
+  frmMain.SetStatusReady;
   frmMain.AddDebug('Selected directory: "' + frmMain.SelectedDirectory + '"');
-  frmMain.ActiveMultifilesOptions;
+//  frmMain.ActiveMultifilesOptions;
+end;
+
+procedure TfrmProgress.EndEventMultiTranslationViewUpdater(Sender: TObject);
+begin
+  Terminated := True;
+  Close;
+//  frmMain.SetStatus('Ready');
+  frmMain.SetStatusReady;
+end;
+
+procedure TfrmProgress.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Screen.Cursor := crDefault;
 end;
 
 procedure TfrmProgress.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  CanDo: Integer;
+
 begin
-  if (Aborted) or (not Terminated) then begin
-    // SCNFScanner.Terminate;  //SubsRetriever.Terminate; fCurrentThread
-    if Assigned(fCurrentThread) then fCurrentThread.Terminate;
-    CanClose := False;
-    Aborted := False;
+  // if canceled by button or window closed when the processus isn't terminated
+  if (AbortQueryByCancelButton) or (not Terminated) then begin
+  
+    AbortQueryByCancelButton := False;
+    CanClose := False; // don't close window now, only when the thread is finished
+    
+    if Assigned(fCurrentThread) then begin
+      fCurrentThread.Suspend;
+      CanDo := MsgBox('Are you sure to cancel the current operation ?', 'Aborting heavy process', MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2);
+      fCurrentThread.Resume; // resume the thread to continue or to stop the thread
+      btnCancel.Enabled := True;
+      if CanDo = IDCANCEL then Exit;
+      fCurrentThread.Terminate; // the thread must be running to get terminate working properly
+    end;
+
+    Aborted := True;
   end;
-  Reset;
+//  Reset;
 end;
 
 procedure TfrmProgress.FormCreate(Sender: TObject);
@@ -98,14 +133,21 @@ begin
   if Key = Chr(VK_ESCAPE) then Close;
 end;
 
+procedure TfrmProgress.FormShow(Sender: TObject);
+begin
+  Screen.Cursor := crAppStart;
+  Reset;
+end;
+
 procedure TfrmProgress.Reset;
 begin
   Terminated := False;
-  Aborted := False;
+  AbortQueryByCancelButton := False;
   pbar.Position := 0;
   lProgBar.Caption := '0%';
   Self.lInfos.Caption := '';
   btnCancel.Enabled := True;
+  Aborted := False;
 end;
 
 procedure TfrmProgress.SetProgressMode(const Value: TProgressMode);
@@ -120,13 +162,15 @@ begin
                       fCurrentThread := SCNFScanner;
                       fCurrentThread.OnTerminate := DirectoryScanningEndEvent;
                     end;
+
     pmMultiScan:
                     begin
                       frmMain.SetStatus('Retrieving subtitles from files list... Please wait.');
                       Self.Caption := 'Retrieving subtitles...';
-                      fCurrentThread := SubsRetriever;
+                      fCurrentThread := MultiTranslationSubsRetriever;
                       fCurrentThread.OnTerminate := SubsRetrieverEndEvent;
                     end;
+
     pmBatchSubsExport:
                       begin
                         frmMain.SetStatus('Batch exporting... Please wait.');
@@ -135,6 +179,14 @@ begin
                         fCurrentThread.OnTerminate := BatchSubsExporterEndEvent;
                         (fCurrentThread as TSubsMassExporterThread).OnErrornousFile := SubsMassExporterErrornousFileEvent;
                         (fCurrentThread as TSubsMassExporterThread).OnCompleted := SubsMassExporterCompletedEvent;
+                      end;
+
+    pmMultiViewUpdater:
+                      begin
+                        frmMain.SetStatus('Updating Multi-translation view...');
+                        Caption := 'Updating Multi-translation view...';
+                        fCurrentThread := MultiTranslationViewUpdater;
+                        fCurrentThread.OnTerminate := EndEventMultiTranslationViewUpdater;
                       end;
   end;
 
@@ -149,12 +201,18 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TfrmProgress.MultiTranslatorEndEvent(Sender: TObject);
+function TfrmProgress.MsgBox(const Text, Title: string;
+  Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Title), Flags);
+end;
+
+(*procedure TfrmProgress.MultiTranslatorEndEvent(Sender: TObject);
 begin
   Terminated := True;
   Close;
   frmMain.SetStatus('Ready');
-end;
+end;*)
 
 procedure TfrmProgress.SubsMassExporterCompletedEvent(Sender: TObject;
   FileExportedCount, FileErrornousCount: Integer);
@@ -174,15 +232,33 @@ procedure TfrmProgress.SubsRetrieverEndEvent(Sender: TObject);
 begin
   Terminated := True;
   Close;
-  frmMain.SetStatus('Ready');
-  frmMain.MultiTranslationFillControls;
+//  frmMain.SetStatus('Ready');
+  frmMain.SetStatusReady;
+
+  if not Aborted then
+    frmMain.AddDebug('Files list scanned successfully. '
+      + IntToStr(MultiTranslationTextData.Subtitles.Count)
+      + ' subtitle(s) retrieved.')
+  else
+    frmMain.AddDebug('Files list scanning aborted.'
+    + ' If some datas are in the window you can work on it anyway...');
+
+  try
+    if frmMain.tvMultiSubs.Items.Count > 0 then begin
+      frmMain.MultiTranslationInUse := True;
+      frmMain.tvMultiSubs.Items[0].Selected := True;
+      frmMain.tvMultiSubsClick(Self);
+    end;
+  except
+  end;
 end;
 
 procedure TfrmProgress.BatchSubsExporterEndEvent(Sender: TObject);
 begin
   Terminated := True;
   Close;
-  frmMain.SetStatus('Ready');
+//  frmMain.SetStatus('Ready');
+  frmMain.SetStatusReady;
 end;
 
 end.

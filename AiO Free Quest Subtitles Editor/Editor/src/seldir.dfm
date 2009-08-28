@@ -14,17 +14,18 @@ object frmSelectDir: TfrmSelectDir
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Bevel1: TBevel
+  object bvDelimiter: TBevel
     Left = 8
     Top = 79
     Width = 359
     Height = 2
   end
-  object Label1: TLabel
+  object lInfo: TLabel
     Left = 8
     Top = 8
     Width = 329
@@ -33,31 +34,32 @@ object frmSelectDir: TfrmSelectDir
       'Please select the target directory to retrieve Free Quest charac' +
       'ters.'
   end
-  object GroupBox1: TGroupBox
+  object gbDirectory: TGroupBox
     Left = 8
     Top = 28
     Width = 359
     Height = 45
     Caption = ' Directory: '
     TabOrder = 0
-    object eDirectory: TEdit
-      Left = 7
-      Top = 16
-      Width = 267
-      Height = 21
-      TabOrder = 0
-    end
-    object Button1: TButton
+    object bBrowse: TButton
       Left = 278
       Top = 14
       Width = 75
       Height = 25
       Caption = 'Browse...'
+      TabOrder = 0
+      OnClick = bBrowseClick
+    end
+    object cbDirectory: TComboBox
+      Left = 7
+      Top = 16
+      Width = 267
+      Height = 21
+      ItemHeight = 13
       TabOrder = 1
-      OnClick = Button1Click
     end
   end
-  object Button2: TButton
+  object bOK: TButton
     Left = 216
     Top = 85
     Width = 75
@@ -66,9 +68,9 @@ object frmSelectDir: TfrmSelectDir
     Default = True
     ModalResult = 1
     TabOrder = 1
-    OnClick = Button2Click
+    OnClick = bOKClick
   end
-  object Button3: TButton
+  object bCancel: TButton
     Left = 292
     Top = 85
     Width = 75

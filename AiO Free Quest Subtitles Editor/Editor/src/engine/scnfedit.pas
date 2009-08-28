@@ -9,8 +9,8 @@
   Free Quest characters subtitles editor for Shenmue I, What's Shenmue,
   Shenmue II XBOX & DC
 
-  Version.............: 3.2.0
-  Release date........: April 1, 2009 @09:42PM
+  Version.............: 3.3.2
+  Release date........: August 24, 2009 @01:04AM
   
   Main code...........: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
   Additional code.....: Manic
@@ -18,17 +18,31 @@
 
   Project website.....: http://shenmuesubs.sourceforge.net/
 }
+(*
+  Short history:
+
+  3.3.2 (August 24, 2009 @01:04AM):
+    - Fixed a problem in the ImportToFile method: <CR> was encoded when importing
+      a XML file.
+
+  3.3.1 (August 21, 2009 @07:15PM):
+    - Fixed the ExportToFile method: Adding the gvShenmue2J GameVersion
+    
+  3.3.0 (August 16, 2009 @11:22PM):
+    - Removed *EVERY* references to the PatchValue CRAP. Every entry in the
+      subtitle table are *RE-CALCULATED* when saving the file.
+*)
 unit scnfedit;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, Common, CharsLst, NPCInfo;
+  Windows, SysUtils, Classes, Common, CharsLst, NPCInfo, ScnfUtil;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.2.0';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'April 1, 2009 @09:42PM';
-  
+  SCNF_EDITOR_ENGINE_VERSION = '3.3.2';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'August 24, 2009 @01:04AM';
+
 type
   // Structure to read IPAC sections info from footer
   TSectionRawBinaryEntry = record
@@ -60,17 +74,17 @@ type
     fStartSubtitleEntry: string;                  // string before each subtitle text
     fStartSubtitleEntryLength: Integer;           // bytes count of that string
 
-    fSubOriginalTextOffset: Integer;
-    fSubOriginalCodeOffset: Integer;
+//    fSubOriginalTextOffset: Integer;
+//    fSubOriginalCodeOffset: Integer;
 
-    fPatchValue: Integer;
+//    fPatchValue: Integer;
     fSubTextOffset: Integer;
     fSubCodeOffset: Integer;
     fUnknowValue: Integer;
 
     fCode: string;
     fText: string;
-    fOriginalTextLength: Integer; // original (not modified) subtitle length
+//    fOriginalTextLength: Integer; // original (not modified) subtitle length
     fCharID: string;
     fVoiceID: string;
 
@@ -82,7 +96,7 @@ type
   public
     constructor Create(Owner: TSubList);
     property CharID: string read fCharID;
-    property CurrentPatchValue: Integer read fPatchValue;
+//    property CurrentPatchValue: Integer read fPatchValue;
     property Code: string read fCode;
     property CodeOffset: Integer read fSubCodeOffset;
     property Text: string read GetText write SetText;
@@ -107,6 +121,7 @@ type
     property Code: Char read fCode;
   end;
 
+  // container of TSCNFCharsDecodeTableItem
   TSCNFCharsDecodeTable = class(TObject)
   private
     fOwner: TSubList;
@@ -125,6 +140,7 @@ type
     property Owner: TSubList read fOwner;
   end;
 
+  // contains all subtitles
   TSubList = class(TObject)
   private
     fOwner: TSCNFEditor;
@@ -140,6 +156,7 @@ type
     destructor Destroy; override;
     function ExportToFile(const FileName: TFileName): Boolean;
     function ImportFromFile(const FileName: TFileName): Boolean;
+    function FindSubtitleByCode(const Code: string): Integer;
     property CharsIdDecodeTable: TSCNFCharsDecodeTable read fCharsDecodeTable;
     property Items[Index: Integer]: TSubEntry read GetItem; default;
     property Count: Integer read GetCount;
@@ -196,9 +213,10 @@ type
     fVoiceFullID: string;                       // x length string (read at 0x112) (not modified)
     fVoiceShortID: string;                  // only the code (extracted from VoiceID) (not modified)
 
-    fStrTableHeaderOffset: Integer;         // String table header position (not modified)
-    fStrScnfCharIdHeaderSize: Integer;      // size of block with SCNF + CharID header (not modified)
-    fStrTableBodyOffset: Integer;           // Subtitles text string table start position (not modified)
+    fScnfCharIdHeaderOffset: Integer;     // position of the CharID offset start within the scnf header
+    fScnfCharIdHeaderSize: Integer;           // size of block with SCNF + CharID header (not modified)
+    fScnfStrTableHeaderOffset: Integer;         // String table header position (not modified)
+    fScnfStrTableBodyOffset: Integer;           // Subtitles text string table start position (not modified)
     
     fSubList: TSubList;
     fSectionsList: TSectionsList;
@@ -218,7 +236,7 @@ type
     function GetGameVersion: TGameVersion;
     function GetCharacterID: string;
     function null_bytes_length(dataSize: Integer): Integer;
-    procedure PatchValues;     // Update subtitles values: modify the TotalPatchValue & do other stuffs (modifing pks values etc...).
+//    procedure PatchValues;     // Update subtitles values: modify the TotalPatchValue & do other stuffs (modifing pks values etc...).
     function GetSectionsList: TSectionsList;
     procedure ParseScnfSection(var F: file; ScnfOffset: Integer);
     procedure CopyFileBlock(var SrcF, DestF: file; SrcStartOffset, SrcBlockSize: Integer);
@@ -233,16 +251,18 @@ type
     function GetLoadedFileName: TFileName;
 
     function LoadFromFile(const FileName: TFileName): Boolean;
+    function ReloadFile: Boolean;
     procedure SaveToFile(const FileName: TFileName);
+    procedure Save;
 
     property CharacterID: string read GetCharacterID;
     property GameVersion: TGameVersion read GetGameVersion;
     property VoiceFullID: string read fVoiceFullID;
     property VoiceShortID: string read fVoiceShortID;
     property FooterOffset: Integer read fFooterOffset;
-    property ScnfChrIDHeaderOffset: Integer read fStrScnfCharIdHeaderSize;
-    property StrTableHeaderOffset: Integer read fStrTableHeaderOffset;
-    property StrTableBodyOffset: Integer read fStrTableBodyOffset;
+    property ScnfCharIDHeaderSize: Integer read fScnfCharIdHeaderSize;
+    property StrTableHeaderOffset: Integer read fScnfStrTableHeaderOffset;
+    property StrTableBodyOffset: Integer read fScnfStrTableBodyOffset;
     
     property Sections: TSectionsList read GetSectionsList;
     property Subtitles: TSubList read GetSubList;
@@ -264,8 +284,8 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, ScnfUtil
-  {$IFDEF DEBUG}, TypInfo {$ENDIF};
+  {$IFDEF DEBUG}TypInfo, {$ENDIF}
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
 
 //------------------------------------------------------------------------------
 // TSubEntry
@@ -279,14 +299,14 @@ begin
   Item := TSubEntry.Create(Self);
   Item.fIndex := fList.Count;
   Item.fSubTextOffset := SubEntry.SubTextOffset;      // offset of the text subtitle
-  Item.fSubOriginalTextOffset := Item.fSubTextOffset;
+//  Item.fSubOriginalTextOffset := Item.fSubTextOffset;
   Item.fSubCodeOffset := SubEntry.SubCodeOffset;      // offset of the subtitle code before text subtitle (like "F2468A001"...)
-  Item.fSubOriginalCodeOffset := Item.fSubCodeOffset;
+//  Item.fSubOriginalCodeOffset := Item.fSubCodeOffset;
   Item.fUnknowValue := SubEntry.UnknowCrap;           // dunno what's it... may be it's a time flag or other...
   Item.fCode := SubEntry.SubCode;                     // subtitle code
   Item.fText := '';                                   // subtitle text: not yet (read after)
-  Item.fOriginalTextLength := 0;
-  Item.fPatchValue := 0;
+//  Item.fOriginalTextLength := 0;
+//  Item.fPatchValue := 0;
   Item.fCharID := CharsIdDecodeTable.GetCharIdFromCode(Item.fCode[1]);
   Item.fVoiceID := '';
   fList.Add(Item);
@@ -368,7 +388,8 @@ begin
       AddXMLNode(XMLDoc, 'filename', ExtractFileName(Owner.fSourceFileName));
 
       // Game version
-      case Owner.fGameVersion of
+      case Owner.GameVersion of
+        gvShenmue2J   : AddXMLNode(XMLDoc, 'gameversion', 's2jdc');
         gvShenmue2    : AddXMLNode(XMLDoc, 'gameversion', 's2dc');
         gvShenmue2X   : AddXMLNode(XMLDoc, 'gameversion', 's2xb');
         gvShenmue     : AddXMLNode(XMLDoc, 'gameversion', 's1dc');
@@ -412,6 +433,25 @@ end;
 
 //------------------------------------------------------------------------------
 
+function TSubList.FindSubtitleByCode(const Code: string): Integer;
+var
+  Found: Boolean;
+
+begin
+  Result := -1;
+  if Count = 0 then Exit;  
+  Found := False;
+    
+  while ((not Found) and (Result < Count)) do begin
+    Inc(Result);
+    Found := SameText(Items[Result].Code, Code);
+//    WriteLn(Items[Result].Code, ' -- ', Result, ' -- ', Code, ' -- ', Found);
+  end;
+  if Result = Count then Result := -1;  
+end;
+
+//------------------------------------------------------------------------------
+
 function TSubList.GetCount: Integer;
 begin
   Result := fList.Count;
@@ -433,6 +473,8 @@ var
   CurrentNode, LoopNode: IXMLNode;
   xmlSubCode, xmlSubtitle, xmlCharID, xmlVoiceID, xmlShortVoiceID: string;
   CurrentSub: TSubEntry;
+  CharsListActive: Boolean;
+
 begin
   Result := False;
   if not FileExists(FileName) then Exit;
@@ -483,6 +525,10 @@ begin
       Exit;
     end;
 
+    // Disabling CharsList...
+    CharsListActive := Owner.CharsList.Active;
+    Owner.CharsList.Active := False;
+    
     // Subtitles
     CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('subtitles');
     if CurrentNode.Attributes['count'] <> Count then begin
@@ -513,7 +559,7 @@ begin
     end;
 
     Result := True;
-    
+    Owner.CharsList.Active := CharsListActive;
   finally
     XMLDoc.Active := False;
     XMLDoc := nil;
@@ -522,27 +568,40 @@ end;
 
 procedure TSubList.WriteSubtitlesTable(var F: file);
 var
-  i: Integer;
   TempSubsStrFile: TFileName;
+  i, ScnfBodyRelativeOffset, NewCodeOffset: Integer;
   F_sub: file;
-
-begin
-  // THIS IS MAY BE TO REMAKE BECAUSE IT'S A LITTLE FUCKED UP...
+  _null: Char;
   
+begin
   // Creating temporary file to write subtitles text (this to optimize the double for-loop...)
-  TempSubsStrFile := Self.fOwner.GetTempFileName;
+  TempSubsStrFile := Owner.GetTempFileName;
   AssignFile(F_sub, TempSubsStrFile);
   FileMode := fmOpenWrite;
   {$I-}ReWrite(F_sub, 1);{$I+}
   if IOResult <> 0 then Exit;
 
+  // This is the offset where will be stored the subs table (-16 for PAKS header)
+  // This value is "relative" to CharID header and will be put in the subtitle
+  // table header. It will be read by the game.
+  ScnfBodyRelativeOffset := Owner.fScnfCharIdHeaderSize
+    + (Owner.fScnfStrTableBodyOffset - Owner.fScnfStrTableHeaderOffset) - 16;
+                  
   // Getting all subtitles from this PAKS file...
+  _null := #$00;
   for i := 0 to Count - 1 do begin
-    // Writing subtitle header table directly to the dest file
-    Items[i].WriteHeaderEntry(F);
+    // Writing VoiceID subtitle
+    NewCodeOffset := ScnfBodyRelativeOffset + FilePos(F_sub);
+    BlockWrite(F_sub, Pointer(Items[i].VoiceID)^, Length(Items[i].VoiceID));
+    BlockWrite(F_sub, _null, 1);
 
     // Writing subtitle text to a temp file to be merged after...
+    Items[i].fSubTextOffset := ScnfBodyRelativeOffset + FilePos(F_sub);
+    Items[i].fSubCodeOffset := NewCodeOffset; // updating values ...
     Items[i].WriteTextEntry(F_sub);
+
+    // Writing subtitle header table directly to the dest file
+    Items[i].WriteHeaderEntry(F);
   end;
 
   // Writing subtitles string table to the final dest file
@@ -565,7 +624,7 @@ constructor TSubEntry.Create(Owner: TSubList);
 begin
   fOwner := Owner;
   fEditorOwner := Owner.Owner;
-  fPatchValue := 0;
+//  fPatchValue := 0;
 end;
              
 //------------------------------------------------------------------------------
@@ -581,7 +640,7 @@ begin
   Self.fText := Copy(RawSubtitleText, StartTextPos + 2, Length(RawSubtitleText));
   EndTextPos := Pos(TABLE_STR_ENTRY_END, Self.fText); // -1 for chars code
   Self.fText := Copy(Self.fText, 1, EndTextPos - 1);
-  fOriginalTextLength := Length(fText); // to calculate PatchValue
+//  fOriginalTextLength := Length(fText); // to calculate PatchValue
 
   fStartSubtitleEntry := Copy(RawSubtitleText, 1, StartTextPos - 1);
   StartBufSize := Length(fStartSubtitleEntry);
@@ -599,19 +658,19 @@ end;
 
 procedure TSubEntry.SetText(const Value: string);
 begin
-  if fText <> Value then begin
+  if fText <> Value then // begin
     fText := EditorOwner.CharsList.EncodeSubtitle(Value); // using charlist to encode subtitle
-    fPatchValue := (Length(fText) - Self.fOriginalTextLength);
-  end;
+//    fPatchValue := (Length(fText) - Self.fOriginalTextLength);
+//  end;
 
-  {$IFDEF DEBUG}
+(*  {$IFDEF DEBUG}
   WriteLn(
     'Code: ', Code,
-    ' - PatchValue: ', fPatchValue,
+//    ' - PatchValue: ', fPatchValue,
     ' - TextOffset: ', fSubTextOffset,
     ' - CodeOffset: ', fSubCodeOffset
   );
-  {$ENDIF}
+  {$ENDIF} *)
 end;
 
 procedure TSubEntry.WriteHeaderEntry(var F: file);
@@ -624,7 +683,6 @@ begin
   SubEntry.SubCodeOffset := fSubCodeOffset;
   StrCopy(SubEntry.SubCode, PChar(Code));
   SubEntry.UnknowCrap := fUnknowValue;
-
   BlockWrite(F, SubEntry, SizeOf(SubEntry));
 end;
 
@@ -635,13 +693,13 @@ const
 
 var
   _tmp: string;
-  _null: Char;
+//  _null: Char;
 
 begin
   // Writing VoiceID
-  BlockWrite(F, Pointer(VoiceID)^, Length(VoiceID));
+(*  BlockWrite(F, Pointer(VoiceID)^, Length(VoiceID));
   _null := #$00;
-  BlockWrite(F, _null, 1);
+  BlockWrite(F, _null, 1); *)
 
   // Writing code and string init chars
   BlockWrite(F, Pointer(fStartSubtitleEntry)^, Length(fStartSubtitleEntry));
@@ -666,9 +724,9 @@ begin
   Self.fCharacterID := '';
   Self.fVoiceFullID := '';
   Self.fVoiceShortID := '';
-  Self.fStrTableHeaderOffset := 0;
-  Self.fStrTableBodyOffset := 0;
-  Self.fStrScnfCharIdHeaderSize := 0;
+  Self.fScnfStrTableHeaderOffset := 0;
+  Self.fScnfStrTableBodyOffset := 0;
+  Self.fScnfCharIdHeaderSize := 0;
 
   Self.fAgeType := atUndef;
   Self.fGender := gtUndef;
@@ -774,7 +832,9 @@ begin
   else if Pos(VOICE_STR_SHENMUE2, FullVoiceID) > 0 then
     Result := gvShenmue2
   else if Pos(VOICE_STR_SHENMUE2X, FullVoiceID) > 0 then
-    Result := gvShenmue2X;
+    Result := gvShenmue2X
+  else if Pos(VOICE_STR_SHENMUE2J, FullVoiceID) > 0 then
+    Result := gvShenmue2J;
 end;
 
 //------------------------------------------------------------------------------
@@ -801,6 +861,8 @@ var
   BytesToRead: Integer;
   
 begin
+  {$IFDEF DEBUG} WriteLn('Loading file...'); {$ENDIF}
+
   // SCNF offset
   {$IFDEF DEBUG} WriteLn('SCNF offset: ', ScnfOffset); {$ENDIF}
 
@@ -810,6 +872,10 @@ begin
 
   // CharID (Section Name)
   CharIDSectionOffset := ScnfOffset + 16;
+  fScnfCharIdHeaderOffset := CharIDSectionOffset;
+  {$IFDEF DEBUG} WriteLn('Char ID (in SCNF header) offset: ', fScnfCharIdHeaderOffset); {$ENDIF}
+
+  // Reading the CharID within the SCNF section header
   Seek(F, CharIDSectionOffset);
   BlockRead(F, BufSubCode, SizeOf(BufSubCode));
   Self.fCharacterID := BufSubCode;
@@ -817,12 +883,12 @@ begin
 
   // string table offset
   Seek(F, CharIDSectionOffset + 24);
-  BlockRead(F, fStrTableHeaderOffset, SizeOf(fStrTableHeaderOffset));
-  fStrTableHeaderOffset := CharIDSectionOffset + fStrTableHeaderOffset;
-  fStrScnfCharIdHeaderSize := (fStrTableHeaderOffset - CharIDSectionOffset) + 16;
+  BlockRead(F, fScnfStrTableHeaderOffset, SizeOf(fScnfStrTableHeaderOffset));
+  fScnfStrTableHeaderOffset := CharIDSectionOffset + fScnfStrTableHeaderOffset;
+  fScnfCharIdHeaderSize := (fScnfStrTableHeaderOffset - CharIDSectionOffset) + 16;
   {$IFDEF DEBUG}
-  WriteLn('StrTableHeaderOffset: ', fStrTableHeaderOffset, #13#10, 'StrScnfCharIdHeaderSize: ',
-    fStrScnfCharIdHeaderSize, #13#10, 'CharIDSectionOffset: ', CharIDSectionOffset);
+  WriteLn('StrTableHeaderOffset: ', fScnfStrTableHeaderOffset, #13#10, 'StrScnfCharIdHeaderSize: ',
+    fScnfCharIdHeaderSize, #13#10, 'CharIDSectionOffset: ', CharIDSectionOffset);
   {$ENDIF}
 
   // Voice ID
@@ -871,12 +937,12 @@ begin
   // Retrieving String Table Body Offset (that contains every subtitles text)
   // Each sub entry starts with ShortVoiceID (Like "FEX20") and with a sub id (like "A001")
   // Where all subs starting with "A" stand for Ryô and "B" is for the NPC character.
-  Seek(F, fStrTableHeaderOffset + 4);
-  BlockRead(F, fStrTableBodyOffset, GAME_INTEGER_SIZE);
-  fStrTableBodyOffset := CharIDSectionOffset + fStrTableBodyOffset;
+  Seek(F, fScnfStrTableHeaderOffset + 4);
+  BlockRead(F, fScnfStrTableBodyOffset, GAME_INTEGER_SIZE);
+  fScnfStrTableBodyOffset := CharIDSectionOffset + fScnfStrTableBodyOffset;
 
   // Reading String Table Header
-  Seek(F, fStrTableHeaderOffset);
+  Seek(F, fScnfStrTableHeaderOffset);
   SubTableHeaderReadingDone := False;
   while not SubTableHeaderReadingDone do begin
     // Reading raw entry from the table
@@ -885,12 +951,14 @@ begin
     // adding the new entry
     Subtitles.AddEntry(SubRawBinaryEntry);
 
-    // To get the StrTableBodyOffset from file read the second value of first sub in the header table
-    SubTableHeaderReadingDone := (FilePos(F) = fStrTableBodyOffset);
+    // To get the StrTableBodyOffset (where is stored all VoiceID and Subtitle datas)
+    // from file read the second value of first sub in the header table
+    // To summarize, the structure of the file is : [Subtitle Table (Header)] [Str Table (Body)]
+    SubTableHeaderReadingDone := (FilePos(F) = fScnfStrTableBodyOffset);
   end;
 
-  {$IFDEF DEBUG} WriteLn(#13#10, 'String table header offset: ', fStrTableHeaderOffset); {$ENDIF}
-  {$IFDEF DEBUG} WriteLn('String table body offset: ', fStrTableBodyOffset, #13#10); {$ENDIF}
+  {$IFDEF DEBUG} WriteLn(#13#10, 'String table header offset: ', fScnfStrTableHeaderOffset); {$ENDIF}
+  {$IFDEF DEBUG} WriteLn('String table body offset: ', fScnfStrTableBodyOffset, #13#10); {$ENDIF}
 
   //----------------------------------------------------------------------------
   // TABLE TEXT ENTRIES SCAN
@@ -906,6 +974,13 @@ begin
     ZeroMemory(@Buffer, VoiceIDLength + 1);
     BlockRead(F, Buffer, VoiceIDLength);
     Subtitles[i].fVoiceID := Buffer;
+
+{$IFDEF DEBUG}
+    if Pos(VoiceShortID, Subtitles[i].fVoiceID) = 0 then
+      WriteLn('WARNING: Subtitle VoiceID beginning seems to be INVALID! ',
+        '(Found = "', Subtitles[i].fVoiceID, '", Excepted = "', VoiceShortID,
+        '"');
+{$ENDIF}
 
     // Reading raw subtitle text
     Seek(F, CharIDSectionOffset + Subtitles[i].TextOffset);
@@ -941,11 +1016,13 @@ var
   {$IFDEF DEBUG} NewSectionItem: TSectionItem; {$ENDIF}
 
 begin
-  fFileLoaded := False;
-  Result := fFileLoaded;
+  Result := False;
 
   // If the file doesn't exists we exit
   if not FileExists(FileName) then Exit;
+
+  // Unload previous file
+  fFileLoaded := False;
 
   // Store filename
   fSourceFileName := FileName;
@@ -1065,7 +1142,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure TSCNFEditor.PatchValues;
+(*procedure TSCNFEditor.PatchValues;
 var
   i, j: Integer;
   PatchValue: Integer;
@@ -1088,6 +1165,13 @@ begin
     Subtitles[i].fOriginalTextLength := Length(Subtitles[i].fText);
     Self.Subtitles[i].fPatchValue := 0;
   end;
+end;*)
+
+function TSCNFEditor.ReloadFile: Boolean;
+begin
+  Result := False;
+  if FileLoaded then
+    Result := LoadFromFile(SourceFileName);
 end;
 
 //------------------------------------------------------------------------------
@@ -1142,6 +1226,17 @@ begin
   BlockWrite(F, Buffer, Padding);
 end;
 
+procedure TSCNFEditor.Save;
+begin
+  if FileLoaded then
+    SaveToFile(GetLoadedFileName)
+{$IFDEF DEBUG}
+  else
+    WriteLn('Save: File NOT loaded!')
+{$ENDIF}
+    ;
+end;
+
 procedure TSCNFEditor.SaveToFile(const FileName: TFileName);
 var
   F_src, F_dest: file;
@@ -1149,7 +1244,7 @@ var
   i, NewPos, NewSize, NewIpacSize, Padding: Integer;
 
 begin
-  PatchValues; // patching offset values
+//  PatchValues; // patching offset values
 
   // Opening source file
   AssignFile(F_src, GetLoadedFileName());
@@ -1187,10 +1282,10 @@ begin
 
       // Write SCNF & CharID section header
       // + 16 for PAKS header
-      CopyFileBlock(F_src, F_dest, Sections[i].Offset + 16, fStrScnfCharIdHeaderSize);
+      CopyFileBlock(F_src, F_dest, Sections[i].Offset + 16, fScnfCharIdHeaderSize);
       {$IFDEF DEBUG} 
       WriteLn('Writing SCNF and CharID sections header offset: ', 
-        Sections[i].Offset + 16, ', size: ', fStrScnfCharIdHeaderSize
+        Sections[i].Offset + 16, ', size: ', fScnfCharIdHeaderSize
       );
       {$ENDIF}
 
@@ -1263,8 +1358,10 @@ begin
 
   // If target file (FileName) is different of source file (GetTempFileName)
   // we must reload the original source file (because every values has been modified).
-  if UpperCase(FileName) <> UpperCase(GetLoadedFileName) then
-    LoadFromFile(GetLoadedFileName);
+  // ** FIX 3.2.2: NO. We must to keep the editor as it. If the user wants to
+  // get the original filename he must RELOAD the file.
+(*  if UpperCase(FileName) <> UpperCase(GetLoadedFileName) then
+    LoadFromFile(GetLoadedFileName); *)
 
   // Deleting temp file
   try

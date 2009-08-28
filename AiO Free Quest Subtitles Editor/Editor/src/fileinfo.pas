@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, JvExComCtrls, JvListView, ScnfEdit,
-  Menus, Common;
+  Menus, ScnfUtil;
 
 type
   TDisplayType = (dtHex, dtDec);
@@ -38,6 +38,7 @@ type
     procedure Savetofile1Click(Sender: TObject);
     procedure Hex1Click(Sender: TObject);
     procedure Dec1Click(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     fDisplayValuesFormat: TDisplayType;
     fHeaderListSorted: Boolean;
@@ -54,6 +55,7 @@ type
   public
     { Déclarations publiques }
     procedure LoadFileInfo;
+    procedure UpdateSubtitles;
     property DisplayValuesFormat: TDisplayType read fDisplayValuesFormat write SetDisplayValuesFormat;
   end;
 
@@ -63,7 +65,7 @@ var
 implementation
 
 uses
-  Main, Utils;
+  Main, Utils, NPCInfo;
   
 {$R *.dfm}
 
@@ -76,12 +78,15 @@ var
 begin
   List := TStringList.Create;
   try
-    List.Add('Index;Code Offset;Text Offset;Patch;VoiceID;CharID;Code;Subtitle');
+    // List.Add('Index;Code Offset;Text Offset;Patch;VoiceID;CharID;Code;Subtitle');
+    List.Add('Index;Code Offset;Text Offset;VoiceID;CharID;Code;Subtitle');
     for i := 0 to ScnfEditor.Subtitles.Count - 1 do begin
       Sub := ScnfEditor.Subtitles[i];
-      List.Add(IntToStr(i + 1) + ';' + IntToStr(Sub.CodeOffset) + ';' + IntToStr(Sub.TextOffset) + ';' +
-        IntToStr(Sub.CurrentPatchValue) + ';' + Sub.VoiceID + ';' + Sub.CharID +
-        ';' + Sub.Code + ';' + StringReplace(Sub.Text, #13#10, '<br>', [rfReplaceAll]));
+      List.Add(IntToStr(i + 1) + ';' + IntToStr(Sub.CodeOffset) + ';' + IntToStr(Sub.TextOffset) + ';'
+        // + IntToStr(Sub.CurrentPatchValue) + ';'
+        + Sub.VoiceID + ';' + Sub.CharID
+//        + ';' + Sub.Code + ';' + StringReplace(Sub.Text, #13#10, '<br>', [rfReplaceAll]));
+        + ';' + Sub.Code + ';' + Sub.Text);
     end;
     List.SaveToFile(FileName);
   finally
@@ -92,7 +97,7 @@ end;
 procedure TfrmFileInfo.Savetofile1Click(Sender: TObject);
 begin
   with sdSubsExport do begin
-    FileName := ChangeFileExt(ExtractFileName(SCNFEditor.GetLoadedFileName), '.csv');
+    FileName := ChangeFileExt(ExtractFileName(SCNFEditor.SourceFileName), '.csv');
     if Execute then SaveSubtitlesToFile(FileName);
     //if Execute then lvSubs.SaveToCSV(FileName);
   end;
@@ -121,6 +126,15 @@ begin
               end;
     end;
   end;
+end;
+
+procedure TfrmFileInfo.UpdateSubtitles;
+var
+  i: Integer;
+
+begin
+  for i := 0 to SCNFEditor.Subtitles.Count - 1 do
+    lvSubs.Items[i].SubItems[4] := SCNFEditor.Subtitles[i].Text;
 end;
 
 procedure TfrmFileInfo.AddHeaderEntry(Name: string; Value: Integer);
@@ -172,11 +186,12 @@ begin
               end;
     end;
 
-    SubItems.Add(IntToStr(SubEntry.CurrentPatchValue));
+//    SubItems.Add(IntToStr(SubEntry.CurrentPatchValue));
     SubItems.Add(SubEntry.VoiceID);
     SubItems.Add(SubEntry.CharID);
     SubItems.Add(SubEntry.Code);
-    SubItems.Add(StringReplace(SubEntry.Text, #13#10, '<br>', [rfReplaceAll]));
+//    SubItems.Add(StringReplace(SubEntry.Text, #13#10, '<br>', [rfReplaceAll]));
+    SubItems.Add(SubEntry.Text);
   end;
 end;
 
@@ -211,6 +226,14 @@ begin
   HeaderListSorted := False;
 end;
 
+procedure TfrmFileInfo.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
+end;
+
 procedure TfrmFileInfo.FormShow(Sender: TObject);
 begin
   LoadFileInfo;
@@ -230,19 +253,31 @@ begin
 
   with SCNFEditor do begin
     // Header
+    case Gender of
+      gtUndef:  AddHeaderEntry('Character gender', '<Undefined>');
+      gtMale:   AddHeaderEntry('Character gender', 'Male');
+      gtFemale: AddHeaderEntry('Character gender', 'Female');
+    end;
+    AddHeaderEntry('Footer offset', FooterOffset);
     AddHeaderEntry('VoiceID', VoiceFullID);
     AddHeaderEntry('VoiceID (short)', VoiceShortID);
-    case GameVersion of
-      gvWhatsShenmue: AddHeaderEntry('Game version', 'What''s Shenmue');
+    (*case GameVersion of
+      gvWhatsShenmue: AddHeaderEntry('Game version', 'What''s Shenmue (NTSC-J) (DC)');
       gvShenmue: AddHeaderEntry('Game version', 'Shenmue I');
-      gvShenmue2: AddHeaderEntry('Game version', 'Shenmue II (DC)');
-      gvShenmue2X: AddHeaderEntry('Game version', 'Shenmue II (XBOX)');
-    end;
+      gvShenmue2J: AddHeaderEntry('Game version', 'Shenmue II (NTSC-J) (DC)');
+      gvShenmue2: AddHeaderEntry('Game version', 'Shenmue II (PAL) (DC)');
+      gvShenmue2X: AddHeaderEntry('Game version', 'Shenmue II (PAL) (XBOX)');
+    end;*)
+    AddHeaderEntry('Game version', GameVersionToStr(GameVersion));
     AddHeaderEntry('Main CharID', CharacterID);
-    AddHeaderEntry('Footer offset', FooterOffset);
-    AddHeaderEntry('SCNF ChrID header size', ScnfChrIDHeaderOffset);
+    AddHeaderEntry('SCNF / CharID header size', ScnfCharIDHeaderSize);
     AddHeaderEntry('String table header offset', StrTableHeaderOffset);
     AddHeaderEntry('String table body offset', StrTableBodyOffset);
+    case AgeType of
+      atUndef: AddHeaderEntry('Character type', '<Undefined>');
+      atAdult: AddHeaderEntry('Character type', 'Adult');
+      atChild: AddHeaderEntry('Character type', 'Child');
+    end;
 
     // SORTING...
     if not HeaderListSorted then begin
@@ -253,7 +288,7 @@ begin
       for i := 1 to 2 do
         lvHeader.ColClick(lvHeader.Columns[0]);
     end;
-  
+
     // Subtitles
     for i := 0 to Subtitles.Count - 1 do
       AddSubtitleEntry(Subtitles[i]);

@@ -32,6 +32,6 @@ FROM IDX CREATOR, LIKE I/O ERROR 105.*
 [ IV. CREDITS ]
 
 Original IDX Creator and all creation algorithms: Manic
-Updating / Fusionning IDX Creator for Shenmue I & II / IDX Maker (console version): [big_fury]SiZiOUS
+Updating / Merging IDX Creator for Shenmue I & II / IDX Maker (console version): [big_fury]SiZiOUS
 
 http://shenmuesubs.sourceforge.net/

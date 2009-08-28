@@ -8,7 +8,7 @@ unit npcinfo;
 interface
 
 uses
-  Windows, SysUtils, Classes, Common;
+  Windows, SysUtils, Classes, ScnfUtil;
   
 type
   TGenderType = (gtUndef, gtMale, gtFemale);
@@ -130,8 +130,9 @@ var
 begin
   Result := -1;
 
-  // Shenmue2X and Shenmue2 has same NPC characters
-  if GameVersion = gvShenmue2X then GameVersion := gvShenmue2;
+  // Shenmue2X, Shenmue2J and Shenmue2 has same NPC characters
+  if (GameVersion = gvShenmue2X) or (GameVersion = gvShenmue2J) then
+    GameVersion := gvShenmue2;
 
   for i := 0 to Count - 1 do
     if ((UpperCase(Items[i].CharID) = UpperCase(CharID))
@@ -166,7 +167,7 @@ begin
 
   Clear;
 
-  //Opening the file (probable chars_list.csv)
+  //Opening the file
   AssignFile(F, FileName);
   Reset(F);
 

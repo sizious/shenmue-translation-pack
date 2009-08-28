@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, MTEdit, StdCtrls, Menus, ComCtrls, FilesLst;
+  Dialogs, MTEdit, StdCtrls, Menus, ComCtrls, FilesLst, JvBaseDlg,
+  JvBrowseFolder;
 
 const
-  APP_VERSION = '1.0';
+  APP_VERSION = '0.1a';
   
 type
   TfrmMain = class(TForm)
@@ -30,8 +31,8 @@ type
     eFilesCount: TEdit;
     GroupBox3: TGroupBox;
     lvSectionsList: TListView;
-    Button1: TButton;
-    Button2: TButton;
+    bExportAll: TButton;
+    bImport: TButton;
     ools1: TMenuItem;
     Autosave1: TMenuItem;
     Makebackup1: TMenuItem;
@@ -40,6 +41,8 @@ type
     Saveas1: TMenuItem;
     N3: TMenuItem;
     exturespreview1: TMenuItem;
+    sdExportTex: TSaveDialog;
+    bfdExportAllTex: TJvBrowseForFolderDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Open1Click(Sender: TObject);
@@ -47,17 +50,25 @@ type
     procedure Opendirectory1Click(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Quit1Click(Sender: TObject);
+    procedure bExportAllClick(Sender: TObject);
+    procedure exturespreview1Click(Sender: TObject);
+    procedure lvTexturesListClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
     fSourceDirectory: TFileName;
+    fExportDirectory: TFileName;
     procedure Clear;
     procedure LoadFileInView;
   public
     { Déclarations publiques }
     procedure ClearFilesListControls;
     procedure ClearFilesInfos;
+    procedure UpdateTexturePreviewWindow;
+    function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
     procedure SetStatus(const Text: string);
+    property ExportDirectory: TFileName read fExportDirectory write fExportDirectory;
     property FilesList: TFilesList read fFilesList;
     property SourceDirectory: TFileName read fSourceDirectory write fSourceDirectory;
   end;
@@ -69,13 +80,41 @@ var
 implementation
 
 uses
-  MTScan_Intf, Progress, seldir;
-  
+  MTScan_Intf, Progress, SelDir, TexView, Common, Pvr2Png;
+
 {$R *.dfm}
+
+procedure TfrmMain.bExportAllClick(Sender: TObject);
+var
+  i: Integer;
+  Item: TTexturesListEntry;
+  
+begin
+  with bfdExportAllTex do begin
+    if ExportDirectory = '' then
+      ExportDirectory := IncludeTrailingPathDelimiter(ExtractFilePath(ModelEditor.FileName));
+    Directory := ExportDirectory;
+    if Execute then
+      for i := 0 to ModelEditor.Textures.Count - 1 do begin
+        Directory := IncludeTrailingPathDelimiter(Directory);
+        Item := ModelEditor.Textures[i];
+        Item.ExportToFile(Directory + Item.GetOutputTextureFileName);
+      end;
+  end;
+end;
 
 procedure TfrmMain.bExportClick(Sender: TObject);
 begin
-  ModelEditor.Textures[0].ExportToFile;
+  if lvTexturesList.ItemIndex = -1 then begin
+    MsgBox('Please select an item in the textures list.', 'Warning', MB_ICONEXCLAMATION);
+    Exit;
+  end;
+
+  with sdExportTex do begin
+    FileName := ModelEditor.Textures[lvTexturesList.ItemIndex].GetOutputTextureFileName;
+    if Execute then
+      ModelEditor.Textures[lvTexturesList.ItemIndex].ExportToFile(FileName);
+  end;
 end;
 
 procedure TfrmMain.Clear;
@@ -90,12 +129,16 @@ begin
   Clear;
   ModelEditor := TModelTexturedEditor.Create;
   fFilesList := TFilesList.Create;
+
+  // DEBUG
+  SourceDirectory := 'G:\Sources\Shenmue\SHENMUE_2\SHENMUE2_DISC1\BUILD\DATA\SCENE\01\0001';
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   fFilesList.Free;
   ModelEditor.Free;
+  ClearFilesInfos;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -119,6 +162,8 @@ end;
 procedure TfrmMain.LoadFileInView;
 var
   i: Integer;
+  TmpPvr: TFileName;
+  PVRConverter: TPVRConverter;
 
 begin
   ClearFilesInfos;
@@ -129,6 +174,13 @@ begin
       Caption := IntToStr(i+1);
       SubItems.Add(IntToStr(ModelEditor.Textures[i].Offset));
       SubItems.Add(IntToStr(ModelEditor.Textures[i].Size));
+
+      // Decoding the PVR texture to PNG...
+      Data := TPVRConverter.Create;
+      PVRConverter := TPVRConverter(Data);
+      TmpPvr := ModelEditor.Textures[i].ExportToFolder(GetWorkingDirectory);
+      if PVRConverter.LoadFromFile(TmpPvr) then
+        DeleteFile(TmpPvr);
     end;
   end;
 
@@ -142,8 +194,23 @@ begin
   end;
 end;
 
-procedure TfrmMain.ClearFilesInfos;
+procedure TfrmMain.lvTexturesListClick(Sender: TObject);
 begin
+  UpdateTexturePreviewWindow;
+end;
+
+function TfrmMain.MsgBox(const Text, Caption: string; Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
+end;
+
+procedure TfrmMain.ClearFilesInfos;
+var
+  i: Integer;
+
+begin
+  for i := 0 to lvTexturesList.Items.Count - 1 do
+    TPVRConverter(lvTexturesList.Items[i].Data).Free;
   lvTexturesList.Clear;
   lvSectionsList.Clear;
 end;
@@ -154,6 +221,12 @@ begin
   eFilesCount.Text := '0';
   SourceDirectory := '';
   if Assigned(FilesList) then FilesList.Clear;
+end;
+
+procedure TfrmMain.exturespreview1Click(Sender: TObject);
+begin
+  frmTexPreview.Show;
+  UpdateTexturePreviewWindow;
 end;
 
 procedure TfrmMain.Open1Click(Sender: TObject);
@@ -181,9 +254,32 @@ begin
   end;
 end;
 
+procedure TfrmMain.Quit1Click(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TfrmMain.SetStatus(const Text: string);
 begin
 
+end;
+
+procedure TfrmMain.UpdateTexturePreviewWindow;
+var
+  PVRConverter: TPVRConverter;
+
+begin
+  if not Assigned(lvTexturesList.ItemFocused) then Exit;  
+  PVRConverter := lvTexturesList.ItemFocused.Data;
+  if not Assigned(PVRConverter) then Exit;
+  
+  if frmTexPreview.Visible then begin
+    with frmTexPreview do begin
+      ClientHeight := PVRConverter.Height;
+      ClientWidth := PVRConverter.Width;
+      iTexture.Picture.LoadFromFile(PVRConverter.TargetFileName);
+    end;
+  end;
 end;
 
 end.

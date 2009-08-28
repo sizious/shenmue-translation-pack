@@ -31,10 +31,12 @@ type
     fList: TList;
     fCharsListLoaded: Boolean;
     fActive: Boolean;
+    fLoadedFileName: TFileName;
     procedure AddEntry(Character: Char; Code: Integer);
     procedure Clear;
     function GetItem(Index: Integer): TSubsCharsListEntry;
     function GetCount: Integer;
+    procedure SetActive(const Value: Boolean);
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TSubsCharsListEntry read GetItem; default;
     function DecodeChar(C: Char): Char;
@@ -42,17 +44,18 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    property Active: Boolean read fActive write fActive;
+    property Active: Boolean read fActive write SetActive;
+    function EncodeSubtitle(Text: string): string;
+    function DecodeSubtitle(Text: string): string;
     function LoadFromFile(FileName: TFileName): Boolean;
     property Loaded: Boolean read fCharsListLoaded;
-    function EncodeSubtitle(const Text: string): string;
-    function DecodeSubtitle(const Text: string): string;
+    property LoadedFileName: TFileName read fLoadedFileName; 
   end;
 
 implementation
 
 uses
-  CharsCnt, Common;
+  CharsCnt, ScnfUtil;
 
 { TCharsList }
 
@@ -96,22 +99,20 @@ begin
     end;
 end;
 
-function TSubsCharsList.DecodeSubtitle(const Text: string): string;
+function TSubsCharsList.DecodeSubtitle(Text: string): string;
 var
   i: Integer;
 
 begin
   Result := Text;
+  if (not Loaded) or (not Active) then Exit;
 
-  if not Loaded then Exit;
-  if not Active then Exit;
+  Text := StringReplace(Text, TABLE_STR_CR, '<br>', [rfReplaceAll]);
+  Text := StringReplace(Text, '=@', '...', [rfReplaceAll]);
 
   Result := '';
   for i := 1 to Length(Text) do
     Result := Result + DecodeChar(Text[i]);
-
-  Result := StringReplace(Result, TABLE_STR_CR, #13#10, [rfReplaceAll]);
-  Result := StringReplace(Result, '=@', '...', [rfReplaceAll]);
 end;
 
 destructor TSubsCharsList.Destroy;
@@ -134,19 +135,19 @@ begin
     end;
 end;
 
-function TSubsCharsList.EncodeSubtitle(const Text: string): string;
+function TSubsCharsList.EncodeSubtitle(Text: string): string;
 var
   i: Integer;
 
 begin
   Result := Text;
-  if not Loaded then Exit;
-//  if not Active then Exit;
+  if (not Loaded) or (not Active) then Exit;
 
   Result := '';
   for i := 1 to Length(Text) do
     Result := Result + EncodeChar(Text[i]);
 
+  Result := StringReplace(Result, '<br>', TABLE_STR_CR, [rfReplaceAll]);
   Result := StringReplace(Result, #13#10, TABLE_STR_CR, [rfReplaceAll]);
   Result := StringReplace(Result, '...', '=@', [rfReplaceAll]);
 end;
@@ -171,10 +172,11 @@ var
 begin
   Result := False;
   if not FileExists(FileName) then Exit;
+  fLoadedFileName := FileName;
 
   Clear;
 
-  //Opening the file (probable chars_list.csv)
+  //Opening the file (probable chrlist1.csv or chrlist2.csv)
   AssignFile(F, FileName);
   Reset(F);
 
@@ -182,8 +184,8 @@ begin
   repeat
     ReadLn(F, mainLine);
     if (mainLine <> '') and (mainLine[1] <> '#') then begin
-      ChrCode := StrToInt(parse_section(',', mainLine, 0));
-      Chr := AnsiDequotedStr(parse_section(',', mainLine, 1), '"')[1];
+      ChrCode := StrToInt(parse_section(';', mainLine, 0));
+      Chr := AnsiDequotedStr(parse_section(';', mainLine, 1), '''')[1];
       AddEntry(Chr, ChrCode);
     end;
   until EOF(F);
@@ -192,6 +194,12 @@ begin
   Result := fCharsListLoaded;
 
   CloseFile(F);
+end;
+
+procedure TSubsCharsList.SetActive(const Value: Boolean);
+begin
+  if not Loaded then Exit;  
+  fActive := Value;
 end;
 
 end.

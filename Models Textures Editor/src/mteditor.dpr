@@ -1,5 +1,7 @@
 program mteditor;
 
+{$R 'rsrc.res' 'rsrc.rc'}
+
 uses
   Windows,
   Forms,
@@ -10,7 +12,10 @@ uses
   mtscan_intf in 'intf\mtscan_intf.pas',
   progress in 'intf\progress.pas' {frmProgress},
   fileslst in 'engine\fileslst.pas',
-  seldir in 'seldir.pas' {frmSelectDir};
+  seldir in 'seldir.pas' {frmSelectDir},
+  pvr2png in 'engine\pvr2png.pas',
+  texview in 'texview.pas' {frmTexPreview},
+  common in 'engine\common.pas';
 
 {$R *.res}
 
@@ -21,11 +26,12 @@ var
 
 begin
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
+  Application.MainFormOnTaskbar := False;
   Application.Title := 'Textured Model Objects Editor';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
+  Application.CreateForm(TfrmTexPreview, frmTexPreview);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // FIX for Delphi IDE...
   ReportMemoryLeaksOnShutdown := True;

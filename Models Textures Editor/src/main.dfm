@@ -86,6 +86,7 @@ object frmMain: TfrmMain
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
+      OnClick = lvTexturesListClick
     end
     object bExport: TButton
       Left = 292
@@ -96,23 +97,23 @@ object frmMain: TfrmMain
       TabOrder = 1
       OnClick = bExportClick
     end
-    object Button1: TButton
+    object bExportAll: TButton
       Left = 292
       Top = 82
       Width = 90
       Height = 25
       Caption = 'Export all...'
       TabOrder = 2
-      OnClick = bExportClick
+      OnClick = bExportAllClick
     end
-    object Button2: TButton
+    object bImport: TButton
       Left = 292
       Top = 19
       Width = 90
       Height = 25
       Caption = 'Import...'
+      Enabled = False
       TabOrder = 3
-      OnClick = bExportClick
     end
   end
   object StatusBar1: TStatusBar
@@ -127,12 +128,12 @@ object frmMain: TfrmMain
     Top = 180
     Width = 385
     Height = 147
-    Caption = ' Informations : '
+    Caption = ' File structure : '
     TabOrder = 3
     object lvSectionsList: TListView
       Left = 6
       Top = 16
-      Width = 373
+      Width = 376
       Height = 123
       Columns = <
         item
@@ -183,6 +184,7 @@ object frmMain: TfrmMain
       object Quit1: TMenuItem
         Caption = '&Quit'
         ShortCut = 16465
+        OnClick = Quit1Click
       end
     end
     object ools1: TMenuItem
@@ -199,6 +201,7 @@ object frmMain: TfrmMain
       object exturespreview1: TMenuItem
         Caption = 'Textures preview...'
         ShortCut = 114
+        OnClick = exturespreview1Click
       end
     end
     object About1: TMenuItem
@@ -216,5 +219,18 @@ object frmMain: TfrmMain
     Title = 'Select the file...'
     Left = 20
     Top = 64
+  end
+  object sdExportTex: TSaveDialog
+    DefaultExt = '.pvr'
+    Filter = 'PowerVR Textures Files (*.pvr)|*.pvr|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Export the selected texture to...'
+    Left = 52
+    Top = 64
+  end
+  object bfdExportAllTex: TJvBrowseForFolderDialog
+    Title = 'Please select the output directory to store exported textures...'
+    Left = 50
+    Top = 34
   end
 end
