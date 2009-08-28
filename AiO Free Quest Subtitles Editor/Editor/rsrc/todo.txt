@@ -1,4 +1,4 @@
 - rescan directory à l'ouverture
-- laisser modified si "save as" est utilisé
+- laisser modified si "save as" est utilisé : OK
 - chercher un charID dans la liste des fichiers
 - drag and drop file to open

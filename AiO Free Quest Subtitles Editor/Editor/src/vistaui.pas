@@ -8,14 +8,15 @@ uses
 function IsWindowsVista: Boolean;  
 procedure SetVistaFonts(const AForm: TCustomForm);
   
+implementation
+
+uses 
+	SysUtils;
+
 const
   VistaFont = 'Segoe UI';
   XPFont = 'Tahoma';
-
-implementation
-
-uses SysUtils;
-
+  
 procedure SetVistaFonts(const AForm: TCustomForm);
 var
   Size: Integer;

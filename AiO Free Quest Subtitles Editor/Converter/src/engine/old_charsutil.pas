@@ -69,7 +69,7 @@ begin
   globalList.strList := TStringList.Create;
   globalList.decList := TIntList.Create;
 
-  //Opening the file (probable chars_list.csv)
+  //Opening the file
   if FileExists(FileName) then begin
     AssignFile(F, FileName);
     Reset(F);

@@ -8,7 +8,6 @@ uses
   main in 'main.pas' {frmMain},
   progress in 'progress.pas' {frmProgress},
   seldir in 'seldir.pas' {frmSelectDir},
-  multitrd in 'multitrd.pas' {frmMultiTranslation},
   scnfedit in 'engine\scnfedit.pas',
   scnfscan in 'engine\scnfscan.pas',
   scnfutil in 'engine\scnfutil.pas',
@@ -30,7 +29,13 @@ uses
   oldskool_font_mapper in '..\..\..\Shenmue Subtitles Preview\src\oldskool_font_mapper.pas',
   oldskool_font_vcl in '..\..\..\Shenmue Subtitles Preview\src\oldskool_font_vcl.pas',
   viewer in '..\..\..\Shenmue Subtitles Preview\src\viewer.pas' {frmSubsPreview},
-  textdata in 'engine\multitrd\textdata.pas';
+  textdata in 'engine\multitrd\textdata.pas',
+  about in 'about.pas' {frmAbout},
+  viewupd in 'engine\multitrd\ui\viewupd.pas',
+  pakfexec in 'engine\npcpakf\pakfexec.pas',
+  pakfextr in 'engine\npcpakf\pakfextr.pas',
+  pakfutil in 'engine\npcpakf\pakfutil.pas',
+  facesext in 'facesext.pas' {frmFacesExtractor};
 
 {$R *.res}
 
@@ -52,7 +57,6 @@ begin
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
-  Application.CreateForm(TfrmMultiTranslation, frmMultiTranslation);
   Application.CreateForm(TfrmFileInfo, frmFileInfo);
   Application.CreateForm(TfrmMassImport, frmMassImport);
   {$IFDEF DEBUG}

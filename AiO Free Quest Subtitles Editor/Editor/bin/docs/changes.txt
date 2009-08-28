@@ -1,12 +1,34 @@
 Changes :: Shenmue AiO Free Quest Subtitles Editor
 ##################################################
 
+Version 2.1 :
+
+ADDED:
+- Powerful and optimized Multi-Translation feature. Entierly rewritten from scratch.
+- Many contextuals features (in files list view, in subtitles view...).
+- A combobox to select a previous selected path in the scan directory window
+- A "true" About Box...
+- Hints for each menu items...
+
+FIXED:
+- Some code has been changed in the hacking method. The hacking method implemented now sould be 100% secure.
+- Fixed a problem with PAKS files from Shenmue 1 (the game was freezed). (this was fixed by the first fix in this list)
+- Chars list modification for Shenmue 1 and Shenmue 2 aren't the same. Fixed.
+- Problem when importing subtitles from XML files (the CR caracter was encoded!)
+- Fixed the "Save as..." feature.
+- Fixed the application state feature (you know the "Ready" label in the bottom of the window).
+- Fixed some "graphical" problems.
+- You can now open several files (instead of one) when using the "Open files" option.
+- Menu items was redesigned.
+- Some heavy actions was multi-threaded.
+- Too many things fixed to be listed here. The application is ready to become the FINAL one!
+
 Version 2.0 :
 
 ADDED:
 - Added the support for Shenmue I and What's Shenmue.
-- Added NPC gender & "age" (child / adult) to help translating (Thanks Shendream for Shenmue II).
-- Added faces screenshots (Thanks Shendreams).
+- Added NPC gender & type (child / adult) to help translating (Thanks Shendream for Shenmue II).
+- Added faces screenshots (Thanks Shendream).
 - Added the Subtitles Previewer (beta version).
 - Added mass import/export subtitles.
 - Added a file properties dialog.

@@ -10,9 +10,11 @@ object frmFileInfo: TfrmFileInfo
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -79,32 +81,31 @@ object frmFileInfo: TfrmFileInfo
         Columns = <
           item
             Caption = 'CharID'
+            Width = 80
           end
           item
             Caption = 'Flag'
+            Width = 80
           end
           item
             Caption = 'Name'
+            Width = 80
           end
           item
             Caption = 'Offset'
+            Width = 80
           end
           item
+            AutoSize = True
             Caption = 'Size'
           end>
         ReadOnly = True
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
-        ColumnsOrder = '0=50,1=50,2=50,3=50,4=50'
+        ColumnsOrder = '0=80,1=80,2=80,3=80,4=138'
         Groups = <>
         ExtendedColumns = <
-          item
-          end
-          item
-          end
-          item
-          end
           item
           end>
         ExplicitHeight = 73
@@ -173,12 +174,8 @@ object frmFileInfo: TfrmFileInfo
             Width = 70
           end
           item
-            Caption = 'Patch'
-            Width = 40
-          end
-          item
             Caption = 'VoiceID'
-            Width = 60
+            Width = 80
           end
           item
             Caption = 'CharID'
@@ -196,11 +193,9 @@ object frmFileInfo: TfrmFileInfo
         PopupMenu = pmSubs
         TabOrder = 0
         ViewStyle = vsReport
-        ColumnsOrder = '0=70,1=70,2=40,3=60,4=50,5=40,6=130'
+        ColumnsOrder = '0=70,1=70,2=80,3=50,4=40,5=150'
         Groups = <>
         ExtendedColumns = <
-          item
-          end
           item
           end
           item
@@ -253,7 +248,7 @@ object frmFileInfo: TfrmFileInfo
       Width = 101
       Height = 25
       Anchors = [akRight, akBottom]
-      Caption = '&File properties...'
+      Caption = '&Properties...'
       TabOrder = 1
       OnClick = bPropertiesClick
     end

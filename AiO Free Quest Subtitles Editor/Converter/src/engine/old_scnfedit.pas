@@ -144,8 +144,8 @@ type
   end;
 
 var
-  fCharsMod: Boolean;       // 'True' if chars_list.csv is loaded
-  fCSVLoaded: Boolean;      // 'True' if chars_list.csv is loaded, but can't be modified
+  fCharsMod: Boolean;       // 'True' if CSV is loaded
+  fCSVLoaded: Boolean;      // 'True' if CSV is loaded, but can't be modified
 
 //------------------------------------------------------------------------------
 implementation

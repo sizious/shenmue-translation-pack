@@ -21,44 +21,42 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Menus, ScnfEdit, MultiScan, ExtCtrls, ScnfScan,
   MultiTrad, JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
-  AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf;
+  AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf, TextData,
+  JvComCtrls, ImgList, ViewUpd;
 
 const
   APP_VERSION = '2.1';
-  COMPIL_DATE_TIME = 'July 11, 2009 @01:41AM';
+  COMPIL_DATE_TIME = 'August 10, 2009 @01:41AM';
 
 type
   TfrmMain = class(TForm)
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
-    Opensinglefile1: TMenuItem;
-    Scandirectory1: TMenuItem;
+    MainMenu: TMainMenu;
+    miFile: TMenuItem;
+    miOpenSingleFile: TMenuItem;
+    miScanDirectory: TMenuItem;
     N1: TMenuItem;
-    Exit1: TMenuItem;
-    ools1: TMenuItem;
-    Help1: TMenuItem;
-    About1: TMenuItem;
+    miQuit: TMenuItem;
+    miTools: TMenuItem;
+    miHelp: TMenuItem;
+    miAbout: TMenuItem;
     N2: TMenuItem;
-    Clearfileslist1: TMenuItem;
-    Save1: TMenuItem;
-    Saveas1: TMenuItem;
+    miClearFilesList: TMenuItem;
+    miSave: TMenuItem;
+    miSaveAs: TMenuItem;
     N3: TMenuItem;
-    Exportsubtitles1: TMenuItem;
+    miExportSubs: TMenuItem;
     N4: TMenuItem;
-    Importsubtitles1: TMenuItem;
-    Autosave1: TMenuItem;
+    miImportSubs: TMenuItem;
+    miAutoSave: TMenuItem;
     N5: TMenuItem;
-    Multitranslation1: TMenuItem;
-    Makebackup1: TMenuItem;
+    miMakeBackup: TMenuItem;
     N6: TMenuItem;
-    Cleardebuglog1: TMenuItem;
-    Savedebuglog1: TMenuItem;
-    Closesinglefile1: TMenuItem;
+    miClearDebugLog: TMenuItem;
+    miSaveDebugLog: TMenuItem;
+    miCloseFile: TMenuItem;
     odMain: TOpenDialog;
     sdMain: TSaveDialog;
-    charsModMenu1: TMenuItem;
-    Findsubtitle1: TMenuItem;
-    N7: TMenuItem;
+    miEnableCharsMod: TMenuItem;
     gbFilesList: TGroupBox;
     lbFilesList: TListBox;
     pcSubs: TPageControl;
@@ -75,15 +73,14 @@ type
     eSubCount: TEdit;
     eCharID: TEdit;
     tsMultiTrad: TTabSheet;
-    Label10: TLabel;
     GroupBox2: TGroupBox;
     GroupBox4: TGroupBox;
     Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
-    Edit1: TEdit;
-    Edit2: TEdit;
-    bRetrieveSubs: TButton;
+    eMTFirstLineLength: TEdit;
+    eMTSecondLineLength: TEdit;
+    bMTRetrieveSubs: TButton;
     Panel2: TPanel;
     Label9: TLabel;
     eFilesCount: TEdit;
@@ -91,25 +88,24 @@ type
     mDebug: TMemo;
     sb: TStatusBar;
     pmSubsSelect: TPopupMenu;
-    Copy1: TMenuItem;
+    miCopySub: TMenuItem;
     N8: TMenuItem;
-    Savetofile1: TMenuItem;
+    miSaveListToFile: TMenuItem;
     miSubsPreview: TMenuItem;
     sdSubsList: TSaveDialog;
     lvSubsSelect: TJvListView;
     N9: TMenuItem;
-    Exportsubtitles2: TMenuItem;
-    Importsubtitles2: TMenuItem;
+    miExportSubs2: TMenuItem;
+    miImportSubs2: TMenuItem;
     pmFilesList: TPopupMenu;
     miFileProperties: TMenuItem;
-    Opendirectory1: TMenuItem;
-    Locatefile1: TMenuItem;
+    miBrowseDirectory: TMenuItem;
+    miLocateFile: TMenuItem;
     N10: TMenuItem;
     miFileProperties2: TMenuItem;
     N11: TMenuItem;
-    N12: TMenuItem;
-    Batchimportsubtitles1: TMenuItem;
-    Batchexportsubtitles1: TMenuItem;
+    miBatchImportSubs: TMenuItem;
+    miBatchExportSubs: TMenuItem;
     N13: TMenuItem;
     miReloadDir: TMenuItem;
     ApplicationEvents: TApplicationEvents;
@@ -129,42 +125,57 @@ type
     eVoiceID: TEdit;
     eGame: TEdit;
     Label5: TLabel;
-    Website1: TMenuItem;
+    miProjectHome: TMenuItem;
     N14: TMenuItem;
     rbatUnknow: TRadioButton;
     rbcgUnknow: TRadioButton;
-    View1: TMenuItem;
+    miView: TMenuItem;
     N15: TMenuItem;
     miExportFilesList: TMenuItem;
-    tvMultiSubs: TTreeView;
-    Memo1: TMemo;
-    Memo2: TMemo;
+    mMTOldSub: TMemo;
+    mMTNewSub: TMemo;
     bMultiTranslate: TButton;
-    procedure Scandirectory1Click(Sender: TObject);
+    bMTClear: TButton;
+    tvMultiSubs: TTreeView;
+    bMTExpandAll: TButton;
+    bMTCollapseAll: TButton;
+    ilMultiSubs: TImageList;
+    pmMultiSubs: TPopupMenu;
+    miGoTo: TMenuItem;
+    miReloadCurrentFile: TMenuItem;
+    N7: TMenuItem;
+    miImportSubs3: TMenuItem;
+    miExportSubs3: TMenuItem;
+    miReloadCurrentFile2: TMenuItem;
+    miCloseFile2: TMenuItem;
+    miReloadDir2: TMenuItem;
+    N12: TMenuItem;
+    N16: TMenuItem;
+    miFacesExtractor: TMenuItem;
+    miClearFilesList2: TMenuItem;
+    procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure mSubTextChange(Sender: TObject);
-    procedure Exit1Click(Sender: TObject);
-    procedure Multitranslation1Click(Sender: TObject);
-    procedure Makebackup1Click(Sender: TObject);
-    procedure Saveas1Click(Sender: TObject);
-    procedure Save1Click(Sender: TObject);
-    procedure Clearfileslist1Click(Sender: TObject);
-    procedure Opensinglefile1Click(Sender: TObject);
-    procedure Cleardebuglog1Click(Sender: TObject);
-    procedure Savedebuglog1Click(Sender: TObject);
-    procedure Autosave1Click(Sender: TObject);
-    procedure Exportsubtitles1Click(Sender: TObject);
-    procedure Closesinglefile1Click(Sender: TObject);
-    procedure About1Click(Sender: TObject);
-    procedure Importsubtitles1Click(Sender: TObject);
-    procedure charsModMenu1Click(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
-    procedure bRetrieveSubsClick(Sender: TObject);
+    procedure miQuitClick(Sender: TObject);
+    procedure miMakeBackupClick(Sender: TObject);
+    procedure miSaveAsClick(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
+    procedure miClearFilesListClick(Sender: TObject);
+    procedure miOpenSingleFileClick(Sender: TObject);
+    procedure miClearDebugLogClick(Sender: TObject);
+    procedure miSaveDebugLogClick(Sender: TObject);
+    procedure miAutoSaveClick(Sender: TObject);
+    procedure miExportSubsClick(Sender: TObject);
+    procedure miCloseFileClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure miImportSubsClick(Sender: TObject);
+    procedure miEnableCharsModClick(Sender: TObject);
+    procedure bMTRetrieveSubsClick(Sender: TObject);
     procedure bMultiTranslateClick(Sender: TObject);
-    procedure Copy1Click(Sender: TObject);
-    procedure Savetofile1Click(Sender: TObject);
+    procedure miCopySubClick(Sender: TObject);
+    procedure miSaveListToFileClick(Sender: TObject);
     procedure miSubsPreviewClick(Sender: TObject);
     procedure lvSubsSelectClick(Sender: TObject);
     procedure lvSubsSelectKeyUp(Sender: TObject; var Key: Word;
@@ -174,18 +185,33 @@ type
       var Handled: Boolean);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lbFilesListDblClick(Sender: TObject);
-    procedure Locatefile1Click(Sender: TObject);
-    procedure Opendirectory1Click(Sender: TObject);
+    procedure miLocateFileClick(Sender: TObject);
+    procedure miBrowseDirectoryClick(Sender: TObject);
     procedure miFileProperties2Click(Sender: TObject);
-    procedure Batchexportsubtitles1Click(Sender: TObject);
+    procedure miBatchExportSubsClick(Sender: TObject);
     procedure miReloadDirClick(Sender: TObject);
-    procedure Batchimportsubtitles1Click(Sender: TObject);
-    procedure ApplicationEventsHint(Sender: TObject);
+    procedure miBatchImportSubsClick(Sender: TObject);
     procedure lbFilesListKeyPress(Sender: TObject; var Key: Char);
-    procedure Website1Click(Sender: TObject);
+    procedure miProjectHomeClick(Sender: TObject);
     procedure miExportFilesListClick(Sender: TObject);
+    procedure bMTClearClick(Sender: TObject);
+    procedure tvMultiSubsClick(Sender: TObject);
+    procedure tvMultiSubsKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure bMTExpandAllClick(Sender: TObject);
+    procedure bMTCollapseAllClick(Sender: TObject);
+    procedure tvMultiSubsContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure miGoToClick(Sender: TObject);
+    procedure mMTNewSubChange(Sender: TObject);
+    procedure pcSubsChange(Sender: TObject);
+    procedure miReloadCurrentFileClick(Sender: TObject);
+    procedure miFacesExtractorClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure ApplicationEventsHint(Sender: TObject);
   private
     { Déclarations privées }
+//    fPrevMessage: string;
     fTargetFileName: TFileName;
     fSelectedDirectory: string;
     fFileModified: Boolean;
@@ -193,47 +219,97 @@ type
     fMakeBackup: Boolean;
     fSubsViewerVisible: Boolean;
     fEnableCharsMod: Boolean;
-    fCanEnableCharsMod: Boolean;
-    fWorkFilesList: TFilesList;
+//    fWorkFilesList: TFilesList;
+    fMultiTranslationSelectedIndex: Integer;
+    fMultiTranslationSelectedNode: TTreeNode;
+    fMultiTranslationSelectedKeySubNode: TTreeNode;
+    fMultiTranslationSubtitleModified: Boolean;
+    fMultiTranslationInUse: Boolean;
+    fMultiTranslationNodeImageIndex: Integer;
+    fMultiTranslationBusy: Boolean;
+    fFileListSelectedIndex: Integer;
+    fMultiTranslationUsedPleaseReloadTheCurrentFile: Boolean;
+    fSubtitleSelected: Integer;
+    fCanEnableCharsMod1: Boolean;
+    fCanEnableCharsMod2: Boolean;
     procedure SetFileOperationMenusItemEnabledState(const State: Boolean);
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
     procedure ResetApplication;
-    procedure SetSingleFileMenusItemState(const State: Boolean);
+//    procedure SetSingleFileMenusItemState(const State: Boolean);
     procedure SetFileSaveOperationsMenusItemEnabledState(const State: Boolean);
     procedure SaveSubtitlesList(const FileName: TFileName);
     procedure RefreshSubtitlesList(UpdateView: Boolean);
     procedure BatchExportSubtitles(const OutputDirectory: TFileName);
     procedure SetEnableCharsMod(const Value: Boolean);
-    procedure SetCanEnableCharsMod(const Value: Boolean);
+//    procedure SetCanEnableCharsMod(const Value: Boolean);
   protected
     procedure PreviewWindowClosedEvent(Sender: TObject);
+    procedure SetModifiedIndicator(State: Boolean);
+    procedure CheckIfSubLengthIsCorrect(const Value: Integer; Field: TEdit);
+    procedure ReloadFileEditor;
+    procedure MultiTranslationFreeView;
+    procedure SetApplicationHint(const HintStr: string);
   public
     { Déclarations publiques }
-    procedure ActiveMultifilesOptions;
+//    procedure ActiveMultifilesOptions;
     procedure AddDebug(m: string);
     procedure Clear;
     function GetTargetDirectory: string;
     function GetTargetFileName: TFileName;
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
     procedure LoadSubtitleFile(const FileName: TFileName);
+    function SaveFileIfNeeded(const CancelButton: Boolean): Boolean;
     procedure ScanDirectory(const Directory: string);
     procedure SetStatus(const Text: string);
+    procedure SetStatusReady; // SetStatus('Ready')
     procedure SetModified(const State: Boolean);
-    procedure RetrieveSubtitles;
-    procedure MultiTranslateSubtitles;
-    procedure MultiTranslationFillControls;
+
+    // Procedures used in Multi-Translation process
+    procedure MultiTranslationRetrieveSubtitles;
+    procedure MultiTranslationUpdateSubtitle(const DataSubtitleIndex: Integer;
+      TranslatedTextNode: TTreeNode; NewSubtitle: string);
+    procedure MultiTranslationReset;
+    procedure MultiTranslationChangeModifiedState(const State: Boolean);
+    procedure MultiTranslationUpdateCharsCount;
+    procedure MultiTranslationSaveFileModifiedEditor;
+//    procedure MultiTranslateSubtitles;
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property FileModified: Boolean read fFileModified;
+    property FileListSelectedIndex: Integer read fFileListSelectedIndex;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
-    property SubsViewerVisible: Boolean read fSubsViewerVisible write fSubsViewerVisible; 
-    property SelectedDirectory: string read fSelectedDirectory write fSelectedDirectory;
 
-    property CanEnableCharsMod: Boolean read fCanEnableCharsMod write SetCanEnableCharsMod;
+    property MultiTranslationBusy: Boolean read fMultiTranslationBusy
+      write fMultiTranslationBusy; // if a current MT is working...
+    property MultiTranslationInUse: Boolean read fMultiTranslationInUse write
+      fMultiTranslationInUse; // if the MT tab is used by the user
+    property MultiTranslationUsedReloadFile: Boolean read
+      fMultiTranslationUsedPleaseReloadTheCurrentFile write
+      fMultiTranslationUsedPleaseReloadTheCurrentFile;
+    property MultiTranslationSubtitleModified: Boolean read fMultiTranslationSubtitleModified;
+    property MultiTranslationSelectedIndex: Integer read // subtitle was edited
+      fMultiTranslationSelectedIndex write fMultiTranslationSelectedIndex;
+    property MultiTranslationSelectedNewSubNode: TTreeNode read
+      fMultiTranslationSelectedNode write fMultiTranslationSelectedNode;
+    property MultiTranslationSelectedHashKeySubNode: TTreeNode read
+      fMultiTranslationSelectedKeySubNode write fMultiTranslationSelectedKeySubNode;
+    property MultiTranslationNodeImageIndex: Integer read
+      fMultiTranslationNodeImageIndex write fMultiTranslationNodeImageIndex; 
+
+    property SubsViewerVisible: Boolean read fSubsViewerVisible write fSubsViewerVisible;
+    property SelectedDirectory: string read fSelectedDirectory write fSelectedDirectory;
+    property SubtitleSelected: Integer read fSubtitleSelected write fSubtitleSelected;
+
+    // For Chars Modification Translation (the charset used by the game isn't exactly the same as Windows)
+    // For Shenmue 1:
+    property CanEnableCharsMod1: Boolean read fCanEnableCharsMod1 write fCanEnableCharsMod1;
+    // For Shenmue 2:
+    property CanEnableCharsMod2: Boolean read fCanEnableCharsMod2 write fCanEnableCharsMod2;
+    // If we must use this feature in the editor or not:
     property EnableCharsMod: Boolean read fEnableCharsMod write SetEnableCharsMod;
 
-    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
+//    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
   end;
 
 var
@@ -242,8 +318,11 @@ var
   SCNFScanner: TSCNFScanDirectory;                    // enable to scan directory to retrieve valid SCNF files
   SCNFEditor: TSCNFEditor;                            // enable to edit any valid SCNF file: this's the main class of this application
 
-  SubsRetriever: TMultiTranslationSubtitlesRetriever; // enable to retrieve all subtitles from loaded file list
-  MultiTranslator: TMultiTranslator;                  // enable to multi-translate subtitles
+  MultiTranslationSubsRetriever: TMultiTranslationSubtitlesRetriever; // enable to retrieve all subtitles from loaded file list
+  MultiTranslationTextData: TMultiTranslationTextData;// contains all multitranslation datas (filled by the TMultiTranslationSubtitlesRetriever)
+  MultiTranslationUpdater: TMultiTranslator;                  // enable to multi-translate subtitles
+  MultiTranslationViewUpdater: TMTViewUpdater;
+
   BatchSubsExporter: TSubsMassExporterThread;         // enable to batch export subtitles
 
   Previewer: TSubtitlesPreviewWindow;                 // Implements the Subtitles Previewer
@@ -251,8 +330,9 @@ var
 implementation
 
 uses
-  Progress, SelDir, MultiTrd, ScnfUtil, Utils, CharsCnt, CharsLst, FileInfo,
-  MassImp, Common, NPCInfo, VistaUI, TextData;
+  {$IFDEF DEBUG} TypInfo, {$ENDIF}
+  Progress, SelDir, ScnfUtil, Utils, CharsCnt, CharsLst, FileInfo,
+  MassImp, Common, NPCInfo, VistaUI, About, facesext;
 
 {$R *.dfm}
 
@@ -262,36 +342,44 @@ const
 
 { TfrmMain }
 
-procedure TfrmMain.About1Click(Sender: TObject);
+procedure TfrmMain.miAboutClick(Sender: TObject);
 begin
-  MsgBox('Version ' + APP_VERSION + #13#10
+(*  MsgBox('Version ' + APP_VERSION + #13#10
   + 'Created by [big_fury]SiZiOUS, additionnal code by Manic' + #13#10 + COMPIL_DATE_TIME + #13#10#13#10
   + 'Engine version: ' + SCNF_EDITOR_ENGINE_VERSION + #13#10
   + 'Engine date: ' + SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
+*)
+  frmAbout := TfrmAbout.Create(Application);
+  try
+    frmAbout.ShowModal;
+  finally
+    frmAbout.Free;
+  end;
 end;
 
-procedure TfrmMain.ActiveMultifilesOptions;
+(*procedure TfrmMain.ActiveMultifilesOptions;
 begin
   EXIT; // DEBUG
 
   Self.Clearfileslist1.Enabled := True;
   Self.Multitranslation1.Enabled := True;
-end;
+end;*)
 
 procedure TfrmMain.AddDebug(m: string);
 begin
   mDebug.Lines.Add('[' + DateToStr(Date) + ' ' + TimeToStr(Now) + '] ' + m);
 end;
 
-procedure TfrmMain.ApplicationEventsHint(Sender: TObject);
-begin
-  if Sender is TMenuItem then AddDebug(Application.Hint)
-end;
-
-procedure TfrmMain.Autosave1Click(Sender: TObject);
+procedure TfrmMain.miAutoSaveClick(Sender: TObject);
 begin
   AutoSave := not AutoSave;
   {$IFDEF DEBUG} WriteLn('AutoSave: ', AutoSave); {$ENDIF}
+end;
+
+procedure TfrmMain.ApplicationEventsHint(Sender: TObject);
+begin
+  SetApplicationHint(Application.Hint);
+  ApplicationEvents.CancelDispatch;
 end;
 
 procedure TfrmMain.BatchExportSubtitles(const OutputDirectory: TFileName);
@@ -314,7 +402,7 @@ begin
   end;
 end;
 
-procedure TfrmMain.Batchexportsubtitles1Click(Sender: TObject);
+procedure TfrmMain.miBatchExportSubsClick(Sender: TObject);
 begin
   with bfdExportSubs do begin
     Directory := GetTargetDirectory;
@@ -323,52 +411,137 @@ begin
   end;
 end;
 
-procedure TfrmMain.Batchimportsubtitles1Click(Sender: TObject);
+procedure TfrmMain.miBatchImportSubsClick(Sender: TObject);
 begin
   frmMassImport.ShowModal;
 end;
 
 procedure TfrmMain.bMultiTranslateClick(Sender: TObject);
 begin
-  MultiTranslateSubtitles;
+  if MultiTranslationBusy then begin
+    AddDebug('WARNING: Multi-translation module is busy, so please wait and retry again.');
+    Exit;
+  end;
+
+  MultiTranslationUpdateSubtitle(MultiTranslationSelectedIndex,
+    MultiTranslationSelectedNewSubNode, mMTNewSub.Text);
 end;
 
-procedure TfrmMain.bRetrieveSubsClick(Sender: TObject);
+procedure TfrmMain.bMTRetrieveSubsClick(Sender: TObject);
+var
+  CanDo: Integer;
+
 begin
-  RetrieveSubtitles;
+  CanDo := MsgBox(
+    'This function will build the Multi-Translation list from the actual loaded files. '
+    + 'If you have many files, this can takes some minutes. '
+    + 'Continue ?',
+    'Multi-Translation Retriever',
+    MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
+  if CanDo = IDNO then Exit;
+  
+  MultiTranslationRetrieveSubtitles;
 end;
 
-procedure TfrmMain.charsModMenu1Click(Sender: TObject);
+procedure TfrmMain.bMTExpandAllClick(Sender: TObject);
+(*var
+  Index, i: Integer;
+  *)
+begin
+(*  Index := tvMultiSubs.Selected.Index;
+  for i := 0 to tvMultiSubs.Items.Count - 1 do begin
+    if Integer(tvMultiSubs.Items[i].Data) = MT_SUBTITLE_KEY_NODE then
+      tvMultiSubs.Items[i].Expand(False);
+  end;
+  tvMultiSubs.Items[Index].Selected := True;*)
+  MultiTranslationUpdateView(nvoExpandAll);
+end;
+
+procedure TfrmMain.bMTClearClick(Sender: TObject);
+var
+  CanDo: Integer;
+
+begin
+  if MultiTranslationSubtitleModified then
+    CanDo := MsgBox(
+      'This operation will cancel the current multi-translation and clear all '
+      + 'datas (but not undone all multi-translation already made). '
+      + 'Continue ?', 'Warning: Multi-translation in progress not saved',
+      MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2)
+  else
+    CanDo := MsgBox(
+      'This operation will clear all '
+      + 'datas (but not undone all multi-translation already made). '
+      + 'Continue ?', 'Reset Multi-translation ?',
+      MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
+
+  if CanDo = IDNO then Exit;
+  MultiTranslationReset;
+end;
+
+procedure TfrmMain.bMTCollapseAllClick(Sender: TObject);
+(*var
+  i: Integer;
+  Node: TTreeNode;*)
+
+begin
+(*  Node := tvMultiSubs.Selected;
+  for i := 0 to tvMultiSubs.Items.Count - 1 do begin
+    if Integer(tvMultiSubs.Items[i].Data) = MT_SUBTITLE_KEY_NODE then
+      tvMultiSubs.Items[i].Collapse(False);
+  end;
+  tvMultiSubs.Selected := Node;*)
+  MultiTranslationUpdateView(nvoCollapseAll);
+end;
+
+procedure TfrmMain.miEnableCharsModClick(Sender: TObject);
 begin
   EnableCharsMod := not EnableCharsMod;
 end;
 
+procedure TfrmMain.CheckIfSubLengthIsCorrect(const Value: Integer;
+  Field: TEdit);
+begin
+  if Value > 44 then begin
+    Field.Font.Color := clRed;
+    Field.Font.Style := [fsBold];
+  end else begin
+    Field.Font.Color := clWindowText;
+    Field.Font.Style := [];
+  end;
+end;
+
 procedure TfrmMain.Clear;
 begin
-  Self.SetFileOperationMenusItemEnabledState(False);
-  Self.SetFileSaveOperationsMenusItemEnabledState(False);
+  SubtitleSelected := -1;
+  SetFileOperationMenusItemEnabledState(False);
+  SetFileSaveOperationsMenusItemEnabledState(False);
   //rbDC.Checked := False;
   //rbXB.Checked := False;
   eGame.Clear;
   eCharID.Clear;
   eVoiceID.Clear;
   eFirstLineLength.Text := '0';
+  CheckIfSubLengthIsCorrect(0, eFirstLineLength);
   eSecondLineLength.Text := '0';
+  CheckIfSubLengthIsCorrect(0, eSecondLineLength);
   eSubCount.Text := '0';
   mSubText.Text := '';
   lvSubsSelect.Clear;
   eFilesCount.Text := IntToStr(lbFilesList.Count);
-  SetStatus('Ready');
+//  SetStatus('Ready');
+  SetStatusReady;
   SetModified(False);
   mOldSubEd.Clear;
-  Self.rbMale.Checked := False;
-  Self.rbFemale.Checked := False;
-  Self.rbAdult.Checked := False;
-  Self.rbChild.Checked := False;
-  Self.iFace.Picture := nil;
+  rbMale.Checked := False;
+  rbFemale.Checked := False;
+  rbAdult.Checked := False;
+  rbChild.Checked := False;
+  iFace.Picture := nil;
+//  fFileListSelectedIndex := -1;
 end;
 
-procedure TfrmMain.Cleardebuglog1Click(Sender: TObject);
+procedure TfrmMain.miClearDebugLogClick(Sender: TObject);
 var
   CanDo: Integer;
 
@@ -378,7 +551,7 @@ begin
   mDebug.Clear;
 end;
 
-procedure TfrmMain.Clearfileslist1Click(Sender: TObject);
+procedure TfrmMain.miClearFilesListClick(Sender: TObject);
 var
   CanDo: Integer;
 begin
@@ -388,39 +561,52 @@ begin
   ResetApplication;
 end;
 
-procedure TfrmMain.Closesinglefile1Click(Sender: TObject);
-var
-  CanDo: Integer;
-
+procedure TfrmMain.miCloseFileClick(Sender: TObject);
 begin
-  // autosave
-  if FileModified then
+  (*if FileModified then
     if AutoSave then
-      Save1Click(lbFilesList)
+      miSave.Click
     else begin
       CanDo := MsgBox('Do you want to save the current file before closing it?', 'Save changes?', MB_YESNOCANCEL + MB_ICONWARNING);
       case CanDo of
          IDCANCEL : Exit;
-         IDYES    : Save1Click(lbFilesList);
+         IDYES    : miSave.Click;
       end;
-    end;
+    end;*)
 
-  ResetApplication;
-  SetSingleFileMenusItemState(False);
+  // Auto Save
+  if not SaveFileIfNeeded(True) then Exit;
+
+  // Delete item
+  lbFilesList.DeleteSelected;
+
+  // Select the next item if possible
+  if (lbFilesList.Count > 0) then begin
+
+    // Determine the correct index
+    if FileListSelectedIndex >= lbFilesList.Count then
+      fFileListSelectedIndex := lbFilesList.Count - 1;
+
+    // Load the appropriate file
+    lbFilesList.ItemIndex := FileListSelectedIndex;
+    fTargetFileName := GetTargetDirectory + lbFilesList.Items[FileListSelectedIndex];
+    LoadSubtitleFile(GetTargetFileName);
+  end else
+    ResetApplication; // else, clear the application if no more files is available
 end;
 
-procedure TfrmMain.Copy1Click(Sender: TObject);
+procedure TfrmMain.miCopySubClick(Sender: TObject);
 var
   i: Integer;
 
 begin
   i := lvSubsSelect.ItemIndex ;
   if i <> -1 then begin
-    Clipboard.SetTextBuf(PChar(lvSubsSelect.Items[i].SubItems[0]));
+    Clipboard.SetTextBuf(PChar(lvSubsSelect.Items[i].SubItems[1]));
   end;
 end;
 
-procedure TfrmMain.Exit1Click(Sender: TObject);
+procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
 end;
@@ -437,171 +623,190 @@ begin
   end;
 end;
 
-procedure TfrmMain.Exportsubtitles1Click(Sender: TObject);
+procedure TfrmMain.miExportSubsClick(Sender: TObject);
 begin
   sdMain.Title := 'Export subtitles to';
   sdMain.Filter := 'XML Files (*.xml)|*.xml';
   sdMain.DefaultExt := 'xml';
 
   with sdMain do begin
-    FileName := ChangeFileExt(SCNFEditor.SourceFileName, '.xml');
+    FileName := ChangeFileExt(ExtractFileName(SCNFEditor.SourceFileName), '.xml');
+    InitialDir := ExtractFilePath(SCNFEditor.SourceFileName);
     if Execute then begin
+      SetStatus('Exporting subtitles...');
       SCNFEditor.Subtitles.ExportToFile(FileName);
-      AddDebug('Saving subtitles from ' + ExtractFileName(SCNFEditor.SourceFileName) + ' to ' + FileName);
+      AddDebug('Subtitles was successfully exported from "'
+        + ExtractFileName(SCNFEditor.SourceFileName) + '" to the "' + FileName + '" file.');
+      SetStatusReady;
     end;
   end;
 end;
 
-procedure TfrmMain.Importsubtitles1Click(Sender: TObject);
+procedure TfrmMain.miImportSubsClick(Sender: TObject);
 begin
   odMain.Title := 'Import subtitles from';
   odMain.Filter := 'XML Files (*.xml)|*.xml';
 
   with odMain do begin
     if Execute then begin
+      SetStatus('Importing subtitles...');
       if SCNFEditor.Subtitles.ImportFromFile(FileName) then begin
-        //lbFilesListClick(Self);
         RefreshSubtitlesList(True);
         SetModified(True);
-        AddDebug('Subtitles imported from ' + ExtractFileName(FileName) + ' file.');
+        AddDebug('Subtitles was successfully imported from the "' + FileName
+          + '" file to the "'+ ExtractFileName(SCNFEditor.SourceFileName)
+          + '" file.');
       end
       else begin
         AddDebug('Subtitles importation: Error » XML not valid for the current file.');
       end;
+      SetStatusReady;
     end;
   end;
-end;
-
-procedure TfrmMain.FormActivate(Sender: TObject);
-begin
-  // --- DEBUG -----------------------------------------------------------------
-  //ScanDirectory('H:\SHENMUE II XBOX\research\specials_pks\');
-  // --- DEBUG -----------------------------------------------------------------
-  //BringToFront;
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   CanDo: Integer;
-
+  HandleMenu: THandle;
+  
 begin
   // autosave
   if FileModified then
-    if AutoSave then
-      Save1Click(lbFilesList)
-    else begin
-      CanDo := MsgBox('Do you want to save file modifications ?', 'Save changes?', MB_YESNOCANCEL + MB_ICONWARNING);
+
+    // If Multi-Translation is used...
+    if MultiTranslationInUse then begin
+      CanDo := MsgBox('Since you are using Multi-translation, the current '
+      + 'file modifications were not saved. Do you want to save modifications to '
+      + 'another file ?', 
+      'Save changes?', MB_ICONWARNING + MB_YESNOCANCEL + MB_DEFBUTTON3);
       case CanDo of
-         IDCANCEL : begin
-                      Action := caNone;
-                      Exit;
-                    end;
-         IDYES    : Save1Click(lbFilesList);
+        IDCANCEL: begin
+                    Action := caNone;
+                    Exit;
+                  end;
+        IDYES:    begin
+                    miSaveAs.Click;
+                  end;
+        end;
+
+    // Else we save as normal
+    end else
+      if not SaveFileIfNeeded(True) then begin
+        Action := caNone;
+        Exit;
       end;
-    end;
+      
+      (*if AutoSave then
+        miSaveClick(lbFilesList)
+      else begin
+        CanDo := MsgBox('Do you want to save file modifications ?', 'Save changes?', MB_YESNOCANCEL + MB_ICONWARNING);
+        case CanDo of
+           IDCANCEL : begin
+                        Action := caNone;
+                        Exit;
+                      end;
+           IDYES    : miSave.Click; // Save1Click(lbFilesList);
+        end;
+      end; *)
+
+  // Disabling the Close button (because freeing MultiTranslation view can be long)
+  miQuit.Enabled := False;
+  HandleMenu := GetSystemMenu(Handle, False);
+  EnableMenuItem(HandleMenu, SC_CLOSE, MF_DISABLED);
 
   // Free the Previewer
   Previewer.Free;
+
+  // Free the MultiTranslation view
+  MultiTranslationFreeView;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
-{var
-  i: Integer;
-  c: TControl;}
-  
 begin
-  // SetVistaFonts(Self);
-  
   Caption := Application.Title + ' - v' + APP_VERSION + ' - by [big_fury]SiZiOUS';
 
-  //DoubleBuffered := True;
-  //lbSubSelect.DoubleBuffered := True;
-  //pcSubs.DoubleBuffered := True;
-
-  WorkFilesList := TFilesList.Create;
+//  WorkFilesList := TFilesList.Create;
 
   // Create the Subtitles Previewer
   Previewer := TSubtitlesPreviewWindow.Create;
   Previewer.OnWindowClosed := PreviewWindowClosedEvent;
 
-  // create the SCNF editor (Shenmue II Free Quest Subtitles Editor)
+  // Create the main object: SCNF Editor (Subtitles Editor)
   SCNFEditor := TSCNFEditor.Create;
   
-  AutoSave := Self.Autosave1.Checked;
+  AutoSave := miAutoSave.Checked;
   ResetApplication;
   SetFileOperationMenusItemEnabledState(False);
   SetModified(False);
-  SetSingleFileMenusItemState(False);
-  SetStatus('Ready');
+//  SetStatus('Ready');
+  SetStatusReady;
 
   // Reset the form
   Clear;
+  MultiTranslationReset;
 
-  // Load config
-//  LoadConfig;
+  // Set the Hints
+  miCloseFile2.Hint := miCloseFile.Hint;
+  miReloadCurrentFile2.Hint := miReloadCurrentFile.Hint;
+  miImportSubs2.Hint := miImportSubs.Hint;
+  miImportSubs3.Hint := miImportSubs.Hint;
+  miExportSubs2.Hint := miExportSubs.Hint;
+  miExportSubs3.Hint := miExportSubs.Hint;
+  miFileProperties.Hint := miFileProperties2.Hint;
+  miClearFilesList2.Hint := miClearFilesList.Hint;
+  miReloadDir.Hint := miReloadDir2.Hint;
 
-  // Loading chars list
-  CanEnableCharsMod := SCNFEditor.CharsList.LoadFromFile('data\chars_list.csv');
-  EnableCharsMod := CanEnableCharsMod;
+  // Constraints for the form
+  Height := WIN_MIN_HEIGHT;
+  Width := WIN_MIN_WIDTH;
+  Constraints.MinHeight := WIN_MIN_HEIGHT;
+  Constraints.MinWidth := WIN_MIN_WIDTH;
+
+  // Select Editor Tab
+  pcSubs.TabIndex := 0;
+
+  //----------------------------------------------------------------------------
+  // CHARS LIST
+  //----------------------------------------------------------------------------
+
+  CanEnableCharsMod1 := IsCharsModAvailable(gvShenmue);
+  CanEnableCharsMod2 := IsCharsModAvailable(gvShenmue2);
+  miEnableCharsMod.Enabled := CanEnableCharsMod1 or CanEnableCharsMod2;
+  EnableCharsMod := miEnableCharsMod.Enabled;
   
-  if not CanEnableCharsMod then
-    AddDebug('WARNING: Unable to enable subtitles text characters modifications. data\chars_list.csv file not found.');
+  if not CanEnableCharsMod1 then
+    AddDebug('WARNING: Unable to enable subtitles text characters modifications '
+      + 'for What''s Shenmue / Shenmue / US Shenmue. "'
+      + GetCorrectCharsList(gvShenmue) + '" file was not found.');
+  if not CanEnableCharsMod2 then
+    AddDebug('WARNING: Unable to enable subtitles text characters modifications '
+     + 'for Shenmue II / Shenmue 2X. "'
+     + GetCorrectCharsList(gvShenmue) + '" file not found.');
+
+  //----------------------------------------------------------------------------
+  // NPC INFOS
+  //----------------------------------------------------------------------------
 
   // Loading CharsID info
-  SCNFEditor.NPCInfos.LoadFromFile('data\npc_info.csv');
+  SCNFEditor.NPCInfos.LoadFromFile(GetNPCInfoFile);
   if not SCNFEditor.NPCInfos.Loaded then begin
-    AddDebug('WARNING: Unable to get NPC characters info. data\npc_infos.csv file not found.');
+    AddDebug('WARNING: Unable to get NPC characters info. "' + GetNPCInfoFile
+      + '" file not found.');
     lGender.Enabled := False;
     lCharType.Enabled := False;
   end;
 
-  // Constraints for the form
-  Self.Height := WIN_MIN_HEIGHT;
-  Self.Width := WIN_MIN_WIDTH;
-  Self.Constraints.MinHeight := WIN_MIN_HEIGHT;
-  Self.Constraints.MinWidth := WIN_MIN_WIDTH;
+  //----------------------------------------------------------------------------
+  // LOADING CONFIG
+  //----------------------------------------------------------------------------
 
-  // contraintes pour la zone de texte d'entrée de sous-titres
-  {with mSubText.Constraints do begin
-    MinHeight := 80;
-    MinWidth := 240;
-  end;
-
-  with lbSubSelect.Constraints do begin
-    MinHeight := 82;
-    MinWidth := 240;
-  end;
-
-  with Self.lbFilesList.Constraints do begin
-    MinWidth := Self.lbFilesList.Width;
-  end;
-
-  with Self.pcSubs do begin
-    Constraints.MinWidth := Width;
-    Constraints.MinHeight := Height;
-  end;}
-
-  //Self.mDebug.Constraints.MinHeight := 50;
-
-  {for i := 0 to Self.ComponentCount - 1 do
-    if Self.Components[i] is TControl then
-      if not (Self.Components[i] is TSplitter) then begin
-         c := Self.Components[i] as TControl;
-         c.Constraints.MinHeight := c.Height;
-         c.Constraints.MinWidth := c.Width;
-      end;}
-  //Self.lbFilesList.Constraints.MinHeight := 20;
-  //Self.gbFilesList.Constraints.MinHeight := 0
-
-  pcSubs.TabIndex := 0;
-
-  // Load config
   LoadConfig;
 
   //----------------------------------------------------------------------------
   // DEBUG
   //----------------------------------------------------------------------------
-  {$IFNDEF DEBUG} tsMultiTrad.TabVisible := False; {$ENDIF}
+  {$IFNDEF DEBUG} miFacesExtractor.Visible := False; {$ENDIF}
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -610,7 +815,12 @@ begin
   SaveConfig;
 
   SCNFEditor.Free;
-  WorkFilesList.Free;
+//  WorkFilesList.Free;
+end;
+
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+  ApplicationEvents.Activate;
 end;
 
 function TfrmMain.GetTargetDirectory: string;
@@ -623,9 +833,35 @@ begin
   Result := fTargetFileName;
 end;
 
+procedure TfrmMain.miGoToClick(Sender: TObject);
+var
+  i: Integer;
+
+begin
+  i := lbFilesList.Items.IndexOf(tvMultiSubs.Selected.Parent.Text);
+  if i <> -1 then begin
+    lbFilesList.Selected[i] := True;
+
+    while not SCNFEditor.FileLoaded do
+      Application.ProcessMessages;
+      
+    i := SCNFEditor.Subtitles.FindSubtitleByCode(tvMultiSubs.Selected.Text);
+
+    while i > lvSubsSelect.Items.Count - 1 do
+      Application.ProcessMessages;
+    
+    if i <> -1 then begin
+      pcSubs.TabIndex := 0;
+      lvSubsSelect.Items[i].Selected := True;
+      lvSubsSelect.Items[i].Focused := True;
+      lvSubsSelect.ItemFocused.Selected := True;
+      lvSubsSelect.SetFocus;
+    end;
+  end;
+end;
+
 procedure TfrmMain.lbFilesListClick(Sender: TObject);
 var
-  CanDo: Integer;
   _newFile: TFileName;
   
 begin
@@ -637,20 +873,15 @@ begin
   if UpperCase(ExtractFileName(_newFile)) = UpperCase(ExtractFileName(GetTargetFileName)) then
     if lvSubsSelect.Items.Count <> 0 then Exit;
 
-  // autosave
-  if FileModified then
-    if AutoSave then
-      Save1Click(lbFilesList)
-    else begin
-      CanDo := MsgBox('Do you want to save file modifications ?', 'Save changes?', MB_YESNOCANCEL + MB_ICONWARNING);
-      case CanDo of
-         IDCANCEL : Exit;
-         IDYES    : Save1Click(lbFilesList);
-      end;
-    end;
-    
+  // Save the current file before changing it on the editor
+  if not SaveFileIfNeeded(True) then begin
+    lbFilesList.ItemIndex := FileListSelectedIndex;
+    Exit;
+  end;
+
   Clear;
   fTargetFileName := _newFile;
+  fFileListSelectedIndex := lbFilesList.ItemIndex;
   LoadSubtitleFile(GetTargetFileName);
 end;
 
@@ -670,12 +901,15 @@ begin
   miFileProperties.Enabled := (lbFilesList.ItemIndex <> -1);
   miFileProperties2.Enabled := miFileProperties.Enabled;
   miReloadDir.Enabled := DirectoryExists(SelectedDirectory);
+  miReloadDir2.Enabled := miReloadDir.Enabled;
   miExportFilesList.Enabled := lbFilesList.Items.Count > 0;
+  miCloseFile2.Enabled := (lbFilesList.ItemIndex <> -1);
+  miCloseFile.Enabled := miCloseFile2.Enabled;
 end;
 
 procedure TfrmMain.lbFilesListDblClick(Sender: TObject);
 begin
-  miFilePropertiesClick(Self);
+  miFileProperties.Click;
 end;
 
 procedure TfrmMain.lbFilesListKeyPress(Sender: TObject; var Key: Char);
@@ -688,18 +922,41 @@ procedure TfrmMain.RefreshSubtitlesList(UpdateView: Boolean);
 var
   i: Integer;
   SubText: string;
+  CharsList: TSubsCharsList;
 
 begin
   if UpdateView then begin
 
+    // Exits: we have nothing to update
+    if lvSubsSelect.Items.Count = 0 then Exit;
+
     // Updating current view
     for i := 0 to SCNFEditor.Subtitles.Count - 1 do begin
-      SubText := StringReplace(SCNFEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
+//      SubText := StringReplace(SCNFEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
+      SubText := SCNFEditor.Subtitles[i].Text;
       lvSubsSelect.Items[i].SubItems[1] := SubText;
     end;
 
     i := lvSubsSelect.ItemIndex;
-    if (i <> -1) then mOldSubEd.Text := SCNFEditor.Subtitles[i].Text;
+    if (i <> -1) then
+      mOldSubEd.Text := StringReplace(SCNFEditor.Subtitles[i].Text, '<br>', #13#10, [rfReplaceAll]);
+
+    // Updating NewSubtitle Memo...
+    CharsList := TSubsCharsList.Create;
+    try
+      // We can't use the built-in CharsList of SCNFEditor because it can be disabled...
+      // CharsList.LoadFromFile(GetDatasDirectory + 'chars_list.LIST_CSV');
+      CharsList.LoadFromFile(GetCorrectCharsList(SCNFEditor.GameVersion));
+      CharsList.Active := True;
+
+      if EnableCharsMod then begin
+        mSubText.Text := CharsList.DecodeSubtitle(mSubText.Text);
+        mSubText.Text := StringReplace(mSubText.Text, '<br>', #13#10, [rfReplaceAll]);
+      end else
+        mSubText.Text := CharsList.EncodeSubtitle(mSubText.Text);
+    finally
+      CharsList.Free;
+    end;
 
   end else begin
 
@@ -710,12 +967,36 @@ begin
       with lvSubsSelect.Items.Add do begin
         Caption := SCNFEditor.Subtitles[i].CharID;
         SubItems.Add(SCNFEditor.Subtitles[i].Code);
-        SubText := StringReplace(SCNFEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
+//        SubText := StringReplace(SCNFEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
+        SubText := SCNFEditor.Subtitles[i].Text;
         SubItems.Add(SubText);
       end;
     end;
 
   end;
+end;
+
+procedure TfrmMain.ReloadFileEditor;
+begin
+  LoadSubtitleFile(SCNFEditor.SourceFileName);
+  AddDebug('File "' + SCNFEditor.SourceFileName + '" was reloaded.');
+end;
+
+procedure TfrmMain.miReloadCurrentFileClick(Sender: TObject);
+var
+  CanDo: Integer;
+  FName: TFileName;
+
+begin
+  FName := ExtractFileName(SCNFEditor.SourceFileName);
+  CanDo := MsgBox(
+    'Reload the "' + FName + '" file ? '
+    + 'Changes not saved will be LOST!',
+    'Warning',
+    MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
+  if (CanDo = IDNO) then Exit;
+
+  ReloadFileEditor;
 end;
 
 procedure TfrmMain.miReloadDirClick(Sender: TObject);
@@ -725,41 +1006,43 @@ end;
 
 procedure TfrmMain.LoadSubtitleFile(const FileName: TFileName);
 var
-  PictFile, GameVersionFolder: TFileName;
+  PictFile: TFileName; //, GameVersionFolder: TFileName;
   GenderChar, AgeChar: string;
   LoadRes: Boolean;
 
 begin
   Clear;
+  
+//  Screen.Cursor := crAppStart;
+  SetStatus('Loading file...');
 
+  // FATAL ERROR WHEN READING THE FILE: IT WAS CORRUPTED BY THE OLD EDITOR (v1.xx)!
   LoadRes := SCNFEditor.LoadFromFile(FileName);
   if not LoadRes then begin
+//    Screen.Cursor := crDefault;
     GenderChar := 'ERROR: File "' + FileName + '" is UNREADABLE!';
     AgeChar := 'ERROR: File "' + ExtractFileName(FileName) + '" is UNREADABLE!';
     AddDebug(GenderChar);
+    SetStatus('ERROR!');
     MsgBox(AgeChar, 'FATAL ERROR !', MB_ICONERROR);
+//    SetStatus('Ready');
+    SetStatusReady;
     Exit;
   end;
 
-  // version
-  case SCNFEditor.GameVersion of
-    gvShenmue2    : begin
-                      eGame.Text := 'Shenmue II (DC)'; //rbDC.Checked := True;
-                      GameVersionFolder := 'shenmue2';
-                    end;
-    gvShenmue2X   : begin
-                      eGame.Text := 'Shenmue II (XBOX)'; //rbXB.Checked := True;
-                      GameVersionFolder := 'shenmue2';
-                    end;
-    gvShenmue     : begin
-                      eGame.Text := 'Shenmue I (DC)';
-                      GameVersionFolder := 'shenmue';
-                    end;
-    gvWhatsShenmue: begin
-                      eGame.Text := 'What''s Shenmue (DC)';
-                      GameVersionFolder := 'whats';
-                    end;
-  end;
+  // Setting the correct chars list file depending of the game version
+  LoadRes :=
+    SCNFEditor.CharsList.LoadFromFile(GetCorrectCharsList(SCNFEditor.GameVersion));
+  if LoadRes then
+    SCNFEditor.CharsList.Active := EnableCharsMod
+  else
+    if pcSubs.TabIndex = 0 then begin // Only if we have the "Editor" tab shown
+      SCNFEditor.CharsList.Active := False;
+      miEnableCharsMod.Enabled := False;
+    end;
+
+  // Show game info
+  eGame.Text := GameVersionToStr(SCNFEditor.GameVersion);
   eCharID.Text := SCNFEditor.CharacterID;
   eVoiceID.Text := SCNFEditor.VoiceShortID;
 
@@ -793,17 +1076,20 @@ begin
   if lvSubsSelect.Items.Count > 0 then begin
     lvSubsSelect.ItemIndex := 0;
     lvSubsSelectClick(Self);
-    Self.miSubsPreview.Enabled := True;
+//    Self.miSubsPreview.Enabled := True;
   end else
-    if Previewer.IsVisible then Previewer.Clear;
+    if Previewer.IsVisible then
+      Previewer.Clear;
 
   SetFileOperationMenusItemEnabledState(True);
   // AddDebug('SCNF file "' + ExtractFileName(FileName) + '" loaded successfully.');
 
   // load face
-  PictFile := ExtractFilePath(Application.ExeName) + '\data\faces\'
+  (*PictFile := GetDatasDirectory + 'faces\'
     + GameVersionFolder + '\' + SCNFEditor.CharacterID + GenderChar + '_'
-    + AgeChar + '.JPG';
+    + AgeChar + '.JPG';*)
+  PictFile := GetFacesDirectory(SCNFEditor.GameVersion) +
+    SCNFEditor.CharacterID + GenderChar + '_' + AgeChar + '.JPG';
 
   if FileExists(PictFile) then
     iFace.Picture.LoadFromFile(PictFile)
@@ -812,9 +1098,11 @@ begin
 
   // Refresh FileInfo dialog
   frmFileInfo.LoadFileInfo;
+//  SetStatus('Ready');
+  SetStatusReady;
 end;
 
-procedure TfrmMain.Locatefile1Click(Sender: TObject);
+procedure TfrmMain.miLocateFileClick(Sender: TObject);
 var
   FName: string;
 
@@ -826,14 +1114,13 @@ end;
 procedure TfrmMain.lvSubsSelectClick(Sender: TObject);
 var
   Sub: string;
-  i: Integer;
   
 begin
-  i := Self.lvSubsSelect.ItemIndex;
-  if i <> -1 then begin
-    Sub := SCNFEditor.Subtitles[i].Text;
-    Self.mSubText.Text := Sub;
-    Self.mOldSubEd.Text := Sub;
+  SubtitleSelected := lvSubsSelect.ItemIndex;
+  if SubtitleSelected <> -1 then begin
+    Sub := SCNFEditor.Subtitles[SubtitleSelected].Text;
+    mSubText.Text := StringReplace(Sub, '<br>', #13#10, [rfReplaceAll]);
+    mOldSubEd.Text := mSubText.Text;
   end;
 end;
 
@@ -843,7 +1130,7 @@ begin
   lvSubsSelectClick(Self);
 end;
 
-procedure TfrmMain.Makebackup1Click(Sender: TObject);
+procedure TfrmMain.miMakeBackupClick(Sender: TObject);
 begin
   MakeBackup := not MakeBackup;
 end;
@@ -854,9 +1141,29 @@ begin
   SubsViewerVisible := miSubsPreview.Checked;
 
   if SubsViewerVisible then begin
-    Previewer.Show(Self.mSubText.Text)
+
+    case pcSubs.TabIndex of
+      0: Previewer.Show(mSubText.Text);
+      1: Previewer.Show(mMTNewSub.Text);
+    end;
+
   end else
     Previewer.Hide;
+end;
+
+procedure TfrmMain.mMTNewSubChange(Sender: TObject);
+begin
+  with Self.MultiTranslationSelectedHashKeySubNode do begin
+    ImageIndex := 2;
+    SelectedIndex := 2;
+    OverlayIndex := 2;
+  end;
+  MultiTranslationChangeModifiedState(True);
+  MultiTranslationUpdateCharsCount;
+
+  // Update Previewer
+  if Previewer.IsVisible then
+    Previewer.Update(mMTNewSub.Text);
 end;
 
 function TfrmMain.MsgBox(const Text, Caption: string; Flags: Integer): Integer;
@@ -866,43 +1173,39 @@ end;
 
 procedure TfrmMain.mSubTextChange(Sender: TObject);
 var
-  CurrentSub: TSubEntry;
+  Subtitle: TSubEntry;
   l1, l2: Integer;
-  
-{const
-  MaxLineCount = 2;}
+  NewSubtitle: string;
 
 begin
-  {if mSubText.Lines.Count > MaxLineCount then begin
-    mSubText.Perform(EM_UNDO, 0, 0); // undo the last change
-    MessageBeep(MB_OK);
-  end;}
+  if SubtitleSelected = -1 then Exit;
+  Subtitle := SCNFEditor.Subtitles[SubtitleSelected];
+  NewSubtitle := StringReplace(mSubText.Text, #13#10, '<br>', [rfReplaceAll]);
 
-  // The EM_EMPTYUNDOBUFFER message clears the undo flag,
-  // which means that you can no longer undo your last change
-  // to the edit control.
-  // mSubText.Perform(EM_EMPTYUNDOBUFFER, 0, 0);
-  if Self.lvSubsSelect.ItemIndex = -1 then Exit;
+  // Update the PAKS file
+  if Subtitle.Text <> NewSubtitle then begin
+    SetModified(True);
 
-  CurrentSub := SCNFEditor.Subtitles[Self.lvSubsSelect.ItemIndex];
+    // Updating subtitle
+    Subtitle.Text := NewSubtitle;
 
-  if CurrentSub.Text <> mSubText.Text then SetModified(True);
-  CurrentSub.Text := mSubText.Text;
+    // Update View
+    lvSubsSelect.Items[SubtitleSelected].SubItems[1] := Subtitle.Text;
+  end;
 
-  //update listbox
-  //Self.lvSubsSelect.Items[Self.lvSubsSelect.ItemIndex] := CurrentSub.Code + ': ' + CurrentSub.Text;
-  // lvSubsSelect.Items[lvSubsSelect.ItemIndex].SubItems[0] := CurrentSub.Text;
-  lvSubsSelect.Items[lvSubsSelect.ItemIndex].SubItems[1] := StringReplace(CurrentSub.Text, #13#10, '<br>', [rfReplaceAll]);
+  // Update the chars count fields
+  CalculateCharsCount(Subtitle.Text, l1, l2);
+  eFirstLineLength.Text := IntToStr(l1);
+  CheckIfSubLengthIsCorrect(l1, eFirstLineLength);
+  eSecondLineLength.Text := IntToStr(l2);
+  CheckIfSubLengthIsCorrect(l2, eSecondLineLength);
 
-  CalculateCharsCount(CurrentSub.Text, l1, l2);
-  Self.eFirstLineLength.Text := IntToStr(l1);
-  Self.eSecondLineLength.Text := IntToStr(l2);
-
+  // Update the Previewer
   if SubsViewerVisible then
-    Previewer.Update(Self.mSubText.Text);
+    Previewer.Update(mSubText.Text);
 end;
 
-procedure TfrmMain.MultiTranslateSubtitles;
+(*procedure TfrmMain.MultiTranslateSubtitles;
 begin
   SetStatus('Translating subtitles ... Please wait.');
 
@@ -917,19 +1220,45 @@ begin
 
   // show the progress window
   frmProgress.ShowModal;
-end;
+end;*)
 
-procedure TfrmMain.Multitranslation1Click(Sender: TObject);
+(*procedure TfrmMain.MultiTranslationAddNewSubtitle(const Subtitle, Code: string;
+  SourceFileName: TFileName);
+var
+  i: Integer;
+  SubNode, FileNode: TTreeNode;
+  Done: Boolean;
+  
 begin
-  if frmMultiTranslation.Visible then
-    frmMultiTranslation.Close
-  else
-    frmMultiTranslation.Show;
-    
-  Multitranslation1.Checked := frmMultiTranslation.Visible;
-end;
+  // Searching the Root node containing the subtitle
+  Done := False;
+  SubNode := nil;
+  i := 0;
+  
+  while (not Done) and (i < tvMultiSubs.Items.Count - 1) do begin
+    if SameText(tvMultiSubs.Items[i].Text, Subtitle) then begin
+      SubNode := tvMultiSubs.Items[i];
+      Done := True;
+    end;
+    Inc(i);
+  end;
 
-procedure TfrmMain.MultiTranslationFillControls;
+  if not Assigned(SubNode) then
+    SubNode := tvMultiSubs.Items.Add(nil, Subtitle);
+
+  // adding the filename / code node
+  FileNode := FindNode(SubNode, SourceFileName);
+  if FileNode = nil then
+    FileNode := tvMultiSubs.Items.AddChild(SubNode, SourceFileName);
+
+  tvMultiSubs.Items.AddChild(FileNode, Code);
+
+  try
+    if Assigned(SubNode) then SubNode.Selected := True;
+  except end;
+end;*)
+
+(*procedure TfrmMain.MultiTranslationFillControls;
 var
   i,j: Integer;
   SubTitle, Code, FileName: string;
@@ -961,40 +1290,92 @@ begin
     end;
 
   end;
+end;*)
+
+procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'explorer', PChar(SelectedDirectory), '', SW_SHOWNORMAL);
 end;
 
-procedure TfrmMain.Opendirectory1Click(Sender: TObject);
+procedure TfrmMain.miOpenSingleFileClick(Sender: TObject);
 var
-  FName: string;
-
+  i: Integer;
+  
 begin
-  FName := ExtractFilePath(SCNFEditor.GetLoadedFileName);
-  ShellExecute(Handle, 'open', 'explorer', PChar(FName), '', SW_SHOWNORMAL);
-end;
+  with odMain do begin
+    Title := 'Open NPC file(s) from...';
+    DefaultExt := '.pks';
+    Filter := 'Shenmue PAKS Files (*.PKS)|*.PKS|All Files (*.*)|*.*';
+    Options := odMain.Options + [ofAllowMultiSelect];
+    if DirectoryExists(SelectedDirectory) then
+      InitialDir := SelectedDirectory;
 
-procedure TfrmMain.Opensinglefile1Click(Sender: TObject);
-begin
-  odMain.Title := 'Open NPC file from';
-  odMain.DefaultExt := '.pks';
-  odMain.Filter := 'PAKS Files (*.PKS)|*.PKS|All Files (*.*)|*.*';
-
-  with odMain do
     if Execute then begin
-      if not IsFileValidScnf(FileName) then begin
-        MsgBox('This file isn''t a valid Shenmue Free Quest subtitles format.', 'Not a valid PAKS SCNF file', MB_ICONWARNING);
-        Exit;
-      end;
+
+      if not SaveFileIfNeeded(True) then Exit;
+
       ResetApplication;
-      SetSingleFileMenusItemState(True);
-      Self.fSelectedDirectory := ExtractFilePath(FileName);
-      Self.lbFilesList.Items.Add(ExtractFileName(FileName));
+
+      for i := 0 to Files.Count - 1 do begin
+          
+        if IsFileValidScnf(Files[i]) then begin
+          fSelectedDirectory := ExtractFilePath(Files[i]);
+          lbFilesList.Items.Add(ExtractFileName(Files[i]));
+        end else begin
+          if Files.Count <> 1 then
+            AddDebug('The selected file, "' + Files[i] + '" isn''t a valid Shenmue Free Quest subtitles format.');
+        end;
+
+      end; // for
+
       if lbFilesList.Count > 0 then begin
         lbFilesList.ItemIndex := 0;
         lbFilesListClick(Self);
-      end;
-      
-      // Self.Multitranslation1.Enabled := True;
-    end;
+      end else
+        MsgBox('This file isn''t a valid Shenmue Free Quest subtitles format.', 'Not a valid PAKS SCNF file', MB_ICONWARNING);
+
+    end; // if Execute
+    Options := Options - [ofAllowMultiSelect];
+  end;
+end;
+
+procedure TfrmMain.pcSubsChange(Sender: TObject);
+var
+  OldSubtitleSelected: Integer;
+
+begin
+  case pcSubs.TabIndex of
+
+    // EDITOR TabSheet
+    0:  begin
+          // Save the MT modification if needed
+          if MultiTranslationSubtitleModified then begin
+            bMultiTranslate.Click;
+          end;
+
+          // Reload the selected file in the editor to show MT modifications
+          if FileListSelectedIndex <> -1 then begin
+            if MultiTranslationUsedReloadFile then begin
+              OldSubtitleSelected := SubtitleSelected;
+              LoadSubtitleFile(fTargetFileName);
+              MultiTranslationUsedReloadFile := False;
+              ListViewSelectItem(lvSubsSelect, OldSubtitleSelected);
+            end;
+
+            // Change state of the the CharsMod menu depending of the file selected
+            miEnableCharsMod.Enabled := IsCharsModAvailable(SCNFEditor.GameVersion);
+          end;
+        end;
+
+    // MULTI-TRANSLATION TabSheet
+    1:  begin
+          // Save files changes if needed
+          SaveFileIfNeeded(False);
+          miEnableCharsMod.Enabled := CanEnableCharsMod1 or CanEnableCharsMod2;
+        end;
+
+  end;
+
 end;
 
 procedure TfrmMain.PreviewWindowClosedEvent(Sender: TObject);
@@ -1015,61 +1396,349 @@ end;
 
 procedure TfrmMain.ResetApplication;
 begin
-  Self.lbFilesList.Clear;
-  Self.Clear;
-  Clearfileslist1.Enabled := False;
-  Self.Multitranslation1.Enabled := False;
-  Self.Batchimportsubtitles1.Enabled := False;
-  Self.Batchexportsubtitles1.Enabled := False;
-  if SubsViewerVisible then Previewer.Clear();
+  Clear;
+  fFileListSelectedIndex := -1;
+  lbFilesList.Clear;
+  miClearFilesList.Enabled := False;
+  miClearFilesList2.Enabled := False;
+  miBatchImportSubs.Enabled := False;
+  miBatchExportSubs.Enabled := False;
+  if SubsViewerVisible then
+    Previewer.Clear();
 end;
 
-procedure TfrmMain.RetrieveSubtitles;
+procedure TfrmMain.MultiTranslationChangeModifiedState(const State: Boolean);
 begin
-  // start the retrieving scanner thread
-  SubsRetriever := TMultiTranslationSubtitlesRetriever.Create(SelectedDirectory, lbFilesList.Items.Text);
-  frmProgress.Mode := pmMultiScan;
-//  SubsRetriever.OnCompleted := MultiTranslationFillControls;
+  SetModifiedIndicator(State);
+  bMultiTranslate.Enabled := State;
+  if not State then begin
+//    SetStatus('Ready');
+    SetStatusReady;
+    MultiTranslationBusy := False;
+  end;
+end;
 
-  SubsRetriever.Resume;
+procedure TfrmMain.MultiTranslationFreeView;
+var
+  i: Integer;
+  
+begin
+  for i := 0 to tvMultiSubs.Items.Count - 1 do begin
+    Dispose(PMultiTranslationNodeType(tvMultiSubs.Items[i].Data));
+    if (i mod 200) = 0 then
+      Application.ProcessMessages;
+  end;
+end;
+
+procedure TfrmMain.MultiTranslationReset;
+begin
+  // Clear MultiSubs view
+  MultiTranslationFreeView;
+  tvMultiSubs.Items.Clear;
+
+  mMTOldSub.Clear;
+  mMTNewSub.Clear;
+  bMultiTranslate.Enabled := False;
+  eMTFirstLineLength.Text := '0';
+  CheckIfSubLengthIsCorrect(0, eMTFirstLineLength);
+  eMTSecondLineLength.Text := '0';
+  CheckIfSubLengthIsCorrect(0, eMTSecondLineLength);
+//  frmMain.tvMultiSubs.OnChange := tvMultiSubsChange;
+  MultiTranslationSelectedIndex := -1;
+  MultiTranslationNodeImageIndex := -1;
+  MultiTranslationSelectedHashKeySubNode := nil;
+  MultiTranslationSelectedNewSubNode := nil;
+  MultiTranslationInUse := False;
+  fMultiTranslationSubtitleModified := False;
+
+  // a bouger éventuellement ...
+{  mMTOldSub.Clear;
+  mMTNewSub.Clear;
+  MultiTranslationSelectedIndex := -1;}
+end;
+
+procedure TfrmMain.MultiTranslationRetrieveSubtitles;
+begin
+  MultiTranslationReset;
+
+  // start the retrieving scanner thread
+  MultiTranslationSubsRetriever := TMultiTranslationSubtitlesRetriever.Create(SelectedDirectory,
+    lbFilesList.Items.Text, EnableCharsMod);
+  MultiTranslationSubsRetriever.Priority := tpHighest;
+  frmProgress.Mode := pmMultiScan;
+
+  MultiTranslationSubsRetriever.Resume;
 
   // show the progress window
   frmProgress.ShowModal;
 end;
 
-procedure TfrmMain.Save1Click(Sender: TObject);
+procedure TfrmMain.MultiTranslationSaveFileModifiedEditor;
+var
+  CanDo: Integer;
+
 begin
-  if SCNFEditor.FileLoaded then begin
-    SetStatus('Saving...');
-    SCNFEditor.SaveToFile(SCNFEditor.GetLoadedFileName);
-    AddDebug('File "' + SCNFEditor.GetLoadedFileName + '" successfully saved.');
-    SetStatus('Ready');
-    SetModified(False);
-    {$IFDEF DEBUG} WriteLn('Saving file : ', ExtractFileName(SCNFEditor.GetLoadedFileName), #13#10); {$ENDIF}
-  end; { else
-    MsgBox('Please load a file first.', 'Warning', MB_ICONWARNING);}
+  CanDo := MsgBox('Sorry, since you are using the Multi-translation module, the save '
+    + 'feature was disabled. You MUST save your modifications to another file. '
+    + 'Do it now ? If you don''t, modifications will be LOST!',
+    'File was not saved! Save as another file ?', MB_ICONWARNING + MB_OKCANCEL);
+  if CanDo = IDCANCEL then
+    ReloadFileEditor
+  else
+    miSaveAs.Click;
 end;
 
-procedure TfrmMain.Saveas1Click(Sender: TObject);
+procedure TfrmMain.MultiTranslationUpdateCharsCount;
+var
+  l1, l2: Integer;
+  
+begin
+  CalculateCharsCount(mMTNewSub.Text, l1, l2);
+  eMTFirstLineLength.Text := IntToStr(l1);
+  CheckIfSubLengthIsCorrect(l1, eMTFirstLineLength);
+  eMTSecondLineLength.Text := IntToStr(l2);
+  CheckIfSubLengthIsCorrect(l2, eMTSecondLineLength);
+end;
+
+procedure TfrmMain.MultiTranslationUpdateSubtitle(
+  const DataSubtitleIndex: Integer; TranslatedTextNode: TTreeNode;
+  NewSubtitle: string);
+var
+  SubInfoList: ISubtitleInfoList;
+  TmpScnfEdit: TSCNFEditor;
+  TmpCharsList: TSubsCharsList;
+  i, SubIndex: Integer;
+  TargetSubEntry: TSubEntry;
+  TargetHashKeySub, // subtitle hash key (can't be modified). it's in fact the ORIGINAL subtitle when the list is built
+  OldSubtitle: string; // this's the real old subtitle. when it's modified the first time, OldSubtitle = TargetKeySub
+  NodeType: TMultiTranslationNodeType;
+
+  procedure CancelMultiTranslation;
+  begin
+    MultiTranslationChangeModifiedState(False);
+    with MultiTranslationSelectedHashKeySubNode do begin
+      ImageIndex := MultiTranslationNodeImageIndex;
+      SelectedIndex := MultiTranslationNodeImageIndex;
+      OverlayIndex := MultiTranslationNodeImageIndex;
+    end;
+  end;
+
+begin
+  // Retrieve the Concerned subtitle
+  TargetHashKeySub := '';
+  if DataSubtitleIndex = -1 then Exit;
+  try
+    // This's the Hash Key of the Target Subtitle
+    TargetHashKeySub := MultiTranslationTextData.Subtitles[DataSubtitleIndex];
+  except
+    Exit;
+  end;
+
+  // Check if new subtitle isn't empty
+  if NewSubtitle = '' then begin
+    AddDebug('Subtitle can''t be empty. Multi-translation cancelled for this one.');
+    CancelMultiTranslation;
+    Exit;
+  end;
+
+  // Retrieve current Selected Key Node infos
+  NodeType := PMultiTranslationNodeType(MultiTranslationSelectedHashKeySubNode.Data)^;
+
+  // OK now we are ready to retrieve the list of subtiles to update if possible.
+  TmpCharsList := TSubsCharsList.Create;
+  try
+    TmpCharsList.LoadFromFile(GetCorrectCharsList(NodeType.GameVersion));
+    TmpCharsList.Active := EnableCharsMod;
+    
+    // Retrieve the list of subtitles code to update
+    with MultiTranslationTextData do
+      SubInfoList := GetSubtitleInfo(TargetHashKeySub);
+
+    // Getting Old and New subtitle...
+    NewSubtitle := TmpCharsList.EncodeSubtitle(NewSubtitle);
+    OldSubtitle := SubInfoList.NewSubtitle; // already encoded
+
+    // Exits if it's the same text
+    if (SameText(NewSubtitle, OldSubtitle)) then begin
+      // Warning if needeed
+      if MultiTranslationSubtitleModified then
+        AddDebug('Unable to multi-translate a subtitle ... to his same value!');
+      CancelMultiTranslation;
+      Exit;
+    end;
+
+    // *************************************************************************
+    // MULTI-TRANSLATING NOW !!
+    // *************************************************************************
+
+    // Updating the TextData item
+    SubInfoList.NewSubtitle := NewSubtitle; // already Encoded by CharsList
+    // This single value must be encoded with Shenmue 1 or Shenmue 2 charslist!
+
+    // Applying modification
+    TmpScnfEdit := TSCNFEditor.Create;
+    try
+//      Screen.Cursor := crAppStart;
+      SetStatus('Multi-translating...');
+      MultiTranslationBusy := True;
+
+      // Updating the MultiTranslation node to show working icon
+      with MultiTranslationSelectedHashKeySubNode do begin
+        ImageIndex := 7;
+        SelectedIndex := 7;
+        OverlayIndex := -1;
+      end;
+
+{$IFDEF DEBUG}
+      WriteLn(#13#10, 'Multi-translating ... Hash Key = "', TargetHashKeySub, '"');
+{$ENDIF}
+
+      // Updating all subtitles by SubCode
+      for i := 0 to SubInfoList.Count - 1 do begin
+
+{$IFDEF DEBUG}
+  WriteLn('  ', SubInfoList.Items[i].Code, ': ', ExtractFileName(SubInfoList.Items[i].FileName));
+{$ENDIF}
+
+        // Load the target file if necessary (if it's the same, we skip this to improve speed)
+        with TmpScnfEdit do
+          if not SameText(GetLoadedFileName, SubInfoList.Items[i].FileName) then begin
+            if FileLoaded then Save; // save the loaded PAKS file (if more than one entry to translate)
+            LoadFromFile(SubInfoList.Items[i].FileName);
+          end;
+
+        // updating the subtitle...
+        SubIndex := TmpScnfEdit.Subtitles.FindSubtitleByCode(SubInfoList.Items[i].Code);
+        if SubIndex <> -1 then begin // not found ??
+          TargetSubEntry := TmpScnfEdit.Subtitles[SubIndex];
+
+          // protection "anti-change" outside the Multi-Translation module
+          if TargetSubEntry.Text = OldSubtitle then
+            TargetSubEntry.Text := NewSubtitle
+          else
+            AddDebug('WARNING: Subtitle "' + SubInfoList.Items[i].Code + '" of the '
+            + 'file "' + SubInfoList.Items[i].FileName + '" has CHANGED outside the '
+            + 'multi-translation module! It HAS NOT BE MODIFIED with the new '
+            + 'multi-translation value!');
+        end else
+          AddDebug('WARNING: Subtitle "' + SubInfoList.Items[i].Code + '" was '
+            + 'NOT found in the file "' + SubInfoList.Items[i].FileName + '"! '
+            + 'THIS IS IMPOSSIBLE! Do you have modified the file outside this editor?');
+
+      end;
+
+      //Saving the last file
+      TmpScnfEdit.Save;
+
+      // Updating the view
+      if EnableCharsMod then      
+        TranslatedTextNode.Text := TmpCharsList.DecodeSubtitle(SubInfoList.NewSubtitle)
+      else
+        // TranslatedTextNode.Text := StringReplace(SubInfoList.NewSubtitle, #13#10, '<br>', [rfReplaceAll]);
+        TranslatedTextNode.Text := SubInfoList.NewSubtitle;        
+
+      // New image for the node!
+      MultiTranslationNodeImageIndex := 1;
+
+      // Modifing Subtitle Root image
+      MultiTranslationSelectedHashKeySubNode.ImageIndex := MultiTranslationNodeImageIndex;
+      MultiTranslationSelectedHashKeySubNode.SelectedIndex := MultiTranslationNodeImageIndex;
+      MultiTranslationSelectedHashKeySubNode.OverlayIndex := MultiTranslationNodeImageIndex;
+
+      // Removing the "Modified" state
+      MultiTranslationChangeModifiedState(False);
+
+      // Notify the "Editor" tab to reload the current selected file (to show
+      // the last MT modifications)
+      MultiTranslationUsedReloadFile := True;
+    finally
+      TmpScnfEdit.Free;
+    end;
+    
+  finally
+    TmpCharsList.Free;
+  end;
+end;
+
+procedure TfrmMain.miFacesExtractorClick(Sender: TObject);
+begin
+  frmFacesExtractor := TfrmFacesExtractor.Create(Application);
+  try
+    frmFacesExtractor.ShowModal;
+  finally
+    frmFacesExtractor.Free;
+  end;
+end;
+
+procedure TfrmMain.miSaveClick(Sender: TObject);
+begin
+  if SCNFEditor.FileLoaded then begin
+
+    // Multi-Translation warning (if used)
+    if MultiTranslationInUse then begin
+      MultiTranslationSaveFileModifiedEditor;
+      Exit;
+    end;
+
+//    Screen.Cursor := crAppStart;
+    SetStatus('Saving...');
+    SCNFEditor.Save;
+    AddDebug('File "' + SCNFEditor.GetLoadedFileName + '" successfully saved.');
+//    SetStatus('Ready');
+    SetStatusReady;
+    SetModified(False);
+
+    // Reloading FileInfo
+    frmFileInfo.LoadFileInfo;
+    
+    {$IFDEF DEBUG} WriteLn('Saving file : ', ExtractFileName(SCNFEditor.GetLoadedFileName), #13#10); {$ENDIF}
+  end;
+end;
+
+procedure TfrmMain.miSaveAsClick(Sender: TObject);
+var
+  Saved: Boolean;
+
 begin
   sdMain.Title := 'Save patched NPC file to';
   sdMain.Filter := 'All Files (*.*)|*.*';
   sdMain.DefaultExt := '';
-
+  Saved := True;
+  
   if SCNFEditor.FileLoaded then begin
     with sdMain do begin
-      FileName := SCNFEditor.GetLoadedFileName;
+      FileName := ExtractFileName(SCNFEditor.GetLoadedFileName);
+      InitialDir := ExtractFilePath(SCNFEditor.GetLoadedFileName);
+
       if Execute then begin
+//        Screen.Cursor := crAppStart;
+        SetStatus('Saving...');
         SCNFEditor.SaveToFile(FileName);
-        SetModified(False);
+        AddDebug('Current Editor state successfully saved to the file "' + FileName + '".');
+//        SetStatus('Ready');
+        SetStatusReady;
+//        SetModified(False);  // NO! We must keep the actual editor state
         {$IFDEF DEBUG} WriteLn('Saving file to: ', SCNFEditor.GetLoadedFileName, #13#10); {$ENDIF}
-      end;
-    end;
-  end; {else
-    MsgBox('Please load a file first.', 'Warning', MB_ICONWARNING);}
+      end else // Execute
+        Saved := False;
+        
+    end; // sdMain
+
+    // If MultiTranslationInUse, we must reload the file to lost any changes!
+    if MultiTranslationInUse then begin
+      if not Saved then
+        AddDebug('Save was cancelled by user !');
+      SCNFEditor.ReloadFile;
+      SetModified(False);
+      AddDebug('Since you are using Multi-translation, the current file was '
+      + 'reloaded from the disk to cancel every modifications.');
+      LoadSubtitleFile(GetTargetFileName);
+    end; // MultiTranslationInUse
+
+  end; // FileLoaded
 end;
 
-procedure TfrmMain.Savedebuglog1Click(Sender: TObject);
+procedure TfrmMain.miSaveDebugLogClick(Sender: TObject);
 begin
   sdMain.Title := 'Save debug log as';
   sdMain.Filter := 'Debug Log Files (*.log)|*.log|Text Files (*.txt)|*.txt|All Files (*.*)|*.*';
@@ -1078,6 +1747,74 @@ begin
   with sdMain do
     if Execute then
       mDebug.Lines.SaveToFile(FileName);    
+end;
+
+(*procedure TfrmMain.SaveCurrentFile;
+var
+  CanDo: Integer;
+
+begin
+  if not FileModified then Exit;
+
+  if AutoSave then begin
+    miSave.Click; // Save1Click(lbFilesList)
+  end else begin
+    CanDo := MsgBox('Do you want to save file modifications ?', 'Save changes?', MB_YESNOCANCEL + MB_ICONWARNING);
+    case CanDo of
+       IDCANCEL : Exit;
+       IDYES    : miSave.Click; // Save1Click(lbFilesList);
+    end;
+  end;
+end;*)
+
+function TfrmMain.SaveFileIfNeeded(const CancelButton: Boolean): Boolean;
+var
+  CanDo, Buttons: Integer;
+  NextMsg: string;
+
+begin
+  Result := False;
+  NextMsg := '';
+
+  if CancelButton then
+    Buttons := MB_YESNOCANCEL
+  else begin
+    Buttons := MB_YESNO;
+    NextMsg := ' If you hit ''No'', changes will be LOST!';
+  end;
+    
+  // AutoSave
+  if FileModified then begin
+
+    // Multi-Translation warning (if used)
+    if MultiTranslationInUse then begin
+      MultiTranslationSaveFileModifiedEditor;
+      Exit;
+    end;
+
+    // Saving the file
+    if AutoSave then begin
+      miSave.Click;
+      Result := True;
+    end else begin
+      CanDo := MsgBox('Do you want to save file modifications ?' + NextMsg,
+        'Save changes?', Buttons + MB_ICONWARNING);
+      case CanDo of
+         IDCANCEL : Exit;
+         IDNO     : begin
+                      Result := True;
+                      if not CancelButton then // reload the file
+                        ReloadFileEditor;
+                    end;
+         IDYES    : begin
+                      miSave.Click;
+                      Result := True;
+                    end;
+      end;
+    end; // if AutoSave
+
+  end else
+    Result := True; // no need to save, so continue
 end;
 
 procedure TfrmMain.SaveSubtitlesList(const FileName: TFileName);
@@ -1093,19 +1830,34 @@ begin
     if LowerCase(FileFormat) = '.csv' then begin
 
       // CSV format
-      List.Add('Index;Code;Subtitle');
+      List.Add('Index;CharID;Code;Subtitle');
       for i := 0 to ScnfEditor.Subtitles.Count - 1 do begin
         IndexText := IntToStr(i + 1);
-        SubText := StringReplace(ScnfEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
-        List.Add(IndexText + ';' + ScnfEditor.Subtitles[i].Code + ';' + SubText);
+//        SubText := StringReplace(ScnfEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
+        SubText := ScnfEditor.Subtitles[i].Text;
+        List.Add(IndexText + ';' + ScnfEditor.Subtitles[i].CharID + ';'
+          + ScnfEditor.Subtitles[i].Code + ';' + SubText);
       end;
 
     end else begin
 
       // Text format
+      with List do begin
+        Add(Caption);
+        Add('---');
+        Add('');
+        Add('Input File   : ' + SCNFEditor.SourceFileName);
+        Add('Character ID : ' + SCNFEditor.CharacterID);
+        Add('Voice ID     : ' + SCNFEditor.VoiceShortID);
+        Add('Game Version : ' + GameVersionToStr(SCNFEditor.GameVersion));
+        Add('');
+        Add('Subtitles    :');
+      end;
       for i := 0 to ScnfEditor.Subtitles.Count - 1 do begin
-        SubText := StringReplace(ScnfEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
-        List.Add(ScnfEditor.Subtitles[i].Code + ': ' + SubText);
+//        SubText := StringReplace(ScnfEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
+        SubText := ScnfEditor.Subtitles[i].Text;
+        List.Add(ScnfEditor.Subtitles[i].Code
+          + ' (' + ScnfEditor.Subtitles[i].CharID + '): ' + SubText);
       end;
 
     end;
@@ -1117,11 +1869,13 @@ begin
   end;
 end;
 
-procedure TfrmMain.Savetofile1Click(Sender: TObject);
+procedure TfrmMain.miSaveListToFileClick(Sender: TObject);
 begin
   with sdSubsList do begin
-    sdSubsList.FileName := ChangeFileExt(SCNFEditor.GetLoadedFileName, '');
-    if Execute then SaveSubtitlesList(sdSubsList.FileName);
+    FileName := ChangeFileExt(ExtractFileName(SCNFEditor.SourceFileName), '');
+    InitialDir := ExtractFilePath(SCNFEditor.SourceFileName);
+    if Execute then
+      SaveSubtitlesList(FileName);
   end;
 end;
 
@@ -1140,94 +1894,240 @@ begin
 
   frmProgress.ShowModal;
 
-  Clearfileslist1.Enabled := True;
-  Self.Batchimportsubtitles1.Enabled := True;
-  Self.Batchexportsubtitles1.Enabled := True;
+  miClearFilesList.Enabled := True;
+  miClearFilesList2.Enabled := True;
+  miBatchImportSubs.Enabled := True;
+  miBatchExportSubs.Enabled := True;
   //Self.Multitranslation1.Enabled := Self.lbFilesList.Count > 1;
   //Self.miSubsPreview.Enabled := Self.lbFilesList.Count > 1;
 end;
 
-procedure TfrmMain.Scandirectory1Click(Sender: TObject);
+procedure TfrmMain.miScanDirectoryClick(Sender: TObject);
 begin
   with frmSelectDir do begin
-    eDirectory.Text := SelectedDirectory;
+    SetDefaultDirectory(SelectedDirectory);
     ShowModal;
     if ModalResult = mrOK then
       ScanDirectory(GetSelectedDirectory);
   end;
 end;
 
+procedure TfrmMain.SetApplicationHint(const HintStr: string);
+begin
+  if HintStr = '' then
+//    SetStatus('Ready')
+    SetStatusReady
+  else begin
+    sb.Panels[2].Text := HintStr;
+  end;
+end;
+
 procedure TfrmMain.SetAutoSave(const Value: Boolean);
 begin
   fAutoSave := Value;
-  Self.Autosave1.Checked := AutoSave;
+  miAutoSave.Checked := AutoSave;
 end;
 
-procedure TfrmMain.SetCanEnableCharsMod(const Value: Boolean);
+(*procedure TfrmMain.SetCanEnableCharsMod(const Value: Boolean);
 begin
   fCanEnableCharsMod := Value;
   charsModMenu1.Enabled := Value;
-end;
+end;*)
 
 procedure TfrmMain.SetEnableCharsMod(const Value: Boolean);
 begin
-  charsModMenu1.Checked := Value;
+  miEnableCharsMod.Checked := Value;
+  fEnableCharsMod := Value;
+
+  // Single view
   if SCNFEditor.CharsList.Loaded then begin
-    fEnableCharsMod := Value;
     SCNFEditor.CharsList.Active := Value;
     RefreshSubtitlesList(True);
   end;
+
+  // Multi-translation
+  if MultiTranslationInUse then
+    if Value then
+      MultiTranslationUpdateView(nvoDecodeText)
+    else
+      MultiTranslationUpdateView(nvoEncodeText);
+
+  // File Infos
+  if Assigned(frmFileInfo) and frmFileInfo.Visible then
+    frmFileInfo.UpdateSubtitles;
 end;
 
 procedure TfrmMain.SetFileOperationMenusItemEnabledState(const State: Boolean);
 begin
-  Self.Importsubtitles1.Enabled := State;
-  Self.Exportsubtitles1.Enabled := State;
-  Self.miFileProperties.Enabled := State;
-  Self.miFileProperties2.Enabled := State;
+  miCloseFile.Enabled := State;
+  miCloseFile2.Enabled := State;
+  miReloadCurrentFile.Enabled := State;
+  miReloadCurrentFile2.Enabled := State;
+  miImportSubs.Enabled := State;
+  miExportSubs.Enabled := State;
+  miImportSubs3.Enabled := State;
+  miExportSubs3.Enabled := State;
+  miFileProperties.Enabled := State;
+  miFileProperties2.Enabled := State;
   if State then
     lvSubsSelect.PopupMenu := pmSubsSelect
   else
     lvSubsSelect.PopupMenu := nil;
-  Self.Locatefile1.Enabled := State;
+  Self.miLocateFile.Enabled := State;
   // Self.Multitranslation1.Enabled := State;
 end;
 
 procedure TfrmMain.SetFileSaveOperationsMenusItemEnabledState(
   const State: Boolean);
 begin
-  Self.Save1.Enabled := State;
-  Self.Saveas1.Enabled := State;
+  miSave.Enabled := State;
+  miSaveAs.Enabled := State;
 end;
 
 procedure TfrmMain.SetMakeBackup(const Value: Boolean);
 begin
   fMakeBackup := Value;
   SCNFEditor.MakeBackup := Value;
-  Self.Makebackup1.Checked := Value;
+  miMakeBackup.Checked := Value;
 end;
 
 procedure TfrmMain.SetModified(const State: Boolean);
 begin
-  if State then
-    sb.Panels[1].Text := 'Modified'
-  else
-    sb.Panels[1].Text := '';
+  SetModifiedIndicator(State);
   fFileModified := State;
   SetFileSaveOperationsMenusItemEnabledState(State);
 end;
 
-procedure TfrmMain.SetSingleFileMenusItemState(const State: Boolean);
+procedure TfrmMain.SetModifiedIndicator(State: Boolean);
 begin
-  Self.Closesinglefile1.Enabled := State;
+  fMultiTranslationSubtitleModified := State;
+  if State then
+    sb.Panels[1].Text := 'Modified'
+  else
+    sb.Panels[1].Text := '';
 end;
+
+(*procedure TfrmMain.SetSingleFileMenusItemState(const State: Boolean);
+begin
+  miCloseSingleFile.Enabled := State;
+end; *)
 
 procedure TfrmMain.SetStatus(const Text: string);
 begin
+  if (Text = 'Ready') then
+    Screen.Cursor := crDefault
+  else
+    Screen.Cursor := crAppStart;
+
   sb.Panels[2].Text := Text;
+  Application.ProcessMessages;
 end;
 
-procedure TfrmMain.Website1Click(Sender: TObject);
+procedure TfrmMain.SetStatusReady;
+begin
+  SetStatus('Ready');
+end;
+
+procedure TfrmMain.tvMultiSubsClick(Sender: TObject);
+var
+  NodeType, PrevNodeType: TMultiTranslationNodeType;
+  Node: TTreeNode;
+  
+begin
+  Node := tvMultiSubs.Selected;
+  if Node = nil then Exit;
+
+  if Assigned(MultiTranslationSelectedHashKeySubNode) then
+    PrevNodeType :=
+      PMultiTranslationNodeType(MultiTranslationSelectedHashKeySubNode.Data)^;
+  NodeType := PMultiTranslationNodeType(Node.Data)^;
+
+{$IFDEF DEBUG}
+  WriteLn('NodeType: ',
+    GetEnumName(TypeInfo(TMultiTranslationNodeViewType), Ord(NodeType.NodeViewType)),
+    ', GameVersion: ',
+    GetEnumName(TypeInfo(TGameVersion), Ord(NodeType.GameVersion)));
+{$ENDIF}
+
+  // Normal node that can be edited
+  if NodeType.NodeViewType = nvtSubtitleKey then begin
+
+    // if working, then exits
+    if MultiTranslationBusy then Exit;
+    
+    // Check if not the same node selected...
+    if Node = MultiTranslationSelectedHashKeySubNode then Exit;
+
+    // Translate the previous subtitle if needed
+    if (PrevNodeType.GameVersion <> gvUndef)
+      and Assigned(MultiTranslationSelectedHashKeySubNode) then
+        MultiTranslationUpdateSubtitle(MultiTranslationSelectedIndex,
+          MultiTranslationSelectedNewSubNode, mMTNewSub.Text);
+
+    // Initialize the current node
+    mMTNewSub.OnChange := nil;
+    MultiTranslationSelectedHashKeySubNode := Node;
+    MultiTranslationNodeImageIndex := Node.ImageIndex;
+    MultiTranslationSelectedIndex := Node.Index;
+    MultiTranslationSelectedNewSubNode := Node.Item[0];
+
+    // Active or not the Decode subtitle item
+    (*if IsTheSameCharsList(NodeType.GameVersion, gvShenmue) then
+      miEnableCharsMod.Enabled := CanEnableCharsMod1;
+    if IsTheSameCharsList(NodeType.GameVersion, gvShenmue2) then
+      miEnableCharsMod.Enabled := CanEnableCharsMod2; *)
+
+    // This node can't be edited (ERRORNOUS NODE!)
+    mMTNewSub.Enabled := NodeType.GameVersion <> gvUndef;
+    if not mMTNewSub.Enabled then begin
+      AddDebug('WARNING: "' + Node.Text
+        + '": This errornous subtitle can''t be translated, since two '
+        + 'different chars list was used!');
+      mMTNewSub.Clear;
+      mMTOldSub.Clear;
+      Exit;
+    end;
+
+    // Loading text to translate
+    if (Node.ImageIndex = 0) then begin // BASED ON THE ImageIndex to know if it is translated or not !!!
+      // Not yet translated
+      mMTOldSub.Text := StringReplace(Node.Text, '<br>', #13#10, [rfReplaceAll]);
+      mMTNewSub.Text := mMTOldSub.Text;
+    end else begin
+      // Already translated, so reload the old "new" subtitle
+      mMTOldSub.Text := StringReplace(Node.Item[0].Text, '<br>', #13#10, [rfReplaceAll]);
+      mMTNewSub.Text := mMTOldSub.Text;
+    end;
+    MultiTranslationUpdateCharsCount;
+    mMTNewSub.OnChange := mMTNewSubChange;
+
+    // Update Previewer
+    if SubsViewerVisible then
+      Previewer.Update(mMTNewSub.Text);
+  end;
+end;
+
+procedure TfrmMain.tvMultiSubsContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+var
+  NodeType: TMultiTranslationNodeType;
+
+begin
+  if tvMultiSubs.Selected = nil then Exit;
+  NodeType := PMultiTranslationNodeType(tvMultiSubs.Selected.Data)^;
+  if NodeType.NodeViewType = nvtSubCode then
+    tvMultiSubs.PopupMenu := pmMultiSubs
+  else
+    tvMultiSubs.PopupMenu := nil;
+end;
+
+procedure TfrmMain.tvMultiSubsKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  tvMultiSubsClick(Sender);
+end;
+
+procedure TfrmMain.miProjectHomeClick(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', 'http://shenmuesubs.sourceforge.net/', '', '', SW_SHOWNORMAL);
 end;

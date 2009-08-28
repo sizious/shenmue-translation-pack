@@ -7,36 +7,123 @@ unit common;
 
 interface
 
+uses
+  SysUtils, ScnfUtil;
+
 type
-  // gvUndef..........: (Undefined)
-  // gvWhatsShenmue...: What's Shenmue (Demo)
-  // gvShenmue........: Shenmue I / US Shenmue
-  // gvShenmue2.......: Shenmue II (DC)
-  // gvShenmue2X......: Shenmue II (XBOX)
-  TGameVersion = (gvUndef, gvWhatsShenmue, gvShenmue, gvShenmue2, gvShenmue2X);
+  // Identify what's the type of each MultiTranslation Node
+  TMultiTranslationNodeViewType = (
+    nvtUndef,          // Undefined
+    nvtSubtitleKey,    // This is a subtitle key node
+    nvtSourceFile,     // This is the source file node
+    nvtSubCode,        // This is a subcode node
+    nvtSubTranslated   // This is the subtitle translated node
+  );
+
+  // Structure attached at TTreeNode.Data in MultiTranslation TreeView
+  PMultiTranslationNodeType = ^TMultiTranslationNodeType;
+  TMultiTranslationNodeType = record
+    NodeViewType: TMultiTranslationNodeViewType;
+    GameVersion: TGameVersion;
+  end;
 
 const
-  // TABLE_CHAR_CODE: Char = #$A1;   // special char: this's a code used by the game
-  // TABLE_STR_ENTRY_BEGIN: Char = #$D6; // start string
-  // TABLE_STR_ENTRY_END: Char = #$D7;   // end string
+  // Default text when not translated...
+  MT_NOT_TRANSLATED_YET       = '# Not translated yet... #';
 
-  TABLE_STR_ENTRY_BEGIN = #$A1#$D6; // start string
-  TABLE_STR_ENTRY_END   = #$A1#$D7; // end string
-  TABLE_STR_CR          = #$A1#$F5; // carriage return
+function GetDatasDirectory: TFileName;
+function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
+function IsCharsModAvailable(GameVersion: TGameVersion): Boolean;
+function IsTheSameCharsList(GameVersion1, GameVersion2: TGameVersion): Boolean;
+function GetFacesDirectory(GameVersion: TGameVersion): TFileName;
+function GetNPCInfoFile: TFileName;
 
-  GAME_INTEGER_SIZE = 4;
-
-  PAKS_SIGN = 'PAKS'; // Global "PKS" file sign
-  SCNF_SIGN = 'SCNF';
-  SCNF_FOOTER_SIGN = 'BIN ';
-
-  // Game detection strings
-  VOICE_STR_WHATS_SHENMUE     = '/prj16sc/MSG/voice/';
-  VOICE_STR_WHATS_SHENMUE_B2  = '/prj16sc2/MSG/voice/';
-  VOICE_STR_SHENMUE           = '/p38/prj38sc/Msg/voice/';
-  VOICE_STR_SHENMUE2          = '/p48/prj48sc/Voice/';
-  VOICE_STR_SHENMUE2X         = '/usr1/people/muramatsu/yoshizawa/humans/data/voice/';
-
+//------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
+
+const
+  DATA_BASE_DIR       = 'data';
+
+  NPC_INFO_FILE       = 'npc_info.csv';
+  CHR_LIST_1          = 'chrlist1.csv'; // for Shenmue, US Shenmue, What's Shenmue
+  CHR_LIST_2          = 'chrlist2.csv'; // for Shenmue II
+
+  FACES_BASE_DIR      = 'faces';
+  FACES_WHATS_DIR     = 'whats';
+  FACES_SHENMUE_DIR   = 'shenmue';
+  FACES_SHENMUE2_DIR  = 'shenmue2';
+
+var
+  DatasDirectory: TFileName;
+
+//------------------------------------------------------------------------------
+
+function GetFacesDirectory(GameVersion: TGameVersion): TFileName;
+begin
+  Result := GetDatasDirectory + FACES_BASE_DIR + '\';
+  case GameVersion of
+    gvWhatsShenmue  : Result := Result + FACES_WHATS_DIR    + '\';
+    gvShenmue       : Result := Result + FACES_SHENMUE_DIR  + '\';
+    gvShenmue2J     : Result := Result + FACES_SHENMUE2_DIR + '\';
+    gvShenmue2      : Result := Result + FACES_SHENMUE2_DIR + '\';
+    gvShenmue2X     : Result := Result + FACES_SHENMUE2_DIR + '\';
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetNPCInfoFile: TFileName;
+begin
+  Result := DatasDirectory + NPC_INFO_FILE;
+end;
+
+//------------------------------------------------------------------------------
+
+function IsTheSameCharsList(GameVersion1, GameVersion2: TGameVersion): Boolean;
+begin
+  if (GameVersion1 = gvShenmue2J) or (GameVersion1 = gvShenmue2X) then
+    GameVersion1 := gvShenmue2;
+  if (GameVersion2 = gvShenmue2J) or (GameVersion2 = gvShenmue2X) then
+    GameVersion2 := gvShenmue2;
+  Result := GameVersion1 = GameVersion2;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetDatasDirectory: TFileName;
+begin
+  Result := DatasDirectory;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
+begin
+  Result := GetDatasDirectory;
+  case GameVersion of
+    gvUndef:        Result := '';
+    gvWhatsShenmue: Result := Result + CHR_LIST_1;
+    gvShenmue:      Result := Result + CHR_LIST_1;
+    gvShenmue2J:    Result := Result + CHR_LIST_2;
+    gvShenmue2:     Result := Result + CHR_LIST_2;
+    gvShenmue2X:    Result := Result + CHR_LIST_2;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function IsCharsModAvailable(GameVersion: TGameVersion): Boolean;
+begin
+  Result := FileExists(GetCorrectCharsList(GameVersion));
+end;
+
+//------------------------------------------------------------------------------
+
+initialization
+  DatasDirectory :=
+    IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + DATA_BASE_DIR + '\';
+
+//------------------------------------------------------------------------------
 
 end.

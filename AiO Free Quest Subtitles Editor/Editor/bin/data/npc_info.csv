@@ -1,5 +1,5 @@
 # Shenmue Series NPC Infos
-# List created by Shendream and SiZ!
+# List created by Shendream and [big_fury]SiZiOUS
 # GameVersion: SM1 = Shenmue I, WSM: What's Shenmue, SM2: Shenmue II
 # Gender: M = Male, F = Female
 # Type: A = Adult, C = Child
@@ -9,6 +9,7 @@ GameVersion;CharID;Gender;Type
 
 # Shenmue I (DC)
 SM1;AKMI;U;U
+SM1;KNJI;M;C
 # todo...
 
 # What's Shenmue (DC)

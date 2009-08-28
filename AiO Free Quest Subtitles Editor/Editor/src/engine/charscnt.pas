@@ -53,6 +53,7 @@ var
   num_substr:Integer;
   
 begin
+  Subtitle := StringReplace(Subtitle, '<br>', '¡õ', [rfReplaceAll]);
   Subtitle := StringReplace(Subtitle, #13#10, '¡õ', [rfReplaceAll]);
   Subtitle := StringReplace(Subtitle, '...', '=@', [rfReplaceAll]);
 

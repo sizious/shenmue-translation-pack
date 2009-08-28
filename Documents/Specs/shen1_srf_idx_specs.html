@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+
+
+
+	
+	<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8"><title></title>
+	
+	<meta name="GENERATOR" content="NeoOffice 2.2  (Unix)">
+	<meta name="CREATED" content="20071207;18261000">
+	<meta name="CHANGED" content="20071216;400900">
+	
+	<style>
+		<!-- 
+		BODY,DIV,TABLE,THEAD,TBODY,TFOOT,TR,TH,TD,P { font-family:"Arial"; font-size:x-small }
+		 -->
+	</style></head><body text="#000000">
+<hr>
+	<p></p><center>
+		<h1>Résumé</h1>
+		<a href="#table0">SRF</a><br>
+		<a href="#table1">IDX</a><br>
+		
+	</center><p></p>
+<hr>
+<a name="table0"><h1>Feuille 1: <em>SRF</em></h1></a>
+<table border="0" cellspacing="0" cols="4" frame="void" rules="none">
+	<colgroup><col width="142"><col width="125"><col width="333"><col width="86"></colgroup>
+	<tbody>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17" width="142"><b>Length</b></td>
+			<td sdnum="3084;0;@" align="center" width="125"><b>Type</b></td>
+			<td sdnum="3084;0;@" align="center" width="333"><b>Description</b></td>
+			<td align="left" width="86"><br></td>
+		</tr>
+		<tr>
+			<td colspan="3" sdnum="3084;0;@" align="center" height="17" valign="middle"><i>En-tête</i></td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">4</td>
+			<td sdnum="3084;0;@" align="center">LongInt</td>
+			<td sdnum="3084;0;@" align="center">Longueur du nom du personnage, habituellement 8</td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">4</td>
+			<td sdnum="3084;0;@" align="center">String</td>
+			<td sdnum="3084;0;@" align="center">Nom du personnage</td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td colspan="3" sdnum="3084;0;@" align="center" height="17" valign="middle"><i>Sous-titre</i></td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">4</td>
+			<td sdnum="3084;0;@" align="center">LongInt</td>
+			<td sdnum="3084;0;@" align="center" bgcolor="#e6e6e6">Longueur du sous-titre</td>
+			<td colspan="2" rowspan="2" align="center" bgcolor="#e6e6e6" valign="middle">Si longueur = 4, pas de texte</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">n</td>
+			<td sdnum="3084;0;@" align="center">String</td>
+			<td sdnum="3084;0;@" align="center">Texte du sous-titres</td>
+			</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">n</td>
+			<td sdnum="3084;0;@" align="center">Byte</td>
+			<td sdnum="3084;0;@" align="center">Bytes nuls (zéro)</td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td colspan="3" sdnum="3084;0;@" align="center" height="17" valign="middle"><i>Données</i></td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">4</td>
+			<td sdnum="3084;0;@" align="center">LongInt</td>
+			<td sdnum="3084;0;@" align="center">Taille des données (en bytes)</td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">n</td>
+			<td sdnum="3084;0;@" align="center">Byte</td>
+			<td sdnum="3084;0;@" align="center">Données</td>
+			<td align="left"><br></td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17">n</td>
+			<td sdnum="3084;0;@" align="center">Byte</td>
+			<td sdnum="3084;0;@" align="center" bgcolor="#e6e6e6">Bytes nuls (zéro), si nécessaire</td>
+			<td colspan="2" rowspan="2" align="center" bgcolor="#e6e6e6" valign="middle">Bloc de 2048 bytes</td>
+		</tr>
+	</tbody>
+</table>
+<!-- ************************************************************************** -->
+<hr>
+<a name="table1"><h1>Feuille 2: <em>IDX</em></h1></a>
+<table border="0" cellspacing="0" cols="3" frame="void" rules="none">
+	<colgroup><col width="142"><col width="125"><col width="321"></colgroup>
+	<tbody>
+		<tr>
+			<td sdnum="3084;0;@" align="center" height="17" width="142"><b>Length</b></td>
+			<td sdnum="3084;0;@" align="center" width="125"><b>Type</b></td>
+			<td sdnum="3084;0;@" align="center" width="321"><b>Description</b></td>
+		</tr>
+		<tr>
+			<td colspan="3" sdnum="3084;0;@" align="center" height="17" valign="middle"><i>En-tête</i></td>
+			</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">4</td>
+			<td sdnum="3084;0;@" align="right">String</td>
+			<td sdnum="3084;0;@" align="center">« IDX »</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">1</td>
+			<td sdnum="3084;0;@" align="right">Byte</td>
+			<td sdnum="3084;0;@" align="center">« 0 » (zéro)</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">2</td>
+			<td sdnum="3084;0;@" align="right">ShortInt</td>
+			<td sdnum="3084;0;@" align="center">Nombre de fichiers – total</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">2</td>
+			<td sdnum="3084;0;@" align="right">ShortInt</td>
+			<td sdnum="3084;0;@" align="center">Nombre de fichiers – moins les SRF</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">12</td>
+			<td sdnum="3084;0;@" align="right">Byte</td>
+			<td sdnum="3084;0;@" align="center">« 0 » (zéro)</td>
+		</tr>
+		<tr>
+			<td colspan="3" sdnum="3084;0;@" align="center" height="17" valign="middle"><i>Pour chaque fichiers qui n'est pas un SRF</i></td>
+			</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">10</td>
+			<td sdnum="3084;0;@" align="right">String</td>
+			<td sdnum="3084;0;@" align="center">Nom du fichier (sans extension)</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">2</td>
+			<td sdnum="3084;0;@" align="right">Byte</td>
+			<td sdnum="3084;0;@" align="center">« 0 » (zéro)</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">2</td>
+			<td sdnum="3084;0;@" align="right">ShortInt</td>
+			<td sdnum="3084;0;@" align="center">Numéro du fichier (moins 1)</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">2</td>
+			<td sdnum="3084;0;@" align="right">ShortInt</td>
+			<td sdnum="3084;0;@" align="center">Numéro de fichier du SRF lié (moins 1)</td>
+		</tr>
+		<tr>
+			<td sdnum="3084;0;@" align="right" height="17">4</td>
+			<td sdnum="3084;0;@" align="right">LongInt</td>
+			<td sdnum="3084;0;@" align="center">Offset du sous-titre dans le SRF</td>
+		</tr>
+	</tbody>
+</table>
+<!-- ************************************************************************** -->
+
+</body></html>

@@ -183,23 +183,23 @@ object frmWarning: TfrmWarning
   object Label2: TLabel
     Left = 44
     Top = 23
-    Width = 342
+    Width = 315
     Height = 26
     Caption = 
-      'This version of the Free Quest editor was entierly rewritten and' +
-      ' include now the CORRECT NPC hacking algorithm.'
+      'This version of the Free Quest editor was entierely rewritten an' +
+      'd include now the CORRECT NPC hacking algorithm.'
     WordWrap = True
   end
   object Label3: TLabel
     Left = 44
-    Top = 53
-    Width = 342
+    Top = 55
+    Width = 330
     Height = 39
     Caption = 
       'Please note that if you have already translated NPC files using ' +
-      'older versions of this editor (like v1.02), using theses BAD HAC' +
-      'KED files with this newest editor will CORRUPT your BAD HACKED f' +
-      'iles.'
+      'older versions of this editor (like v1.02), the use of these BAD' +
+      ' HACKED files with this newest editor will CORRUPT your BAD HACK' +
+      'ED files.'
     WordWrap = True
   end
   object Label4: TLabel
@@ -221,7 +221,7 @@ object frmWarning: TfrmWarning
   object Label5: TLabel
     Left = 44
     Top = 160
-    Width = 347
+    Width = 298
     Height = 26
     Caption = 'If you have never used this editor before, you aren'#39't concerned.'
     Font.Charset = DEFAULT_CHARSET
@@ -235,7 +235,7 @@ object frmWarning: TfrmWarning
   object Label6: TLabel
     Left = 44
     Top = 100
-    Width = 342
+    Width = 290
     Height = 26
     Caption = 
       'ANYWAY, THESE OLD BAD HACKED FILES WILL WORK RANDOMLY IN YOUR CO' +

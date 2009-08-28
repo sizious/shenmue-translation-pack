@@ -35,12 +35,12 @@ type
     fOffset: Integer;
   protected
     function GetLoadedFileName: TFileName;
-    function GetOutputTextureFileName: TFileName;
   public
     constructor Create(AOwner: TTexturesList);
-    procedure ExportToFile; overload;
-    procedure ExportToFile(const FileName: TFileName); overload;
-    property Index: Integer read fIndex;
+    procedure ExportToFile(const FileName: TFileName);
+    function ExportToFolder(const Folder: TFileName): TFileName;
+    function GetOutputTextureFileName: TFileName;
+    property Index: Integer read fIndex;  // give this item index in the TexturesList
     property Offset: Integer read fOffset;
     property Size: Integer read fSize;
     property Owner: TTexturesList read fOwner;
@@ -57,9 +57,9 @@ type
     function GetOffset: Integer;
     function GetSize: Integer;
   protected
-    procedure Add(const Offset, Size: Integer);
+    procedure Add(const Index, Offset, Size: Integer);
     procedure Clear;
-    procedure ParseTexturesSection(var F: file);
+    procedure Shenmue2_MT7_ParseTexturesSection(var F: file);
   public
     constructor Create(AOwner: TModelTexturedEditor);
     destructor Destroy; override;
@@ -130,19 +130,16 @@ const
   
 { TTexturesList }
 
-procedure TTexturesList.Add(const Offset, Size: Integer);
+procedure TTexturesList.Add(const Index, Offset, Size: Integer);
 var
   Item: TTexturesListEntry;
-  i: Integer;
   
 begin
   Item := TTexturesListEntry.Create(Self);
   Item.fOffset := Offset;
   Item.fSize := Size;
-  i := fTexturesList.Add(Item);
-  Item.fIndex := i;
-
-  {$IFDEF DEBUG} WriteLn('  #', i, ': ', Item.Offset, ', ', Item.Size); {$ENDIF}
+  fTexturesList.Add(Item);
+  Item.fIndex := Index;
 end;
 
 procedure TTexturesList.Clear;
@@ -188,20 +185,18 @@ begin
   Result := Owner.Sections[fSectionIndex].Size;
 end;
 
-// ParseTexturesSection
-// !!! A REFAIRE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-procedure TTexturesList.ParseTexturesSection(var F: file);
+procedure TTexturesList.Shenmue2_MT7_ParseTexturesSection(var F: file);
 var
   i, TextObjIndex, TexturesSectionOffset, TexturesCount, CalcSize: Integer;
   TexturesSectionItem: TSectionsListEntry;
+  TempTexItem: TTexturesListEntry;
 
 begin
   TextObjIndex := Owner.Sections.GetTexturesSectionIndex;
 
   if TextObjIndex <> -1 then begin
     fSectionIndex := TextObjIndex;
-    
+
     {$IFDEF DEBUG} WriteLn('PARSING TEXTURES SECTION'); {$ENDIF}
 
     TexturesSectionItem := Owner.Sections[TextObjIndex];
@@ -216,7 +211,7 @@ begin
     CalcSize := TexturesSectionItem.Size;
 
     // Reading all textures offset info from the back <- to the start
-    for i := 0 to TexturesCount - 1 do begin
+    for i := TexturesCount - 1 downto 0 do begin
       // reading current texture entry
       Seek(F, FilePos(F) - GAME_INTEGER_SIZE);
       BlockRead(F, TextObjIndex, GAME_INTEGER_SIZE);
@@ -226,11 +221,24 @@ begin
       CalcSize := CalcSize - TextObjIndex;
 
       // Adding the new texture entry
-      Self.Add(TextObjIndex, CalcSize);
+      Self.Add(i, TextObjIndex, CalcSize);
 
       // The old texture offset becomes the new CalcSize to compute the next texture size
       CalcSize := TextObjIndex;
     end;
+
+    // Sorting TexturesList
+    for i := 0 to Count - 1 do begin
+      TempTexItem := fTexturesList.Items[Items[i].Index];
+      fTexturesList.Items[Items[i].Index] := fTexturesList.Items[i];
+      fTexturesList.Items[TempTexItem.Index] := TempTexItem;
+    end;
+
+    // Showing Textures List
+    {$IFDEF DEBUG}
+    for i := 0 to Count - 1 do
+      WriteLn('  #', i, ': ', Items[i].Offset, ', ', Items[i].Size);
+    {$ENDIF}
 
   end;
 end;
@@ -355,7 +363,7 @@ var
 
 begin
   Result := False;
-  fLoadedFileName := FileName;
+  fLoadedFileName := ExpandFileName(FileName);
   
   // Set game version
   fGameVersion := gvUndef;
@@ -387,7 +395,7 @@ begin
         {$IFDEF DEBUG} WriteLn(''); {$ENDIF}
         
         // Parse the texture section
-        Textures.ParseTexturesSection(F);
+        Textures.Shenmue2_MT7_ParseTexturesSection(F);
         {$IFDEF DEBUG} WriteLn(''); {$ENDIF}
         
       except
@@ -410,11 +418,6 @@ end;
 constructor TTexturesListEntry.Create(AOwner: TTexturesList);
 begin
   fOwner := AOwner;
-end;
-
-procedure TTexturesListEntry.ExportToFile;
-begin
-  ExportToFile(GetOutputTextureFileName);
 end;
 
 procedure TTexturesListEntry.ExportToFile(const FileName: TFileName);
@@ -440,6 +443,12 @@ begin
   CloseFile(F_dest);
 end;
 
+function TTexturesListEntry.ExportToFolder(const Folder: TFileName): TFileName;
+begin
+  Result := IncludeTrailingPathDelimiter(Folder) + GetOutputTextureFileName;
+  ExportToFile(Result);
+end;
+
 function TTexturesListEntry.GetLoadedFileName: TFileName;
 begin
   Result := Owner.Owner.FileName;
@@ -447,7 +456,7 @@ end;
 
 function TTexturesListEntry.GetOutputTextureFileName: TFileName;
 begin
-  Result := ExtractFileName(GetLoadedFileName) + '_PVR#' + Format('%02d', [Index + 1]) + '.pvr';
+  Result := ExtractFileName(GetLoadedFileName) + '_PVR#' + Format('%2.2d', [Index + 1]) + '.pvr';
 end;
 
 end.
