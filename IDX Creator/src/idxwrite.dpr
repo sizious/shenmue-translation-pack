@@ -1,4 +1,4 @@
-program idxcreator;
+program idxwrite;
 
 uses
   Windows,
