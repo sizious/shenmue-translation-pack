@@ -23,6 +23,8 @@ FIXED:
 - Some heavy actions was multi-threaded.
 - Too many things fixed to be listed here. The application is ready to become the FINAL one!
 
+---
+
 Version 2.0 :
 
 ADDED:
