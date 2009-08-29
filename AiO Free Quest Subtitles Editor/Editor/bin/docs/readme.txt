@@ -16,13 +16,8 @@
  __                                           _________________________________
  __| Shenmue AiO Free Quest Subtitles Editor |_________________________________
 
-  Version...: 2.0
-  Date......: April 1, 2009 (This isn't a joke!)
- __               _____________________________________________________________
- __| DESCRiPTiON |_____________________________________________________________
-
-  Shenmue AiO Free Quest Subtitles Editor is an Open Source software used to 
-  modify in-game NPC (Non-Playing Characters) subtitles text of Shenmue Series, 
+  Shenmue AiO Free Quest Subtitles Editor is a free software used to modify 
+  in-game NPC (Non-Playing Characters) subtitles text of Shenmue Series, 
   including:
   
     - What's Shenmue (DC)
@@ -49,20 +44,24 @@
   
   Structure of the "data" directory:
     - npc_info.csv   : Contains NPC informations (Gender...).
-	- chars_list.csv : This file is used for accentuated characters support. 
-	                   Open it with a text editor to see available characters.
-	- faces          : This directory contains NPC faces images.
+    - chrlistX.csv   : This file is used for accentuated characters support. 
+                       Open it with a text editor to see available characters.
+                       Two versions are available, for Shenmue I and II.
+    - faces          : This directory contains NPC faces images.
  __           _________________________________________________________________
  __| CONTACT |_________________________________________________________________
 
   This tool is part of Shenmue Translation Pack.
   
-  SourceForge Project Page: https://sourceforge.net/projects/shenmuesubs/
-  License: http://www.gnu.org/licenses/gpl.html
+  SourceForge Project Page : http://shenmuesubs.sourceforge.net/
+  License                  : http://www.gnu.org/licenses/gpl.html (included)
  __           _________________________________________________________________
  __| CREDiTS |_________________________________________________________________
  
   Main code...........: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
   Additional code.....: Manic (Project founder)
   Alpha/Beta test.....: Shendream, Sadako
+  Thanks to...........: Manic, Shendream, Sadako, Hiei-, kogami-san, Dark_Neo,
+                        mimix, Sunmingzhao, MagicSeb, FamilyGuy and everyone
+                        supporting us.
  _____________________________________________________________________[ EOF ]___
