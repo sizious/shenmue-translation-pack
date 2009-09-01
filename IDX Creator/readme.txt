@@ -11,9 +11,11 @@ Two versions are availables:
 - IDX Creator (Win32 GUI)
 - IDX Maker (Console)
 
+YOU DON'T NEED TO RECREATE THE IDX FILE FOR THE HUMANS.AFS FILE.
+
 [ II. COMPILING ]
 
-To compile IDX Creator (Win32 GUI), open "idxcreator.dproj" and REBUILD.
+To compile IDX Creator (Win32 GUI), open "idxwrite.dproj" and REBUILD.
 
 To compile IDX Maker (Console), open "idxmaker.dproj" and REBUILD.
 
