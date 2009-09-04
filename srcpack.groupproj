@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Projects Include="AFS Utils\src\afsutils_v2.dproj" />
+    <Projects Include="AFS Utils\src\afsutils.dproj" />
     <Projects Include="AiO Cinematics Subtitles Editor\src\scinsube.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
@@ -12,7 +12,7 @@
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
     <Projects Include="Models Textures Editor\src\mteditor.dproj" />
     <Projects Include="Shenmue Subtitles Preview\src\debug\preview.dproj" />
-    <Projects Include="SPR Utils\src\sprutils_v2.dproj" />
+    <Projects Include="SPR Utils\src\sprutils.dproj" />
   </ItemGroup>
   <ProjectExtensions>
     <Borland.Personality>Default.Personality</Borland.Personality>
@@ -20,24 +20,6 @@
     <BorlandProject>
 <BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
-  <Target Name="afsutils_v2">
-    <MSBuild Projects="AFS Utils\src\afsutils_v2.dproj" Targets="" />
-  </Target>
-  <Target Name="afsutils_v2:Clean">
-    <MSBuild Projects="AFS Utils\src\afsutils_v2.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="afsutils_v2:Make">
-    <MSBuild Projects="AFS Utils\src\afsutils_v2.dproj" Targets="Make" />
-  </Target>
-  <Target Name="sprutils_v2">
-    <MSBuild Projects="SPR Utils\src\sprutils_v2.dproj" Targets="" />
-  </Target>
-  <Target Name="sprutils_v2:Clean">
-    <MSBuild Projects="SPR Utils\src\sprutils_v2.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="sprutils_v2:Make">
-    <MSBuild Projects="SPR Utils\src\sprutils_v2.dproj" Targets="Make" />
-  </Target>
   <Target Name="idxmaker">
     <MSBuild Projects="IDX Creator\src\idxmaker.dproj" Targets="" />
   </Target>
@@ -101,14 +83,32 @@
   <Target Name="idxwrite:Make">
     <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="Make" />
   </Target>
+  <Target Name="afsutils">
+    <MSBuild Projects="AFS Utils\src\afsutils.dproj" Targets="" />
+  </Target>
+  <Target Name="afsutils:Clean">
+    <MSBuild Projects="AFS Utils\src\afsutils.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="afsutils:Make">
+    <MSBuild Projects="AFS Utils\src\afsutils.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sprutils">
+    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="" />
+  </Target>
+  <Target Name="sprutils:Clean">
+    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sprutils:Make">
+    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="afsutils_v2;sprutils_v2;idxmaker;sfqsubed;convert;preview;scinsube;mteditor;idxwrite" />
+    <CallTarget Targets="idxmaker;sfqsubed;convert;preview;scinsube;mteditor;idxwrite;afsutils;sprutils" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="afsutils_v2:Clean;sprutils_v2:Clean;idxmaker:Clean;sfqsubed:Clean;convert:Clean;preview:Clean;scinsube:Clean;mteditor:Clean;idxwrite:Clean" />
+    <CallTarget Targets="idxmaker:Clean;sfqsubed:Clean;convert:Clean;preview:Clean;scinsube:Clean;mteditor:Clean;idxwrite:Clean;afsutils:Clean;sprutils:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="afsutils_v2:Make;sprutils_v2:Make;idxmaker:Make;sfqsubed:Make;convert:Make;preview:Make;scinsube:Make;mteditor:Make;idxwrite:Make" />
+    <CallTarget Targets="idxmaker:Make;sfqsubed:Make;convert:Make;preview:Make;scinsube:Make;mteditor:Make;idxwrite:Make;afsutils:Make;sprutils:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

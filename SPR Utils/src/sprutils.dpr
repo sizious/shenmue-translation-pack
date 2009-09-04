@@ -1,4 +1,4 @@
-program sprutils_v2;
+program sprutils;
 
 uses
   Forms,

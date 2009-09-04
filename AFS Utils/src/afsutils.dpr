@@ -1,4 +1,4 @@
-program afsutils_v2;
+program afsutils;
 
 uses
   Windows,

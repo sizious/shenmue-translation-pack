@@ -25,7 +25,7 @@ uses
   ImgList, ViewUpd;
 
 const
-  APP_VERSION = '2.1';
+  APP_VERSION = '2.2';
   COMPIL_DATE_TIME = 'August 29, 2009 @00:23AM';
 
 type
@@ -153,6 +153,7 @@ type
     N16: TMenuItem;
     miFacesExtractor: TMenuItem;
     miClearFilesList2: TMenuItem;
+    miCheckForUpdate: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -209,6 +210,7 @@ type
     procedure miFacesExtractorClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ApplicationEventsHint(Sender: TObject);
+    procedure miCheckForUpdateClick(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -498,6 +500,13 @@ end;
 procedure TfrmMain.miEnableCharsModClick(Sender: TObject);
 begin
   EnableCharsMod := not EnableCharsMod;
+end;
+
+procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open',
+    'http://sourceforge.net/projects/shenmuesubs/files/', '', '',
+    SW_SHOWNORMAL);
 end;
 
 procedure TfrmMain.CheckIfSubLengthIsCorrect(const Value: Integer;
