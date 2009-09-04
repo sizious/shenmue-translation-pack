@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Title Generated > // Free Quest Editor'
-  ClientHeight = 496
-  ClientWidth = 572
+  ClientHeight = 494
+  ClientWidth = 564
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -26,7 +26,7 @@ object frmMain: TfrmMain
     Left = 3
     Top = 3
     Width = 148
-    Height = 367
+    Height = 365
     Margins.Right = 0
     Align = alLeft
     Caption = ' Files list: '
@@ -39,7 +39,7 @@ object frmMain: TfrmMain
       Left = 4
       Top = 17
       Width = 140
-      Height = 319
+      Height = 317
       Align = alClient
       ItemHeight = 13
       PopupMenu = pmFilesList
@@ -51,7 +51,7 @@ object frmMain: TfrmMain
     end
     object Panel2: TPanel
       Left = 4
-      Top = 336
+      Top = 334
       Width = 140
       Height = 27
       Align = alBottom
@@ -85,8 +85,8 @@ object frmMain: TfrmMain
     AlignWithMargins = True
     Left = 154
     Top = 3
-    Width = 415
-    Height = 367
+    Width = 407
+    Height = 365
     ActivePage = tsEditor
     Align = alClient
     TabOrder = 1
@@ -94,32 +94,36 @@ object frmMain: TfrmMain
     object tsEditor: TTabSheet
       Caption = '&Editor'
       DesignSize = (
-        407
-        339)
+        399
+        337)
       object Label4: TLabel
         Left = 146
-        Top = 319
+        Top = 317
         Width = 91
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Second line length:'
+        ExplicitTop = 319
       end
       object Label3: TLabel
         Left = 8
-        Top = 320
+        Top = 318
         Width = 77
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'First line length:'
+        ExplicitTop = 320
       end
       object Label2: TLabel
         Left = 8
-        Top = 290
-        Width = 65
+        Top = 288
+        Width = 57
         Height = 13
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
         Caption = 'New text:'
+        ExplicitTop = 290
+        ExplicitWidth = 65
       end
       object Label1: TLabel
         Left = 8
@@ -130,29 +134,33 @@ object frmMain: TfrmMain
       end
       object Label8: TLabel
         Left = 288
-        Top = 319
+        Top = 317
         Width = 75
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Subtitles count:'
+        ExplicitTop = 319
       end
       object Label6: TLabel
         Left = 173
         Top = 81
-        Width = 51
+        Width = 43
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 'Char ID:'
+        ExplicitWidth = 51
       end
       object Label18: TLabel
         Left = 8
-        Top = 248
-        Width = 65
+        Top = 246
+        Width = 57
         Height = 13
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
         Caption = 'Old text:'
+        ExplicitTop = 248
+        ExplicitWidth = 65
       end
       object lGender: TLabel
         Left = 8
@@ -164,11 +172,12 @@ object frmMain: TfrmMain
       object Label7: TLabel
         Left = 8
         Top = 80
-        Width = 52
+        Width = 44
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 'Voice ID :'
+        ExplicitWidth = 52
       end
       object Label5: TLabel
         Left = 8
@@ -179,7 +188,7 @@ object frmMain: TfrmMain
       end
       object eSecondLineLength: TEdit
         Left = 246
-        Top = 316
+        Top = 314
         Width = 30
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -190,7 +199,7 @@ object frmMain: TfrmMain
       end
       object eFirstLineLength: TEdit
         Left = 104
-        Top = 316
+        Top = 314
         Width = 30
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -201,8 +210,8 @@ object frmMain: TfrmMain
       end
       object mSubText: TMemo
         Left = 104
-        Top = 276
-        Width = 300
+        Top = 274
+        Width = 292
         Height = 37
         Anchors = [akLeft, akRight, akBottom]
         Lines.Strings = (
@@ -214,7 +223,7 @@ object frmMain: TfrmMain
       end
       object eSubCount: TEdit
         Left = 368
-        Top = 316
+        Top = 314
         Width = 36
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -236,8 +245,8 @@ object frmMain: TfrmMain
       object lvSubsSelect: TJvListView
         Left = 104
         Top = 104
-        Width = 300
-        Height = 129
+        Width = 292
+        Height = 127
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -258,20 +267,18 @@ object frmMain: TfrmMain
         ViewStyle = vsReport
         OnClick = lvSubsSelectClick
         OnKeyUp = lvSubsSelectKeyUp
-        ColumnsOrder = '0=50,1=50,2=196'
+        ColumnsOrder = '0=50,1=50,2=188'
         Groups = <>
         ExtendedColumns = <
           item
           end
           item
           end>
-        ExplicitWidth = 292
-        ExplicitHeight = 127
       end
       object mOldSubEd: TMemo
         Left = 104
-        Top = 236
-        Width = 300
+        Top = 234
+        Width = 292
         Height = 37
         Anchors = [akLeft, akRight, akBottom]
         Color = clBtnFace
@@ -301,7 +308,7 @@ object frmMain: TfrmMain
         TabOrder = 8
       end
       object Panel1: TPanel
-        Left = 304
+        Left = 296
         Top = 0
         Width = 100
         Height = 100
@@ -395,29 +402,29 @@ object frmMain: TfrmMain
       end
     end
     object tsMultiTrad: TTabSheet
-      Caption = '&Multi-translation'
+      Caption = '&Global'
       ImageIndex = 1
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
       DesignSize = (
-        407
-        339)
+        399
+        337)
       object GroupBox2: TGroupBox
         Left = 3
         Top = 3
-        Width = 401
-        Height = 202
+        Width = 393
+        Height = 200
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = ' Available strings : '
         TabOrder = 0
         DesignSize = (
-          401
-          202)
+          393
+          200)
         object bMTClear: TButton
-          Left = 316
-          Top = 174
+          Left = 308
+          Top = 172
           Width = 80
           Height = 25
           Anchors = [akRight, akBottom]
@@ -428,8 +435,8 @@ object frmMain: TfrmMain
         object tvMultiSubs: TTreeView
           Left = 8
           Top = 16
-          Width = 387
-          Height = 157
+          Width = 379
+          Height = 155
           Anchors = [akLeft, akTop, akRight, akBottom]
           Images = ilMultiSubs
           Indent = 19
@@ -442,8 +449,8 @@ object frmMain: TfrmMain
           OnKeyUp = tvMultiSubsKeyUp
         end
         object bMTExpandAll: TButton
-          Left = 156
-          Top = 174
+          Left = 148
+          Top = 172
           Width = 80
           Height = 25
           Anchors = [akRight, akBottom]
@@ -452,8 +459,8 @@ object frmMain: TfrmMain
           OnClick = bMTExpandAllClick
         end
         object bMTCollapseAll: TButton
-          Left = 236
-          Top = 174
+          Left = 228
+          Top = 172
           Width = 80
           Height = 25
           Anchors = [akRight, akBottom]
@@ -464,8 +471,8 @@ object frmMain: TfrmMain
       end
       object GroupBox4: TGroupBox
         Left = 3
-        Top = 208
-        Width = 401
+        Top = 206
+        Width = 393
         Height = 129
         Margins.Left = 0
         Margins.Top = 0
@@ -475,7 +482,7 @@ object frmMain: TfrmMain
         Caption = ' Replace the string with : '
         TabOrder = 1
         DesignSize = (
-          401
+          393
           129)
         object Label15: TLabel
           Left = 9
@@ -527,7 +534,7 @@ object frmMain: TfrmMain
         object mMTOldSub: TMemo
           Left = 95
           Top = 16
-          Width = 300
+          Width = 292
           Height = 37
           Anchors = [akLeft, akRight, akBottom]
           Color = clBtnFace
@@ -541,7 +548,7 @@ object frmMain: TfrmMain
         object mMTNewSub: TMemo
           Left = 95
           Top = 56
-          Width = 300
+          Width = 292
           Height = 37
           Anchors = [akLeft, akRight, akBottom]
           Lines.Strings = (
@@ -552,7 +559,7 @@ object frmMain: TfrmMain
           OnChange = mMTNewSubChange
         end
         object bMultiTranslate: TButton
-          Left = 306
+          Left = 298
           Top = 99
           Width = 92
           Height = 25
@@ -564,8 +571,8 @@ object frmMain: TfrmMain
         end
       end
       object bMTRetrieveSubs: TButton
-        Left = 78
-        Top = 177
+        Left = 70
+        Top = 175
         Width = 80
         Height = 25
         Anchors = [akRight, akBottom]
@@ -578,8 +585,8 @@ object frmMain: TfrmMain
   object gbDebug: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 373
-    Width = 566
+    Top = 371
+    Width = 558
     Height = 101
     Margins.Top = 0
     Align = alBottom
@@ -592,7 +599,7 @@ object frmMain: TfrmMain
     object mDebug: TMemo
       Left = 4
       Top = 16
-      Width = 558
+      Width = 550
       Height = 81
       Align = alClient
       Color = clBtnFace
@@ -603,8 +610,8 @@ object frmMain: TfrmMain
   end
   object sb: TStatusBar
     Left = 0
-    Top = 477
-    Width = 572
+    Top = 475
+    Width = 564
     Height = 19
     Panels = <
       item
@@ -784,7 +791,7 @@ object frmMain: TfrmMain
       object miFacesExtractor: TMenuItem
         Caption = 'Faces extractor...'
         Hint = 'Extract NPC faces textures from PAKF files.'
-        ShortCut = 113
+        ShortCut = 120
         OnClick = miFacesExtractorClick
       end
     end
@@ -792,9 +799,14 @@ object frmMain: TfrmMain
       Caption = '&Help'
       object miProjectHome: TMenuItem
         Caption = '&Project home...'
-        Hint = 'Visit the project web site.'
+        Hint = 'Visit the project home web site.'
         ShortCut = 112
         OnClick = miProjectHomeClick
+      end
+      object miCheckForUpdate: TMenuItem
+        Caption = '&Check for update...'
+        Hint = 'Open the SourceForge page of the project.'
+        OnClick = miCheckForUpdateClick
       end
       object N14: TMenuItem
         Caption = '-'
