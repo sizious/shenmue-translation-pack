@@ -14,6 +14,7 @@ type
   TGameVersion = (
     gvUndef,          // (Undefined)
     gvWhatsShenmue,   // What's Shenmue [Demo] (NTSC-J) (DC)
+    gvShenmueJ,       // Shenmue I (NTSC-J) (DC)
     gvShenmue,        // Shenmue I (PAL) (DC) / US Shenmue (NTSC-J) (DC)
     gvShenmue2J,      // Shenmue II (NTSC-J) (DC)
     gvShenmue2,       // Shenmue II (PAL) (DC)
@@ -33,11 +34,11 @@ const
 
   // Game detection strings
   VOICE_STR_WHATS_SHENMUE       = '/prj16sc/MSG/voice/';                                  // What's Shenmue (DC) (NTSC-J)
-  VOICE_STR_WHATS_SHENMUE_B2    = '/prj16sc2/MSG/voice/';                                 // What's Shenmue (DC) (NTSC-J)
-  VOICE_STR_SHENMUE             = '/p38/prj38sc/Msg/voice/';                              // Shenmue 1 (DC) (PAL) / US Shenmue (DC) (NTSC-J)
-  VOICE_STR_SHENMUE2J           = '/p39/prj39sc/Msg/voice/';                              // Shenmue 2 (DC)  (NTSC-J)
-  VOICE_STR_SHENMUE2            = '/p48/prj48sc/Voice/';                                  // Shenmue 2 (DC) (PAL)
-  VOICE_STR_SHENMUE2X           = '/usr1/people/muramatsu/yoshizawa/humans/data/voice/';  // Shenmue 2 (XBOX) (PAL)
+  VOICE_STR_SHENMUEJ            = '/prj16sc2/MSG/voice/';                                 // Shenmue I (DC) (NTSC-J)
+  VOICE_STR_SHENMUE             = '/p38/prj38sc/Msg/voice/';                              // Shenmue I (DC) (PAL) / US Shenmue (DC) (NTSC-J)
+  VOICE_STR_SHENMUE2J           = '/p39/prj39sc/Msg/voice/';                              // Shenmue II (DC)  (NTSC-J)
+  VOICE_STR_SHENMUE2            = '/p48/prj48sc/Voice/';                                  // Shenmue II (DC) (PAL)
+  VOICE_STR_SHENMUE2X           = '/usr1/people/muramatsu/yoshizawa/humans/data/voice/';  // Shenmue II (XBOX) (PAL)
 
 // SCNF Utilities
 function FindPaksFooterOffset(var F: file; var SectionsCount: Integer): Integer; overload;
@@ -60,13 +61,14 @@ uses
 
 function GameVersionToStr(GameVersion: TGameVersion): string;
 begin
-  Result := '(Unknow)';
+  Result := '(Undefined)';
   case GameVersion of
+    gvWhatsShenmue  : Result := 'What''s Shenmue (NTSC-J) (DC)';
+    gvShenmueJ      : Result := 'Shenmue I (NTSC-J) (DC)';
+    gvShenmue       : Result := 'Shenmue I (PAL) (DC)';
+    gvShenmue2J     : Result := 'Shenmue II (NTSC-J) (DC)';
     gvShenmue2      : Result := 'Shenmue II (PAL) (DC)';
     gvShenmue2X     : Result := 'Shenmue II (PAL) (XBOX)';
-    gvShenmue       : Result := 'Shenmue I (PAL) (DC)';
-    gvWhatsShenmue  : Result := 'What''s Shenmue (NTSC-J) (DC)';
-    gvShenmue2J     : Result := 'Shenmue II (NTSC-J) (DC)';
   end;
 end;
 

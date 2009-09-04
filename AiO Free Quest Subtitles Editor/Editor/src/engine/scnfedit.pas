@@ -9,8 +9,8 @@
   Free Quest characters subtitles editor for Shenmue I, What's Shenmue,
   Shenmue II XBOX & DC
 
-  Version.............: 3.3.2
-  Release date........: August 24, 2009 @01:04AM
+  Version.............: 3.3.3
+  Release date........: September 2, 2009 @01:18AM
   
   Main code...........: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
   Additional code.....: Manic
@@ -20,6 +20,10 @@
 }
 (*
   Short history:
+
+  3.3.3 (September 2, 2009 @01:18AM):
+    - Adding the Shenmue I JAP detection string.
+    - Adding the support of the utf-8 charset instead of ISO for XML files
 
   3.3.2 (August 24, 2009 @01:04AM):
     - Fixed a problem in the ImportToFile method: <CR> was encoded when importing
@@ -40,8 +44,8 @@ uses
   Windows, SysUtils, Classes, Common, CharsLst, NPCInfo, ScnfUtil;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.3.2';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'August 24, 2009 @01:04AM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.3.3';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'September 2, 2009 @01:18AM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -378,7 +382,7 @@ begin
         NodeIndentStr:= '  ';
         Active := True;
         Version := '1.0';
-        Encoding := 'ISO-8859-1';
+        Encoding := 'utf-8'; //'ISO-8859-1';
       end;
 
       // Creating the root
@@ -389,11 +393,12 @@ begin
 
       // Game version
       case Owner.GameVersion of
-        gvShenmue2J   : AddXMLNode(XMLDoc, 'gameversion', 's2jdc');
-        gvShenmue2    : AddXMLNode(XMLDoc, 'gameversion', 's2dc');
-        gvShenmue2X   : AddXMLNode(XMLDoc, 'gameversion', 's2xb');
-        gvShenmue     : AddXMLNode(XMLDoc, 'gameversion', 's1dc');
-        gvWhatsShenmue: AddXMLNode(XMLDoc, 'gameversion', 'wsdc');
+        gvWhatsShenmue: AddXMLNode(XMLDoc, 'gameversion', 'WSM_JAP_DC');
+        gvShenmueJ    : AddXMLNode(XMLDoc, 'gameversion', 'SM1_JAP_DC');
+        gvShenmue     : AddXMLNode(XMLDoc, 'gameversion', 'SM1_PAL_DC');
+        gvShenmue2J   : AddXMLNode(XMLDoc, 'gameversion', 'SM2_JAP_DC');
+        gvShenmue2    : AddXMLNode(XMLDoc, 'gameversion', 'SM2_PAL_DC');
+        gvShenmue2X   : AddXMLNode(XMLDoc, 'gameversion', 'SM2_PAL_XB');
       end;
 
       // CharID
@@ -487,7 +492,7 @@ begin
       NodeIndentStr:= '  ';
       Active := True;
       Version := '1.0';
-      Encoding := 'ISO-8859-1';
+      Encoding := 'utf-8'; // 'ISO-8859-1';
     end;
 
     XMLDoc.LoadFromFile(FileName);
@@ -824,9 +829,10 @@ end;
 function TSCNFEditor.GetGameVersionFromVoiceID(const FullVoiceID: string): TGameVersion;
 begin
   Result := gvUndef;
-  if (Pos(VOICE_STR_WHATS_SHENMUE, FullVoiceID) > 0) or
-    (Pos(VOICE_STR_WHATS_SHENMUE_B2, FullVoiceID) > 0) then
+  if Pos(VOICE_STR_WHATS_SHENMUE, FullVoiceID) > 0 then
     Result := gvWhatsShenmue
+  else if Pos(VOICE_STR_SHENMUEJ, FullVoiceID) > 0 then
+    Result := gvShenmueJ
   else if Pos(VOICE_STR_SHENMUE, FullVoiceID) > 0 then
     Result := gvShenmue
   else if Pos(VOICE_STR_SHENMUE2, FullVoiceID) > 0 then
