@@ -15,6 +15,8 @@
 
 unit main;
 
+// {$DEFINE GLOBAL_TRANSLATION_NODE_DEBUG}
+
 interface
 
 uses
@@ -22,7 +24,7 @@ uses
   Dialogs, ComCtrls, StdCtrls, Menus, ScnfEdit, MultiScan, ExtCtrls, ScnfScan,
   MultiTrad, JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
   AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf, TextData,
-  ImgList, ViewUpd;
+  ImgList, ViewUpd, Progress;
 
 const
   APP_VERSION = '2.2';
@@ -231,17 +233,18 @@ type
     fSubtitleSelected: Integer;
     fCanEnableCharsMod1: Boolean;
     fCanEnableCharsMod2: Boolean;
+    fMultiTranslate: Boolean;
+    fMultiTranslationTextDataList: TMultiTranslationTextData;
     procedure SetFileOperationMenusItemEnabledState(const State: Boolean);
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
     procedure ResetApplication;
-//    procedure SetSingleFileMenusItemState(const State: Boolean);
     procedure SetFileSaveOperationsMenusItemEnabledState(const State: Boolean);
     procedure SaveSubtitlesList(const FileName: TFileName);
     procedure RefreshSubtitlesList(UpdateView: Boolean);
     procedure BatchExportSubtitles(const OutputDirectory: TFileName);
     procedure SetEnableCharsMod(const Value: Boolean);
-//    procedure SetCanEnableCharsMod(const Value: Boolean);
+    procedure SetMultiTranslate(const Value: Boolean);
   protected
     procedure FreeApplication;
     procedure PreviewWindowClosedEvent(Sender: TObject);
@@ -251,7 +254,6 @@ type
     procedure SetApplicationHint(const HintStr: string);
   public
     { Déclarations publiques }
-//    procedure ActiveMultifilesOptions;
     procedure AddDebug(m: string);
     procedure Clear;
     function GetTargetDirectory: string;
@@ -265,18 +267,22 @@ type
     procedure SetModified(const State: Boolean);
 
     // Procedures used in Multi-Translation process
-    procedure MultiTranslationRetrieveSubtitles;
+    procedure RetrieveSubtitles(TextDataList: TMultiTranslationTextData;
+      ProgressFormMode: TProgressMode);
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property FileModified: Boolean read fFileModified;
     property FileListSelectedIndex: Integer read fFileListSelectedIndex;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
 
+    { Implements the Global-Translation module }
     property GlobalTranslation: TGlobalTranslationModule read fGlobalTranslation
       write fGlobalTranslation;
 
     property SubsViewerVisible: Boolean read fSubsViewerVisible write fSubsViewerVisible;
     property SelectedDirectory: string read fSelectedDirectory write fSelectedDirectory;
+
+    // Subtitle selected in the editor
     property SubtitleSelected: Integer read fSubtitleSelected write fSubtitleSelected;
 
     // For Chars Modification Translation (the charset used by the game isn't exactly the same as Windows)
@@ -287,6 +293,9 @@ type
     // If we must use this feature in the editor or not:
     property EnableCharsMod: Boolean read fEnableCharsMod write SetEnableCharsMod;
 
+    property MultiTranslate: Boolean read fMultiTranslate write SetMultiTranslate;
+    property MultiTranslationTextDataList: TMultiTranslationTextData
+      read fMultiTranslationTextDataList write fMultiTranslationTextDataList;
 //    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
   end;
 
@@ -301,7 +310,9 @@ type
     fNodeImageIndex: Integer;
     fBusy: Boolean;
     fMustReloadEditorTab: Boolean;
+    fMultiTranslationTextData: TMultiTranslationTextData;
   protected
+    procedure Abort; // abort the Global-Translation processus
     procedure FreeTreeViewUI;
     procedure UpdateSubtitle(const DataSubtitleIndex: Integer;
       TranslatedTextNode: TTreeNode; NewSubtitle: string);
@@ -310,22 +321,29 @@ type
     destructor Destroy; override;
 
     procedure Apply(const NewText: string);
-    procedure Reset;
     procedure ChangeModifiedState(const State: Boolean);
-    procedure UpdateCharsCount;
-    function SaveFileModifiedEditor: Boolean;
     procedure LoadSelectedSubtitle;
-    
+    procedure Reset;
+    function SaveFileModifiedEditor: Boolean;
+    procedure UpdateCharsCount;
+
     // Indicate if a Global-Translation is currently in progress.
     property Busy: Boolean read fBusy write fBusy;
 
     // Indicate if the user is using the Global-Translation module.
     property InUse: Boolean read fInUse write fInUse;
 
+    // Contains all multitranslation datas (filled by the TMultiTranslationSubtitlesRetriever)
+    property TextDataList: TMultiTranslationTextData read
+      fMultiTranslationTextData write fMultiTranslationTextData;
+
     { Notify the "Editor" tab to reload the current selected file (to show
       the last Global-Translation modifications) }
     property MustRefreshEditorTab: Boolean read fMustReloadEditorTab
       write fMustReloadEditorTab;
+
+    { Used by the Apply function. }
+    property NodeImageIndex: Integer read fNodeImageIndex write fNodeImageIndex;
 
     { This flag indicate if the user has translated a subtitle in the
       "Global-Translation" view but his modification has not be saved yet. }
@@ -341,8 +359,6 @@ type
 
     property SelectedHashKeySubNode: TTreeNode read fSelectedKeySubNode
       write fSelectedKeySubNode;
-
-    property NodeImageIndex: Integer read fNodeImageIndex write fNodeImageIndex;
   end;
 
 var
@@ -352,7 +368,6 @@ var
   SCNFEditor: TSCNFEditor;                            // enable to edit any valid SCNF file: this's the main class of this application
 
   MultiTranslationSubsRetriever: TMultiTranslationSubtitlesRetriever; // enable to retrieve all subtitles from loaded file list
-  MultiTranslationTextData: TMultiTranslationTextData;// contains all multitranslation datas (filled by the TMultiTranslationSubtitlesRetriever)
   MultiTranslationUpdater: TMultiTranslator;                  // enable to multi-translate subtitles
   MultiTranslationViewUpdater: TMTViewUpdater;
 
@@ -364,7 +379,7 @@ implementation
 
 uses
   {$IFDEF DEBUG} TypInfo, {$ENDIF}
-  Progress, SelDir, SCNFUtil, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
+  SelDir, SCNFUtil, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, VistaUI, About, FacesExt, IconsUI;
 
 {$R *.dfm}
@@ -447,19 +462,20 @@ var
 
 begin
   CanDo := MsgBox(
-    'This function will build the Multi-Translation list from the actual loaded files. '
+    'This function will build the Global-Translation list from the actual loaded files. '
     + 'If you have many files, this can takes some minutes. '
     + 'Continue ?',
-    'Multi-Translation Retriever',
+    'Global-Translation retriever question',
     MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
   if CanDo = IDNO then Exit;
-  
-  MultiTranslationRetrieveSubtitles;
+
+  GlobalTranslation.Reset;
+  RetrieveSubtitles(GlobalTranslation.TextDataList, pmGlobalScan);
 end;
 
 procedure TfrmMain.bMTExpandAllClick(Sender: TObject);
 begin
-  MultiTranslationUpdateView(nvoExpandAll);
+  GlobalTranslationUpdateView(nvoExpandAll);
 end;
 
 procedure TfrmMain.bMTClearClick(Sender: TObject);
@@ -469,15 +485,15 @@ var
 begin
   if GlobalTranslation.SubtitleModified then
     CanDo := MsgBox(
-      'This operation will cancel the current multi-translation and clear all '
-      + 'datas (but not undone all multi-translation already made). '
-      + 'Continue ?', 'Warning: Multi-translation in progress not saved',
+      'This operation will cancel the current Global-Translation and clear all '
+      + 'datas (but not undone all the work already made). '
+      + 'Continue ?', 'Warning: Global-Translation current work not saved',
       MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2)
   else
     CanDo := MsgBox(
       'This operation will clear all '
-      + 'datas (but not undone all multi-translation already made). '
-      + 'Continue ?', 'Reset Multi-translation ?',
+      + 'datas (but not undone all Global-Translation already made). '
+      + 'Continue ?', 'Reset Global-Translation ?',
       MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
 
   if CanDo = IDNO then Exit;
@@ -486,7 +502,7 @@ end;
 
 procedure TfrmMain.bMTCollapseAllClick(Sender: TObject);
 begin
-  MultiTranslationUpdateView(nvoCollapseAll);
+  GlobalTranslationUpdateView(nvoCollapseAll);
 end;
 
 procedure TfrmMain.miEnableCharsModClick(Sender: TObject);
@@ -660,9 +676,9 @@ begin
   // To apply the auto save feature or not !
   if FileModified then
 
-    // If Multi-Translation is used...
+    // If Global-Translation is used...
     if GlobalTranslation.InUse then begin
-      CanDo := MsgBox('Since you are using Multi-translation, the current '
+      CanDo := MsgBox('Since you are using the Global-Translation module, the current '
       + 'file modifications were not saved. Do you want to save modifications to '
       + 'another file ?', 
       'Save changes?', MB_ICONWARNING + MB_YESNOCANCEL + MB_DEFBUTTON3);
@@ -684,9 +700,9 @@ begin
         Exit;
       end;
 
-  // Confirmation to exit if Multi-translation module in use.
+  // Confirmation to exit if Global-Translation module in use.
   if GlobalTranslation.InUse then begin
-    CanDo := MsgBox('You are currently using Multi-translation. Are you sure to exit ?',
+    CanDo := MsgBox('You are currently using the Global-Translation module. Are you sure to exit ?',
       'Please confirm!', MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
     if CanDo = IDNO then begin
       Action := caNone;
@@ -707,6 +723,7 @@ begin
   // Create the control object for the GlobalTranslation module
   // This module is here to implements the "Global" tab.
   GlobalTranslation := TGlobalTranslationModule.Create;
+  MultiTranslationTextDataList := TMultiTranslationTextData.Create;
 
   // Create the Subtitles Previewer
   Previewer := TSubtitlesPreviewWindow.Create;
@@ -796,7 +813,10 @@ begin
 
   // Destroying GlobalTranslation module
   GlobalTranslation.Free;
-  
+
+  // Destroying Multi-Translation data list
+  MultiTranslationTextDataList.Free;
+
   SCNFEditor.Free;
 //  WorkFilesList.Free;
 end;
@@ -1137,7 +1157,7 @@ end;
 
 procedure TfrmMain.miMultiTranslateClick(Sender: TObject);
 begin
-  MessageBeep(MB_OK);
+  MultiTranslate := not MultiTranslate;
 end;
 
 procedure TfrmMain.miSubsPreviewClick(Sender: TObject);
@@ -1285,7 +1305,7 @@ begin
           end;
         end;
 
-    // MULTI-TRANSLATION TabSheet
+    // GLOBAL-TRANSLATION TabSheet
     1:  begin
           // Save files changes if needed
           SaveFileIfNeeded(False);
@@ -1324,17 +1344,21 @@ begin
     Previewer.Clear();
 end;
 
+procedure TfrmMain.RetrieveSubtitles(TextDataList: TMultiTranslationTextData;
+  ProgressFormMode: TProgressMode);
+var
+  FillGlobalTranslationView: Boolean;
 
-
-procedure TfrmMain.MultiTranslationRetrieveSubtitles;
 begin
-  GlobalTranslation.Reset;
-
+  FillGlobalTranslationView := (ProgressFormMode = pmGlobalScan);
+  
   // start the retrieving scanner thread
-  MultiTranslationSubsRetriever := TMultiTranslationSubtitlesRetriever.Create(SelectedDirectory,
-    lbFilesList.Items.Text, EnableCharsMod);
+  MultiTranslationSubsRetriever :=
+    TMultiTranslationSubtitlesRetriever.Create(SelectedDirectory,
+    lbFilesList.Items.Text, EnableCharsMod, TextDataList,
+    FillGlobalTranslationView);
   MultiTranslationSubsRetriever.Priority := tpHighest;
-  frmProgress.Mode := pmMultiScan;
+  frmProgress.Mode := ProgressFormMode;
 
   MultiTranslationSubsRetriever.Resume;
 
@@ -1356,7 +1380,7 @@ procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
   if SCNFEditor.FileLoaded then begin
 
-    // Multi-Translation warning (if used)
+    // Global-Translation warning (if used)
     if GlobalTranslation.InUse then begin
       GlobalTranslation.SaveFileModifiedEditor;
       Exit;
@@ -1412,7 +1436,7 @@ begin
         AddDebug('Save was cancelled by user !');
       SCNFEditor.ReloadFile;
       SetModified(False);
-      AddDebug('Since you are using Multi-translation, the current file was '
+      AddDebug('Since you are using the Global-Translation module, the current file was '
       + 'reloaded from the disk to cancel every modifications.');
       LoadSubtitleFile(GetTargetFileName);
     end; // MultiTranslationInUse
@@ -1450,7 +1474,7 @@ begin
   // AutoSave
   if FileModified then begin
 
-    // Multi-Translation warning (if used)
+    // Global-Translation warning (if used)
     if GlobalTranslation.InUse then begin
       GlobalTranslation.SaveFileModifiedEditor;
       Exit;
@@ -1601,12 +1625,12 @@ begin
     RefreshSubtitlesList(True);
   end;
 
-  // Multi-translation
+  // Global-Translation
   if GlobalTranslation.InUse then
     if Value then
-      MultiTranslationUpdateView(nvoDecodeText)
+      GlobalTranslationUpdateView(nvoDecodeText)
     else
-      MultiTranslationUpdateView(nvoEncodeText);
+      GlobalTranslationUpdateView(nvoEncodeText);
 
   // File Infos
   if Assigned(frmFileInfo) and frmFileInfo.Visible then
@@ -1663,6 +1687,21 @@ begin
     sb.Panels[1].Text := '';
 end;
 
+procedure TfrmMain.SetMultiTranslate(const Value: Boolean);
+begin
+  fMultiTranslate := Value;
+  miMultiTranslate.Checked := fMultiTranslate;
+
+  if fMultiTranslate then begin
+    // afficher un warning ?
+
+    // Building the Multi-Translation list
+    if lbFilesList.Items.Count > 0 then    
+      RetrieveSubtitles(MultiTranslationTextDataList, pmMultiScan); 
+  end else
+    frmMain.MultiTranslationTextDataList.Clear; // clear all datas
+end;
+
 procedure TfrmMain.SetStatus(const Text: string);
 begin
   if (Text = 'Ready') then
@@ -1716,7 +1755,7 @@ end;
 procedure TGlobalTranslationModule.Apply(const NewText: string);
 begin
   if Busy then begin
-    frmMain.AddDebug('WARNING: Multi-translation module is busy, so please wait and retry again.');
+    frmMain.AddDebug('WARNING: Global-Translation module is busy, so please wait and retry again.');
     Exit;
   end;
 
@@ -1736,14 +1775,25 @@ begin
   end; // with frmMain
 end;
 
+procedure TGlobalTranslationModule.Abort;
+begin
+  ChangeModifiedState(False);
+  with SelectedHashKeySubNode do begin
+    ImageIndex := NodeImageIndex;
+    SelectedIndex := NodeImageIndex;
+    OverlayIndex := NodeImageIndex;
+  end;
+end;
+
 constructor TGlobalTranslationModule.Create;
 begin
-
+  TextDataList := TMultiTranslationTextData.Create;
 end;
 
 destructor TGlobalTranslationModule.Destroy;
 begin
   FreeTreeViewUI;
+  TextDataList.Free;
   inherited Destroy;
 end;
 
@@ -1776,10 +1826,12 @@ begin
     NodeType := PMultiTranslationNodeType(Node.Data)^;
 
 {$IFDEF DEBUG}
+{$IFDEF GLOBAL_TRANSLATION_NODE_DEBUG}
     WriteLn('NodeType: ',
       GetEnumName(TypeInfo(TMultiTranslationNodeViewType), Ord(NodeType.NodeViewType)),
       ', GameVersion: ',
       GetEnumName(TypeInfo(TGameVersion), Ord(NodeType.GameVersion)));
+{$ENDIF}
 {$ENDIF}
 
     // Normal node that can be edited
@@ -1867,7 +1919,7 @@ var
 begin
   with frmMain do begin
     Result := False;
-    CanDo := MsgBox('Sorry, since you are using the Multi-translation module, the save '
+    CanDo := MsgBox('Sorry, since you are using the Global-Translation module, the save '
       + 'feature was disabled. You MUST save your modifications to another file. '
       + 'Do it now ? If you don''t, modifications will be LOST!',
       'File was not saved! Save as another file ?', MB_ICONWARNING + MB_OKCANCEL);
@@ -1900,23 +1952,13 @@ procedure TGlobalTranslationModule.UpdateSubtitle(
   NewSubtitle: string);
 var
   SubInfoList: ISubtitleInfoList;
-  TmpScnfEdit: TSCNFEditor;
+  GlobalTranslationSCNFEditor: TSCNFEditor;
   TmpCharsList: TSubsCharsList;
   i, SubIndex: Integer;
   TargetSubEntry: TSubEntry;
   TargetHashKeySub, // subtitle hash key (can't be modified). it's in fact the ORIGINAL subtitle when the list is built
   OldSubtitle: string; // this's the real old subtitle. when it's modified the first time, OldSubtitle = TargetKeySub
   NodeType: TMultiTranslationNodeType;
-
-  procedure CancelMultiTranslation;
-  begin
-    ChangeModifiedState(False);
-    with SelectedHashKeySubNode do begin
-      ImageIndex := NodeImageIndex;
-      SelectedIndex := NodeImageIndex;
-      OverlayIndex := NodeImageIndex;
-    end;
-  end;
 
 begin
   with frmMain do begin
@@ -1925,15 +1967,15 @@ begin
     if DataSubtitleIndex = -1 then Exit;
     try
       // This's the Hash Key of the Target Subtitle
-      TargetHashKeySub := MultiTranslationTextData.Subtitles[DataSubtitleIndex];
+      TargetHashKeySub := TextDataList.Subtitles[DataSubtitleIndex];
     except
       Exit;
     end;
 
     // Check if new subtitle isn't empty
     if NewSubtitle = '' then begin
-      frmMain.AddDebug('Subtitle can''t be empty. Multi-translation cancelled for this one.');
-      CancelMultiTranslation;
+      frmMain.AddDebug('Subtitle can''t be empty. Global-Translation cancelled for this one.');
+      Abort;
       Exit;
     end;
 
@@ -1947,7 +1989,7 @@ begin
       TmpCharsList.Active := frmMain.EnableCharsMod;
 
       // Retrieve the list of subtitles code to update
-      with MultiTranslationTextData do
+      with TextDataList do
         SubInfoList := GetSubtitleInfo(TargetHashKeySub);
 
       // Getting Old and New subtitle...
@@ -1959,7 +2001,7 @@ begin
         // Warning if needeed
         if SubtitleModified then
           frmMain.AddDebug('Unable to multi-translate a subtitle ... to his same value!');
-        CancelMultiTranslation;
+        Abort;
         Exit;
       end;
 
@@ -1972,50 +2014,50 @@ begin
       // This single value must be encoded with Shenmue 1 or Shenmue 2 charslist!
 
       // Applying modification
-      TmpScnfEdit := TSCNFEditor.Create;
+      GlobalTranslationSCNFEditor := TSCNFEditor.Create;
       try
   //      Screen.Cursor := crAppStart;
         SetStatus('Multi-translating...');
         Busy := True;
 
-        // Updating the MultiTranslation node to show working icon
+        // Updating the Global-Translation node to show working icon
         with SelectedHashKeySubNode do begin
           ImageIndex := GT_ICON_TRANSLATION_IN_PROGRESS;
           SelectedIndex := GT_ICON_TRANSLATION_IN_PROGRESS;
           OverlayIndex := -1;
         end;
 
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
         WriteLn(#13#10, 'Multi-translating ... Hash Key = "', TargetHashKeySub, '"');
-  {$ENDIF}
+{$ENDIF}
 
         // Updating all subtitles by SubCode
         for i := 0 to SubInfoList.Count - 1 do begin
 
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
     WriteLn('  ', SubInfoList.Items[i].Code, ': ', ExtractFileName(SubInfoList.Items[i].FileName));
-  {$ENDIF}
+{$ENDIF}
 
           // Load the target file if necessary (if it's the same, we skip this to improve speed)
-          with TmpScnfEdit do
+          with GlobalTranslationSCNFEditor do
             if not SameText(GetLoadedFileName, SubInfoList.Items[i].FileName) then begin
               if FileLoaded then Save; // save the loaded PAKS file (if more than one entry to translate)
               LoadFromFile(SubInfoList.Items[i].FileName);
             end;
 
           // updating the subtitle...
-          SubIndex := TmpScnfEdit.Subtitles.FindSubtitleByCode(SubInfoList.Items[i].Code);
+          SubIndex := GlobalTranslationSCNFEditor.Subtitles.FindSubtitleByCode(SubInfoList.Items[i].Code);
           if SubIndex <> -1 then begin // not found ??
-            TargetSubEntry := TmpScnfEdit.Subtitles[SubIndex];
+            TargetSubEntry := GlobalTranslationSCNFEditor.Subtitles[SubIndex];
 
-            // protection "anti-change" outside the Multi-Translation module
+            // protection "anti-change" outside the Global-Translation module
             if TargetSubEntry.Text = OldSubtitle then
               TargetSubEntry.Text := NewSubtitle
             else
               AddDebug('WARNING: Subtitle "' + SubInfoList.Items[i].Code + '" of the '
                 + 'file "' + SubInfoList.Items[i].FileName + '" has CHANGED outside the '
-                + 'multi-translation module! It HAS NOT BE MODIFIED with the new '
-                + 'multi-translation value!');
+                + 'Global-Translation module! It HAS NOT BE MODIFIED with the new '
+                + 'Global-Translation value!');
           end else
             AddDebug('WARNING: Subtitle "' + SubInfoList.Items[i].Code + '" was '
               + 'NOT found in the file "' + SubInfoList.Items[i].FileName + '"! '
@@ -2024,7 +2066,7 @@ begin
         end;
 
         //Saving the last file
-        TmpScnfEdit.Save;
+        GlobalTranslationSCNFEditor.Save;
 
         // Updating the view
         if EnableCharsMod then
@@ -2048,7 +2090,7 @@ begin
         // the last MT modifications)
         MustRefreshEditorTab := True;
       finally
-        TmpScnfEdit.Free;
+        GlobalTranslationSCNFEditor.Free;
       end;
 
     finally

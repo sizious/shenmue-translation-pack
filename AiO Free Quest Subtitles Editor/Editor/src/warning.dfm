@@ -197,7 +197,7 @@ object frmWarning: TfrmWarning
     Height = 39
     Caption = 
       'Please note that if you have already translated NPC files using ' +
-      'older versions of this editor (like v1.02), the use of these BAD' +
+      'older versions of this editor (like v1.xx), the use of these BAD' +
       ' HACKED files with this newest editor will CORRUPT your BAD HACK' +
       'ED files.'
     WordWrap = True
@@ -221,9 +221,11 @@ object frmWarning: TfrmWarning
   object Label5: TLabel
     Left = 44
     Top = 160
-    Width = 298
+    Width = 330
     Height = 26
-    Caption = 'If you have never used this editor before, you aren'#39't concerned.'
+    Caption = 
+      'If you have never used this editor before the v2.0, you aren'#39't c' +
+      'oncerned.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -235,7 +237,7 @@ object frmWarning: TfrmWarning
   object Label6: TLabel
     Left = 44
     Top = 100
-    Width = 290
+    Width = 295
     Height = 26
     Caption = 
       'ANYWAY, THESE OLD BAD HACKED FILES WILL WORK RANDOMLY IN YOUR CO' +

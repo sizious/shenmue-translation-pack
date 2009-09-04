@@ -31,7 +31,7 @@ type
     property Operation: TNodesViewOperation read fOperation;
   end;
   
-procedure MultiTranslationUpdateView(const Operation: TNodesViewOperation);
+procedure GlobalTranslationUpdateView(const Operation: TNodesViewOperation);
 
 //------------------------------------------------------------------------------
 implementation
@@ -40,7 +40,7 @@ implementation
 uses
   ScnfUtil, Common, Main, Progress, TextData;
 
-procedure MultiTranslationUpdateView(const Operation: TNodesViewOperation);
+procedure GlobalTranslationUpdateView(const Operation: TNodesViewOperation);
 begin
   MultiTranslationViewUpdater := TMTViewUpdater.Create(Operation);
   MultiTranslationViewUpdater.Priority := tpHigher;
@@ -192,7 +192,7 @@ begin
     // The node is the Subtitle Key
     if NodeType.NodeViewType = nvtSubtitleKey then begin
 
-      with MultiTranslationTextData do
+      with frmMain.GlobalTranslation.TextDataList do
         SubsList := GetSubtitleInfo(Subtitles[Node.Index]);
 
       if Assigned(SubsList) then begin

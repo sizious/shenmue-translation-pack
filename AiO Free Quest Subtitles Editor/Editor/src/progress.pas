@@ -12,7 +12,13 @@ uses
   Dialogs, ExtCtrls, ComCtrls, StdCtrls;
 
 type
-  TProgressMode = (pmSCNFScanner, pmMultiScan, pmBatchSubsExport, pmMultiViewUpdater);
+  TProgressMode = (
+    pmSCNFScanner,      // SCNF directory scanner
+    pmGlobalScan,       // Global-Translation subtitles list builder
+    pmMultiScan,        // Multi-Translation subtitles list builder
+    pmBatchSubsExport,  // Batch exporter
+    pmMultiViewUpdater  // Global-Translation View Updater
+  );
 
   TfrmProgress = class(TForm)
     lInfos: TLabel;
@@ -37,7 +43,8 @@ type
     procedure DirectoryScanningEndEvent(Sender: TObject);
 //    procedure MultiTranslatorEndEvent(Sender: TObject);
     procedure SetProgressMode(const Value: TProgressMode);
-    procedure SubsRetrieverEndEvent(Sender: TObject);
+    procedure SubsRetrieverGlobalTranslationEndEvent(Sender: TObject);
+    procedure SubsRetrieverMultiTranslationEndEvent(Sender: TObject);
     procedure BatchSubsExporterEndEvent(Sender: TObject);
     procedure SubsMassExporterErrornousFileEvent(Sender: TObject;
       ErrornousFileName: TFileName; ReasonMessage: string);
@@ -163,12 +170,20 @@ begin
                       fCurrentThread.OnTerminate := DirectoryScanningEndEvent;
                     end;
 
+    pmGlobalScan:
+                    begin
+                      frmMain.SetStatus('Retrieving subtitles from files list... Please wait.');
+                      Self.Caption := 'Retrieving subtitles...';
+                      fCurrentThread := MultiTranslationSubsRetriever;
+                      fCurrentThread.OnTerminate := SubsRetrieverGlobalTranslationEndEvent;
+                    end;
+
     pmMultiScan:
                     begin
                       frmMain.SetStatus('Retrieving subtitles from files list... Please wait.');
                       Self.Caption := 'Retrieving subtitles...';
                       fCurrentThread := MultiTranslationSubsRetriever;
-                      fCurrentThread.OnTerminate := SubsRetrieverEndEvent;
+                      fCurrentThread.OnTerminate := SubsRetrieverMultiTranslationEndEvent;
                     end;
 
     pmBatchSubsExport:
@@ -228,7 +243,7 @@ begin
     + ErrornousFileName + '". Reason: ' + ReasonMessage + '.');
 end;
 
-procedure TfrmProgress.SubsRetrieverEndEvent(Sender: TObject);
+procedure TfrmProgress.SubsRetrieverGlobalTranslationEndEvent(Sender: TObject);
 begin
   Terminated := True;
   Close;
@@ -237,7 +252,7 @@ begin
 
   if not Aborted then
     frmMain.AddDebug('Files list scanned successfully. '
-      + IntToStr(MultiTranslationTextData.Subtitles.Count)
+      + IntToStr(frmMain.GlobalTranslation.TextDataList.Subtitles.Count)
       + ' subtitle(s) retrieved.')
   else
     frmMain.AddDebug('Files list scanning aborted.'
@@ -250,6 +265,22 @@ begin
       frmMain.tvMultiSubsClick(Self);
     end;
   except
+  end;
+end;
+
+procedure TfrmProgress.SubsRetrieverMultiTranslationEndEvent(Sender: TObject);
+begin
+  Terminated := True;
+  Close;
+  frmMain.SetStatusReady;
+
+  if not Aborted then
+    frmMain.AddDebug('Files list scanned successfully. '
+      + IntToStr(frmMain.MultiTranslationTextDataList.Subtitles.Count)
+      + ' subtitle(s) retrieved.')
+  else begin
+    frmMain.AddDebug('Files list scanning aborted. The function will not be available if you abort the process.');
+    frmMain.MultiTranslate := False;
   end;
 end;
 

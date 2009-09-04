@@ -413,7 +413,7 @@ object frmMain: TfrmMain
         Width = 393
         Height = 200
         Anchors = [akLeft, akTop, akRight, akBottom]
-        Caption = ' Available strings : '
+        Caption = ' Global-Translation available strings : '
         TabOrder = 0
         DesignSize = (
           393
