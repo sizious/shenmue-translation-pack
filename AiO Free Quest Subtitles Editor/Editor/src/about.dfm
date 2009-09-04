@@ -1565,7 +1565,7 @@ object frmAbout: TfrmAbout
       'Manic, Shendream, Sadako, '
       'Hiei-, kogami-san, Dark_Neo,'
       'mimix, Sunmingzhao, MagicSeb, '
-      'FamilyGuy and everyone '
+      'FamilyGuy, Ayla and everyone '
       'supporting us!'
       ''
       'Thanks to everyone in '
@@ -1594,7 +1594,10 @@ object frmAbout: TfrmAbout
       'Cheers !'
       ''
       'The ShenTrad Team, Here to '
-      'Breake the Language Barrier!'
+      'breake the Language Barrier!'
+      ''
+      'Special smack '#224' ma petite'
+      'bestiole!'
       ''
       '-- The End --')
     ReadOnly = True

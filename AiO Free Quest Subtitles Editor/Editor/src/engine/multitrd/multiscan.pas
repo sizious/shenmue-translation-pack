@@ -12,8 +12,17 @@ uses
   SysUtils, Classes, Forms, Math, ComCtrls, TextData, CharsLst, ScnfUtil;
 
 type
+  TTextDataEntry = record
+    Text: string;
+    Code: string;
+    FileName: TFileName;
+    GameVersion: TGameVersion;
+  end;
+  
   TMultiTranslationSubtitlesRetriever = class(TThread)
   private
+    fEntry: TTextDataEntry;
+    fFillGTView: Boolean;
 //    fBufNode: TTreeNode;
     fStrBuf: string;
     fFilesList: TStringList;
@@ -25,10 +34,12 @@ type
     fFileListParam: string;
     fDecodeSubtitles: Boolean;
     fCharsList: TSubsCharsList;
+    fMultiTranslationTextData: TMultiTranslationTextData;
 //    fEnabled: Boolean;
 
     procedure InitializeProgressWindow(const FilesCount: Integer);
     procedure AddDebug(const Text: string);
+    procedure ClearTextDataList;
     procedure UpdatePercentage;
     procedure UpdateProgressOperation(const S: string);
     procedure UpdateViewSubsList(const Subtitle: string;
@@ -37,16 +48,26 @@ type
 
     // --- don't call directly ---
     procedure SyncAddDebug;
+    procedure SyncAddSubtitleEntry;
     procedure SyncInitializeProgressWindow;
     procedure SyncUpdateProgressOperation;
     procedure SyncUpdateViewSubsList;
+    procedure AddSubtitleEntry;
 //    procedure SyncChangeUpdateMemoViewState;
     
   protected
     procedure Execute; override;
+
     property CharsList: TSubsCharsList read fCharsList write fCharsList;
+    property Entry: TTextDataEntry read fEntry write fEntry;
+    property FillView: Boolean read fFillGTView;
+    property MultiTranslationTextData: TMultiTranslationTextData read
+      fMultiTranslationTextData write fMultiTranslationTextData;
   public
-    constructor Create(const BaseDir, FileList: string; DecodeSubtitles: Boolean);
+    constructor Create(const BaseDir, FileList: string;
+      DecodeSubtitles: Boolean;
+      var ResultTextDataList: TMultiTranslationTextData;
+      UseGlobalTranslationView: Boolean);
   end;
 
 // -----------------------------------------------------------------------------
@@ -57,16 +78,7 @@ uses
   Main, Progress, ScnfEdit, Utils, Common, IconsUI;
 
 // -----------------------------------------------------------------------------
-{ TMultiTranslationSubtitlesRetriever }
-// -----------------------------------------------------------------------------
-
-(*procedure TMultiTranslationSubtitlesRetriever.ChangeUpdateMemoViewState(
-  const Enabled: Boolean);
-begin
-  fEnabled := Enabled;
-  Synchronize(SyncChangeUpdateMemoViewState);
-end;*)
-
+// TMultiTranslationSubtitlesRetriever
 // -----------------------------------------------------------------------------
 
 procedure TMultiTranslationSubtitlesRetriever.AddDebug(const Text: string);
@@ -75,13 +87,31 @@ begin
   Synchronize(SyncAddDebug);
 end;
 
+procedure TMultiTranslationSubtitlesRetriever.AddSubtitleEntry;
+begin
+  Synchronize(SyncAddSubtitleEntry);
+end;
+
+procedure TMultiTranslationSubtitlesRetriever.ClearTextDataList;
+begin
+  Synchronize(MultiTranslationTextData.Clear);
+end;
+
 constructor TMultiTranslationSubtitlesRetriever.Create(const BaseDir,
-  FileList: string; DecodeSubtitles: Boolean);
+  FileList: string; DecodeSubtitles: Boolean;
+  var ResultTextDataList: TMultiTranslationTextData;
+  UseGlobalTranslationView: Boolean);
 begin
   FreeOnTerminate := True;
   fBaseDir := BaseDir;
   fFileListParam := FileList;
   fDecodeSubtitles := DecodeSubtitles;
+  fFillGTView := UseGlobalTranslationView;
+
+  if not Assigned(ResultTextDataList) then
+    raise Exception.Create('Error: ResultTextDataList not assigned!');
+
+  MultiTranslationTextData := ResultTextDataList;
   
   inherited Create(True);
 end;
@@ -105,7 +135,7 @@ begin
   fFilesList := TStringList.Create;
   fFilesList.Text := Self.fFileListParam;
 
-  MultiTranslationTextData.Clear;
+  ClearTextDataList;
 
   //----------------------------------------------------------------------------
   // BUILDING THE TEXT DATA LIST
@@ -132,44 +162,51 @@ begin
         Text := _tmp_scnf_edit.Subtitles[j].Text;
         Code := _tmp_scnf_edit.Subtitles[j].Code;
 
-        MultiTranslationTextData.PutSubtitleInfo(Text, Code, FileName,
-          _tmp_scnf_edit.GameVersion);
+        fEntry.Text := Text;
+        fEntry.Code := Code;
+        fEntry.FileName := FileName;
+        fEntry.GameVersion := _tmp_scnf_edit.GameVersion;
+        AddSubtitleEntry;
       end;
 
       UpdatePercentage;
     end;
 
-    MultiTranslationTextData.Subtitles.Sort;
+    Synchronize(MultiTranslationTextData.Subtitles.Sort);
 
     //----------------------------------------------------------------------------
     // FILLING THE VIEW
     //----------------------------------------------------------------------------
 
-    // Adding all infos to the TreeView
-    InitializeProgressWindow(MultiTranslationTextData.Subtitles.Count);
-    UpdateProgressOperation('Updating view with extracted datas...');
-//    PrevGameVersion := gvUndef;
-    
-    for i := 0 to MultiTranslationTextData.Subtitles.Count - 1 do begin
-      if Terminated then Break;
-      Text := MultiTranslationTextData.Subtitles[i];
-      List := MultiTranslationTextData.GetSubtitleInfo(Text);
+    if FillView then begin
 
-      // Loading the correct charslist
-      (*if not IsTheSameCharsList(PrevGameVersion, _tmp_scnf_edit.GameVersion) then begin
-        CharsListFound := CharsList.LoadFromFile(GetCorrectCharsList(_tmp_scnf_edit.GameVersion));
-        if CharsListFound then
-          CharsList.Active := fDecodeSubtitles
-        else
-          CharsList.Active := False;
+      // Adding all infos to the TreeView
+      InitializeProgressWindow(MultiTranslationTextData.Subtitles.Count);
+      UpdateProgressOperation('Updating view with extracted datas...');
+  //    PrevGameVersion := gvUndef;
+
+      for i := 0 to MultiTranslationTextData.Subtitles.Count - 1 do begin
+        if Terminated then Break;
+        Text := MultiTranslationTextData.Subtitles[i];
+        List := MultiTranslationTextData.GetSubtitleInfo(Text);
+
+        // Loading the correct charslist
+        (*if not IsTheSameCharsList(PrevGameVersion, _tmp_scnf_edit.GameVersion) then begin
+          CharsListFound := CharsList.LoadFromFile(GetCorrectCharsList(_tmp_scnf_edit.GameVersion));
+          if CharsListFound then
+            CharsList.Active := fDecodeSubtitles
+          else
+            CharsList.Active := False;
+        end;
+        PrevGameVersion := _tmp_scnf_edit.GameVersion;*)
+
+  //      UpdateViewSubsList(CharsList.DecodeSubtitle(Text), List);
+
+        UpdateViewSubsList(Text, List);
+        UpdatePercentage;
       end;
-      PrevGameVersion := _tmp_scnf_edit.GameVersion;*)
 
-//      UpdateViewSubsList(CharsList.DecodeSubtitle(Text), List);
-
-      UpdateViewSubsList(Text, List);
-      UpdatePercentage;
-    end;
+    end; // UseGlobalTranslationView
 
   finally
     fFilesList.Free;
@@ -232,6 +269,12 @@ end;
 procedure TMultiTranslationSubtitlesRetriever.SyncAddDebug;
 begin
   frmMain.AddDebug(fStrBuf);
+end;
+
+procedure TMultiTranslationSubtitlesRetriever.SyncAddSubtitleEntry;
+begin
+  MultiTranslationTextData.PutSubtitleInfo(Entry.Text, Entry.Code,
+    Entry.FileName, Entry.GameVersion)
 end;
 
 procedure TMultiTranslationSubtitlesRetriever.SyncInitializeProgressWindow;
@@ -358,14 +401,6 @@ begin
     // nothing
   end;
 end;
-
-// -----------------------------------------------------------------------------
-
-initialization
-  MultiTranslationTextData := TMultiTranslationTextData.Create;
-
-finalization
-  MultiTranslationTextData.Free;
 
 // -----------------------------------------------------------------------------
   
