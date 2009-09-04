@@ -54,7 +54,7 @@ implementation
 // -----------------------------------------------------------------------------
 
 uses
-  Main, Progress, ScnfEdit, Utils, Common;
+  Main, Progress, ScnfEdit, Utils, Common, IconsUI;
 
 // -----------------------------------------------------------------------------
 { TMultiTranslationSubtitlesRetriever }
@@ -276,21 +276,24 @@ begin
   // Adding the original node
   RootNode := frmMain.tvMultiSubs.Items.Add(nil, fStrSubtitle);
   RootNode.Data := NewNodeType(nvtSubtitleKey, gvUndef);
-  RootNode.ImageIndex := 0;
-  RootNode.SelectedIndex := 0;
+  RootNode.ImageIndex := GT_ICON_NOT_TRANSLATED;
+  RootNode.SelectedIndex := GT_ICON_NOT_TRANSLATED;
+  RootNode.OverlayIndex := -1;
 
   try
     // Adding the NewSubtitle node
     TranslatedNode := frmMain.tvMultiSubs.Items.AddChild(RootNode, MT_NOT_TRANSLATED_YET);
     TranslatedNode.Data := NewNodeType(nvtSubTranslated, gvUndef);
-    TranslatedNode.ImageIndex := 6;
-    TranslatedNode.SelectedIndex := 6;
+    TranslatedNode.ImageIndex := GT_ICON_TRANSLATED_TEXT;
+    TranslatedNode.SelectedIndex := GT_ICON_TRANSLATED_TEXT;
+    TranslatedNode.OverlayIndex := -1;
 
     // Creating the Entries node if needed
     EntriesNode := frmMain.tvMultiSubs.Items.AddChild(RootNode, 'Subtitles');
     EntriesNode.Data := NewNodeType(nvtUndef, gvUndef);
-    EntriesNode.ImageIndex := 3;
-    EntriesNode.SelectedIndex := 3;
+    EntriesNode.ImageIndex := GT_ICON_SUBTITLES_FOLDER;
+    EntriesNode.SelectedIndex := GT_ICON_SUBTITLES_FOLDER;
+    EntriesNode.OverlayIndex := -1;
 
     // Put plural or not...
     Code := 'entry';
@@ -317,15 +320,17 @@ begin
       if Node = nil then begin
         Node := frmMain.tvMultiSubs.Items.AddChild(EntriesNode, FileName);
         Node.Data := NewNodeType(nvtSourceFile, GameVersion);
-        Node.ImageIndex := 4;
-        Node.SelectedIndex := 4;
+        Node.ImageIndex := GT_ICON_PAKS_FILE;
+        Node.SelectedIndex := GT_ICON_PAKS_FILE;
+        Node.OverlayIndex := -1;
       end;
 
       // Adding the Sub code node
       Node := frmMain.tvMultiSubs.Items.AddChild(Node, Code);
       Node.Data := NewNodeType(nvtSubCode, gvUndef);
-      Node.ImageIndex := 5;
-      Node.SelectedIndex := 5;
+      Node.ImageIndex := GT_ICON_SUBTITLE_CODE;
+      Node.SelectedIndex := GT_ICON_SUBTITLE_CODE;
+      Node.OverlayIndex := -1;
     end;
 
     // Final: setting the GameVersion for the RootNode (SubKey) and TranslatedNode (TranslatedText)
@@ -333,8 +338,9 @@ begin
       AddDebug('WARNING: Chars list problem for the subtitle "'
         + fStrSubtitle + '" ! Two different game versions was detected, '
         + 'so unable to multi-translate this item.');
-      RootNode.ImageIndex := 8;
-      RootNode.SelectedIndex := 8;
+      RootNode.ImageIndex := GT_ICON_ERRORNOUS_SUBTITLE;
+      RootNode.SelectedIndex := GT_ICON_ERRORNOUS_SUBTITLE;
+      RootNode.OverlayIndex := -1;
     end else begin
       SetGameVersion(RootNode, PrevGameVersion);
       SetGameVersion(TranslatedNode, PrevGameVersion);

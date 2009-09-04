@@ -314,6 +314,7 @@ type
     procedure ChangeModifiedState(const State: Boolean);
     procedure UpdateCharsCount;
     function SaveFileModifiedEditor: Boolean;
+    procedure LoadSelectedSubtitle;
     
     // Indicate if a Global-Translation is currently in progress.
     property Busy: Boolean read fBusy write fBusy;
@@ -363,8 +364,8 @@ implementation
 
 uses
   {$IFDEF DEBUG} TypInfo, {$ENDIF}
-  Progress, SelDir, ScnfUtil, Utils, CharsCnt, CharsLst, FileInfo,
-  MassImp, Common, NPCInfo, VistaUI, About, facesext;
+  Progress, SelDir, SCNFUtil, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
+  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI;
 
 {$R *.dfm}
 
@@ -1158,9 +1159,9 @@ end;
 procedure TfrmMain.mMTNewSubChange(Sender: TObject);
 begin
   with GlobalTranslation.SelectedHashKeySubNode do begin
-    ImageIndex := 2;
-    SelectedIndex := 2;
-    OverlayIndex := 2;
+    ImageIndex := GT_ICON_TEXT_MODIFIED;
+    SelectedIndex := GT_ICON_TEXT_MODIFIED;
+    OverlayIndex := GT_ICON_TEXT_MODIFIED;
   end;
   GlobalTranslation.ChangeModifiedState(True);
   GlobalTranslation.UpdateCharsCount;
@@ -1679,76 +1680,8 @@ begin
 end;
 
 procedure TfrmMain.tvMultiSubsClick(Sender: TObject);
-var
-  NodeType, PrevNodeType: TMultiTranslationNodeType;
-  Node: TTreeNode;
-  
 begin
-  Node := tvMultiSubs.Selected;
-  if Node = nil then Exit;
-
-  if Assigned(GlobalTranslation.SelectedHashKeySubNode) then
-    PrevNodeType :=
-      PMultiTranslationNodeType(GlobalTranslation.SelectedHashKeySubNode.Data)^;
-  NodeType := PMultiTranslationNodeType(Node.Data)^;
-
-{$IFDEF DEBUG}
-  WriteLn('NodeType: ',
-    GetEnumName(TypeInfo(TMultiTranslationNodeViewType), Ord(NodeType.NodeViewType)),
-    ', GameVersion: ',
-    GetEnumName(TypeInfo(TGameVersion), Ord(NodeType.GameVersion)));
-{$ENDIF}
-
-  // Normal node that can be edited
-  if NodeType.NodeViewType = nvtSubtitleKey then begin
-
-    // if working, then exits
-    if GlobalTranslation.Busy then Exit;
-    
-    // Check if not the same node selected...
-    if Node = GlobalTranslation.SelectedHashKeySubNode then Exit;
-
-    // Translate the previous subtitle if needed
-    if (PrevNodeType.GameVersion <> gvUndef)
-      and Assigned(GlobalTranslation.SelectedHashKeySubNode) then
-        GlobalTranslation.UpdateSubtitle(GlobalTranslation.SelectedNodeIndex,
-          GlobalTranslation.SelectedNewSubNode, mMTNewSub.Text);
-
-    // Initialize the current node
-    mMTNewSub.OnChange := nil;
-    GlobalTranslation.SelectedHashKeySubNode := Node;
-    GlobalTranslation.NodeImageIndex := Node.ImageIndex;
-    GlobalTranslation.SelectedNodeIndex := Node.Index;
-    GlobalTranslation.SelectedNewSubNode := Node.Item[0];
-
-    // This node can't be edited (ERRORNOUS NODE!)
-    mMTNewSub.Enabled := NodeType.GameVersion <> gvUndef;
-    if not mMTNewSub.Enabled then begin
-      AddDebug('WARNING: "' + Node.Text
-        + '": This errornous subtitle can''t be translated, since two '
-        + 'different chars list was used!');
-      mMTNewSub.Clear;
-      mMTOldSub.Clear;
-      Exit;
-    end;
-
-    // Loading text to translate
-    if (Node.ImageIndex = 0) then begin // BASED ON THE ImageIndex to know if it is translated or not !!!
-      // Not yet translated
-      mMTOldSub.Text := StringReplace(Node.Text, '<br>', #13#10, [rfReplaceAll]);
-      mMTNewSub.Text := mMTOldSub.Text;
-    end else begin
-      // Already translated, so reload the old "new" subtitle
-      mMTOldSub.Text := StringReplace(Node.Item[0].Text, '<br>', #13#10, [rfReplaceAll]);
-      mMTNewSub.Text := mMTOldSub.Text;
-    end;
-    GlobalTranslation.UpdateCharsCount;
-    mMTNewSub.OnChange := mMTNewSubChange;
-
-    // Update Previewer
-    if SubsViewerVisible then
-      Previewer.Update(mMTNewSub.Text);
-  end;
+  GlobalTranslation.LoadSelectedSubtitle;
 end;
 
 procedure TfrmMain.tvMultiSubsContextPopup(Sender: TObject; MousePos: TPoint;
@@ -1824,6 +1757,82 @@ begin
     if (i mod 200) = 0 then
       Application.ProcessMessages;
   end;
+end;
+
+procedure TGlobalTranslationModule.LoadSelectedSubtitle;
+var
+  NodeType, PrevNodeType: TMultiTranslationNodeType;
+  Node: TTreeNode;
+  
+begin
+  with frmMain do begin
+
+    Node := tvMultiSubs.Selected;
+    if Node = nil then Exit;
+
+    if Assigned(SelectedHashKeySubNode) then
+      PrevNodeType :=
+        PMultiTranslationNodeType(SelectedHashKeySubNode.Data)^;
+    NodeType := PMultiTranslationNodeType(Node.Data)^;
+
+{$IFDEF DEBUG}
+    WriteLn('NodeType: ',
+      GetEnumName(TypeInfo(TMultiTranslationNodeViewType), Ord(NodeType.NodeViewType)),
+      ', GameVersion: ',
+      GetEnumName(TypeInfo(TGameVersion), Ord(NodeType.GameVersion)));
+{$ENDIF}
+
+    // Normal node that can be edited
+    if NodeType.NodeViewType = nvtSubtitleKey then begin
+
+      // if working, then exits
+      if Busy then Exit;
+
+      // Check if not the same node selected...
+      if Node = SelectedHashKeySubNode then Exit;
+
+      // Translate the previous subtitle if needed
+      if (PrevNodeType.GameVersion <> gvUndef)
+        and Assigned(SelectedHashKeySubNode) then
+          UpdateSubtitle(SelectedNodeIndex, SelectedNewSubNode, mMTNewSub.Text);
+
+      // Initialize the current node
+      mMTNewSub.OnChange := nil;
+      SelectedHashKeySubNode := Node;
+      NodeImageIndex := Node.ImageIndex;
+      SelectedNodeIndex := Node.Index;
+      SelectedNewSubNode := Node.Item[0];
+
+      // This node can't be edited (ERRORNOUS NODE!)
+      mMTNewSub.Enabled := NodeType.GameVersion <> gvUndef;
+      if not mMTNewSub.Enabled then begin
+        AddDebug('WARNING: "' + Node.Text
+          + '": This errornous subtitle can''t be translated, since two '
+          + 'different chars list was used!');
+        mMTNewSub.Clear;
+        mMTOldSub.Clear;
+        Exit;
+      end;
+
+      // Loading text to translate
+      if (Node.ImageIndex = GT_ICON_NOT_TRANSLATED) then begin // BASED ON THE ImageIndex to know if it is translated or not !!!
+        // Not yet translated
+        mMTOldSub.Text := StringReplace(Node.Text, '<br>', #13#10, [rfReplaceAll]);
+        mMTNewSub.Text := mMTOldSub.Text;
+      end else begin
+        // Already translated, so reload the old "new" subtitle
+        mMTOldSub.Text := StringReplace(Node.Item[0].Text, '<br>', #13#10, [rfReplaceAll]);
+        mMTNewSub.Text := mMTOldSub.Text;
+      end;
+      UpdateCharsCount;
+      mMTNewSub.OnChange := mMTNewSubChange;
+
+      // Update Previewer
+      if SubsViewerVisible then
+        Previewer.Update(mMTNewSub.Text);
+    end;
+
+  end; // with frmMain
 end;
 
 procedure TGlobalTranslationModule.Reset;
@@ -1971,8 +1980,8 @@ begin
 
         // Updating the MultiTranslation node to show working icon
         with SelectedHashKeySubNode do begin
-          ImageIndex := 7;
-          SelectedIndex := 7;
+          ImageIndex := GT_ICON_TRANSLATION_IN_PROGRESS;
+          SelectedIndex := GT_ICON_TRANSLATION_IN_PROGRESS;
           OverlayIndex := -1;
         end;
 
@@ -2025,7 +2034,7 @@ begin
           TranslatedTextNode.Text := SubInfoList.NewSubtitle;
 
         // New image for the node!
-        NodeImageIndex := 1;
+        NodeImageIndex := GT_ICON_TRANSLATED;
 
         // Modifing Subtitle Root image
         SelectedHashKeySubNode.ImageIndex := NodeImageIndex;
