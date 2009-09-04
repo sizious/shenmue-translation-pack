@@ -397,6 +397,10 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Multi-translation'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         407
         339)
