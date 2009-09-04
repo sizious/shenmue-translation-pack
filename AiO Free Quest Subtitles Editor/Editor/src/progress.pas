@@ -245,7 +245,7 @@ begin
 
   try
     if frmMain.tvMultiSubs.Items.Count > 0 then begin
-      frmMain.MultiTranslationInUse := True;
+      frmMain.GlobalTranslation.InUse := True;
       frmMain.tvMultiSubs.Items[0].Selected := True;
       frmMain.tvMultiSubsClick(Self);
     end;
