@@ -1,6 +1,7 @@
 program sfqsubed;
 
 {$R '..\..\..\Shenmue Subtitles Preview\src\font.res' '..\..\..\Shenmue Subtitles Preview\src\font.rc'}
+{$R 'engine\npcpakf\pakfbin.res' 'engine\npcpakf\pakfbin.rc'}
 
 uses
   Windows,
@@ -35,7 +36,8 @@ uses
   pakfexec in 'engine\npcpakf\pakfexec.pas',
   pakfextr in 'engine\npcpakf\pakfextr.pas',
   pakfutil in 'engine\npcpakf\pakfutil.pas',
-  facesext in 'facesext.pas' {frmFacesExtractor};
+  facesext in 'facesext.pas' {frmFacesExtractor},
+  iconsui in 'engine\multitrd\ui\iconsui.pas';
 
 {$R *.res}
 

@@ -404,10 +404,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         399
         337)
@@ -770,6 +766,12 @@ object frmMain: TfrmMain
         ShortCut = 119
         OnClick = miMakeBackupClick
       end
+      object miMultiTranslate: TMenuItem
+        Caption = 'M&ulti-translate'
+        Hint = 'Enable or disable subtitle multi-translation inside the Editor.'
+        ShortCut = 113
+        OnClick = miMultiTranslateClick
+      end
       object N6: TMenuItem
         Caption = '-'
       end
@@ -789,8 +791,8 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object miFacesExtractor: TMenuItem
-        Caption = 'Faces extractor...'
-        Hint = 'Extract NPC faces textures from PAKF files.'
+        Caption = '&Faces extractor...'
+        Hint = 'Extract NPC faces textures files from associated PAKF files.'
         ShortCut = 120
         OnClick = miFacesExtractorClick
       end
