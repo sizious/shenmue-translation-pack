@@ -17,6 +17,7 @@ object frmFacesExtractor: TfrmFacesExtractor
   OnClose = FormClose
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel1: TBevel

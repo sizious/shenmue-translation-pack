@@ -27,6 +27,7 @@ type
     procedure bBrowseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormShow(Sender: TObject);
   private
     { Déclarations privées }
     fProcessBusy: Boolean;
@@ -139,6 +140,11 @@ begin
     Key := #0;
     bCancel.Click;
   end;
+end;
+
+procedure TfrmFacesExtractor.FormShow(Sender: TObject);
+begin
+  Reset(0);
 end;
 
 function TfrmFacesExtractor.MsgBox(const Text, Caption: string;
