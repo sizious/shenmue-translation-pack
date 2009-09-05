@@ -81,14 +81,27 @@ end;
 procedure TfrmProgress.DirectoryScanningEndEvent(Sender: TObject);
 begin
   Terminated := True;
-  Close;
   
   frmMain.eFilesCount.Text := IntToStr(frmMain.lbFilesList.Count);
   if frmMain.lbFilesList.CanFocus then frmMain.lbFilesList.SetFocus;
-//  frmMain.SetStatus('Ready');
+
   frmMain.SetStatusReady;
   frmMain.AddDebug('Selected directory: "' + frmMain.SelectedDirectory + '"');
-//  frmMain.ActiveMultifilesOptions;
+
+  // Multi-Translate if needed
+  if frmMain.MultiTranslate then begin
+
+    if not Aborted then // if aborted when scanning files
+      frmMain.MultiTranslationPrepare
+    else begin
+      // We don't have the time to update the Multi-Translation list, so we must clear it
+      frmMain.MultiTranslate := False;
+      frmMain.AddDebug('You have cancelled the file scan process. The Multi-Translation retriever has been cancelled too.');
+      Close;      
+    end;
+          
+  end else
+    Close; // the job is finished
 end;
 
 procedure TfrmProgress.EndEventMultiTranslationViewUpdater(Sender: TObject);
@@ -143,7 +156,7 @@ end;
 procedure TfrmProgress.FormShow(Sender: TObject);
 begin
   Screen.Cursor := crAppStart;
-  Reset;
+//  Reset;
 end;
 
 procedure TfrmProgress.Reset;
@@ -159,6 +172,7 @@ end;
 
 procedure TfrmProgress.SetProgressMode(const Value: TProgressMode);
 begin
+  Reset;
   fProgressMode := Value;
 
   case fProgressMode of
@@ -277,9 +291,9 @@ begin
   if not Aborted then
     frmMain.AddDebug('Files list scanned successfully. '
       + IntToStr(frmMain.MultiTranslationTextDataList.Subtitles.Count)
-      + ' subtitle(s) retrieved.')
+      + ' subtitle(s) retrieved. The Multi-Translation function is now ready.')
   else begin
-    frmMain.AddDebug('Files list scanning aborted. The function will not be available if you abort the process.');
+    frmMain.AddDebug('Files list scanning aborted. The Multi-Translation function will not be available if you abort the process. It has been disabled.');
     frmMain.MultiTranslate := False;
   end;
 end;

@@ -1,10 +1,11 @@
+{TODO 1 -cFIX : Désactiver la Multi-Translation quand la Global-Translation est active.}
 {TODO 3 : Possibilité de chercher un sous titre précis dans la liste ?}
 {TODO 3 : Possibilité de chercher un CHAR ID dans la liste?}
 {TODO 4 -cADD : Rescan du dossier à l'ouverture de l'appli ?}
 {TODO 3 -cADD : Fonction de recherche dans la liste des sous-titres de Multi-Translation...}
 {DONE 2 -cFIX :Décoding de FileInfo lors d'un appui sur F6}
-{TODO 1 -cTEST :Problème lors du décoding des sous-titres}
-{TODO 1 -cTEST :Travailler sur les "<br>": Seulement remplacer le "<br>" quand c'est chargé dans la zone de texte à modifier (actuellement c'est l'inverse qui est fait!!).}
+{DONE 1 -cTEST :Problème lors du décoding des sous-titres}
+{DONE 1 -cTEST :Travailler sur les "<br>": Seulement remplacer le "<br>" quand c'est chargé dans la zone de texte à modifier (actuellement c'est l'inverse qui est fait!!).}
 {DONE 1 -cFIX : IMPORTANT: Bug de save à cause de la chaine non encodée "..." à la place de "=@". Cause des décalages}
 {TODO 3 -cFIX : Multi threader l'action de multi traduire...}
-{TODO 1 -cFIX : PROBLEME IMPORTANT LORS DE L'IMPORTING - EXPORTING... LE CARACTERE BR EST ENCODE ALORS QU'IL DEVRAIT PAS!!!}
+{DONE 1 -cFIX : PROBLEME IMPORTANT LORS DE L'IMPORTING - EXPORTING... LE CARACTERE BR EST ENCODE ALORS QU'IL DEVRAIT PAS!!!}

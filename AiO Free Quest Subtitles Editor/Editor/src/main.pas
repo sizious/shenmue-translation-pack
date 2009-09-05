@@ -266,6 +266,8 @@ type
     procedure SetStatusReady; // SetStatus('Ready')
     procedure SetModified(const State: Boolean);
 
+    procedure MultiTranslationPrepare;
+    
     // Procedures used in Multi-Translation process
     procedure RetrieveSubtitles(TextDataList: TMultiTranslationTextData;
       ProgressFormMode: TProgressMode);
@@ -1230,6 +1232,16 @@ begin
     Previewer.Update(mSubText.Text);
 end;
 
+procedure TfrmMain.MultiTranslationPrepare;
+begin
+  // afficher un warning ?
+
+  // Building the Multi-Translation list
+  MultiTranslationTextDataList.Clear;
+  if lbFilesList.Items.Count > 0 then
+    RetrieveSubtitles(MultiTranslationTextDataList, pmMultiScan);
+end;
+
 procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', 'explorer', PChar(SelectedDirectory), '', SW_SHOWNORMAL);
@@ -1336,6 +1348,7 @@ begin
   Clear;
   fFileListSelectedIndex := -1;
   lbFilesList.Clear;
+  MultiTranslationTextDataList.Clear;
   miClearFilesList.Enabled := False;
   miClearFilesList2.Enabled := False;
   miBatchImportSubs.Enabled := False;
@@ -1363,7 +1376,8 @@ begin
   MultiTranslationSubsRetriever.Resume;
 
   // show the progress window
-  frmProgress.ShowModal;
+  if not frmProgress.Visible then
+    frmProgress.ShowModal;
 end;
 
 procedure TfrmMain.miFacesExtractorClick(Sender: TObject);
@@ -1692,14 +1706,10 @@ begin
   fMultiTranslate := Value;
   miMultiTranslate.Checked := fMultiTranslate;
 
-  if fMultiTranslate then begin
-    // afficher un warning ?
-
-    // Building the Multi-Translation list
-    if lbFilesList.Items.Count > 0 then    
-      RetrieveSubtitles(MultiTranslationTextDataList, pmMultiScan); 
-  end else
-    frmMain.MultiTranslationTextDataList.Clear; // clear all datas
+  if fMultiTranslate then
+    MultiTranslationPrepare
+  else
+    MultiTranslationTextDataList.Clear; // clear all datas
 end;
 
 procedure TfrmMain.SetStatus(const Text: string);
