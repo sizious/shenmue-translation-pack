@@ -67,6 +67,7 @@
 
  * DCL
    http://sourceforge.net/projects/dclx/
+   Please use the fixed version available in "/Tools/Libs/".
  
  * DFF Library
    http://www.delphiforfun.org/Programs/Library/Default.htm
@@ -79,6 +80,7 @@
 
  * PNG Image
    http://?
+   Please use the fixed version available in "/Tools/Libs/".
  __           _________________________________________________________________
  __| CREDiTS |_________________________________________________________________
   

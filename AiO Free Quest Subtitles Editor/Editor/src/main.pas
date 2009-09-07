@@ -32,6 +32,7 @@ const
 
 type
   TGlobalTranslationModule = class;
+  TMultiTranslationModule = class;
   
   TfrmMain = class(TForm)
     MainMenu: TMainMenu;
@@ -233,8 +234,7 @@ type
     fSubtitleSelected: Integer;
     fCanEnableCharsMod1: Boolean;
     fCanEnableCharsMod2: Boolean;
-    fMultiTranslate: Boolean;
-    fMultiTranslationTextDataList: TMultiTranslationTextData;
+    fMultiTranslation: TMultiTranslationModule;
     procedure SetFileOperationMenusItemEnabledState(const State: Boolean);
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
@@ -244,7 +244,6 @@ type
     procedure RefreshSubtitlesList(UpdateView: Boolean);
     procedure BatchExportSubtitles(const OutputDirectory: TFileName);
     procedure SetEnableCharsMod(const Value: Boolean);
-    procedure SetMultiTranslate(const Value: Boolean);
   protected
     procedure FreeApplication;
     procedure PreviewWindowClosedEvent(Sender: TObject);
@@ -266,8 +265,6 @@ type
     procedure SetStatusReady; // SetStatus('Ready')
     procedure SetModified(const State: Boolean);
 
-    procedure MultiTranslationPrepare;
-    
     // Procedures used in Multi-Translation process
     procedure RetrieveSubtitles(TextDataList: TMultiTranslationTextData;
       ProgressFormMode: TProgressMode);
@@ -295,10 +292,31 @@ type
     // If we must use this feature in the editor or not:
     property EnableCharsMod: Boolean read fEnableCharsMod write SetEnableCharsMod;
 
-    property MultiTranslate: Boolean read fMultiTranslate write SetMultiTranslate;
-    property MultiTranslationTextDataList: TMultiTranslationTextData
-      read fMultiTranslationTextDataList write fMultiTranslationTextDataList;
+    property MultiTranslation: TMultiTranslationModule read fMultiTranslation
+      write fMultiTranslation;
 //    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
+  end;
+
+  TMultiTranslationModule = class(TObject)
+  private
+    fActive: Boolean;
+    fActiveSavedState: Boolean;
+    fTextDataList: TMultiTranslationTextData;
+    fDisabled: Boolean;
+    procedure SetActive(const Value: Boolean);
+    procedure SetDisabled(const Value: Boolean);
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure Apply;
+    procedure Clear;
+    procedure Prepare;
+
+    property Active: Boolean read fActive write SetActive;
+    property Disabled: Boolean read fDisabled write SetDisabled;
+    property TextDataList: TMultiTranslationTextData
+      read fTextDataList write fTextDataList;
   end;
 
   // This class implements the Global-Translation view.
@@ -463,6 +481,18 @@ var
   CanDo: Integer;
 
 begin
+  if MultiTranslation.Active then begin
+    CanDo := MsgBox(
+      'You are currently using the Multi-Translation function. '
+      + 'It can be used with the Global-Translation function. Are you sure to continue? '
+      + 'If you hit ''OK'', the Multi-Translation function will be DISABLED and all not saved '
+      + 'datas will be LOST!',
+      'Multi-Translation / Global-Translation uncompatiblity',
+      MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2);
+    if CanDo = IDCANCEL then Exit;
+    MultiTranslation.Disabled := True;
+  end;
+
   CanDo := MsgBox(
     'This function will build the Global-Translation list from the actual loaded files. '
     + 'If you have many files, this can takes some minutes. '
@@ -500,6 +530,9 @@ begin
 
   if CanDo = IDNO then Exit;
   GlobalTranslation.Reset;
+
+  // Re-enable Multi-Translation if needeed
+  MultiTranslation.Disabled := False;
 end;
 
 procedure TfrmMain.bMTCollapseAllClick(Sender: TObject);
@@ -725,7 +758,8 @@ begin
   // Create the control object for the GlobalTranslation module
   // This module is here to implements the "Global" tab.
   GlobalTranslation := TGlobalTranslationModule.Create;
-  MultiTranslationTextDataList := TMultiTranslationTextData.Create;
+
+  MultiTranslation := TMultiTranslationModule.Create;
 
   // Create the Subtitles Previewer
   Previewer := TSubtitlesPreviewWindow.Create;
@@ -817,7 +851,7 @@ begin
   GlobalTranslation.Free;
 
   // Destroying Multi-Translation data list
-  MultiTranslationTextDataList.Free;
+  MultiTranslation.Free;
 
   SCNFEditor.Free;
 //  WorkFilesList.Free;
@@ -1159,7 +1193,7 @@ end;
 
 procedure TfrmMain.miMultiTranslateClick(Sender: TObject);
 begin
-  MultiTranslate := not MultiTranslate;
+  MultiTranslation.Active := not MultiTranslation.Active;
 end;
 
 procedure TfrmMain.miSubsPreviewClick(Sender: TObject);
@@ -1230,16 +1264,6 @@ begin
   // Update the Previewer
   if SubsViewerVisible then
     Previewer.Update(mSubText.Text);
-end;
-
-procedure TfrmMain.MultiTranslationPrepare;
-begin
-  // afficher un warning ?
-
-  // Building the Multi-Translation list
-  MultiTranslationTextDataList.Clear;
-  if lbFilesList.Items.Count > 0 then
-    RetrieveSubtitles(MultiTranslationTextDataList, pmMultiScan);
 end;
 
 procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
@@ -1348,7 +1372,7 @@ begin
   Clear;
   fFileListSelectedIndex := -1;
   lbFilesList.Clear;
-  MultiTranslationTextDataList.Clear;
+  MultiTranslation.Clear;
   miClearFilesList.Enabled := False;
   miClearFilesList2.Enabled := False;
   miBatchImportSubs.Enabled := False;
@@ -1699,17 +1723,6 @@ begin
     sb.Panels[1].Text := 'Modified'
   else
     sb.Panels[1].Text := '';
-end;
-
-procedure TfrmMain.SetMultiTranslate(const Value: Boolean);
-begin
-  fMultiTranslate := Value;
-  miMultiTranslate.Checked := fMultiTranslate;
-
-  if fMultiTranslate then
-    MultiTranslationPrepare
-  else
-    MultiTranslationTextDataList.Clear; // clear all datas
 end;
 
 procedure TfrmMain.SetStatus(const Text: string);
@@ -2107,6 +2120,65 @@ begin
       TmpCharsList.Free;
     end;
   end;
+end;
+
+//------------------------------------------------------------------------------
+// TMultiTranslationModule
+//------------------------------------------------------------------------------
+
+procedure TMultiTranslationModule.Apply;
+begin
+  
+end;
+
+procedure TMultiTranslationModule.Clear;
+begin
+  TextDataList.Clear;
+end;
+
+constructor TMultiTranslationModule.Create;
+begin
+  TextDataList := TMultiTranslationTextData.Create;
+end;
+
+destructor TMultiTranslationModule.Destroy;
+begin
+  TextDataList.Free;
+  inherited;
+end;
+
+procedure TMultiTranslationModule.Prepare;
+begin
+  // afficher un warning ?
+
+  // Building the Multi-Translation list
+  Clear;
+  if frmMain.lbFilesList.Items.Count > 0 then
+    frmMain.RetrieveSubtitles(TextDataList, pmMultiScan);
+end;
+
+procedure TMultiTranslationModule.SetActive(const Value: Boolean);
+begin
+  fActive := Value;
+  frmMain.miMultiTranslate.Checked := fActive;
+
+  if fActive then
+    Prepare
+  else
+    Clear; // clear all datas
+end;
+
+procedure TMultiTranslationModule.SetDisabled(const Value: Boolean);
+begin
+  fDisabled := Value;
+  
+  if Disabled then begin
+    fActiveSavedState := fActive;
+    frmMain.miMultiTranslate.Checked := False;
+  end else
+    frmMain.MultiTranslation.Active := fActiveSavedState;
+    
+  frmMain.miMultiTranslate.Enabled := not Disabled;
 end;
 
 end.

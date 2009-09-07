@@ -89,13 +89,13 @@ begin
   frmMain.AddDebug('Selected directory: "' + frmMain.SelectedDirectory + '"');
 
   // Multi-Translate if needed
-  if frmMain.MultiTranslate then begin
+  if frmMain.MultiTranslation.Active then begin
 
     if not Aborted then // if aborted when scanning files
-      frmMain.MultiTranslationPrepare
+      frmMain.MultiTranslation.Prepare
     else begin
       // We don't have the time to update the Multi-Translation list, so we must clear it
-      frmMain.MultiTranslate := False;
+      frmMain.MultiTranslation.Active := False;
       frmMain.AddDebug('You have cancelled the file scan process. The Multi-Translation retriever has been cancelled too.');
       Close;      
     end;
@@ -178,7 +178,7 @@ begin
   case fProgressMode of
     pmSCNFScanner:
                     begin
-                      frmMain.SetStatus('Scanning directory ... Please wait.');
+                      frmMain.SetStatus('Scanning directory... Please wait.');
                       Self.Caption := 'Scanning directory...';
                       fCurrentThread := SCNFScanner;
                       fCurrentThread.OnTerminate := DirectoryScanningEndEvent;
@@ -194,8 +194,8 @@ begin
 
     pmMultiScan:
                     begin
-                      frmMain.SetStatus('Retrieving subtitles from files list... Please wait.');
-                      Self.Caption := 'Retrieving subtitles...';
+                      frmMain.SetStatus('Preparing Multi-Translation... Please wait.');
+                      Self.Caption := 'Preparing Multi-Translation...';
                       fCurrentThread := MultiTranslationSubsRetriever;
                       fCurrentThread.OnTerminate := SubsRetrieverMultiTranslationEndEvent;
                     end;
@@ -289,12 +289,12 @@ begin
   frmMain.SetStatusReady;
 
   if not Aborted then
-    frmMain.AddDebug('Files list scanned successfully. '
-      + IntToStr(frmMain.MultiTranslationTextDataList.Subtitles.Count)
-      + ' subtitle(s) retrieved. The Multi-Translation function is now ready.')
+    frmMain.AddDebug('The Multi-Translation function is now ready. '
+      + IntToStr(frmMain.MultiTranslation.TextDataList.Subtitles.Count)
+      + ' subtitle(s) retrieved.')
   else begin
-    frmMain.AddDebug('Files list scanning aborted. The Multi-Translation function will not be available if you abort the process. It has been disabled.');
-    frmMain.MultiTranslate := False;
+    frmMain.AddDebug('The Multi-Translation function will not be available if you abort the process. It has been disabled.');
+    frmMain.MultiTranslation.Active := False;
   end;
 end;
 

@@ -121,7 +121,7 @@ end;
 
 constructor TMultiTranslationTextData.Create;
 begin
-  fHashMap := TStrIntfHashMap.Create(16);
+  fHashMap := TStrIntfHashMap.Create;
   fSubtitles := TStringList.Create;
 end;
 

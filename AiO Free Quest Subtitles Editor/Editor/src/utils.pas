@@ -10,6 +10,7 @@ uses
 
 procedure SaveConfig;
 function LoadConfig: Boolean;
+
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
@@ -94,6 +95,7 @@ begin
     AddXMLNode(XMLDoc, 'directory', frmMain.SelectedDirectory);
     AddXMLNode(XMLDoc, 'decodesubs', frmMain.EnableCharsMod);
     AddXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);
+    AddXMLNode(XMLDoc, 'multitranslate', frmMain.MultiTranslation.Active);
 
     XMLDoc.SaveToFile(ConfigFileName);
   finally
@@ -149,6 +151,13 @@ begin
       if Assigned(Node) then
         if not VarIsNull(Node.NodeValue) then
           frmMain.SelectedDirectory := Node.NodeValue;
+    except end;
+
+     try
+      Node := XMLDoc.DocumentElement.ChildNodes.FindNode('multitranslate');
+      if Assigned(Node) then
+        if not VarIsNull(Node.NodeValue) then
+          frmMain.MultiTranslation.Active := Node.NodeValue;
     except end;
 
     Result := True;
