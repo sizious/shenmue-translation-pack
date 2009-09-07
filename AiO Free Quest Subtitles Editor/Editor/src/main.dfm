@@ -87,7 +87,7 @@ object frmMain: TfrmMain
     Top = 3
     Width = 415
     Height = 367
-    ActivePage = tsEditor
+    ActivePage = tsMultiTrad
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
@@ -397,10 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)

@@ -600,6 +600,7 @@ begin
   WriteLn('HASH: ',
     MultiTranslation.TextDataList.UpdateSubtitleKey('=@Oui.', '!!! FUCKED !!!')
   );
+//  frmMain.GlobalTranslation.TextDataList.Subtitles[1].Count;
 end;
 
 procedure TfrmMain.miClearDebugLogClick(Sender: TObject);
@@ -1993,7 +1994,7 @@ procedure TGlobalTranslationModule.UpdateSubtitle(
   TranslatedTextNode: TTreeNode;
   NewSubtitle: string);
 var
-  SubInfoList: ISubtitleInfoList;
+  SubInfoList: TSubtitlesInfoList;
   GlobalTranslationSCNFEditor: TSCNFEditor;
   TmpCharsList: TSubsCharsList;
   i, SubIndex: Integer;
@@ -2009,7 +2010,7 @@ begin
     if DataSubtitleIndex = -1 then Exit;
     try
       // This's the Hash Key of the Target Subtitle
-      TargetHashKeySub := TextDataList.Subtitles[DataSubtitleIndex];
+      TargetHashKeySub := TextDataList.Subtitles[DataSubtitleIndex].SubtitleKey;
     except
       Exit;
     end;
@@ -2031,8 +2032,9 @@ begin
       TmpCharsList.Active := frmMain.EnableCharsMod;
 
       // Retrieve the list of subtitles code to update
-      with TextDataList do
-        SubInfoList := GetSubtitleInfo(TargetHashKeySub);
+      {with TextDataList do
+        SubInfoList := GetSubtitleInfo(TargetHashKeySub);}
+      SubInfoList := TextDataList.FindBySubtitleKey(TargetHashKeySub);
 
       // Getting Old and New subtitle...
       NewSubtitle := TmpCharsList.EncodeSubtitle(NewSubtitle);
@@ -2048,7 +2050,7 @@ begin
       end;
 
       // *************************************************************************
-      // MULTI-TRANSLATING NOW !!
+      // GLOBAL-TRANSLATING NOW !!
       // *************************************************************************
 
       // Updating the TextData item
@@ -2059,7 +2061,7 @@ begin
       GlobalTranslationSCNFEditor := TSCNFEditor.Create;
       try
   //      Screen.Cursor := crAppStart;
-        SetStatus('Multi-translating...');
+        SetStatus('Global-translating...');
         Busy := True;
 
         // Updating the Global-Translation node to show working icon
@@ -2070,7 +2072,7 @@ begin
         end;
 
 {$IFDEF DEBUG}
-        WriteLn(#13#10, 'Multi-translating ... Hash Key = "', TargetHashKeySub, '"');
+        WriteLn(#13#10, 'Global-translating ... Hash Key = "', TargetHashKeySub, '"');
 {$ENDIF}
 
         // Updating all subtitles by SubCode
@@ -2180,7 +2182,8 @@ procedure TMultiTranslationModule.SetActive(const Value: Boolean);
 begin
   fActive := Value;
   frmMain.miMultiTranslate.Checked := fActive;
-
+  fActiveSavedState := fActive;
+  
   if fActive then
     Prepare
   else
@@ -2191,10 +2194,9 @@ procedure TMultiTranslationModule.SetDisabled(const Value: Boolean);
 begin
   fDisabled := Value;
   
-  if Disabled then begin
-    fActiveSavedState := fActive;
-    frmMain.miMultiTranslate.Checked := False;
-  end else
+  if Disabled then
+    frmMain.miMultiTranslate.Checked := False
+  else
     frmMain.MultiTranslation.Active := fActiveSavedState;
     
   frmMain.miMultiTranslate.Enabled := not Disabled;
