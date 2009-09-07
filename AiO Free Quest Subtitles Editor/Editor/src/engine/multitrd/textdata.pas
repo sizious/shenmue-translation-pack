@@ -31,6 +31,7 @@ uses
 type
   // This object stores the FileName and subtitle Code where the subtitle text
   // aka the "key" of the hashmap was found.
+  // This object is a TSubtitleInfoList entry item.
   TTextDataItem = class(TObject)
   private
     fCode: string;
@@ -91,10 +92,11 @@ type
     destructor Destroy; override;
     procedure Clear;
     function GetSubtitleInfo(const Text: string): ISubtitleInfoList;
-{    function ModifySubtitle(SubIndexToModify: Integer;
-      const NewSubtitle: string): Boolean;}
+{    function ModifySubtitle(SubIndexToModify: Integer; const NewSubtitle: string): Boolean;}
     function IsSubtitleExists(const Text: string): Boolean;
     function PutSubtitleInfo(const Text: string; const Code: string; const FileName: TFileName; const GameVersion: TGameVersion): Boolean;
+    function UpdateSubtitleKey(const Text: string; NewText: string): Boolean;
+    
     property Subtitles: TStringList read GetSubtitles;
   end;
 
@@ -204,6 +206,36 @@ begin
     SubtitleInfoList.Add(Code, FileName, GameVersion);
 {$IFDEF DEBUG} WriteLn('UPDATING: "', Text, '", Code: "', Code, '", FileName: "', ExtractFileName(FileName), '"'); {$ENDIF}
   end;
+end;
+
+function TMultiTranslationTextData.UpdateSubtitleKey(const Text: string;
+  NewText: string): Boolean;
+var
+  SubtitleInfoList: ISubtitleInfoList;
+  i: Integer;
+
+begin
+  Result := False;
+  if not fHashMap.ContainsKey(Text) then Exit;
+
+  SubtitleInfoList := ISubtitleInfoList(fHashMap.GetValue(Text));
+  {with SubtitleInfoList do begin
+    for i := 0 to Count - 1 do
+      PutSubtitleInfo(
+        NewText,
+        Items[i].Code,
+        Items[i].FileName,
+        Items[i].GameVersion
+      );
+  end;}
+  fHashMap.PutValue(NewText, SubtitleInfoList);
+  GetSubtitleInfo(NewText).NewSubtitle := NewText;
+
+  fHashMap.Remove(Text);
+
+  i := fSubtitles.IndexOf(Text);
+  fSubtitles[i] := NewText;
+  Result := True;
 end;
 
 { TTextDataItem }
