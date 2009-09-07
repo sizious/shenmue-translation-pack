@@ -3,16 +3,17 @@ unit vistaui;
 interface
 
 uses
-  Windows, Forms;
+  Windows; //, Forms;
 
 function IsWindowsVista: Boolean;  
-procedure SetVistaFonts(const AForm: TCustomForm);
+// procedure SetVistaFonts(const AForm: TCustomForm);
   
 implementation
 
 uses 
 	SysUtils;
 
+(*
 const
   VistaFont = 'Segoe UI';
   XPFont = 'Tahoma';
@@ -34,6 +35,7 @@ begin
       AForm.Font.Size := Size;
   end;
 end;
+*)
 
 function IsWindowsVista: Boolean;   
 var
