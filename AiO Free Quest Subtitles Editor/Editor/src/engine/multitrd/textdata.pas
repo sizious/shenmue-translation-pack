@@ -1,4 +1,4 @@
-//    This file is part of Shenmue II Free Quest Subtitles Editor.
+//    This file is part of Shenmue AiO Free Quest Subtitles Editor.
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Shenmue AiO Free Quest Subtitles Editor.  If not, see <http://www.gnu.org/licenses/>.
@@ -23,10 +23,16 @@
 
 unit textdata;
 
+{$DEFINE USE_DCL}
+
 interface
 
 uses
-  Windows, SysUtils, Classes, DCL_Intf, HashMap, ScnfUtil;
+  Windows, SysUtils, Classes, ScnfUtil, NPCInfo
+  {$IFDEF USE_DCL}
+  , DCL_Intf, HashMap
+  {$ENDIF}
+  ;
 
 type
   // This object stores the FileName and subtitle Code where the subtitle text
@@ -37,279 +43,234 @@ type
     fCode: string;
     fFileName: TFileName;
     fGameVersion: TGameVersion;
-  protected
-    function GetCode: string;
-    function GetFileName: TFileName;
+    fGender: TGenderType;
   public
-    property Code: string read GetCode;
-    property FileName: TFileName read GetFileName;
-    property GameVersion: TGameVersion read fGameVersion;
+    property Code: string read fCode write fCode;
+    property FileName: TFileName read fFileName write fFileName;
+    property GameVersion: TGameVersion read fGameVersion write fGameVersion;
+    property Gender: TGenderType read fGender write fGender;
   end;
 
-  ISubtitleInfoList = interface
-  ['{75C8579B-4D5D-A9E2-8418-AEA75456791D}']
-    procedure Add(Item: TTextDataItem); overload;
-    procedure Add(const Code: string; const FileName: TFileName;
-      const GameVersion: TGameVersion); overload;
-    function Count: Integer;
-    procedure Clear;
-
-    function GetItem(Index: Integer): TTextDataItem;
-    function GetNewSubtitle: string;
-    procedure SetNewSubtitle(const Value: string);
-
-    property Items[Index: Integer]: TTextDataItem read GetItem;
-    property NewSubtitle: string read GetNewSubtitle write SetNewSubtitle;
-  end;
-
-  TSubtitleInfoList = class(TInterfacedObject, ISubtitleInfoList)
+  { This class is a TTextDataItem container. }
+  TSubtitlesInfoList = class(TObject)
   private
-    fList: TList;
+    fTextDataList: TList;
     fNewSubtitle: string;
+    fSubtitleKey: string;
     procedure Add(Item: TTextDataItem); overload;
-    procedure Add(const Code: string; const FileName: TFileName;
-      const GameVersion: TGameVersion); overload;
     procedure Clear;
-    function GetNewSubtitle: string;
-    procedure SetNewSubtitle(const Value: string);
   protected
-    function GetItem(Index: Integer): TTextDataItem;
+    function GetTextDataItem(Index: Integer): TTextDataItem;
   public
     constructor Create;
     destructor Destroy; override;
+
     function Count: Integer;
-    property Items[Index: Integer]: TTextDataItem read GetItem;
-    property NewSubtitle: string read GetNewSubtitle write SetNewSubtitle;
+
+    property NewSubtitle: string read fNewSubtitle write fNewSubtitle;
+    property SubtitleKey: string read fSubtitleKey;
+    property Items[Index: Integer]: TTextDataItem read GetTextDataItem; default;
   end;
 
-  TMultiTranslationTextData = class
+  { Main Class
+    This class is TSubtitlesInfoList container. }
+  TMultiTranslationTextData = class(TObject)
   private
-    fHashMap: IStrIntfMap;
-    fSubtitles: TStringList;
-    function GetSubtitles: TStringList;
+    fSubtitleInfoList: TList;
+{$IFDEF USE_DCL}
+    fOptimizationHashMap: IStrMap;
+{$ENDIF}
+    function GetItemByInteger(Index: Integer): TSubtitlesInfoList;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Clear;
-    function GetSubtitleInfo(const Text: string): ISubtitleInfoList;
-{    function ModifySubtitle(SubIndexToModify: Integer; const NewSubtitle: string): Boolean;}
-    function IsSubtitleExists(const Text: string): Boolean;
-    function PutSubtitleInfo(const Text: string; const Code: string; const FileName: TFileName; const GameVersion: TGameVersion): Boolean;
-    function UpdateSubtitleKey(const Text: string; NewText: string): Boolean;
+
+    procedure Add(const SubtitleKey: string; SubtitleInfo: TTextDataItem);
     
-    property Subtitles: TStringList read GetSubtitles;
+    procedure Clear;
+    function Count: Integer;
+    function FindBySubtitleKey(SubtitleKey: string): TSubtitlesInfoList;
+    function UpdateSubtitleKey(const Text: string; NewText: string): Boolean;
+
+    property Subtitles[Index: Integer]: TSubtitlesInfoList read GetItemByInteger; default;
   end;
 
 implementation
 
+{$IFDEF USE_DCL}
+
+type
+  TIndexHashItem = class(TObject)
+  private
+    fItemIndex: Integer;
+  public
+    property ItemIndex: Integer read fItemIndex write fItemIndex;
+  end;
+
+{$ENDIF}
+
 { TMultiTranslationTextData }
+
+procedure TMultiTranslationTextData.Add(const SubtitleKey: string;
+  SubtitleInfo: TTextDataItem);
+var
+  Item: TSubtitlesInfoList;
+{$IFDEF USE_DCL}
+  Index: Integer;
+  HashItem: TIndexHashItem;
+{$ENDIF}
+
+begin
+  Item := FindBySubtitleKey(SubtitleKey);
+
+  if not Assigned(Item) then begin
+    // Adding new subtitle
+
+    Item := TSubtitlesInfoList.Create;
+
+    Item.fNewSubtitle := SubtitleKey;
+    Item.fSubtitleKey := SubtitleKey; // Original subtitle in encoded form (Shenmue charset) [not modified]
+    Item.Add(SubtitleInfo);
+
+{$IFDEF USE_DCL}
+
+    Index := fSubtitleInfoList.Add(Item);
+    
+    HashItem := TIndexHashItem.Create;
+    HashItem.ItemIndex := Index;
+    fOptimizationHashMap.PutValue(SubtitleKey, HashItem);
+
+{$ELSE}
+
+    fSubtitleInfoList.Add(Item);
+
+{$ENDIF}
+
+    {$IFDEF DEBUG} WriteLn('CREATING: "', SubtitleKey, '"'); {$ENDIF}
+  end else begin
+    // Updating subtitle
+    
+    Item.Add(SubtitleInfo);
+    {$IFDEF DEBUG} WriteLn('UPDATING: "', SubtitleKey, '"'); {$ENDIF}
+  end;
+end;
 
 procedure TMultiTranslationTextData.Clear;
 var
-  Iterator: IIntfIterator;
+  i: Integer;
 
 begin
-  // Retrieve the iterator to clear all SubtitleInfoList stored in the HashMap
-  Iterator := fHashMap.Values.First;
-  while Iterator.HasNext do
-    ISubtitleInfoList(Iterator.Next).Clear;
-
-  // Cleaning HashMap
-  fHashMap.Clear;
+{$IFDEF USE_DCL}
+  // Cleaning OptimizationHashMap
+  fOptimizationHashMap.Clear;
+{$ENDIF}
 
   // Cleaning subtitles list
-  fSubtitles.Clear;
+  for i := 0 to Count - 1 do
+    TSubtitlesInfoList(fSubtitleInfoList[i]).Free;
+  fSubtitleInfoList.Clear;
 end;
 
 constructor TMultiTranslationTextData.Create;
 begin
-  fHashMap := TStrIntfHashMap.Create;
-  fSubtitles := TStringList.Create;
+{$IFDEF USE_DCL}
+  fOptimizationHashMap := TStrHashMap.Create;
+{$ENDIF}
+  fSubtitleInfoList := TList.Create;
 end;
 
 destructor TMultiTranslationTextData.Destroy;
 begin
   Clear;
-  fSubtitles.Free;
-  inherited;
-end;
-
-function TMultiTranslationTextData.GetSubtitleInfo(const Text: string): ISubtitleInfoList;
-begin
-  Result := ISubtitleInfoList(fHashMap.GetValue(Text));
-end;
-
-function TMultiTranslationTextData.GetSubtitles: TStringList;
-begin
-  Result := fSubtitles;
-end;
-
-function TMultiTranslationTextData.IsSubtitleExists(const Text: string): Boolean;
-begin
-  Result := fHashMap.ContainsKey(Text);
-end;
-
-(*function TMultiTranslationTextData.ModifySubtitle(SubIndexToModify: Integer;
-  const NewSubtitle: string): Boolean;
-var
-  OldSubtitle: string;
-  SubtitleInfoList: ISubtitleInfoList;
-  i: Integer;
-  Item: TTextDataItem;
-
-begin
-  Result := False;
-
-  // Get the old subtitle
-  OldSubtitle := Subtitles[SubIndexToModify];
-  Subtitles[SubIndexToModify] := NewSubtitle;
-  if not IsSubtitleExists(OldSubtitle) then Exit;
-
-  // Updating the hashmap
-  SubtitleInfoList := GetSubtitleInfo(OldSubtitle);
-  for i := 0 to SubtitleInfoList.Count - 1 do begin
-    Item := SubtitleInfoList.Items[i];
-    PutSubtitleInfo(NewSubtitle, Item.Code, Item.FileName);
-  end;
-  SubtitleInfoList.Clear;
-//  TSubtitleInfoList(fHashMap.GetValue(OldSubtitle)).Free;
-
-  // Removing the old subtitle from the hashmap
-  SubtitleInfoList := ISubtitleInfoList(fHashMap.Remove(OldSubtitle));
-  FreeAndNil(SubtitleInfoList);
-end;*)
-
-function TMultiTranslationTextData.PutSubtitleInfo(const Text: string;
-  const Code: string; const FileName: TFileName;
-  const GameVersion: TGameVersion): Boolean;
-var
-  SubtitleInfoList: ISubtitleInfoList;
-//  TextDataItem: TTextDataItem;
+  fSubtitleInfoList.Free;
   
-begin
-  Result := False;
-  if Trim(Text) = '' then Exit;
+  inherited Destroy;
+end;
 
-  if not IsSubtitleExists(Text) then begin
-    // add a new text subtitle inside the hash map and store the filename / sub code
-    SubtitleInfoList := TSubtitleInfoList.Create;
-    SubtitleInfoList.Add(Code, FileName, GameVersion);
-    SubtitleInfoList.NewSubtitle := Text;
-    fHashMap.PutValue(Text, SubtitleInfoList);
-    Result := True;
-    // Adding the subtitle in the list
-    fSubtitles.Add(Text);
-{$IFDEF DEBUG} WriteLn('CREATING: "', Text, '", Code: "', Code, '", FileName: "', ExtractFileName(FileName), '"'); {$ENDIF}
-  end else begin
-    // add a new filename / sub code to an existing subtitle
-    SubtitleInfoList := GetSubtitleInfo(Text);
-    SubtitleInfoList.Add(Code, FileName, GameVersion);
-{$IFDEF DEBUG} WriteLn('UPDATING: "', Text, '", Code: "', Code, '", FileName: "', ExtractFileName(FileName), '"'); {$ENDIF}
-  end;
+function TMultiTranslationTextData.Count: Integer;
+begin
+  Result := fSubtitleInfoList.Count;
+end;
+
+function TMultiTranslationTextData.GetItemByInteger(
+  Index: Integer): TSubtitlesInfoList;
+begin
+  Result := TSubtitlesInfoList(fSubtitleInfoList.Items[Index]);
 end;
 
 function TMultiTranslationTextData.UpdateSubtitleKey(const Text: string;
   NewText: string): Boolean;
+begin
+  raise Exception.Create('TO DO');
+end;
+
+function TMultiTranslationTextData.FindBySubtitleKey(SubtitleKey: string): TSubtitlesInfoList;
 var
-  SubtitleInfoList: ISubtitleInfoList;
-  i: Integer;
-
+  Index: Integer;
+{$IFDEF USE_DCL}
+  Obj: TIndexHashItem;
+{$ENDIF}
+  
 begin
-  Result := False;
-  if not fHashMap.ContainsKey(Text) then Exit;
+  Result := nil;
 
-  SubtitleInfoList := ISubtitleInfoList(fHashMap.GetValue(Text));
-  {with SubtitleInfoList do begin
-    for i := 0 to Count - 1 do
-      PutSubtitleInfo(
-        NewText,
-        Items[i].Code,
-        Items[i].FileName,
-        Items[i].GameVersion
-      );
-  end;}
-  fHashMap.PutValue(NewText, SubtitleInfoList);
-  GetSubtitleInfo(NewText).NewSubtitle := NewText;
+{$IFDEF USE_DCL}
 
-  fHashMap.Remove(Text);
+  Obj := TIndexHashItem(fOptimizationHashMap.GetValue(SubtitleKey));
+  if Assigned(Obj) then begin
+    Index := Obj.ItemIndex;
+    Result := Subtitles[Index];
+  end;
 
-  i := fSubtitles.IndexOf(Text);
-  fSubtitles[i] := NewText;
-  Result := True;
-end;
+{$ELSE}
 
-{ TTextDataItem }
+  for Index := 0 to Count - 1 do
+    if Subtitles[Index].SubtitleKey = SubtitleKey then
+    begin
+      Result := Subtitles[Index];
+      Break;
+    end;
 
-function TTextDataItem.GetCode: string;
-begin
-  Result := Self.fCode;
-end;
-
-function TTextDataItem.GetFileName: TFileName;
-begin
-  Result := Self.fFileName;
+{$ENDIF}
 end;
 
 { TSubtitleInfoList }
 
-procedure TSubtitleInfoList.Add(Item: TTextDataItem);
+procedure TSubtitlesInfoList.Add(Item: TTextDataItem);
 begin
-  fList.Add(Item);
+  fTextDataList.Add(Item);
 end;
 
-procedure TSubtitleInfoList.Add(const Code: string; const FileName: TFileName;
-  const GameVersion: TGameVersion);
-var
-  TextDataItem: TTextDataItem;
-
-begin
-  TextDataItem := TTextDataItem.Create;
-  TextDataItem.fCode := Code;
-  TextDataItem.fFileName := FileName;
-  TextDataItem.fGameVersion := GameVersion;
-  Add(TextDataItem);
-end;
-
-procedure TSubtitleInfoList.Clear;
+procedure TSubtitlesInfoList.Clear;
 var
   i: Integer;
 
 begin
-  for i := 0 to fList.Count - 1 do
-    TTextDataItem(fList[i]).Free;
-  fList.Clear;
+  for i := 0 to fTextDataList.Count - 1 do
+    TTextDataItem(fTextDataList[i]).Free;
+  fTextDataList.Clear;
 end;
 
-function TSubtitleInfoList.Count: Integer;
+function TSubtitlesInfoList.Count: Integer;
 begin
-  Result := fList.Count;
+  Result := fTextDataList.Count;
 end;
 
-constructor TSubtitleInfoList.Create;
+constructor TSubtitlesInfoList.Create;
 begin
-  fList := TList.Create;
+  fTextDataList := TList.Create;
 end;
 
-destructor TSubtitleInfoList.Destroy;
+destructor TSubtitlesInfoList.Destroy;
 begin
-  fList.Clear;
-  fList.Free;
+  Clear;
+  fTextDataList.Free;
   inherited;
 end;
 
-function TSubtitleInfoList.GetItem(Index: Integer): TTextDataItem;
+function TSubtitlesInfoList.GetTextDataItem(Index: Integer): TTextDataItem;
 begin
-  Result := fList[Index];
-end;
-
-function TSubtitleInfoList.GetNewSubtitle: string;
-begin
-  Result := fNewSubtitle;
-end;
-
-procedure TSubtitleInfoList.SetNewSubtitle(const Value: string);
-begin
-  fNewSubtitle := Value;
+  Result := fTextDataList[Index];
 end;
 
 end.

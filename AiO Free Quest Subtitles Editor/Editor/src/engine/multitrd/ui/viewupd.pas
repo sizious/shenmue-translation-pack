@@ -71,9 +71,9 @@ begin
     nvoCollapseAll:
       UpdateProgressOperation('Collapsing all nodes...');
     nvoDecodeText:
-      UpdateProgressOperation('Decoding subtitles...');
+      UpdateProgressOperation('Decoding subtitles from Shenmue to Windows charset...');
     nvoEncodeText:
-      UpdateProgressOperation('Encoding subtitles...');
+      UpdateProgressOperation('Encoding subtitles from Windows to Shenmue charset...');
   end;
 
   // Expanding or Collapsing nodes...
@@ -177,7 +177,7 @@ end;
 procedure TMTViewUpdater.SyncUpdateListView;
 var
   Node: TTreeNode;
-  SubsList: ISubtitleInfoList;
+//  SubsList: TSubtitlesInfoList;
   NodeType: TMultiTranslationNodeType;
 
 begin
@@ -192,15 +192,16 @@ begin
     // The node is the Subtitle Key
     if NodeType.NodeViewType = nvtSubtitleKey then begin
 
-      with frmMain.GlobalTranslation.TextDataList do
-        SubsList := GetSubtitleInfo(Subtitles[Node.Index]);
+      {with frmMain.GlobalTranslation.TextDataList do
+        SubsList := GetSubtitleInfo(Subtitles[Node.Index]);}
+//      SubsList := frmMain.GlobalTranslation.TextDataList.FindBySubtitleKey(Node.Text);
 
-      if Assigned(SubsList) then begin
+//      if Assigned(SubsList) then begin
         case Operation of
           nvoDecodeText: Node.Text := CharsList.DecodeSubtitle(Node.Text);
           nvoEncodeText: Node.Text := CharsList.EncodeSubtitle(Node.Text);
         end;
-      end;
+//      end;
 
     end else
       // The node is the Translated Text Node

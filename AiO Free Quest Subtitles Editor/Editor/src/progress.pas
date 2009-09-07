@@ -146,6 +146,7 @@ procedure TfrmProgress.FormCreate(Sender: TObject);
 begin
   Reset;
   DoubleBuffered := True;
+  lProgBar.DoubleBuffered := True;
 end;
 
 procedure TfrmProgress.FormKeyPress(Sender: TObject; var Key: Char);
@@ -212,8 +213,8 @@ begin
 
     pmMultiViewUpdater:
                       begin
-                        frmMain.SetStatus('Updating Multi-translation view...');
-                        Caption := 'Updating Multi-translation view...';
+                        frmMain.SetStatus('Updating Global-translation view...');
+                        Caption := 'Updating Global-translation view...';
                         fCurrentThread := MultiTranslationViewUpdater;
                         fCurrentThread.OnTerminate := EndEventMultiTranslationViewUpdater;
                       end;
@@ -266,7 +267,7 @@ begin
 
   if not Aborted then
     frmMain.AddDebug('Files list scanned successfully. '
-      + IntToStr(frmMain.GlobalTranslation.TextDataList.Subtitles.Count)
+      + IntToStr(frmMain.GlobalTranslation.TextDataList.Count)
       + ' subtitle(s) retrieved.')
   else
     frmMain.AddDebug('Files list scanning aborted.'
@@ -290,7 +291,7 @@ begin
 
   if not Aborted then
     frmMain.AddDebug('The Multi-Translation function is now ready. '
-      + IntToStr(frmMain.MultiTranslation.TextDataList.Subtitles.Count)
+      + IntToStr(frmMain.MultiTranslation.TextDataList.Count)
       + ' subtitle(s) retrieved.')
   else begin
     frmMain.AddDebug('The Multi-Translation function will not be available if you abort the process. It has been disabled.');
