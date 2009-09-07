@@ -87,7 +87,7 @@ object frmMain: TfrmMain
     Top = 3
     Width = 415
     Height = 367
-    ActivePage = tsMultiTrad
+    ActivePage = tsEditor
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
@@ -397,6 +397,10 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         407
         339)
@@ -812,6 +816,10 @@ object frmMain: TfrmMain
         ShortCut = 123
         OnClick = miAboutClick
       end
+    end
+    object DEBUG1: TMenuItem
+      Caption = 'DEBUG'
+      OnClick = DEBUG1Click
     end
   end
   object odMain: TOpenDialog

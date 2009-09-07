@@ -160,6 +160,7 @@ type
     miClearFilesList2: TMenuItem;
     miCheckForUpdate: TMenuItem;
     miMultiTranslate: TMenuItem;
+    DEBUG1: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -218,6 +219,7 @@ type
     procedure ApplicationEventsHint(Sender: TObject);
     procedure miCheckForUpdateClick(Sender: TObject);
     procedure miMultiTranslateClick(Sender: TObject);
+    procedure DEBUG1Click(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -235,6 +237,7 @@ type
     fCanEnableCharsMod1: Boolean;
     fCanEnableCharsMod2: Boolean;
     fMultiTranslation: TMultiTranslationModule;
+    fWrapStr: string;
     procedure SetFileOperationMenusItemEnabledState(const State: Boolean);
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
@@ -295,6 +298,8 @@ type
     property MultiTranslation: TMultiTranslationModule read fMultiTranslation
       write fMultiTranslation;
 //    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
+
+    property WrapStr: string read fWrapStr write fWrapStr;
   end;
 
   TMultiTranslationModule = class(TObject)
@@ -483,24 +488,24 @@ var
 begin
   if MultiTranslation.Active then begin
     CanDo := MsgBox(
-      'You are currently using the Multi-Translation function. '
-      + 'It can be used with the Global-Translation function. Are you sure to continue? '
-      + 'If you hit ''OK'', the Multi-Translation function will be DISABLED and all not saved '
-      + 'datas will be LOST!',
+      'You are currently using the Multi-Translation function and it can be used with' + WrapStr
+      + 'the Global-Translation function. Are you sure to continue?' + WrapStr +
+      'If you hit ''OK'', the Multi-Translation function will be DISABLED and all not saved ' + WrapStr +
+      'datas will be LOST!',
       'Multi-Translation / Global-Translation uncompatiblity',
       MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2);
     if CanDo = IDCANCEL then Exit;
-    MultiTranslation.Disabled := True;
   end;
 
   CanDo := MsgBox(
-    'This function will build the Global-Translation list from the actual loaded files. '
-    + 'If you have many files, this can takes some minutes. '
-    + 'Continue ?',
+    'This function will build the Global-Translation list from the actual loaded files. ' + WrapStr +
+    'If you have many files, this can takes some minutes. ' + WrapStr +
+    'Continue ?',
     'Global-Translation retriever question',
     MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
   if CanDo = IDNO then Exit;
 
+  MultiTranslation.Disabled := True;
   GlobalTranslation.Reset;
   RetrieveSubtitles(GlobalTranslation.TextDataList, pmGlobalScan);
 end;
@@ -518,13 +523,13 @@ begin
   if GlobalTranslation.SubtitleModified then
     CanDo := MsgBox(
       'This operation will cancel the current Global-Translation and clear all '
-      + 'datas (but not undone all the work already made). '
+      + 'datas (but not undone all the work already made). ' + WrapStr
       + 'Continue ?', 'Warning: Global-Translation current work not saved',
       MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2)
   else
     CanDo := MsgBox(
       'This operation will clear all '
-      + 'datas (but not undone all Global-Translation already made). '
+      + 'datas (but not undone all Global-Translation already made). ' + WrapStr
       + 'Continue ?', 'Reset Global-Translation ?',
       MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
 
@@ -590,6 +595,13 @@ begin
   iFace.Picture := nil;
 end;
 
+procedure TfrmMain.DEBUG1Click(Sender: TObject);
+begin
+  WriteLn('HASH: ',
+    MultiTranslation.TextDataList.UpdateSubtitleKey('=@Oui.', '!!! FUCKED !!!')
+  );
+end;
+
 procedure TfrmMain.miClearDebugLogClick(Sender: TObject);
 var
   CanDo: Integer;
@@ -604,7 +616,8 @@ procedure TfrmMain.miClearFilesListClick(Sender: TObject);
 var
   CanDo: Integer;
 begin
-  CanDo := MsgBox('Are you sure to clear all the files list? Changes not saved will be LOST!', 'Warning',
+  CanDo := MsgBox('Are you sure to clear all the files list?'  + WrapStr
+  + 'Changes not saved will be LOST!', 'Warning',
     + MB_ICONWARNING + MB_DEFBUTTON2 + MB_YESNO);
   if CanDo = IDNO then Exit;
   ResetApplication;
@@ -714,8 +727,8 @@ begin
     // If Global-Translation is used...
     if GlobalTranslation.InUse then begin
       CanDo := MsgBox('Since you are using the Global-Translation module, the current '
-      + 'file modifications were not saved. Do you want to save modifications to '
-      + 'another file ?', 
+      + 'file modifications were not saved.' + WrapStr +
+      'Do you want to save modifications to another file ?',
       'Save changes?', MB_ICONWARNING + MB_YESNOCANCEL + MB_DEFBUTTON3);
       case CanDo of
         IDCANCEL: begin
@@ -737,7 +750,8 @@ begin
 
   // Confirmation to exit if Global-Translation module in use.
   if GlobalTranslation.InUse then begin
-    CanDo := MsgBox('You are currently using the Global-Translation module. Are you sure to exit ?',
+    CanDo := MsgBox('You are currently using the Global-Translation module.' + WrapStr
+    + 'Are you sure to exit ?',
       'Please confirm!', MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
     if CanDo = IDNO then begin
       Action := caNone;
@@ -751,6 +765,10 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  // WrapStr for Windows XP
+  WrapStr := sLineBreak;
+  if IsWindowsVista then WrapStr := ' ';
+
   Caption := Application.Title + ' - v' + APP_VERSION + ' - by [big_fury]SiZiOUS';
 
 //  WorkFilesList := TFilesList.Create;
@@ -1047,7 +1065,7 @@ begin
   FName := ExtractFileName(SCNFEditor.SourceFileName);
   CanDo := MsgBox(
     'Reload the "' + FName + '" file ? '
-    + 'Changes not saved will be LOST!',
+    + WrapStr + 'Changes not saved will be LOST!',
     'Warning',
     MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
   if (CanDo = IDNO) then Exit;
@@ -1943,7 +1961,8 @@ begin
   with frmMain do begin
     Result := False;
     CanDo := MsgBox('Sorry, since you are using the Global-Translation module, the save '
-      + 'feature was disabled. You MUST save your modifications to another file. '
+      + 'feature was disabled.' + WrapStr
+      + 'You MUST save your modifications to another file. ' + WrapStr
       + 'Do it now ? If you don''t, modifications will be LOST!',
       'File was not saved! Save as another file ?', MB_ICONWARNING + MB_OKCANCEL);
     if CanDo = IDCANCEL then
