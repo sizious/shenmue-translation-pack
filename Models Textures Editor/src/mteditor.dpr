@@ -13,9 +13,9 @@ uses
   progress in 'intf\progress.pas' {frmProgress},
   fileslst in 'engine\fileslst.pas',
   seldir in 'seldir.pas' {frmSelectDir},
-  pvr2png in 'engine\pvr2png.pas',
   texview in 'texview.pas' {frmTexPreview},
-  common in 'engine\common.pas';
+  common in 'engine\common.pas',
+  pvr2png in '..\..\Common\pvr2png.pas';
 
 {$R *.res}
 

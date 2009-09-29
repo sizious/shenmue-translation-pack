@@ -60,6 +60,12 @@ type
     Export1: TMenuItem;
     N6: TMenuItem;
     Exportall1: TMenuItem;
+    exturespreviewontop1: TMenuItem;
+    pmTextures: TPopupMenu;
+    Import2: TMenuItem;
+    Export2: TMenuItem;
+    N7: TMenuItem;
+    Exportall2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Open1Click(Sender: TObject);
