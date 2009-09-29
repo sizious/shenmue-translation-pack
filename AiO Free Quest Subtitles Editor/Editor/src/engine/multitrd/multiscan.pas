@@ -14,6 +14,7 @@ uses
 type
   TMultiTranslationSubtitlesRetriever = class(TThread)
   private
+    fRefreshRequested: Boolean;
     fEntry: TTextDataItem;
     fFillGTView: Boolean;
 //    fBufNode: TTreeNode;
@@ -57,10 +58,8 @@ type
     property WorkTextDataList: TMultiTranslationTextData read
       fMultiTranslationTextData write fMultiTranslationTextData;
   public
-    constructor Create(const BaseDir, FileList: string;
-      DecodeSubtitles: Boolean;
-      var ResultTextDataList: TMultiTranslationTextData;
-      UseGlobalTranslationView: Boolean);
+    constructor Create(const BaseDir: string; const FileList: string; DecodeSubtitles: Boolean; var ResultTextDataList: TMultiTranslationTextData; UseGlobalTranslationView, RefreshRequest: Boolean);
+    property RefreshRequested: Boolean read fRefreshRequested;
   end;
 
 // -----------------------------------------------------------------------------
@@ -90,17 +89,18 @@ begin
   Synchronize(WorkTextDataList.Clear);
 end;
 
-constructor TMultiTranslationSubtitlesRetriever.Create(const BaseDir,
-  FileList: string; DecodeSubtitles: Boolean;
-  var ResultTextDataList: TMultiTranslationTextData;
-  UseGlobalTranslationView: Boolean);
+constructor TMultiTranslationSubtitlesRetriever.Create(const BaseDir: string;
+  const FileList: string; DecodeSubtitles: Boolean;
+  var ResultTextDataList: TMultiTranslationTextData; UseGlobalTranslationView,
+  RefreshRequest: Boolean);
 begin
   FreeOnTerminate := True;
   fBaseDir := BaseDir;
   fFileListParam := FileList;
   fDecodeSubtitles := DecodeSubtitles;
   fFillGTView := UseGlobalTranslationView;
-
+  fRefreshRequested := RefreshRequest;
+  
   if not Assigned(ResultTextDataList) then
     raise Exception.Create('Error: ResultTextDataList not assigned!');
 
@@ -139,6 +139,7 @@ begin
   _tmp_scnf_edit := TSCNFEditor.Create;
   try
     _tmp_scnf_edit.CharsList.Active := False;
+    _tmp_scnf_edit.NPCInfos.LoadFromFile(GetNPCInfoFile);
     
     // scanning all found files
     InitializeProgressWindow(fFilesList.Count);

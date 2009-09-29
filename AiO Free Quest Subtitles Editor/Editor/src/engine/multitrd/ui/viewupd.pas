@@ -44,7 +44,7 @@ procedure GlobalTranslationUpdateView(const Operation: TNodesViewOperation);
 begin
   MultiTranslationViewUpdater := TMTViewUpdater.Create(Operation);
   MultiTranslationViewUpdater.Priority := tpHigher;
-  frmProgress.Mode := pmMultiViewUpdater;
+  frmProgress.Mode := pmGlobalViewUpdater;
   MultiTranslationViewUpdater.Resume;
   frmProgress.ShowModal;
 end;
@@ -159,8 +159,8 @@ begin
             begin
               mMTOldSub.Text := CharsList.EncodeSubtitle(mMTOldSub.Text);
               mMTNewSub.Text := CharsList.EncodeSubtitle(mMTNewSub.Text);
-              mMTOldSub.Text := StringReplace(mMTOldSub.Text, #13#10, TABLE_STR_CR, [rfReplaceAll]);
-              mMTNewSub.Text := StringReplace(mMTNewSub.Text, #13#10, TABLE_STR_CR, [rfReplaceAll]);
+              mMTOldSub.Text := StringReplace(mMTOldSub.Text, #13#10, GAME_BR, [rfReplaceAll]);
+              mMTNewSub.Text := StringReplace(mMTNewSub.Text, #13#10, GAME_BR, [rfReplaceAll]);
             end;
         end;
         mMTNewSub.OnChange := mMTNewSubChange;

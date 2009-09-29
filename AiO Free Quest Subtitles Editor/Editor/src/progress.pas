@@ -13,11 +13,12 @@ uses
 
 type
   TProgressMode = (
-    pmSCNFScanner,      // SCNF directory scanner
-    pmGlobalScan,       // Global-Translation subtitles list builder
-    pmMultiScan,        // Multi-Translation subtitles list builder
-    pmBatchSubsExport,  // Batch exporter
-    pmMultiViewUpdater  // Global-Translation View Updater
+    pmSCNFScanner,        // SCNF directory scanner
+    pmGlobalScan,         // Global-Translation subtitles list builder
+    pmMultiScan,          // Multi-Translation subtitles list builder
+    pmBatchSubsExport,    // Batch exporter
+    pmGlobalViewUpdater,  // Global-Translation View Updater
+    pmMultiExec           // Multi-Translation execution
   );
 
   TfrmProgress = class(TForm)
@@ -39,16 +40,23 @@ type
     fTerminated: Boolean;
     fProgressMode: TProgressMode;
     fAborted: Boolean;
-    procedure EndEventMultiTranslationViewUpdater(Sender: TObject);
-    procedure DirectoryScanningEndEvent(Sender: TObject);
-//    procedure MultiTranslatorEndEvent(Sender: TObject);
     procedure SetProgressMode(const Value: TProgressMode);
-    procedure SubsRetrieverGlobalTranslationEndEvent(Sender: TObject);
-    procedure SubsRetrieverMultiTranslationEndEvent(Sender: TObject);
-    procedure BatchSubsExporterEndEvent(Sender: TObject);
-    procedure SubsMassExporterErrornousFileEvent(Sender: TObject;
+  protected
+    procedure EventEndCommon;
+    
+    procedure EventEndBatchSubsExporter(Sender: TObject);
+    procedure EventEndDirectoryScanning(Sender: TObject);
+    procedure EventEndGlobalTranslationViewUpdater(Sender: TObject);
+    procedure EventEndMultiTranslationExecution(Sender: TObject);
+    procedure EventEndSubsRetrieverGlobalTranslation(Sender: TObject);
+    procedure EventEndSubsRetrieverMultiTranslation(Sender: TObject);
+
+    procedure EventMultiTranslationCompleted(Sender: TObject;
+      SubsUpdatedCount, SubsUpdatedOccurencesCount: Integer);
+
+    procedure EventSubsMassExporterErrornousFile(Sender: TObject;
       ErrornousFileName: TFileName; ReasonMessage: string);
-    procedure SubsMassExporterCompletedEvent(Sender: TObject; FileExportedCount,
+    procedure EventSubsMassExporterCompleted(Sender: TObject; FileExportedCount,
       FileErrornousCount: Integer);
   public
     { Déclarations publiques }
@@ -69,7 +77,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Main, Math, SubsExp, MultiScan;
+  Main, Math, SubsExp, MultiScan, MultiTrad;
   
 procedure TfrmProgress.btnCancelClick(Sender: TObject);
 begin
@@ -78,7 +86,7 @@ begin
   Close;
 end;
 
-procedure TfrmProgress.DirectoryScanningEndEvent(Sender: TObject);
+procedure TfrmProgress.EventEndDirectoryScanning(Sender: TObject);
 begin
   Terminated := True;
   
@@ -92,11 +100,12 @@ begin
   if frmMain.MultiTranslation.Active then begin
 
     if not Aborted then // if aborted when scanning files
-      frmMain.MultiTranslation.Prepare
+      frmMain.MultiTranslation.Prepare(False)
     else begin
       // We don't have the time to update the Multi-Translation list, so we must clear it
       frmMain.MultiTranslation.Active := False;
-      frmMain.AddDebug('You have cancelled the file scan process. The Multi-Translation retriever has been cancelled too.');
+      frmMain.AddDebug('You have cancelled the file scan process. '
+        + 'The Multi-Translation retriever has been cancelled too.');
       Close;      
     end;
           
@@ -104,12 +113,14 @@ begin
     Close; // the job is finished
 end;
 
-procedure TfrmProgress.EndEventMultiTranslationViewUpdater(Sender: TObject);
+procedure TfrmProgress.EventEndMultiTranslationExecution(Sender: TObject);
 begin
-  Terminated := True;
-  Close;
-//  frmMain.SetStatus('Ready');
-  frmMain.SetStatusReady;
+  EventEndCommon;
+end;
+
+procedure TfrmProgress.EventEndGlobalTranslationViewUpdater(Sender: TObject);
+begin
+  EventEndCommon;
 end;
 
 procedure TfrmProgress.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -182,7 +193,7 @@ begin
                       frmMain.SetStatus('Scanning directory... Please wait.');
                       Self.Caption := 'Scanning directory...';
                       fCurrentThread := SCNFScanner;
-                      fCurrentThread.OnTerminate := DirectoryScanningEndEvent;
+                      fCurrentThread.OnTerminate := EventEndDirectoryScanning;
                     end;
 
     pmGlobalScan:
@@ -190,7 +201,7 @@ begin
                       frmMain.SetStatus('Retrieving subtitles from files list... Please wait.');
                       Self.Caption := 'Retrieving subtitles...';
                       fCurrentThread := MultiTranslationSubsRetriever;
-                      fCurrentThread.OnTerminate := SubsRetrieverGlobalTranslationEndEvent;
+                      fCurrentThread.OnTerminate := EventEndSubsRetrieverGlobalTranslation;
                     end;
 
     pmMultiScan:
@@ -198,7 +209,7 @@ begin
                       frmMain.SetStatus('Preparing Multi-Translation... Please wait.');
                       Self.Caption := 'Preparing Multi-Translation...';
                       fCurrentThread := MultiTranslationSubsRetriever;
-                      fCurrentThread.OnTerminate := SubsRetrieverMultiTranslationEndEvent;
+                      fCurrentThread.OnTerminate := EventEndSubsRetrieverMultiTranslation;
                     end;
 
     pmBatchSubsExport:
@@ -206,17 +217,27 @@ begin
                         frmMain.SetStatus('Batch exporting... Please wait.');
                         Self.Caption := 'Batch exporting...';
                         fCurrentThread := BatchSubsExporter;
-                        fCurrentThread.OnTerminate := BatchSubsExporterEndEvent;
-                        (fCurrentThread as TSubsMassExporterThread).OnErrornousFile := SubsMassExporterErrornousFileEvent;
-                        (fCurrentThread as TSubsMassExporterThread).OnCompleted := SubsMassExporterCompletedEvent;
+                        fCurrentThread.OnTerminate := EventEndBatchSubsExporter;
+                        (fCurrentThread as TSubsMassExporterThread).OnErrornousFile := EventSubsMassExporterErrornousFile;
+                        (fCurrentThread as TSubsMassExporterThread).OnCompleted := EventSubsMassExporterCompleted;
                       end;
 
-    pmMultiViewUpdater:
+    pmGlobalViewUpdater:
                       begin
                         frmMain.SetStatus('Updating Global-translation view...');
                         Caption := 'Updating Global-translation view...';
                         fCurrentThread := MultiTranslationViewUpdater;
-                        fCurrentThread.OnTerminate := EndEventMultiTranslationViewUpdater;
+                        fCurrentThread.OnTerminate := EventEndGlobalTranslationViewUpdater;
+                      end;
+
+    pmMultiExec:
+                      begin
+                        Caption := 'Multi-Translating...';
+                        frmMain.SetStatus(Caption + ' Please wait.');
+                        fCurrentThread := MultiTranslationUpdater;
+                        fCurrentThread.OnTerminate := EventEndMultiTranslationExecution;
+                        (fCurrentThread as TMultiTranslationExecThread).OnCompleted :=
+                          EventMultiTranslationCompleted;
                       end;
   end;
 
@@ -244,26 +265,23 @@ begin
   frmMain.SetStatus('Ready');
 end;*)
 
-procedure TfrmProgress.SubsMassExporterCompletedEvent(Sender: TObject;
+procedure TfrmProgress.EventSubsMassExporterCompleted(Sender: TObject;
   FileExportedCount, FileErrornousCount: Integer);
 begin
   frmMain.AddDebug(IntToStr(FileExportedCount) + ' file(s) exported successfully with '
     + IntToStr(FileErrornousCount) + ' error(s).');
 end;
 
-procedure TfrmProgress.SubsMassExporterErrornousFileEvent(Sender: TObject;
+procedure TfrmProgress.EventSubsMassExporterErrornousFile(Sender: TObject;
   ErrornousFileName: TFileName; ReasonMessage: string);
 begin
   frmMain.AddDebug('Error when exporting subs from the file "'
     + ErrornousFileName + '". Reason: ' + ReasonMessage + '.');
 end;
 
-procedure TfrmProgress.SubsRetrieverGlobalTranslationEndEvent(Sender: TObject);
+procedure TfrmProgress.EventEndSubsRetrieverGlobalTranslation(Sender: TObject);
 begin
-  Terminated := True;
-  Close;
-//  frmMain.SetStatus('Ready');
-  frmMain.SetStatusReady;
+  EventEndCommon;
 
   if not Aborted then
     frmMain.AddDebug('Files list scanned successfully. '
@@ -283,27 +301,58 @@ begin
   end;
 end;
 
-procedure TfrmProgress.SubsRetrieverMultiTranslationEndEvent(Sender: TObject);
-begin
-  Terminated := True;
-  Close;
-  frmMain.SetStatusReady;
+procedure TfrmProgress.EventEndSubsRetrieverMultiTranslation(Sender: TObject);
+var
+  RefreshRequested: Boolean;
 
-  if not Aborted then
-    frmMain.AddDebug('The Multi-Translation function is now ready. '
-      + IntToStr(frmMain.MultiTranslation.TextDataList.Count)
-      + ' subtitle(s) retrieved.')
-  else begin
+begin
+  EventEndCommon;
+
+  RefreshRequested :=
+    (fCurrentThread as TMultiTranslationSubtitlesRetriever).RefreshRequested;
+
+  if not Aborted then begin
+
+    if RefreshRequested then
+      frmMain.AddDebug('Since you are using Multi-Translation, datas has been '
+        + 'updated. '
+        + IntToStr(frmMain.MultiTranslation.TextDataList.Count)
+        + ' subtitle(s) retrieved.')
+    else
+      frmMain.AddDebug('The Multi-Translation function is now ready. '
+        + IntToStr(frmMain.MultiTranslation.TextDataList.Count)
+        + ' subtitle(s) retrieved.');
+        
+  end else begin
     frmMain.AddDebug('The Multi-Translation function will not be available if you abort the process. It has been disabled.');
     frmMain.MultiTranslation.Active := False;
   end;
 end;
 
-procedure TfrmProgress.BatchSubsExporterEndEvent(Sender: TObject);
+procedure TfrmProgress.EventMultiTranslationCompleted(Sender: TObject;
+  SubsUpdatedCount, SubsUpdatedOccurencesCount: Integer);
+var
+  S: string;
+
+begin
+  S := 'Multi-Translation done. ';
+  if (SubsUpdatedCount = 0) and (SubsUpdatedOccurencesCount = 0) then
+    frmMain.AddDebug(S + ' No subtitle was needed to be updated with this feature.')
+  else
+    frmMain.AddDebug(S + IntToStr(SubsUpdatedCount)
+      + ' subtitle(s) updated in ' + IntToStr(SubsUpdatedOccurencesCount)
+      + ' occurence(s).');
+end;
+
+procedure TfrmProgress.EventEndBatchSubsExporter(Sender: TObject);
+begin
+  EventEndCommon;
+end;
+
+procedure TfrmProgress.EventEndCommon;
 begin
   Terminated := True;
   Close;
-//  frmMain.SetStatus('Ready');
   frmMain.SetStatusReady;
 end;
 

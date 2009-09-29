@@ -2,7 +2,7 @@ object frmMassImport: TfrmMassImport
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Batch subtitles import'
+  Caption = 'Batch Subtitles Import'
   ClientHeight = 258
   ClientWidth = 369
   Color = clBtnFace
@@ -11,11 +11,12 @@ object frmMassImport: TfrmMassImport
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
-  OnShow = FormShow
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel1: TBevel
@@ -40,7 +41,7 @@ object frmMassImport: TfrmMassImport
     object Label1: TLabel
       Left = 7
       Top = 15
-      Width = 329
+      Width = 346
       Height = 26
       Caption = 
         'XML subtitles files must be the same name as PAKS files but with' +

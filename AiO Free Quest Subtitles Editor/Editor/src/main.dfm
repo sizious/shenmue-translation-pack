@@ -18,6 +18,7 @@ object frmMain: TfrmMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -87,7 +88,7 @@ object frmMain: TfrmMain
     Top = 3
     Width = 415
     Height = 367
-    ActivePage = tsMultiTrad
+    ActivePage = tsEditor
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
@@ -746,19 +747,6 @@ object frmMain: TfrmMain
     end
     object miTools: TMenuItem
       Caption = '&Tools'
-      object miAutoSave: TMenuItem
-        Caption = '&Auto-save'
-        Checked = True
-        Hint = 'Auto-saving the current file.'
-        ShortCut = 118
-        OnClick = miAutoSaveClick
-      end
-      object miMakeBackup: TMenuItem
-        Caption = '&Make backup'
-        Hint = 'Auto-Save a copy of the current file before saving.'
-        ShortCut = 119
-        OnClick = miMakeBackupClick
-      end
       object miMultiTranslate: TMenuItem
         Caption = 'M&ulti-translate'
         Hint = 'Enable or disable subtitle multi-translation inside the Editor.'
@@ -769,13 +757,13 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object miBatchImportSubs: TMenuItem
-        Caption = 'Batch imp&ort subtitles...'
+        Caption = 'Batch imp&ort...'
         Hint = 'Import subtitles in mass.'
         ShortCut = 49225
         OnClick = miBatchImportSubsClick
       end
       object miBatchExportSubs: TMenuItem
-        Caption = '&Batch export subtitles...'
+        Caption = '&Batch export...'
         Hint = 'Export subtitles in mass.'
         ShortCut = 49221
         OnClick = miBatchExportSubsClick
@@ -788,6 +776,27 @@ object frmMain: TfrmMain
         Hint = 'Extract NPC faces textures files from associated PAKF files.'
         ShortCut = 120
         OnClick = miFacesExtractorClick
+      end
+    end
+    object miOptions: TMenuItem
+      Caption = '&Options'
+      object miAutoSave: TMenuItem
+        Caption = '&Auto-save'
+        Checked = True
+        Hint = 'Auto-saving the current file.'
+        ShortCut = 118
+        OnClick = miAutoSaveClick
+      end
+      object miMakeBackup: TMenuItem
+        Caption = '&Make backup'
+        Hint = 'Auto-create a copy of the current file before saving it.'
+        ShortCut = 119
+        OnClick = miMakeBackupClick
+      end
+      object miReloadDirAtStartup: TMenuItem
+        Caption = 'Reload folder at startup'
+        Hint = 'Rescan the selected directory at startup.'
+        OnClick = miReloadDirAtStartupClick
       end
     end
     object miHelp: TMenuItem
@@ -813,9 +822,16 @@ object frmMain: TfrmMain
         OnClick = miAboutClick
       end
     end
-    object DEBUG1: TMenuItem
+    object miDEBUG: TMenuItem
       Caption = 'DEBUG'
-      OnClick = DEBUG1Click
+      object miDumpMultiTranslationTextData: TMenuItem
+        Caption = 'Dump Multi-Translation Text Data'
+        OnClick = miDumpMultiTranslationTextDataClick
+      end
+      object DumpMultiTranslationCacheList1: TMenuItem
+        Caption = 'Dump Multi-Translation Cache List'
+        OnClick = DumpMultiTranslationCacheList1Click
+      end
     end
   end
   object odMain: TOpenDialog

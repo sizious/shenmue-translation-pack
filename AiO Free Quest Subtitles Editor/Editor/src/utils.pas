@@ -18,13 +18,14 @@ function GetConfigFileName: TFileName;
 function GetPreviousSelectedPathFileName: TFileName;
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
+function WrapStr: string;
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Main, Warning;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Main, Warning, VistaUI;
 
 const
   HexValues = '0123456789ABCDEF';
@@ -33,6 +34,7 @@ var
   AppDir: TFileName;
   ConfigFileName: TFileName;
   PreviousSelectedPathFileName: TFileName;
+  sWrapStr: string; // used for MsgBox
 
 //------------------------------------------------------------------------------
 
@@ -55,21 +57,21 @@ var
   XMLDoc: IXMLDocument;
 
   CurrentNode: IXMLNode;
-  procedure AddXMLNode(var XML: IXMLDocument; const Key, Value: string); overload;
+  procedure WriteXMLNode(var XML: IXMLDocument; const Key, Value: string); overload;
   begin
     CurrentNode := XMLDoc.CreateNode(Key);
     CurrentNode.NodeValue := Value;
     XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
   end;
 
-  procedure AddXMLNode(var XML: IXMLDocument; const Key: string; const Value: Integer); overload;
+  procedure WriteXMLNode(var XML: IXMLDocument; const Key: string; const Value: Integer); overload;
   begin
     CurrentNode := XMLDoc.CreateNode(Key);
     CurrentNode.NodeValue := Value;
     XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
   end;
 
-  procedure AddXMLNode(var XML: IXMLDocument; const Key: string; const Value: Boolean); overload;
+  procedure WriteXMLNode(var XML: IXMLDocument; const Key: string; const Value: Boolean); overload;
   begin
     CurrentNode := XMLDoc.CreateNode(Key);
     CurrentNode.NodeValue := Value;
@@ -90,12 +92,13 @@ begin
 
     XMLDoc.DocumentElement := XMLDoc.CreateNode('freequestcfg'); // On crée la racine
 
-    AddXMLNode(XMLDoc, 'autosave', frmMain.AutoSave);
-    AddXMLNode(XMLDoc, 'makebackup', frmMain.MakeBackup);
-    AddXMLNode(XMLDoc, 'directory', frmMain.SelectedDirectory);
-    AddXMLNode(XMLDoc, 'decodesubs', frmMain.EnableCharsMod);
-    AddXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);
-    AddXMLNode(XMLDoc, 'multitranslate', frmMain.MultiTranslation.Active);
+    WriteXMLNode(XMLDoc, 'autosave', frmMain.AutoSave);
+    WriteXMLNode(XMLDoc, 'makebackup', frmMain.MakeBackup);
+    WriteXMLNode(XMLDoc, 'directory', frmMain.SelectedDirectory);
+    WriteXMLNode(XMLDoc, 'decodesubs', frmMain.EnableCharsMod);
+    WriteXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);
+    WriteXMLNode(XMLDoc, 'multitranslate', frmMain.MultiTranslation.Active);
+    WriteXMLNode(XMLDoc, 'rescandirstartup', frmMain.ReloadDirectoryAtStartup);
 
     XMLDoc.SaveToFile(ConfigFileName);
   finally
@@ -111,6 +114,27 @@ var
   XMLDoc: IXMLDocument;
   Node: IXMLNode;
 
+  function ReadXMLNodeString(var XML: IXMLDocument; const Key: string): string;
+  begin
+    Result := '';
+    try
+      Node := XMLDoc.DocumentElement.ChildNodes.FindNode(Key);
+      if Assigned(Node) then
+        if not VarIsNull(Node.NodeValue) then
+          Result := Node.NodeValue;
+    except
+    end;
+  end;
+
+  function ReadXMLNodeBoolean(var XML: IXMLDocument; const Key: string): Boolean;
+  var
+    V: string;
+
+  begin
+    V := LowerCase(ReadXMLNodeString(XML, Key));
+    Result := (V = 'true') or (V = '1');
+  end;
+  
 begin
   Result := False;
   if not FileExists(ConfigFileName) then Exit;
@@ -131,34 +155,13 @@ begin
     if (XMLDoc.DocumentElement.NodeName <> 'freequestcfg') and
       (XMLDoc.DocumentElement.NodeName <> 's2freequestcfg') then Exit;
 
-    try
-      Node := XMLDoc.DocumentElement.ChildNodes.FindNode('autosave');
-      if Assigned(Node) then frmMain.AutoSave := Node.NodeValue;
-    except end;
-
-    try
-      Node := XMLDoc.DocumentElement.ChildNodes.FindNode('makebackup');
-      if Assigned(Node) then frmMain.MakeBackup := Node.NodeValue;
-    except end;
-
-    try
-      Node := XMLDoc.DocumentElement.ChildNodes.FindNode('decodesubs');
-      if Assigned(Node) then frmMain.EnableCharsMod := Node.NodeValue;
-    except end;
-
-    try
-      Node := XMLDoc.DocumentElement.ChildNodes.FindNode('directory');
-      if Assigned(Node) then
-        if not VarIsNull(Node.NodeValue) then
-          frmMain.SelectedDirectory := Node.NodeValue;
-    except end;
-
-     try
-      Node := XMLDoc.DocumentElement.ChildNodes.FindNode('multitranslate');
-      if Assigned(Node) then
-        if not VarIsNull(Node.NodeValue) then
-          frmMain.MultiTranslation.Active := Node.NodeValue;
-    except end;
+    // Reading config values
+    frmMain.AutoSave := ReadXMLNodeBoolean(XMLDoc, 'autosave');
+    frmMain.MakeBackup := ReadXMLNodeBoolean(XMLDoc, 'makebackup');
+    frmMain.EnableCharsMod := ReadXMLNodeBoolean(XMLDoc, 'decodesubs');
+    frmMain.SelectedDirectory := ReadXMLNodeString(XMLDoc, 'directory');
+    frmMain.MultiTranslation.Active := ReadXMLNodeBoolean(XMLDoc, 'multitranslate');
+    frmMain.ReloadDirectoryAtStartup := ReadXMLNodeBoolean(XMLDoc, 'rescandirstartup');
 
     Result := True;
   finally
@@ -256,8 +259,27 @@ end;
 
 //------------------------------------------------------------------------------
 
+procedure InitWrapStr;
+begin
+  sWrapStr := sLineBreak; // WrapStr for Windows XP
+  if IsWindowsVista then sWrapStr := ' ';
+end;
+
+//------------------------------------------------------------------------------
+
+function WrapStr: string;
+begin
+  Result := sWrapStr;
+end;
+
+//------------------------------------------------------------------------------
+
 initialization
   AppDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
   ConfigFileName := AppDir + 'config.xml';
   PreviousSelectedPathFileName := AppDir + 'selpath.ini';
+  InitWrapStr;
+
+//------------------------------------------------------------------------------
+
 end.

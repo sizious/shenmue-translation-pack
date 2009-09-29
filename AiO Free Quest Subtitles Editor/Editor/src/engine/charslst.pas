@@ -99,6 +99,7 @@ begin
     end;
 end;
 
+// Shenmue to Windows Charset
 function TSubsCharsList.DecodeSubtitle(Text: string): string;
 var
   i: Integer;
@@ -107,7 +108,7 @@ begin
   Result := Text;
   if (not Loaded) or (not Active) then Exit;
 
-  Text := StringReplace(Text, TABLE_STR_CR, '<br>', [rfReplaceAll]);
+  Text := StringReplace(Text, GAME_BR, '<br>', [rfReplaceAll]);
   Text := StringReplace(Text, '=@', '...', [rfReplaceAll]);
 
   Result := '';
@@ -135,6 +136,7 @@ begin
     end;
 end;
 
+// Windows to Shenmue Charset
 function TSubsCharsList.EncodeSubtitle(Text: string): string;
 var
   i: Integer;
@@ -147,8 +149,8 @@ begin
   for i := 1 to Length(Text) do
     Result := Result + EncodeChar(Text[i]);
 
-  Result := StringReplace(Result, '<br>', TABLE_STR_CR, [rfReplaceAll]);
-  Result := StringReplace(Result, #13#10, TABLE_STR_CR, [rfReplaceAll]);
+  Result := StringReplace(Result, '<br>', GAME_BR, [rfReplaceAll]);
+  Result := StringReplace(Result, #13#10, GAME_BR, [rfReplaceAll]);
   Result := StringReplace(Result, '...', '=@', [rfReplaceAll]);
 end;
 

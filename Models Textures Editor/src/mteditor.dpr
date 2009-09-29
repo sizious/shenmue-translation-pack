@@ -27,7 +27,7 @@ var
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
-  Application.Title := 'Textured Model Objects Editor';
+  Application.Title := 'Shenmue Models Textures Editor';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);

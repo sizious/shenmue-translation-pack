@@ -3,7 +3,22 @@
              |      |  |--.---.-.-----.-----.-----.-----.
              |   ---|     |  _  |     |  _  |  -__|__ --|
              |______|__|__|___._|__|__|___  |_____|_____|
-                                      |_____| What's new?    
+                                      |_____| What's new?
+___                           _________________________________________________
+___| Version 2.2: 2009-09-14 |_________________________________________________
+    
+ADDED:
+- New feature added: "Multi-Translation". This is based on the old 
+  Multi-Translation behavior that you can find in old versions (before v2.xx).
+  You can activate it by pressing the F2 key (Thanks Hiei- and Shendream).
+
+FIXED:
+- The Multi-Translation feature of the v2.1 was renamed as Global-Translation.
+  The tab sheet is now "Global".
+- The Batch Import feature has been fixed to resolve somes problems with the
+  Multi-Translation / Global-Translation.
+- Global-Translation must be fixed... it doesn't sort items now.
+
 ___                           _________________________________________________
 ___| Version 2.1: 2009-08-29 |_________________________________________________
 

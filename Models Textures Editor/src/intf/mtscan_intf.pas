@@ -42,6 +42,12 @@ var
   MTScanListener: TMTScanDirectoryThreadListener;
   
 begin
+  if not DirectoryExists(Directory) then Exit;
+  with frmMain do begin
+    Clear;
+    SetStatus('Scanning directory ... Please wait.');
+  end;
+
   // We create a 'listener' (check the class in the beginning of this file)
   MTScanListener := TMTScanDirectoryThreadListener.Create(Directory);
   try
