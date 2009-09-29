@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Generated Name > // MT Editor // (C)reated by SiZiOUS'
-  ClientHeight = 426
+  ClientHeight = 446
   ClientWidth = 542
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,23 +18,24 @@ object frmMain: TfrmMain
   OnShow = FormShow
   DesignSize = (
     542
-    426)
+    446)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 2
     Top = 4
     Width = 149
-    Height = 293
+    Height = 313
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
+    ExplicitHeight = 293
     DesignSize = (
       149
-      293)
+      313)
     object Label9: TLabel
       Left = 6
-      Top = 267
+      Top = 287
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -45,16 +46,17 @@ object frmMain: TfrmMain
       Left = 6
       Top = 16
       Width = 137
-      Height = 245
+      Height = 265
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
+      ExplicitHeight = 245
     end
     object eFilesCount: TEdit
       Left = 70
-      Top = 264
+      Top = 284
       Width = 73
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -62,33 +64,37 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
+      ExplicitTop = 264
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 407
+    Top = 427
     Width = 542
     Height = 19
     Panels = <>
+    ExplicitTop = 407
   end
   object PageControl1: TPageControl
     Left = 154
     Top = 4
     Width = 388
-    Height = 293
+    Height = 313
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
+    ExplicitHeight = 293
     object TabSheet1: TTabSheet
       Caption = 'Textures'
+      ExplicitHeight = 265
       DesignSize = (
         380
-        265)
+        285)
       object lvTexturesList: TListView
         Left = 3
         Top = 3
         Width = 283
-        Height = 258
+        Height = 278
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -107,10 +113,12 @@ object frmMain: TfrmMain
         ColumnClick = False
         ReadOnly = True
         RowSelect = True
+        PopupMenu = pmTextures
         TabOrder = 0
         ViewStyle = vsReport
         OnClick = lvTexturesListClick
         OnKeyUp = lvTexturesListKeyUp
+        ExplicitHeight = 258
       end
       object bImport: TButton
         Left = 287
@@ -118,7 +126,7 @@ object frmMain: TfrmMain
         Width = 90
         Height = 25
         Anchors = [akTop, akRight]
-        Caption = 'Replace...'
+        Caption = '&Import...'
         Enabled = False
         TabOrder = 1
       end
@@ -128,7 +136,7 @@ object frmMain: TfrmMain
         Width = 90
         Height = 25
         Anchors = [akTop, akRight]
-        Caption = '&Extract...'
+        Caption = '&Export...'
         TabOrder = 2
         OnClick = bExportClick
       end
@@ -138,7 +146,7 @@ object frmMain: TfrmMain
         Width = 90
         Height = 25
         Anchors = [akTop, akRight]
-        Caption = '&Extract all...'
+        Caption = '&Export all...'
         TabOrder = 3
         OnClick = bExportAllClick
       end
@@ -146,14 +154,15 @@ object frmMain: TfrmMain
     object Sections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
+      ExplicitHeight = 265
       DesignSize = (
         380
-        265)
+        285)
       object lvSectionsList: TListView
         Left = 3
         Top = 3
         Width = 375
-        Height = 258
+        Height = 278
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -170,17 +179,19 @@ object frmMain: TfrmMain
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
+        ExplicitHeight = 258
       end
     end
   end
   object GroupBox2: TGroupBox
     Left = 2
-    Top = 300
+    Top = 320
     Width = 536
     Height = 105
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 3
+    ExplicitTop = 300
     object mDebug: TMemo
       Left = 3
       Top = 16
@@ -255,6 +266,9 @@ object frmMain: TfrmMain
         ShortCut = 114
         OnClick = exturespreview1Click
       end
+      object exturespreviewontop1: TMenuItem
+        Caption = '&Preview on top'
+      end
       object N4: TMenuItem
         Caption = '-'
       end
@@ -316,6 +330,22 @@ object frmMain: TfrmMain
       Caption = '&Refresh'
       ShortCut = 116
       OnClick = Refresh1Click
+    end
+  end
+  object pmTextures: TPopupMenu
+    Left = 472
+    Top = 154
+    object Import2: TMenuItem
+      Caption = '&Import...'
+    end
+    object Export2: TMenuItem
+      Caption = '&Export...'
+    end
+    object N7: TMenuItem
+      Caption = '-'
+    end
+    object Exportall2: TMenuItem
+      Caption = '&Export all...'
     end
   end
 end
