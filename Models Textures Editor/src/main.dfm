@@ -1,11 +1,9 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu, biMinimize]
-  BorderStyle = bsSingle
-  Caption = 'frmMain'
-  ClientHeight = 348
-  ClientWidth = 544
+  Caption = '< Generated Name > // MT Editor // (C)reated by SiZiOUS'
+  ClientHeight = 426
+  ClientWidth = 542
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,38 +16,45 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
+  DesignSize = (
+    542
+    426)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
-    Left = 4
+    Left = 2
     Top = 4
     Width = 149
-    Height = 323
+    Height = 293
+    Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
     DesignSize = (
       149
-      323)
+      293)
     object Label9: TLabel
       Left = 6
-      Top = 298
+      Top = 267
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
       Caption = 'Files count :'
+      ExplicitTop = 207
     end
     object lbFilesList: TListBox
       Left = 6
       Top = 16
       Width = 137
-      Height = 273
+      Height = 245
+      Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
+      PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
     end
     object eFilesCount: TEdit
       Left = 70
-      Top = 295
+      Top = 264
       Width = 73
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -59,103 +64,137 @@ object frmMain: TfrmMain
       Text = '100'
     end
   end
-  object GroupBox2: TGroupBox
-    Left = 156
-    Top = 4
-    Width = 385
-    Height = 173
-    Caption = ' Textures : '
-    TabOrder = 1
-    object lvTexturesList: TListView
-      Left = 6
-      Top = 16
-      Width = 280
-      Height = 150
-      Columns = <
-        item
-          Caption = 'Index'
-        end
-        item
-          Caption = 'Offset'
-        end
-        item
-          Caption = 'Size'
-        end>
-      ColumnClick = False
-      ReadOnly = True
-      RowSelect = True
-      TabOrder = 0
-      ViewStyle = vsReport
-      OnClick = lvTexturesListClick
-    end
-    object bExport: TButton
-      Left = 292
-      Top = 51
-      Width = 90
-      Height = 25
-      Caption = 'Export...'
-      TabOrder = 1
-      OnClick = bExportClick
-    end
-    object bExportAll: TButton
-      Left = 292
-      Top = 82
-      Width = 90
-      Height = 25
-      Caption = 'Export all...'
-      TabOrder = 2
-      OnClick = bExportAllClick
-    end
-    object bImport: TButton
-      Left = 292
-      Top = 19
-      Width = 90
-      Height = 25
-      Caption = 'Import...'
-      Enabled = False
-      TabOrder = 3
-    end
-  end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 329
-    Width = 544
+    Top = 407
+    Width = 542
     Height = 19
     Panels = <>
   end
-  object GroupBox3: TGroupBox
-    Left = 156
-    Top = 180
-    Width = 385
-    Height = 147
-    Caption = ' File structure : '
+  object PageControl1: TPageControl
+    Left = 154
+    Top = 4
+    Width = 388
+    Height = 293
+    ActivePage = TabSheet1
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = 'Textures'
+      DesignSize = (
+        380
+        265)
+      object lvTexturesList: TListView
+        Left = 3
+        Top = 3
+        Width = 283
+        Height = 258
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Columns = <
+          item
+            Caption = 'Index'
+          end
+          item
+            Caption = 'Offset'
+          end
+          item
+            Caption = 'Size'
+          end
+          item
+            Caption = 'Updated'
+            Width = 80
+          end>
+        ColumnClick = False
+        ReadOnly = True
+        RowSelect = True
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnClick = lvTexturesListClick
+        OnKeyUp = lvTexturesListKeyUp
+      end
+      object bImport: TButton
+        Left = 287
+        Top = 17
+        Width = 90
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = 'Replace...'
+        Enabled = False
+        TabOrder = 1
+      end
+      object bExport: TButton
+        Left = 287
+        Top = 44
+        Width = 90
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = '&Extract...'
+        TabOrder = 2
+        OnClick = bExportClick
+      end
+      object bExportAll: TButton
+        Left = 287
+        Top = 73
+        Width = 90
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = '&Extract all...'
+        TabOrder = 3
+        OnClick = bExportAllClick
+      end
+    end
+    object Sections: TTabSheet
+      Caption = 'Sections'
+      ImageIndex = 1
+      DesignSize = (
+        380
+        265)
+      object lvSectionsList: TListView
+        Left = 3
+        Top = 3
+        Width = 375
+        Height = 258
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Columns = <
+          item
+            Caption = 'Name'
+          end
+          item
+            Caption = 'Offset'
+          end
+          item
+            Caption = 'Size'
+          end>
+        ColumnClick = False
+        ReadOnly = True
+        RowSelect = True
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 2
+    Top = 300
+    Width = 536
+    Height = 105
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = ' Debug : '
     TabOrder = 3
-    object lvSectionsList: TListView
-      Left = 6
+    object mDebug: TMemo
+      Left = 3
       Top = 16
-      Width = 376
-      Height = 123
-      Columns = <
-        item
-          Caption = 'Name'
-        end
-        item
-          Caption = 'Offset'
-        end
-        item
-          Caption = 'Size'
-        end>
-      ColumnClick = False
+      Width = 530
+      Height = 86
+      Color = clBtnFace
       ReadOnly = True
-      RowSelect = True
       TabOrder = 0
-      ViewStyle = vsReport
     end
   end
   object mmMain: TMainMenu
     Left = 20
     Top = 34
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object Opendirectory1: TMenuItem
         Caption = '&Open directory...'
@@ -173,6 +212,7 @@ object frmMain: TfrmMain
       object Save1: TMenuItem
         Caption = '&Save'
         ShortCut = 16467
+        OnClick = Save1Click
       end
       object Saveas1: TMenuItem
         Caption = '&Save as...'
@@ -187,8 +227,46 @@ object frmMain: TfrmMain
         OnClick = Quit1Click
       end
     end
-    object ools1: TMenuItem
-      Caption = '&Tools'
+    object Edit1: TMenuItem
+      Caption = '&Edit'
+      object Undo1: TMenuItem
+        Caption = '&Undo changes...'
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object Import1: TMenuItem
+        Caption = '&Import texture...'
+      end
+      object Export1: TMenuItem
+        Caption = '&Export texture...'
+      end
+      object N6: TMenuItem
+        Caption = '-'
+      end
+      object Exportall1: TMenuItem
+        Caption = '&Export all...'
+      end
+    end
+    object miView: TMenuItem
+      Caption = '&View'
+      object exturespreview1: TMenuItem
+        Caption = '&Textures preview...'
+        ShortCut = 114
+        OnClick = exturespreview1Click
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object Savedebuglog1: TMenuItem
+        Caption = '&Save debug log...'
+      end
+      object Cleardebuglog1: TMenuItem
+        Caption = '&Clear debug log...'
+      end
+    end
+    object miOptions: TMenuItem
+      Caption = '&Options'
       object Autosave1: TMenuItem
         Caption = 'A&uto-save'
       end
@@ -198,14 +276,12 @@ object frmMain: TfrmMain
       object N3: TMenuItem
         Caption = '-'
       end
-      object exturespreview1: TMenuItem
-        Caption = 'Textures preview...'
-        ShortCut = 114
-        OnClick = exturespreview1Click
+      object StripGBIXheader1: TMenuItem
+        Caption = '&Strip GBIX header'
       end
     end
     object About1: TMenuItem
-      Caption = '&About'
+      Caption = '&Help'
       object About2: TMenuItem
         Caption = 'A&bout...'
         ShortCut = 123
@@ -232,5 +308,14 @@ object frmMain: TfrmMain
     Title = 'Please select the output directory to store exported textures...'
     Left = 50
     Top = 34
+  end
+  object pmFilesList: TPopupMenu
+    Left = 14
+    Top = 158
+    object Refresh1: TMenuItem
+      Caption = '&Refresh'
+      ShortCut = 116
+      OnClick = Refresh1Click
+    end
   end
 end

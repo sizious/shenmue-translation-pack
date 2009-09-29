@@ -18,6 +18,7 @@ type
     function ExtractedFileName: TFileName; overload;
     function ExtractedFileName(NewExtension: string): TFileName; overload;
     function ExtractedFileName(NewExtension: string; AppendNewExtension: Boolean): TFileName; overload;
+    function HasExtension: Boolean;
     property FileName: TFileName read fFileName write fFileName;
   end;
 
@@ -130,6 +131,11 @@ end;
 function TFileEntry.ExtractedPath: TFileName;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(FileName));
+end;
+
+function TFileEntry.HasExtension: Boolean;
+begin
+  Result := ExtractFileExt(FileName) <> '';
 end;
 
 end.

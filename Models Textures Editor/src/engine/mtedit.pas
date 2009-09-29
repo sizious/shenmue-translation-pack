@@ -4,7 +4,12 @@ interface
 
 uses
   Windows, SysUtils, Classes;
-  
+
+const
+  SHENMUE2_MT7_TEXTURE_SECTION = 'TXT7';
+  SHENMUE1_MT6_TEXTURE_SECTION = 'TEXD';
+  SHENMUE1_SECTION_IGNORE      = 'TEXN'; // because it's written with the TEXD section
+
 type
   // The main class to use !
   TModelTexturedEditor = class;
@@ -27,83 +32,101 @@ type
   // Texture list entry
   // Textures are PVR or DDS inside a GBIX container.
   // The GBIX format is: [GBIX_HEADER] (12 bytes) ... [TEX_DATA] (variable, in DDS/PVR format)
-  TTexturesListEntry = class
+  TTexturesListEntry = class(TObject)
   private
+    fImportFileName: TFileName;
+    fMTEditorOwner: TModelTexturedEditor;
     fOwner: TTexturesList;
     fIndex: Integer;
     fSize: Integer;
     fOffset: Integer;
+    fUpdated: Boolean;
   protected
     function GetLoadedFileName: TFileName;
+    property MTEditorOwner: TModelTexturedEditor read fMTEditorOwner;
   public
     constructor Create(AOwner: TTexturesList);
+    procedure CancelImport;
+    function ImportFromFile(const FileName: TFileName): Boolean;
     procedure ExportToFile(const FileName: TFileName);
     function ExportToFolder(const Folder: TFileName): TFileName;
     function GetOutputTextureFileName: TFileName;
     property Index: Integer read fIndex;  // give this item index in the TexturesList
+    property ImportFileName: TFileName read fImportFileName;
     property Offset: Integer read fOffset;
     property Size: Integer read fSize;
     property Owner: TTexturesList read fOwner;
+    property Updated: Boolean read fUpdated;
   end;
 
+  TSectionsListEntry = class;
+  
   // Texture list
-  TTexturesList = class
+  // This is a Section item but with Textures specifics properties
+  // TEXD: Shenmue 1
+  // TXT7: Shenmue 2
+  TTexturesList = class(TObject)
   private
-    fSectionIndex: Integer; // Index of the TXT section in the Section array (init by ParseTexturesSection)
+    fTexturesSectionIndex: Integer; // Index of the TXT section in the Section array (init by ParseTexturesSection)
     fOwner: TModelTexturedEditor;
     fTexturesList: TList;
     function GetItem(Index: Integer): TTexturesListEntry;
     function GetCount: Integer;
-    function GetOffset: Integer;
-    function GetSize: Integer;
+    function GetTexturesSectionEntry: TSectionsListEntry;
   protected
     procedure Add(const Index, Offset, Size: Integer);
     procedure Clear;
-    procedure Shenmue2_MT7_ParseTexturesSection(var F: file);
+    procedure ParseTexturesSection_Shenmue2_MT7(var F: file);
+    procedure ParseTexturesSection_Shenmue_MT5_MT6(var F: file);
+    procedure WriteTexturesSection_Shenmue2_MT7(var InStream, OutStream: TFileStream);
+    procedure WriteTexturesSection_Shenmue_MT5_MT6(var InStream, OutStream: TFileStream);
   public
     constructor Create(AOwner: TModelTexturedEditor);
     destructor Destroy; override;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TTexturesListEntry read GetItem; default;
-    property Offset: Integer read GetOffset;
     property Owner: TModelTexturedEditor read fOwner;
-    property Size: Integer read GetSize;
+    property Section: TSectionsListEntry read GetTexturesSectionEntry;
   end;
 
   // Section list entry
-  TSectionsListEntry = class
+  TSectionsListEntry = class(TObject)
   private
     fName: string;
     fSize: Integer;
     fOffset: Integer;
+    fIsTextures: Boolean;
+    fIgnore: Boolean;
   public
+    constructor Create;
+    property Ignored: Boolean read fIgnore;
+    property IsTextures: Boolean read fIsTextures;
     property Name: string read fName;
     property Offset: Integer read fOffset;
     property Size: Integer read fSize;
   end;
 
   // Sections list
-  TSectionsList = class
+  TSectionsList = class(TObject)
   private
     fOwner: TModelTexturedEditor;
     fSectionsList: TList;
     function GetItem(Index: Integer): TSectionsListEntry;
     function GetCount: Integer;
   protected
-    procedure Add(const Name: string; const Offset, Size: Integer);
+    function Add(const Name: string; const Offset, Size: Integer): Integer;
     procedure Clear;
-    procedure ParseFile(var F: file);
+    function ParseFile(var F: file): TGameVersion;
   public
     constructor Create(AOwner: TModelTexturedEditor);
     destructor Destroy; override;
-    function GetTexturesSectionIndex: Integer;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TSectionsListEntry read GetItem; default;
     property Owner: TModelTexturedEditor read fOwner;
-  end;
+ end;
 
   // Main object
-  TModelTexturedEditor = class
+  TModelTexturedEditor = class(TObject)
   private
     fGameVersion: TGameVersion;
     fLoadedFileName: TFileName;
@@ -115,7 +138,7 @@ type
     function LoadFromFile(const FileName: TFileName): Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
     property GameVersion: TGameVersion read fGameVersion;
-    property FileName: TFileName read fLoadedFileName;
+    property SourceFileName: TFileName read fLoadedFileName;
     property Sections: TSectionsList read fSections;
     property Textures: TTexturesList read fTextures;
   end;
@@ -133,7 +156,7 @@ const
 procedure TTexturesList.Add(const Index, Offset, Size: Integer);
 var
   Item: TTexturesListEntry;
-  
+
 begin
   Item := TTexturesListEntry.Create(Self);
   Item.fOffset := Offset;
@@ -156,6 +179,7 @@ constructor TTexturesList.Create;
 begin
   fOwner := AOwner;
   fTexturesList := TList.Create;
+  fTexturesSectionIndex  := -1;
 end;
 
 destructor TTexturesList.Destroy;
@@ -175,31 +199,27 @@ begin
   Result := TTexturesListEntry(fTexturesList[Index]);
 end;
 
-function TTexturesList.GetOffset: Integer;
+function TTexturesList.GetTexturesSectionEntry: TSectionsListEntry;
 begin
-  Result := Owner.Sections[fSectionIndex].Offset;
+  Result := Owner.Sections[fTexturesSectionIndex];
 end;
 
-function TTexturesList.GetSize: Integer;
-begin
-  Result := Owner.Sections[fSectionIndex].Size;
-end;
-
-procedure TTexturesList.Shenmue2_MT7_ParseTexturesSection(var F: file);
+procedure TTexturesList.ParseTexturesSection_Shenmue2_MT7(var F: file);
 var
-  i, TextObjIndex, TexturesSectionOffset, TexturesCount, CalcSize: Integer;
+  i, TexturesSectionOffset, TexturesCount, CalcSize, TextureOffset: Integer;
   TexturesSectionItem: TSectionsListEntry;
   TempTexItem: TTexturesListEntry;
 
 begin
-  TextObjIndex := Owner.Sections.GetTexturesSectionIndex;
+//  TextObjIndex := Owner.Sections.GetTexturesSectionIndex;
 
-  if TextObjIndex <> -1 then begin
-    fSectionIndex := TextObjIndex;
+  if fTexturesSectionIndex <> -1 then begin
+                  
+{$IFDEF DEBUG}
+    WriteLn('*** MT7 PARSING TEXTURES SECTION: ');
+{$ENDIF}
 
-    {$IFDEF DEBUG} WriteLn('PARSING TEXTURES SECTION'); {$ENDIF}
-
-    TexturesSectionItem := Owner.Sections[TextObjIndex];
+    TexturesSectionItem := Section;
 
     // Positionning on the Section Count offset inside the Textures section (TXT7)
     TexturesSectionOffset := TexturesSectionItem.Offset + SizeOf(TRawSectionHeader);  // 8 for section name [4] + section size [4]
@@ -214,17 +234,17 @@ begin
     for i := TexturesCount - 1 downto 0 do begin
       // reading current texture entry
       Seek(F, FilePos(F) - GAME_INTEGER_SIZE);
-      BlockRead(F, TextObjIndex, GAME_INTEGER_SIZE);
+      BlockRead(F, TextureOffset, GAME_INTEGER_SIZE);
       Seek(F, FilePos(F) - GAME_INTEGER_SIZE); // Because we are reading entries from the BACK!!! (one loop optimization)
 
       // Computing the texture GBIX size
-      CalcSize := CalcSize - TextObjIndex;
+      CalcSize := CalcSize - TextureOffset;
 
       // Adding the new texture entry
-      Self.Add(i, TextObjIndex, CalcSize);
+      Add(i, TextureOffset, CalcSize);
 
       // The old texture offset becomes the new CalcSize to compute the next texture size
-      CalcSize := TextObjIndex;
+      CalcSize := TextureOffset;
     end;
 
     // Sorting TexturesList
@@ -233,19 +253,64 @@ begin
       fTexturesList.Items[Items[i].Index] := fTexturesList.Items[i];
       fTexturesList.Items[TempTexItem.Index] := TempTexItem;
     end;
+  end;
+end;
 
-    // Showing Textures List
-    {$IFDEF DEBUG}
-    for i := 0 to Count - 1 do
-      WriteLn('  #', i, ': ', Items[i].Offset, ', ', Items[i].Size);
-    {$ENDIF}
+procedure TTexturesList.ParseTexturesSection_Shenmue_MT5_MT6(var F: file);
+var
+  i, TexturesCount,
+  Size: Integer;
+  SectionItem: TSectionsListEntry;
 
+begin
+{$IFDEF DEBUG}
+    WriteLn('*** MT5/MT6 PARSING TEXTURES SECTION: ');
+{$ENDIF}
+
+  // Get TEXD infos
+  if fTexturesSectionIndex <> -1 then begin
+    // Read the textures TEXN count in the TEXD section
+    Seek(F, Owner.Sections[fTexturesSectionIndex].Offset + 8); // skip "TEXD" sign + "TEXD" size
+    BlockRead(F, TexturesCount, GAME_INTEGER_SIZE);
+
+    for i := 0 to TexturesCount - 1 do begin
+      SectionItem := Owner.Sections[fTexturesSectionIndex + i + 1]; // get "TEXN" section
+
+      // Get the GBIX PVR size
+      Seek(F, SectionItem.Offset + 4);
+      BlockRead(F, Size, GAME_INTEGER_SIZE);
+      Dec(Size, 16); // 16 is the "TEXN" section header
+      Add(i, SectionItem.Offset + 16, Size); // 16 to skip "TEXN" header
+    end;
+  end;
+end;
+
+procedure TTexturesList.WriteTexturesSection_Shenmue2_MT7(var InStream,
+  OutStream: TFileStream);
+begin
+  
+end;
+
+procedure TTexturesList.WriteTexturesSection_Shenmue_MT5_MT6(var InStream,
+  OutStream: TFileStream);
+var
+  i: Integer;
+
+begin
+  // Saving the "TEXD" section
+  InStream.Seek(Section.Offset, soFromBeginning);
+  OutStream.CopyFrom(InStream, Section.Size);
+
+  // Saving "TEXN" sections
+  for i := 0 to Count - 1 do begin
+    InStream.Seek(Items[i].Offset, soFromBeginning);
+    OutStream.CopyFrom(InStream, Items[i].Size);
   end;
 end;
 
 { TSectionsList }
 
-procedure TSectionsList.Add(const Name: string; const Offset, Size: Integer);
+function TSectionsList.Add(const Name: string; const Offset, Size: Integer): Integer;
 var
   Item: TSectionsListEntry;
   
@@ -254,7 +319,7 @@ begin
   Item.fName := Name;
   Item.fOffset := Offset;
   Item.fSize := Size;
-  fSectionsList.Add(Item);
+  Result := fSectionsList.Add(Item);
   {$IFDEF DEBUG} WriteLn('  ', Item.fName, ': Offset: ', Item.fOffset, ', Size: ', Item.fSize); {$ENDIF}
 end;
 
@@ -266,6 +331,7 @@ begin
   for i := 0 to fSectionsList.Count - 1 do
     TSectionsListEntry(fSectionsList[i]).Free;
   fSectionsList.Clear;
+  Owner.Textures.fTexturesSectionIndex  := -1;
 end;
 
 constructor TSectionsList.Create(AOwner: TModelTexturedEditor);
@@ -291,48 +357,57 @@ begin
   Result := TSectionsListEntry(fSectionsList[Index]);
 end;
 
-function TSectionsList.GetTexturesSectionIndex: Integer;
+(*function TSectionsList.GetTexturesSectionIndex(GameVersion: TGameVersion): Integer;
 var
   i: Integer;
   SearchedSection: string;
 
 begin
   Result := -1;
-  SearchedSection := '';
-
-  case Owner.GameVersion of
-    gvShenmue2: SearchedSection := 'TXT7';
-    //gvShenmue : SearchedSection := 'TEXN';
-  end;
-
+  SearchedSection := SHENMUE2_MT7_TEXTURE_SECTION;
   for i := 0 to Count - 1 do
     if (Items[i].Name = SearchedSection) then begin
       Result := i;
       Break;
     end;
-end;
+end;*)
 
-procedure TSectionsList.ParseFile(var F: file);
+function TSectionsList.ParseFile(var F: file): TGameVersion;
 var
   RawEntry: TRawSectionHeader;
-  Offset: Integer;
+  Offset, SectionIndex: Integer;
   Done: Boolean;
 
 begin
-  {$IFDEF DEBUG}
-  case Owner.GameVersion of
-    gvUndef     : WriteLn('UNDEFINED FILE FORMAT ?!');
-    gvShenmue2  : WriteLn('MT7 SECTIONS ENTRIES:');
-  end;
-  {$ENDIF}
+  Result := gvUndef;
   
+{$IFDEF DEBUG}
+  WriteLn('*** PARSING SECTIONS ***');
+{$ENDIF}
+
   Done := False;
+  
   while not Done do begin
     Offset := FilePos(F);
     BlockRead(F, RawEntry, SizeOf(TRawSectionHeader));
 
     if (RawEntry.Size < FileSize(F)) then begin
-      Add(RawEntry.Name, Offset, RawEntry.Size);
+      SectionIndex := Add(RawEntry.Name, Offset, RawEntry.Size);
+
+      // Detecting the Textures section & Game version
+      if RawEntry.Name = SHENMUE1_MT6_TEXTURE_SECTION then begin
+        Result := gvShenmue;
+        Items[SectionIndex].fIsTextures := True;
+        Owner.Textures.fTexturesSectionIndex := SectionIndex;
+      end else if RawEntry.Name = SHENMUE2_MT7_TEXTURE_SECTION then begin
+        Result := gvShenmue2;
+        Items[SectionIndex].fIsTextures := True;
+        Owner.Textures.fTexturesSectionIndex := SectionIndex;
+      end;
+
+      if RawEntry.Name = SHENMUE1_SECTION_IGNORE then
+        Items[SectionIndex].fIgnore := True;
+
       Seek(F, Offset + RawEntry.Size); // seeking to next section
     end;
 
@@ -359,65 +434,144 @@ end;
 function TModelTexturedEditor.LoadFromFile(const FileName: TFileName): Boolean;
 var
   F: file;
-  Buf: string;
+{$IFDEF DEBUG}
+  i: Integer;
+{$ENDIF}
 
 begin
-  Result := False;
   fLoadedFileName := ExpandFileName(FileName);
   
   // Set game version
-  fGameVersion := gvUndef;
+(*  fGameVersion := gvUndef;
   Buf := UpperCase(ExtractFileExt(FileName));
   if (Buf = '.MT7') then
     fGameVersion := gvShenmue2
   else
     if ((Buf = '.MT6') or (Buf = '.MT5')) then
-      fGameVersion := gvShenmue;
+      fGameVersion := gvShenmue;*)
 
   // Parse the loaded file if recognized
-  if (GameVersion <> gvUndef) then begin
-    Result := True;
+//  if (GameVersion <> gvUndef) then begin
 
-    Textures.Clear;
-    Sections.Clear;
-    
-    // Opening the file
-    AssignFile(F, FileName);
-    FileMode := fmOpenRead;
-    {$I-}Reset(F, 1);{$I+}
-    if IOResult <> 0 then Exit;
+  Result := True;
+
+  Textures.Clear;
+  Sections.Clear;
+
+  // Opening the file
+  AssignFile(F, FileName);
+  FileMode := fmOpenRead;
+  {$I-}Reset(F, 1);{$I+}
+  if IOResult <> 0 then Exit;
+
+  try
 
     try
+      // Retrieve file sections
+      fGameVersion := Sections.ParseFile(F);
 
-      try
-        // Retrieve file sections
-        Sections.ParseFile(F);
-        {$IFDEF DEBUG} WriteLn(''); {$ENDIF}
-        
-        // Parse the texture section
-        Textures.Shenmue2_MT7_ParseTexturesSection(F);
-        {$IFDEF DEBUG} WriteLn(''); {$ENDIF}
-        
-      except
-        Result := False;
+{$IFDEF DEBUG}
+      WriteLn('');
+{$ENDIF}
+
+      // Parse the texture section
+      case GameVersion of
+        gvShenmue:
+          Textures.ParseTexturesSection_Shenmue_MT5_MT6(F);
+        gvShenmue2:
+          Textures.ParseTexturesSection_Shenmue2_MT7(F);
       end;
 
-    finally
-      CloseFile(F);
+{$IFDEF DEBUG}
+    // Showing Textures List
+    if Textures.Count > 0 then begin
+      for i := 0 to Textures.Count - 1 do
+        WriteLn('  #', i, ': ', Textures.Items[i].Offset, ', ', Textures.Items[i].Size);
+    end else
+      WriteLn('  (empty)');
+    WriteLn('');
+{$ENDIF}
+        
+    except
+      Result := False;
     end;
-  end {$IFNDEF DEBUG}; {$ELSE} else WriteLn('UNDEFINED FILE FORMAT !!'); {$ENDIF}
+
+  finally
+    CloseFile(F);
+  end;
+
+//  end {$IFNDEF DEBUG}; {$ELSE} else WriteLn('UNDEFINED FILE FORMAT !!'); {$ENDIF}
 end;
 
 function TModelTexturedEditor.SaveToFile(const FileName: TFileName): Boolean;
-begin
+var
+  i: Integer;
+  InStream, OutStream: TFileStream;
 
+begin
+  Result := False;
+  if not FileExists(SourceFileName) then Exit;
+
+{$IFDEF DEBUG}
+  WriteLn('*** SAVING AND PATCHING FILE ***');
+{$ENDIF}
+
+  InStream := TFileStream.Create(SourceFileName, fmOpenRead);
+  OutStream := TFileStream.Create(FileName, fmOpenWrite);
+  try
+
+    for i := 0 to Sections.Count - 1 do begin
+
+{$IFDEF DEBUG}
+      Write('  ', Sections[i].Name, ', offset: ', Sections[i].Offset,
+        ', size: ', Sections[i].Size);
+{$ENDIF}
+
+      if Sections[i].IsTextures then begin
+{$IFDEF DEBUG}
+        Write(', (Textures Section)');
+{$ENDIF}
+        case GameVersion of
+{$IFDEF DEBUG}
+          gvUndef:
+            WriteLn('UNDEFINED GAME VERSION ?!!');
+{$ENDIF}
+          gvShenmue:
+            Textures.WriteTexturesSection_Shenmue_MT5_MT6(InStream, OutStream);
+            
+          gvShenmue2:
+            Textures.WriteTexturesSection_Shenmue2_MT7(InStream, OutStream);
+        end;
+
+      end else begin
+        if not Sections[i].Ignored then begin
+          InStream.Seek(Sections[i].Offset, soFromBeginning);
+          OutStream.CopyFrom(InStream, Sections[i].Size);
+        end;
+      end;
+
+{$IFDEF DEBUG}
+      WriteLn('');
+{$ENDIF}
+    end;
+
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
 end;
 
 { TTexturesListEntry }
 
+procedure TTexturesListEntry.CancelImport;
+begin
+  fUpdated := False;
+end;
+
 constructor TTexturesListEntry.Create(AOwner: TTexturesList);
 begin
   fOwner := AOwner;
+  fMTEditorOwner := Owner.Owner;
 end;
 
 procedure TTexturesListEntry.ExportToFile(const FileName: TFileName);
@@ -437,7 +591,12 @@ begin
   {$I-}ReWrite(F_dest, 1);{$I+}
   if IOResult <> 0 then Exit;
 
-  CopyFileBlock(F_src, F_dest, (Owner.Offset + Offset), Size);
+  case MTEditorOwner.GameVersion of
+    gvShenmue:
+      CopyFileBlock(F_src, F_dest, Offset, Size); // not a container in TEXN sections (Shenmue 1)
+    gvShenmue2:
+      CopyFileBlock(F_src, F_dest, (Owner.Section.Offset + Offset), Size); // relative offset ('TXT7' is a container with several sections)
+  end;
 
   CloseFile(F_src);
   CloseFile(F_dest);
@@ -451,12 +610,27 @@ end;
 
 function TTexturesListEntry.GetLoadedFileName: TFileName;
 begin
-  Result := Owner.Owner.FileName;
+  Result := Owner.Owner.SourceFileName
 end;
 
 function TTexturesListEntry.GetOutputTextureFileName: TFileName;
 begin
   Result := ExtractFileName(GetLoadedFileName) + '_PVR#' + Format('%2.2d', [Index + 1]) + '.pvr';
+end;
+
+function TTexturesListEntry.ImportFromFile(const FileName: TFileName): Boolean;
+begin
+  Result := FileExists(FileName);
+  if not Result then Exit;
+  fImportFileName := FileName;
+end;
+
+{ TSectionsListEntry }
+
+constructor TSectionsListEntry.Create;
+begin
+  fIsTextures := False;
+  fIgnore := False;
 end;
 
 end.

@@ -24,7 +24,7 @@ type
 const
   TABLE_STR_ENTRY_BEGIN = #$A1#$D6; // start string
   TABLE_STR_ENTRY_END   = #$A1#$D7; // end string
-  TABLE_STR_CR          = #$A1#$F5; // carriage return
+  GAME_BR          = #$A1#$F5; // carriage return
 
   GAME_INTEGER_SIZE = 4;
 

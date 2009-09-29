@@ -37,7 +37,9 @@ uses
   pakfextr in 'engine\npcpakf\pakfextr.pas',
   pakfutil in 'engine\npcpakf\pakfutil.pas',
   facesext in 'facesext.pas' {frmFacesExtractor},
-  iconsui in 'engine\multitrd\ui\iconsui.pas';
+  iconsui in 'engine\multitrd\ui\iconsui.pas',
+  multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
+  mtexec in 'multitrd\mtexec.pas';
 
 {$R *.res}
 
@@ -60,7 +62,6 @@ begin
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmFileInfo, frmFileInfo);
-  Application.CreateForm(TfrmMassImport, frmMassImport);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

@@ -6,7 +6,8 @@ uses
   WINDOWS, SysUtils, Classes, Forms, FilesLst, ActiveX, ScnfEdit;
 
 type
-  TImportResult = (irUndef, irSuccess, irFailed, irSubsFileNotFound, irSubsFileAmbiguous);
+  TImportResult = (irUndef, irSuccess, irFailed, irSubsFileNotFound,
+    irSubsFileAmbiguous);
 
   TMassImporterCompletedEvent = procedure(Sender: TObject; FilesImported,
     FilesFailure: Integer) of object;
@@ -97,12 +98,27 @@ begin
       if Subs1Exists then SubsFile := SubsFile1; // the SubsFile is SubsFile1
       if Subs2Exists then SubsFile := SubsFile2; // the SubsFile is SubsFile2
 
-      // we can't make the choice, Subs1 and Subs2 exists, it's the end user to
-      // do the choice so the result is marked as "ambiguous"
-      if Subs1Exists and Subs2Exists then Result := irSubsFileAmbiguous;
+      // This is only if the source file has an extension
+      if SourceFilesList.Files[i].HasExtension then begin
+        // we can't make the choice, Subs1 and Subs2 exists, it's the end user to
+        // do the choice so the result is marked as "ambiguous"
+        if Subs1Exists and Subs2Exists then begin
+          Result := irSubsFileAmbiguous;
+          Inc(Errors);
+        end;
+      end else begin
+        { The file has NOT extension, then the SubsFile must be the SubsFile2
+          (<radical_paks_name[.noext]>.xml }
+        SubsFile := SubsFile2;
+      end;
 
       // Not any subs XML file found
-      if (not Subs1Exists) and (not Subs2Exists) then Result := irSubsFileNotFound;
+      { In the case of the source file has not extension, the SubsFile1 is in
+        fact the real PAKS file, and the SubsFile2 is the SubsXML file. }
+      if (not Subs1Exists) and (not Subs2Exists) then begin
+        Result := irSubsFileNotFound;
+        Inc(Errors);
+      end;
 
       // Importing the XML to the PAKS and saving the modified PAKS
       if Result = irUndef then

@@ -36,6 +36,7 @@ type
   private
     fList: TList;
     fCharsInfoLoaded: Boolean;
+    fLoadedFileName: TFileName;
     function GetItem(Index: Integer): TNPCInfosTableEntry;
     function GetCount: Integer;
   protected
@@ -55,6 +56,7 @@ type
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TNPCInfosTableEntry read GetItem; default;
     property Loaded: Boolean read fCharsInfoLoaded;
+    property LoadedFileName: TFileName read fLoadedFileName;
   end;
 
 implementation
@@ -164,6 +166,7 @@ var
 begin
   Result := False;
   if not FileExists(FileName) then Exit;
+  fLoadedFileName := FileName;
 
   Clear;
 
