@@ -43,11 +43,13 @@ set ARCHIVE_NAME=%ARCHIVE_PATH%\sfqsubed_%VERSION%.zip
 
 REM Compressing the Converter program
 cd Converter\bin\
+IF NOT EXIST convert.exe goto convert_missing
 "%SEVENZIP_BIN%" a "..\..\%ARCHIVE_PATH%\convert.zip" batconv.cmd convert.exe tutorial.txt
 cd ..\..\ 
 
 REM Compressing the Free Quest program
 cd Editor\bin\
+IF NOT EXIST sfqsubed.exe goto sfqsubed_missing
 "%SEVENZIP_BIN%" a -r -x!.* "..\..\%ARCHIVE_NAME%" "..\..\%ARCHIVE_PATH%\convert.zip" "docs\*.*" "data\*.*" sfqsubed.exe
 cd ..\..\
 if exist "%ARCHIVE_PATH%\convert.zip" del "%ARCHIVE_PATH%\convert.zip"
@@ -55,6 +57,16 @@ if exist "%ARCHIVE_PATH%\convert.zip" del "%ARCHIVE_PATH%\convert.zip"
 REM Checking...
 if not exist "%ARCHIVE_NAME%" goto mk_error
 goto mk_success
+
+:convert_missing
+cd ..\..\
+echo ERROR: convert.exe missing. Please rebuild it in RELEASE mode.
+goto end
+
+:sfqsubed_missing
+cd ..\..\
+echo ERROR: sfqsubed.exe missing. Please rebuild it in RELEASE mode.
+goto end
 
 :mk_error
 echo ERROR: The archive "%ARCHIVE_NAME%" wasn't created...
