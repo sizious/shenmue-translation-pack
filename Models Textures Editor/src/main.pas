@@ -32,15 +32,13 @@ type
     Save1: TMenuItem;
     N2: TMenuItem;
     Saveas1: TMenuItem;
-    N3: TMenuItem;
     exturespreview1: TMenuItem;
     sdExportTex: TSaveDialog;
     bfdExportAllTex: TJvBrowseForFolderDialog;
     miView: TMenuItem;
-    StripGBIXheader1: TMenuItem;
     pmFilesList: TPopupMenu;
     Refresh1: TMenuItem;
-    PageControl1: TPageControl;
+    pcMain: TPageControl;
     TabSheet1: TTabSheet;
     Sections: TTabSheet;
     lvTexturesList: TListView;
@@ -66,6 +64,9 @@ type
     Export2: TMenuItem;
     N7: TMenuItem;
     Exportall2: TMenuItem;
+    pmSections: TPopupMenu;
+    miDumpSection: TMenuItem;
+    sdDumpSection: TSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Open1Click(Sender: TObject);
@@ -81,6 +82,7 @@ type
     procedure lvTexturesListKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure Save1Click(Sender: TObject);
+    procedure miDumpSectionClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -108,7 +110,7 @@ var
 implementation
 
 uses
-  MTScan_Intf, Progress, SelDir, TexView, Common, Pvr2Png;
+  MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png;
 
 {$R *.dfm}
 
@@ -164,10 +166,7 @@ begin
 
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
-  
-  // DEBUG
-//  SourceDirectory := 'G:\Sources\Shenmue\SHENMUE_2\SHENMUE2_DISC1\BUILD\DATA\SCENE\01\0001';
-  SourceDirectory := '.';
+  pcMain.TabIndex := 0;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -266,6 +265,20 @@ begin
 //  SourceDirectory := '';
   if Assigned(FilesList) then
     FilesList.Clear;
+end;
+
+procedure TfrmMain.miDumpSectionClick(Sender: TObject);
+var
+  Target: TSectionsListEntry;
+
+begin
+  if lvSectionsList.Selected = nil then Exit;
+  with sdDumpSection do begin
+    Target := MTEditor.Sections[lvSectionsList.Selected.Index];
+    FileName := Target.Name;
+    if Execute then
+      Target.SaveToFile(FileName);
+  end;
 end;
 
 procedure TfrmMain.exturespreview1Click(Sender: TObject);
