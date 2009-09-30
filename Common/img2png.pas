@@ -3,7 +3,7 @@
 
   Powered by Pvr2Png 1.01 by Gzav
 *)
-unit pvr2png;
+unit img2png;
 
 interface
 

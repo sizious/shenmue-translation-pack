@@ -15,8 +15,7 @@ uses
   fileslst in 'engine\fileslst.pas',
   seldir in 'seldir.pas' {frmSelectDir},
   texview in 'texview.pas' {frmTexPreview},
-  common in 'engine\common.pas',
-  pvr2png in '..\..\Common\pvr2png.pas';
+  common in 'engine\common.pas';
 
 {$R *.res}
 
