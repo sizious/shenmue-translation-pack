@@ -13,10 +13,10 @@
     <DCC_DebugInformation>False</DCC_DebugInformation>
     <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-    <DCC_ExeOutput>.\bin</DCC_ExeOutput>
-    <DCC_DcuOutput>.\obj</DCC_DcuOutput>
-    <DCC_ObjOutput>.\obj</DCC_ObjOutput>
-    <DCC_HppOutput>.\obj</DCC_HppOutput>
+    <DCC_ExeOutput>..\bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\obj</DCC_DcuOutput>
+    <DCC_ObjOutput>..\obj</DCC_ObjOutput>
+    <DCC_HppOutput>..\obj</DCC_HppOutput>
     <DCC_Define>DEBUG;DEBUG;RELEASE</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -94,6 +94,30 @@
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages></Delphi.Personality></BorlandProject></BorlandProject>
@@ -104,10 +128,10 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <RcCompile Include="..\..\Common\com_rsrc.rc">
-      <Form>..\..\Common\com_rsrc.res</Form>
+      <Form>'..\..\Common\com_rsrc.res'</Form>
     </RcCompile>
     <RcCompile Include="rsrc.rc">
-      <Form>rsrc.res</Form>
+      <Form>'rsrc.res'</Form>
     </RcCompile>
     <DCCReference Include="..\..\Common\img2png.pas" />
     <DCCReference Include="engine\common.pas" />
