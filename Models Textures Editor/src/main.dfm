@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Generated Name > // MT Editor // (C)reated by SiZiOUS'
-  ClientHeight = 446
+  ClientHeight = 526
   ClientWidth = 542
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,23 +18,24 @@ object frmMain: TfrmMain
   OnShow = FormShow
   DesignSize = (
     542
-    446)
+    526)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 2
     Top = 4
     Width = 149
-    Height = 313
+    Height = 393
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
+    ExplicitHeight = 313
     DesignSize = (
       149
-      313)
+      393)
     object Label9: TLabel
       Left = 6
-      Top = 287
+      Top = 367
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -45,16 +46,17 @@ object frmMain: TfrmMain
       Left = 6
       Top = 16
       Width = 137
-      Height = 265
+      Height = 345
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
+      ExplicitHeight = 265
     end
     object eFilesCount: TEdit
       Left = 70
-      Top = 284
+      Top = 364
       Width = 73
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -62,33 +64,37 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
+      ExplicitTop = 284
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 427
+    Top = 507
     Width = 542
     Height = 19
     Panels = <>
+    ExplicitTop = 427
   end
-  object PageControl1: TPageControl
+  object pcMain: TPageControl
     Left = 154
     Top = 4
     Width = 388
-    Height = 313
+    Height = 393
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
+    ExplicitHeight = 313
     object TabSheet1: TTabSheet
       Caption = 'Textures'
+      ExplicitHeight = 285
       DesignSize = (
         380
-        285)
+        365)
       object lvTexturesList: TListView
         Left = 3
         Top = 3
         Width = 283
-        Height = 278
+        Height = 358
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -112,6 +118,7 @@ object frmMain: TfrmMain
         ViewStyle = vsReport
         OnClick = lvTexturesListClick
         OnKeyUp = lvTexturesListKeyUp
+        ExplicitHeight = 278
       end
       object bImport: TButton
         Left = 287
@@ -147,18 +154,15 @@ object frmMain: TfrmMain
     object Sections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 265
+      ExplicitHeight = 285
       DesignSize = (
         380
-        285)
+        365)
       object lvSectionsList: TListView
         Left = 3
         Top = 3
         Width = 375
-        Height = 278
+        Height = 358
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -173,20 +177,22 @@ object frmMain: TfrmMain
         ColumnClick = False
         ReadOnly = True
         RowSelect = True
+        PopupMenu = pmSections
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 258
+        ExplicitHeight = 278
       end
     end
   end
   object GroupBox2: TGroupBox
     Left = 2
-    Top = 320
+    Top = 400
     Width = 536
     Height = 105
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 3
+    ExplicitTop = 320
     object mDebug: TMemo
       Left = 3
       Top = 16
@@ -282,12 +288,6 @@ object frmMain: TfrmMain
       object Makebackup1: TMenuItem
         Caption = 'Make &backup'
       end
-      object N3: TMenuItem
-        Caption = '-'
-      end
-      object StripGBIXheader1: TMenuItem
-        Caption = '&Strip GBIX header'
-      end
     end
     object About1: TMenuItem
       Caption = '&Help'
@@ -342,5 +342,21 @@ object frmMain: TfrmMain
     object Exportall2: TMenuItem
       Caption = '&Export all...'
     end
+  end
+  object pmSections: TPopupMenu
+    Left = 472
+    Top = 190
+    object miDumpSection: TMenuItem
+      Caption = '&Dump...'
+      OnClick = miDumpSectionClick
+    end
+  end
+  object sdDumpSection: TSaveDialog
+    DefaultExt = '.bin'
+    Filter = 'Generic Binary File (*.BIN)|*.bin|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Dump the selected section to...'
+    Left = 472
+    Top = 222
   end
 end

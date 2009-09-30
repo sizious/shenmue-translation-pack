@@ -1,7 +1,7 @@
 program mteditor;
 
 {$R 'rsrc.res' 'rsrc.rc'}
-{$R '..\..\Common\img2png.res' '..\..\Common\img2png.rc'}
+{$R '..\..\Common\com_rsrc.res' '..\..\Common\com_rsrc.rc'}
 
 uses
   Windows,
@@ -15,7 +15,8 @@ uses
   fileslst in 'engine\fileslst.pas',
   seldir in 'seldir.pas' {frmSelectDir},
   texview in 'texview.pas' {frmTexPreview},
-  common in 'engine\common.pas';
+  common in 'engine\common.pas',
+  img2png in '..\..\Common\img2png.pas';
 
 {$R *.res}
 
