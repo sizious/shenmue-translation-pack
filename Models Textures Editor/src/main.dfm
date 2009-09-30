@@ -29,7 +29,6 @@ object frmMain: TfrmMain
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
-    ExplicitHeight = 293
     DesignSize = (
       149
       313)
@@ -52,7 +51,6 @@ object frmMain: TfrmMain
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
-      ExplicitHeight = 245
     end
     object eFilesCount: TEdit
       Left = 70
@@ -64,7 +62,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
-      ExplicitTop = 264
     end
   end
   object StatusBar1: TStatusBar
@@ -73,7 +70,6 @@ object frmMain: TfrmMain
     Width = 542
     Height = 19
     Panels = <>
-    ExplicitTop = 407
   end
   object PageControl1: TPageControl
     Left = 154
@@ -83,10 +79,8 @@ object frmMain: TfrmMain
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
-    ExplicitHeight = 293
     object TabSheet1: TTabSheet
       Caption = 'Textures'
-      ExplicitHeight = 265
       DesignSize = (
         380
         285)
@@ -118,7 +112,6 @@ object frmMain: TfrmMain
         ViewStyle = vsReport
         OnClick = lvTexturesListClick
         OnKeyUp = lvTexturesListKeyUp
-        ExplicitHeight = 258
       end
       object bImport: TButton
         Left = 287
@@ -154,6 +147,9 @@ object frmMain: TfrmMain
     object Sections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 265
       DesignSize = (
         380
@@ -191,7 +187,6 @@ object frmMain: TfrmMain
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 3
-    ExplicitTop = 300
     object mDebug: TMemo
       Left = 3
       Top = 16
