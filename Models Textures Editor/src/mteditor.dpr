@@ -1,6 +1,7 @@
 program mteditor;
 
 {$R 'rsrc.res' 'rsrc.rc'}
+{$R '..\..\Common\img2png.res' '..\..\Common\img2png.rc'}
 
 uses
   Windows,
