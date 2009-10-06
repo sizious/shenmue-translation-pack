@@ -83,6 +83,7 @@ type
       Shift: TShiftState);
     procedure Save1Click(Sender: TObject);
     procedure miDumpSectionClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -110,7 +111,7 @@ var
 implementation
 
 uses
-  MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png;
+  MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools;
 
 {$R *.dfm}
 
@@ -153,6 +154,11 @@ begin
   ClearFilesInfos;
 end;
 
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SaveConfig;
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title + ' - v' + APP_VERSION + ' - (C)reated by [big_fury]SiZiOUS';
@@ -179,6 +185,7 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   Application.Title := frmMain.Caption;
+  LoadConfig;
 end;
 
 procedure TfrmMain.lbFilesListClick(Sender: TObject);
