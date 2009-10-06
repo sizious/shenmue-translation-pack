@@ -16,7 +16,8 @@ uses
   seldir in 'seldir.pas' {frmSelectDir},
   texview in 'texview.pas' {frmTexPreview},
   common in 'engine\common.pas',
-  img2png in '..\..\Common\img2png.pas';
+  img2png in '..\..\Common\img2png.pas',
+  tools in 'tools.pas';
 
 {$R *.res}
 

@@ -310,8 +310,41 @@ end;
 
 procedure TTexturesList.WriteTexturesSection_Shenmue2_MT7(var InStream,
   OutStream: TFileStream);
+var
+  i: Integer;
+  Item: TTexturesListEntry;
+  TXT7_Size_Offset, TXT7_Size, Buf: Integer;
+
 begin
-  
+  // Write TXT7 section name
+  OutStream.Write(GraphicSection.Name, 4);
+
+  // Write TXT7 section size
+  TXT7_Size := $0;
+  TXT7_Size_Offset := OutStream.Position;
+  OutStream.Write(TXT7_Size, GAME_INTEGER_SIZE); // reserve space
+
+  // Write Textures count
+  Buf := Count;
+  OutStream.Write(Buf, GAME_INTEGER_SIZE);
+  OutStream.Write(Buf, 
+
+  // Write Textures
+  for i := 0 to Count - 1 do begin
+    Item := Items[i];
+
+    if Item.Updated then begin
+      
+    end else begin
+      // Write original texture
+      InStream.Seek(Item.Offset, soFromBeginning);
+      OutStream.CopyFrom(InStream, Item.Size);
+    end;
+
+  end;
+
+  OutStream.Seek(TXT7_Size_Offset, soFromBeginning);
+  OutStream.Write(TXT7_Size, GAME_INTEGER_SIZE);
 end;
 
 procedure TTexturesList.WriteTexturesSection_Shenmue_MT5_MT6(var InStream,
