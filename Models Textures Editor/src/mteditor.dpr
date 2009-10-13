@@ -1,7 +1,7 @@
 program mteditor;
 
 {$R 'rsrc.res' 'rsrc.rc'}
-{$R '..\..\Common\com_rsrc.res' '..\..\Common\com_rsrc.rc'}
+{$R '..\..\Common\binaries.res' '..\..\Common\binaries.rc'}
 
 uses
   Windows,
