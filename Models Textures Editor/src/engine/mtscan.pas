@@ -44,7 +44,7 @@ implementation
 // -----------------------------------------------------------------------------
 
 uses
-  Main;
+  Main, MTEdit;
 
 { TMTScanDirectoryThread }
 
@@ -68,33 +68,43 @@ var
   i: Integer;
   FName: TFileName;
   ValidFile: Boolean;
-  Buf: string;
+  MTE_TestFiles: TModelTexturedEditor;
 
 begin
-  // Retrieving files list from the directory
-  if Assigned(fOnInitGettingFilesList) then
-    fOnInitGettingFilesList(Self);
-  GetDirectoryFilesList(Directory, fFilesList);
+  MTE_TestFiles := TModelTexturedEditor.Create;
+  try
+    // Retrieving files list from the directory
+    if Assigned(fOnInitGettingFilesList) then
+      fOnInitGettingFilesList(Self);
+    GetDirectoryFilesList(Directory, fFilesList);
+    fFilesList.Sort;
 
-  // scanning all found files
-  if Assigned(fOnStart) then
-    fOnStart(Self, fFilesList.Count);
+    // scanning all found files
+    if Assigned(fOnStart) then
+      fOnStart(Self, fFilesList.Count);
 
-  i := 0;
-  while (not Terminated) and (i < fFilesList.Count - 1) do begin
-    FName := fFilesList[i];
+    i := 0;
+    while (not Terminated) and (i < fFilesList.Count - 1) do begin
+      FName := fFilesList[i];
 
-    if Assigned(fOnFileFound) then
-      fOnFileFound(Self, FName);
+      if Assigned(fOnFileFound) then
+        fOnFileFound(Self, FName);
 
-    Buf := UpperCase(ExtractFileExt(FName));
-    ValidFile := (Buf = '.MT7') or (Buf = '.MT6') or (Buf = '.MT5');
+      // Opening and testing file...
+      ValidFile := MTE_TestFiles.LoadFromFile(FName);
+      if ValidFile then
+        ValidFile := MTE_TestFiles.Textures.Count > 0;
+      MTE_TestFiles.Close;
+      
+      // We have found a valid file or not ?
+      if Assigned(fOnFileScanned) then
+        fOnFileScanned(Self, FName, ValidFile);
 
-    // We have found a valid file or not ?
-    if Assigned(fOnFileScanned) then
-      fOnFileScanned(Self, FName, ValidFile);
+      Inc(i);
+    end;
 
-    Inc(i);
+  finally
+    MTE_TestFiles.Free;
   end;
 
   // Notify the Listener that the thread is over

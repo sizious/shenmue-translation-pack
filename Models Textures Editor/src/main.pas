@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, MTEdit, StdCtrls, Menus, ComCtrls, FilesLst, JvBaseDlg,
-  JvBrowseFolder;
+  JvBrowseFolder, ExtCtrls;
 
 const
   APP_VERSION = '0.1a';
@@ -67,6 +67,9 @@ type
     pmSections: TPopupMenu;
     miDumpSection: TMenuItem;
     sdDumpSection: TSaveDialog;
+    Button1: TButton;
+    odImportTexture: TOpenDialog;
+    rgVersion: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Open1Click(Sender: TObject);
@@ -84,11 +87,16 @@ type
     procedure Save1Click(Sender: TObject);
     procedure miDumpSectionClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure lvTexturesListContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure bImportClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
     fSourceDirectory: TFileName;
     fExportDirectory: TFileName;
+    fSelectedTexture: TTexturesListEntry;
+    fSelectedItem: TListItem;
   protected
     procedure LoadFileInView;
   public
@@ -96,11 +104,13 @@ type
     procedure Clear;
     procedure ClearFilesListControls;
     procedure ClearFilesInfos;
-    procedure UpdateTexturePreviewWindow;
+    function UpdateTexturePreviewWindow: Boolean;
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
     procedure SetStatus(const Text: string);
     property ExportDirectory: TFileName read fExportDirectory write fExportDirectory;
     property FilesList: TFilesList read fFilesList;
+    property SelectedItem: TListItem read fSelectedItem write fSelectedItem;
+    property SelectedTexture: TTexturesListEntry read fSelectedTexture write fSelectedTexture;
     property SourceDirectory: TFileName read fSourceDirectory write fSourceDirectory;
   end;
 
@@ -142,10 +152,19 @@ begin
   end;
 
   with sdExportTex do begin
-    FileName := MTEditor.Textures[lvTexturesList.ItemIndex].GetOutputTextureFileName;
+    FileName := SelectedTexture.GetOutputTextureFileName;
     if Execute then
-      MTEditor.Textures[lvTexturesList.ItemIndex].ExportToFile(FileName);
+      SelectedTexture.ExportToFile(FileName);
   end;
+end;
+
+procedure TfrmMain.bImportClick(Sender: TObject);
+begin
+  with odImportTexture do
+    if Execute then begin
+      SelectedTexture.ImportFromFile(FileName);
+      SelectedItem.SubItems[2] := 'Yes';
+    end;
 end;
 
 procedure TfrmMain.Clear;
@@ -212,12 +231,15 @@ var
 begin
   ClearFilesInfos;
 
+  rgVersion.ItemIndex := Integer(MTEditor.GameVersion);
+
   // Textures
   for i := 0 to MTEditor.Textures.Count - 1 do begin
     with lvTexturesList.Items.Add do begin
       Caption := IntToStr(i+1);
       SubItems.Add(IntToStr(MTEditor.Textures[i].Offset));
       SubItems.Add(IntToStr(MTEditor.Textures[i].Size));
+      SubItems.Add('');
 
       // Decoding the PVR texture to PNG...
       Data := TPVRConverter.Create;
@@ -239,8 +261,21 @@ begin
 end;
 
 procedure TfrmMain.lvTexturesListClick(Sender: TObject);
+var
+  TextureSelected: Boolean;
+
 begin
-  UpdateTexturePreviewWindow;
+  TextureSelected := UpdateTexturePreviewWindow;
+
+  // Enable or disable Import / export options
+  bImport.Enabled := TextureSelected;
+  bExport.Enabled := TextureSelected;
+end;
+
+procedure TfrmMain.lvTexturesListContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  lvTexturesListClick(Self);
 end;
 
 procedure TfrmMain.lvTexturesListKeyUp(Sender: TObject; var Key: Word;
@@ -282,7 +317,7 @@ begin
   if lvSectionsList.Selected = nil then Exit;
   with sdDumpSection do begin
     Target := MTEditor.Sections[lvSectionsList.Selected.Index];
-    FileName := Target.Name;
+    FileName := MTEditor.SourceFileName + '_' + Target.Name;
     if Execute then
       Target.SaveToFile(FileName);
   end;
@@ -337,15 +372,22 @@ begin
 
 end;
 
-procedure TfrmMain.UpdateTexturePreviewWindow;
+function TfrmMain.UpdateTexturePreviewWindow: Boolean;
 var
   PVRConverter: TPVRConverter;
 
 begin
-  if not Assigned(lvTexturesList.ItemFocused) then Exit;  
+  Result := False;
+  if lvTexturesList.ItemIndex = -1 then Exit;
+
+  // Set the current item selected
+  SelectedTexture := MTEditor.Textures[lvTexturesList.ItemIndex];
+  SelectedItem  := lvTexturesList.Items[lvTexturesList.ItemIndex];
+
+  // Load the proper picture
   PVRConverter := lvTexturesList.ItemFocused.Data;
   if not Assigned(PVRConverter) then Exit;
-  
+
   if frmTexPreview.Visible then begin
     with frmTexPreview do begin
       ClientHeight := PVRConverter.Height;
@@ -353,6 +395,8 @@ begin
       iTexture.Picture.LoadFromFile(PVRConverter.TargetFileName);
     end;
   end;
+
+  Result := True;
 end;
 
 end.
