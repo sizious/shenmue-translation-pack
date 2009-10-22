@@ -1,2 +1,2 @@
-PVR2PNG RCDATA ..\..\Common\Tools\pvr2png.exe
-PVRX2PNG RCDATA ..\..\Common\Tools\pvrx2png.exe
+PVR2PNG RCDATA ..\..\Common\Binaries\pvr2png.exe
+PVRX2PNG RCDATA ..\..\Common\Binaries\pvrx2png.exe

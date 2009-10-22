@@ -39,6 +39,9 @@ type
   // Entry of the TSectionsList
   TSectionsListEntry = class;
 
+  // Exports format for the textures
+  TExportFormat = (efAll, efPVR, efDDS);
+  
   // Texture list entry
   // Textures are PVR or DDS inside a GBIX container.
   // The GBIX format is: [GBIX_HEADER] (12 bytes) ... [TEX_DATA] (variable, in DDS/PVR format)
@@ -68,9 +71,10 @@ type
 
     procedure CancelImport;
     function ImportFromFile(const FileName: TFileName): Boolean;
-    procedure ExportToFile(const FileName: TFileName);
-    function ExportToFolder(const Folder: TFileName): TFileName;
-    function GetOutputTextureFileName: TFileName;
+    procedure ExportToFile(const FileName: TFileName; OutputFormat: TExportFormat);
+    function ExportToFolder(const Folder: TFileName): TFileName; overload;
+    function ExportToFolder(const Folder: TFileName; OutputFormat: TExportFormat): TFileName; overload;
+    function GetOutputTextureFileName(OutputFormat: TExportFormat): TFileName;
     function IsFileSection: Boolean; // if this texture is a registered section (TEXN). Shenmue 1 only.
 
     property DataOffset: Integer read fDataOffset;                // give the data offset in relative format (PVRT data or DDS data)
@@ -980,9 +984,10 @@ begin
   fMTEditorOwner := Owner.Owner;
 end;
 
-procedure TTexturesListEntry.ExportToFile(const FileName: TFileName);
+procedure TTexturesListEntry.ExportToFile(const FileName: TFileName; OutputFormat: TExportFormat);
 var
   F_src, F_dest: file;
+  TextureOffset, TextureSize: Integer;
 
 begin
 
@@ -992,29 +997,65 @@ begin
   {$I-}Reset(F_src, 1);{$I+}
   if IOResult <> 0 then Exit;
 
+  // opening the dest file
   AssignFile(F_dest, FileName);
   FileMode := fmOpenWrite;
   {$I-}ReWrite(F_dest, 1);{$I+}
   if IOResult <> 0 then Exit;
 
-  (*case MTEditorOwner.GameVersion of
-    gvShenmue:
-      CopyFileBlock(F_src, F_dest, Offset, Size); // not a container in TEXN sections (Shenmue 1)
-    gvShenmue2:
-      CopyFileBlock(F_src, F_dest, (Owner.GraphicSection.Offset + Offset), Size); // relative offset ('TXT7' is a container with several sections)
-  end;*)
+  // GBIX save...
+  TextureOffset := Offset;
+  TextureSize := Size;
 
   // copy the texture
-  CopyFileBlock(F_src, F_dest, Offset, Size);
+  case OutputFormat of
+    efAll: raise Exception.Create('ExportToFile: The efAll value is ONLY for the ExportToFolder method.');
+    efDDS:
+          begin
+            // Data only (DDS...)
+            TextureOffset := DataOffset;
+            TextureSize := DataSize;
+          end;
+  end;
+
+  CopyFileBlock(F_src, F_dest, TextureOffset, TextureSize);
 
   CloseFile(F_src);
   CloseFile(F_dest);
 end;
 
 function TTexturesListEntry.ExportToFolder(const Folder: TFileName): TFileName;
+var
+  OutputFormat: TExportFormat;
+
 begin
-  Result := IncludeTrailingPathDelimiter(Folder) + GetOutputTextureFileName;
-  ExportToFile(Result);
+  if (MTEditorOwner.GameVersion = gvShenmue2X) then
+    OutputFormat := efAll
+  else
+    OutputFormat := efPVR;
+
+  Result := ExportToFolder(Folder, OutputFormat);
+end;
+
+function TTexturesListEntry.ExportToFolder(const Folder: TFileName; OutputFormat: TExportFormat): TFileName;
+var
+  DDSResult: TFileName;
+
+begin
+  if OutputFormat <> efDDS then begin
+    // efAll & efPVR: Result is the PVR file
+    Result := IncludeTrailingPathDelimiter(Folder) + GetOutputTextureFileName(efPVR);
+    ExportToFile(Result, efPVR);
+  end;
+
+  if (OutputFormat <> efPVR) then begin
+    DDSResult := IncludeTrailingPathDelimiter(Folder) + GetOutputTextureFileName(efDDS);
+    ExportToFile(DDSResult, efDDS);
+  end;
+
+  // efDDS: Result is the DDS file
+  if (OutputFormat = efDDS) then
+    Result := DDSResult;
 end;
 
 function TTexturesListEntry.GetLoadedFileName: TFileName;
@@ -1022,9 +1063,19 @@ begin
   Result := Owner.Owner.SourceFileName
 end;
 
-function TTexturesListEntry.GetOutputTextureFileName: TFileName;
+function TTexturesListEntry.GetOutputTextureFileName(OutputFormat: TExportFormat): TFileName;
+var
+  sFormat: string;
+
 begin
-  Result := ExtractFileName(GetLoadedFileName) + '_PVR#' + Format('%2.2d', [Index + 1]) + '.pvr';
+  case OutputFormat of
+    efPVR: sFormat := 'pvr';
+    efDDS: sFormat := 'dds';
+    efAll: raise Exception.Create('ExportToFile: The efAll value is ONLY for the ExportToFolder method.');
+  end;
+
+  Result := ExtractFileName(GetLoadedFileName) + '_' + UpperCase(sFormat)
+    + '#' + Format('%2.2d', [Index + 1]) + '.' + sFormat;
 end;
 
 function TTexturesListEntry.GetTexturesSection: TSectionsListEntry;

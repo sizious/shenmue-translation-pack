@@ -32,9 +32,27 @@ object frmTexPreview: TfrmTexPreview
     Width = 122
     Height = 104
     Align = alClient
+    PopupMenu = pmTexture
+    OnContextPopup = iTextureContextPopup
     ExplicitLeft = 84
     ExplicitTop = 10
     ExplicitWidth = 105
     ExplicitHeight = 105
+  end
+  object sdTexture: TSaveDialog
+    DefaultExt = 'png'
+    Filter = 'Portable Network Graphics (*.PNG)|*.PNG|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Save texture to...'
+    Left = 32
+    Top = 24
+  end
+  object pmTexture: TPopupMenu
+    Left = 66
+    Top = 24
+    object miSaveTex: TMenuItem
+      Caption = '&Save...'
+      OnClick = miSaveTexClick
+    end
   end
 end

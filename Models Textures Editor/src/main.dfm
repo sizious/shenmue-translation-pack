@@ -1,9 +1,11 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = '< Generated Name > // MT Editor // (C)reated by SiZiOUS'
-  ClientHeight = 484
-  ClientWidth = 590
+  Caption = 
+    '< Generated Name > // MT Editor // (C)reated by [big_fury]SiZiOU' +
+    'S'
+  ClientHeight = 516
+  ClientWidth = 592
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,24 +20,25 @@ object frmMain: TfrmMain
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    590
-    484)
+    592
+    516)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 2
     Top = 4
     Width = 149
-    Height = 351
+    Height = 383
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
+    ExplicitHeight = 351
     DesignSize = (
       149
-      351)
+      383)
     object Label9: TLabel
       Left = 6
-      Top = 325
+      Top = 357
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -46,16 +49,17 @@ object frmMain: TfrmMain
       Left = 6
       Top = 16
       Width = 137
-      Height = 303
+      Height = 335
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
+      ExplicitHeight = 303
     end
     object eFilesCount: TEdit
       Left = 70
-      Top = 322
+      Top = 354
       Width = 73
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -63,33 +67,40 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
+      ExplicitTop = 322
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 465
-    Width = 590
+    Top = 497
+    Width = 592
     Height = 19
     Panels = <>
+    ExplicitTop = 465
+    ExplicitWidth = 590
   end
   object pcMain: TPageControl
     Left = 154
     Top = 4
-    Width = 436
-    Height = 351
+    Width = 438
+    Height = 383
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
+    ExplicitWidth = 436
+    ExplicitHeight = 351
     object TabSheet1: TTabSheet
       Caption = 'Textures'
+      ExplicitWidth = 428
+      ExplicitHeight = 323
       DesignSize = (
-        428
-        323)
+        430
+        355)
       object lvTexturesList: TListView
         Left = 3
         Top = 3
-        Width = 331
-        Height = 316
+        Width = 333
+        Height = 348
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -114,11 +125,13 @@ object frmMain: TfrmMain
         OnClick = lvTexturesListClick
         OnContextPopup = lvTexturesListContextPopup
         OnKeyUp = lvTexturesListKeyUp
+        ExplicitWidth = 331
+        ExplicitHeight = 316
       end
       object bImport: TButton
-        Left = 335
+        Left = 337
         Top = 17
-        Width = 90
+        Width = 92
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Import...'
@@ -127,39 +140,42 @@ object frmMain: TfrmMain
         OnClick = bImportClick
       end
       object bExport: TButton
-        Left = 335
+        Left = 337
         Top = 44
-        Width = 90
+        Width = 92
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Export...'
+        Enabled = False
         TabOrder = 2
         OnClick = bExportClick
       end
       object bExportAll: TButton
-        Left = 335
+        Left = 337
         Top = 71
-        Width = 90
+        Width = 92
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Export all...'
+        Enabled = False
         TabOrder = 3
         OnClick = bExportAllClick
       end
-      object Button1: TButton
-        Left = 335
+      object bUndo: TButton
+        Left = 337
         Top = 99
-        Width = 90
+        Width = 92
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Undo import...'
         Enabled = False
         TabOrder = 4
+        OnClick = bUndoClick
       end
       object rgVersion: TRadioGroup
         Left = 338
         Top = 126
-        Width = 87
+        Width = 91
         Height = 87
         Caption = ' Version : '
         Enabled = False
@@ -174,14 +190,16 @@ object frmMain: TfrmMain
     object Sections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
+      ExplicitWidth = 428
+      ExplicitHeight = 323
       DesignSize = (
-        428
-        323)
+        430
+        355)
       object lvSectionsList: TListView
         Left = 3
         Top = 3
-        Width = 423
-        Height = 316
+        Width = 425
+        Height = 348
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -199,30 +217,34 @@ object frmMain: TfrmMain
         PopupMenu = pmSections
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 296
+        ExplicitWidth = 423
+        ExplicitHeight = 316
       end
     end
   end
   object GroupBox2: TGroupBox
     Left = 2
-    Top = 358
-    Width = 584
+    Top = 390
+    Width = 586
     Height = 105
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 3
+    ExplicitTop = 358
+    ExplicitWidth = 584
     DesignSize = (
-      584
+      586
       105)
     object mDebug: TMemo
       Left = 6
       Top = 16
-      Width = 571
+      Width = 573
       Height = 83
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
       ReadOnly = True
       TabOrder = 0
+      ExplicitWidth = 571
     end
   end
   object mmMain: TMainMenu
@@ -263,23 +285,31 @@ object frmMain: TfrmMain
     end
     object Edit1: TMenuItem
       Caption = '&Edit'
-      object Undo1: TMenuItem
+      object miUndo: TMenuItem
         Caption = '&Undo changes...'
+        ShortCut = 16474
+        OnClick = bUndoClick
       end
       object N5: TMenuItem
         Caption = '-'
       end
-      object Import1: TMenuItem
+      object miImport: TMenuItem
         Caption = '&Import texture...'
+        ShortCut = 16457
+        OnClick = bImportClick
       end
-      object Export1: TMenuItem
+      object miExport: TMenuItem
         Caption = '&Export texture...'
+        ShortCut = 16453
+        OnClick = bExportClick
       end
       object N6: TMenuItem
         Caption = '-'
       end
-      object Exportall1: TMenuItem
+      object miExportAll: TMenuItem
         Caption = '&Export all...'
+        ShortCut = 16449
+        OnClick = bExportAllClick
       end
     end
     object miView: TMenuItem
@@ -331,7 +361,7 @@ object frmMain: TfrmMain
     Top = 64
   end
   object sdExportTex: TSaveDialog
-    DefaultExt = '.pvr'
+    DefaultExt = 'pvr'
     Filter = 'PowerVR Textures Files (*.pvr)|*.pvr|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Export the selected texture to...'
@@ -355,17 +385,20 @@ object frmMain: TfrmMain
   object pmTextures: TPopupMenu
     Left = 508
     Top = 296
-    object Import2: TMenuItem
+    object miImport2: TMenuItem
       Caption = '&Import...'
+      OnClick = bImportClick
     end
-    object Export2: TMenuItem
+    object miExport2: TMenuItem
       Caption = '&Export...'
+      OnClick = bExportClick
     end
     object N7: TMenuItem
       Caption = '-'
     end
-    object Exportall2: TMenuItem
+    object miExportAll2: TMenuItem
       Caption = '&Export all...'
+      OnClick = bExportAllClick
     end
   end
   object pmSections: TPopupMenu
@@ -386,10 +419,10 @@ object frmMain: TfrmMain
   end
   object odImportTexture: TOpenDialog
     DefaultExt = 'PVR'
-    Filter = 'Textures Files (*.PVR)|*.PVR|All Files (*.*)|*.*'
+    Filter = 'PowerVR Textures Files (*.pvr)|*.pvr|All Files (*.*)|*.*'
     Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select your texture file...'
-    Left = 18
+    Left = 20
     Top = 198
   end
 end

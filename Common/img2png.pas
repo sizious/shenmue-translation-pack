@@ -11,11 +11,22 @@ uses
   Windows, SysUtils, Classes;
 
 type
-  TTextureType = (ttUnknow, ttSmallVQ128, ttSmallVQ64, ttSmallVQ32,
-                  ttSmallVQ16, ttVQ, ttTwiddle, ttRectangle);
+  TTextureType = (
+    ttUnknow, ttSmallVQ128, ttSmallVQ64, ttSmallVQ32,
+    ttSmallVQ16, ttVQ, ttTwiddle, ttRectangle,
+    ttNotApplicable
+  );
 
-  TPixelFormat = (pfUnknow, pfBump, pfRGB565, pfYUV422, pfARGB4444, pfARGB1555);
+  TPixelFormat = (
+    pfUnknow,
+    pfBump, pfRGB565, pfYUV422, pfARGB4444, pfARGB1555,
+    pfDXT1, pfDXT3, pfDXT5, pfUncompressed
+  );
 
+  TFileFormat = (ffUnknow, ffPVR, ffDDS, ffPVRX, ffGBIXPVRX);
+
+  TFileType = (ftUnknow, ftDreamcast, ftXBox);
+  
   TPVRConverter = class(TObject)
   private
     fTargetFileName: TFileName; // Output PNG file
@@ -29,9 +40,13 @@ type
     fMipmap: Boolean;
     fPixelFormat: TPixelFormat;
     fLoaded: Boolean;
+    fFileType: TFileType;
+    fFileFormat: TFileFormat;
   protected
+    function GetFileSystemType(const FileName: TFileName): TFileType;
     function RunEngine: Boolean;
-    procedure ParseConsoleOutputFile;
+    procedure ParseConsoleOutputFile_Dreamcast;
+    procedure ParseConsoleOutputFile_Xbox;
   public
     destructor Destroy; override;
     
@@ -40,6 +55,8 @@ type
 
     property DataSize: Integer read fDataSize;
     property Encoding: TTextureType read fEncoding;
+    property FileFormat: TFileFormat read fFileFormat;
+    property FileType: TFileType read fFileType;
     property GlobalIndex: Integer read fGlobalIndex;
     property Height: Integer read fHeight;
     property Loaded: Boolean read fLoaded;
@@ -58,7 +75,8 @@ uses
   Common, Utils;
 
 var
-  EngineFile: TFileName;
+  PVR_EngineFile,
+  PVRX_EngineFile: TFileName;
 
 { TPVRConverter }
 
@@ -69,6 +87,9 @@ var
 begin
   Result := False;
   try
+    fFileType := ftUnknow;
+    fFileFormat := ffUnknow;
+    
     Result := FileExists(SourceFileName);
     if not Result then Exit;
     Clear;
@@ -78,11 +99,19 @@ begin
     fTargetFileName := RadicalName + '.png';
     fConsoleOutputFileName := RadicalName + '.out';
 
+    fFileType := GetFileSystemType(SourceFileName);
+
     // Run conversion
     if RunEngine then begin
       Result := True;
       fLoaded := True;
-      ParseConsoleOutputFile; // fill infos file
+      // Fill infos file;
+      case FileType of
+        ftDreamcast: ParseConsoleOutputFile_Dreamcast;
+        ftXBox: ParseConsoleOutputFile_Xbox;
+        ftUnknow: raise Exception.Create('SORRY IMPOSSIBLE TO DETERMINATE THE FILE TYPE...');
+      end;
+
     end;
   except
 {$IFDEF DEBUG}
@@ -91,7 +120,7 @@ begin
   end;
 end;
 
-procedure TPVRConverter.ParseConsoleOutputFile;
+procedure TPVRConverter.ParseConsoleOutputFile_Dreamcast;
 var
   ConvResults: TStringList;
   Buf: string;
@@ -133,6 +162,55 @@ begin
 
     // Mipmap
     fMipMap := Right(': ', ConvResults[10]) = 'Yes';
+
+    fFileFormat := ffPVR;
+  finally
+    ConvResults.Free;
+
+    if FileExists(fConsoleOutputFileName) then
+      DeleteFile(fConsoleOutputFileName);
+  end;
+end;
+
+procedure TPVRConverter.ParseConsoleOutputFile_Xbox;
+var
+  ConvResults: TStringList;
+  Buf: string;
+  
+begin
+  ConvResults := TStringList.Create;
+  try
+    ConvResults.LoadFromFile(fConsoleOutputFileName);
+
+    // File format
+    Buf := Right(': ', ConvResults[5]);
+    if Buf = 'GBIX / PVR-X' then fFileFormat := ffGBIXPVRX;
+    if Buf = 'PVR-X' then fFileFormat := ffPVRX;
+    if Buf = 'DDS' then fFileFormat := ffDDS;
+
+    // Global Index (GBIX)
+    fGlobalIndex := StrToIntDef(Right(': ', ConvResults[6]), 0);
+
+    // Image size
+    fWidth := StrToIntDef(ExtractStr(': ', 'x', ConvResults[7]), 0);
+    fHeight := StrToIntDef(Right('x', ConvResults[7]), 0);
+
+    // Data size
+    fDataSize := StrToIntDef(Right(': ', ConvResults[8]), 0);
+
+    // Pixel format
+    fPixelFormat := pfUnknow;
+    Buf := Right(': ', ConvResults[9]);
+    if Buf = 'Uncompressed' then fPixelFormat := pfUncompressed;
+    if Buf = 'DXT1' then fPixelFormat := pfDXT1;
+    if Buf = 'DXT3' then fPixelFormat := pfDXT3;
+    if Buf = 'DXT5' then fPixelFormat := pfDXT5;
+
+    // Texture type
+    fEncoding := ttNotApplicable;
+
+    // Mipmap
+    fMipMap := False;
   finally
     ConvResults.Free;
 
@@ -144,9 +222,17 @@ end;
 function TPVRConverter.RunEngine: Boolean;
 var
   BatchContent: TStringList;
-  BatchTarget: TFileName;
+  BatchTarget, EngineFile: TFileName;
 
 begin
+  Result := False;
+  
+  case FileType of
+    ftUnknow: Exit;
+    ftDreamcast: EngineFile := PVR_EngineFile;
+    ftXBox: EngineFile := PVRX_EngineFile;
+  end;
+
   // Creating the batch file
   BatchTarget := ChangeFileExt(fTargetFileName, '.bat');
   BatchContent := TStringList.Create;
@@ -196,8 +282,53 @@ begin
   inherited Destroy;
 end;
 
+function TPVRConverter.GetFileSystemType(const FileName: TFileName): TFileType;
+type
+  TRawEntry = record
+    Name: array[0..3] of Char;
+    Size: LongWord;
+  end;
+
+const
+  GBIX_SIGN = 'GBIX';
+  PVRT_SIGN = 'PVRT';
+  DDS__SIGN = 'DDS ';
+  PVRT_SIZE = 8;
+  
+var
+  Stream: TFileStream;
+  Entry: TRawEntry;
+
+begin
+  Result := ftUnknow;
+  Stream := TFileStream.Create(FileName, fmOpenRead);
+  try
+    // Read GBIX
+    Stream.Read(Entry, SizeOf(Entry));
+    if not (Entry.Name = GBIX_SIGN) then Exit;
+    Stream.Seek(Entry.Size, soCurrent);
+
+    // Read PVRT
+    Stream.Read(Entry, SizeOf(Entry));
+    if not (Entry.Name = PVRT_SIGN) then Exit;
+    Stream.Seek(PVRT_SIZE, soCurrent);
+
+    // Read PVRT data
+    Stream.Read(Entry, SizeOf(Entry));
+    if (Entry.Name = DDS__SIGN) then
+      Result := ftXBox
+    else
+      Result := ftDreamcast;
+  finally
+    Stream.Free;
+  end;
+end;
+
 initialization
-  EngineFile := GetWorkingDirectory + 'pvr2png.exe';
-  ExtractFile('PVR2PNG', EngineFile);
+  PVR_EngineFile := GetWorkingDirectory + 'pvr2png.exe';
+  ExtractFile('PVR2PNG', PVR_EngineFile);
+  
+  PVRX_EngineFile := GetWorkingDirectory + 'pvrx2png.exe';
+  ExtractFile('PVRX2PNG', PVRX_EngineFile);
 
 end.
