@@ -52,22 +52,22 @@ type
     Savedebuglog1: TMenuItem;
     Cleardebuglog1: TMenuItem;
     Edit1: TMenuItem;
-    Undo1: TMenuItem;
+    miUndo: TMenuItem;
     N5: TMenuItem;
-    Import1: TMenuItem;
-    Export1: TMenuItem;
+    miImport: TMenuItem;
+    miExport: TMenuItem;
     N6: TMenuItem;
-    Exportall1: TMenuItem;
+    miExportAll: TMenuItem;
     exturespreviewontop1: TMenuItem;
     pmTextures: TPopupMenu;
-    Import2: TMenuItem;
-    Export2: TMenuItem;
+    miImport2: TMenuItem;
+    miExport2: TMenuItem;
     N7: TMenuItem;
-    Exportall2: TMenuItem;
+    miExportAll2: TMenuItem;
     pmSections: TPopupMenu;
     miDumpSection: TMenuItem;
     sdDumpSection: TSaveDialog;
-    Button1: TButton;
+    bUndo: TButton;
     odImportTexture: TOpenDialog;
     rgVersion: TRadioGroup;
     procedure FormCreate(Sender: TObject);
@@ -90,6 +90,7 @@ type
     procedure lvTexturesListContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
     procedure bImportClick(Sender: TObject);
+    procedure bUndoClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -98,6 +99,9 @@ type
     fSelectedTexture: TTexturesListEntry;
     fSelectedItem: TListItem;
   protected
+    procedure ChangeControlsState(State: Boolean);
+    procedure ChangeExportAllControlsState(State: Boolean);
+    procedure ChangeUndoImportControlsState(State: Boolean);
     procedure LoadFileInView;
   public
     { Déclarations publiques }
@@ -123,28 +127,34 @@ implementation
 uses
   MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools;
 
+const
+  DEFAULT_WIDTH = 600;
+  DEFAULT_HEIGHT = 570;
+   
 {$R *.dfm}
 
 procedure TfrmMain.bExportAllClick(Sender: TObject);
 var
   i: Integer;
-  Item: TTexturesListEntry;
   
 begin
   with bfdExportAllTex do begin
     if ExportDirectory = '' then
       ExportDirectory := IncludeTrailingPathDelimiter(ExtractFilePath(MTEditor.SourceFileName));
     Directory := ExportDirectory;
-    if Execute then
-      for i := 0 to MTEditor.Textures.Count - 1 do begin
-        Directory := IncludeTrailingPathDelimiter(Directory);
-        Item := MTEditor.Textures[i];
-        Item.ExportToFile(Directory + Item.GetOutputTextureFileName);
-      end;
+    if Execute then begin
+      Directory := IncludeTrailingPathDelimiter(Directory);
+      ExportDirectory := Directory;
+      for i := 0 to MTEditor.Textures.Count - 1 do
+        MTEditor.Textures[i].ExportToFolder(Directory);
+    end;
   end;
 end;
 
 procedure TfrmMain.bExportClick(Sender: TObject);
+var
+  OutputFormat: TExportFormat;
+
 begin
   if lvTexturesList.ItemIndex = -1 then begin
     MsgBox('Please select an item in the textures list.', 'Warning', MB_ICONEXCLAMATION);
@@ -152,9 +162,24 @@ begin
   end;
 
   with sdExportTex do begin
-    FileName := SelectedTexture.GetOutputTextureFileName;
-    if Execute then
-      SelectedTexture.ExportToFile(FileName);
+    FileName := ChangeFileExt(ExtractFileName(MTEditor.SourceFileName), '') + '_TEX#'
+      + Format('%2.2d', [SelectedTexture.Index + 1]);
+
+    // Add the DDS for Shenmue 2X
+    if MTEditor.GameVersion = gvShenmue2X then
+      Filter := 'PowerVR Textures Files (*.PVR)|*.pvr|DirectDraw Surface Files (*.DDS)|*.dds|All Files (*.*)|*.*'
+    else
+      Filter := 'PowerVR Textures Files (*.PVR)|*.pvr|All Files (*.*)|*.*';
+    FilterIndex := 1;
+
+    if Execute then begin
+      OutputFormat := efPVR;
+      if (FilterIndex = 2) and (MTEditor.GameVersion = gvShenmue2X) then
+        OutputFormat := efDDS;
+
+      SelectedTexture.ExportToFile(FileName, OutputFormat);
+    end;
+
   end;
 end;
 
@@ -167,10 +192,41 @@ begin
     end;
 end;
 
+procedure TfrmMain.bUndoClick(Sender: TObject);
+begin
+  SelectedTexture.CancelImport;
+end;
+
+procedure TfrmMain.ChangeControlsState(State: Boolean);
+begin
+  bImport.Enabled := State;
+  bExport.Enabled := State;
+  miImport.Enabled := bImport.Enabled;
+  miExport.Enabled := bExport.Enabled;
+  miImport2.Enabled := bImport.Enabled;
+  miExport2.Enabled := bExport.Enabled;
+end;
+
+procedure TfrmMain.ChangeExportAllControlsState(State: Boolean);
+begin
+  bExportAll.Enabled := State;
+  miExportAll.Enabled := State;
+  miExportAll2.Enabled := State;
+end;
+
+procedure TfrmMain.ChangeUndoImportControlsState(State: Boolean);
+begin
+  bUndo.Enabled := State;
+  miUndo.Enabled := State;
+end;
+
 procedure TfrmMain.Clear;
 begin
   ClearFilesListControls;
   ClearFilesInfos;
+  ChangeUndoImportControlsState(False);
+  ChangeControlsState(False);
+  ChangeExportAllControlsState(False);
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -189,6 +245,8 @@ begin
   // Initialization of the FileList object
   fFilesList := TFilesList.Create;
 
+  Height := DEFAULT_HEIGHT;
+  Width := DEFAULT_WIDTH;
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
   pcMain.TabIndex := 0;
@@ -218,6 +276,13 @@ begin
   if FileEntry.Exists then begin
     MTEditor.LoadFromFile(FileEntry.FileName);
     LoadFileInView; // load textures
+
+    // Clear preview window
+    if Assigned(frmTexPreview) then begin
+      frmTexPreview.iTexture.Picture := nil;
+      frmTexPreview.ClientHeight := DEFAULT_HEIGHT;
+      frmTexPreview.ClientWidth := DEFAULT_WIDTH;
+    end;
   end else
     SetStatus(FileEntry.ExtractedFileName + ' has been deleted!');
 end;
@@ -227,6 +292,7 @@ var
   i: Integer;
   TmpPvr: TFileName;
   PVRConverter: TPVRConverter;
+  HasTextures: Boolean;
 
 begin
   ClearFilesInfos;
@@ -234,6 +300,7 @@ begin
   rgVersion.ItemIndex := Integer(MTEditor.GameVersion);
 
   // Textures
+  HasTextures := MTEditor.Textures.Count > 0;
   for i := 0 to MTEditor.Textures.Count - 1 do begin
     with lvTexturesList.Items.Add do begin
       Caption := IntToStr(i+1);
@@ -244,11 +311,13 @@ begin
       // Decoding the PVR texture to PNG...
       Data := TPVRConverter.Create;
       PVRConverter := TPVRConverter(Data);
-      TmpPvr := MTEditor.Textures[i].ExportToFolder(GetWorkingDirectory);
+      TmpPvr := MTEditor.Textures[i].ExportToFolder(GetWorkingDirectory, efPVR);
       if PVRConverter.LoadFromFile(TmpPvr) then
         DeleteFile(TmpPvr);
     end;
   end;
+
+  ChangeExportAllControlsState(HasTextures);
 
   // Sections
   for i := 0 to MTEditor.Sections.Count - 1 do begin
@@ -268,8 +337,7 @@ begin
   TextureSelected := UpdateTexturePreviewWindow;
 
   // Enable or disable Import / export options
-  bImport.Enabled := TextureSelected;
-  bExport.Enabled := TextureSelected;
+  ChangeControlsState(TextureSelected);
 end;
 
 procedure TfrmMain.lvTexturesListContextPopup(Sender: TObject; MousePos: TPoint;
@@ -298,6 +366,7 @@ begin
     TPVRConverter(lvTexturesList.Items[i].Data).Free;
   lvTexturesList.Clear;
   lvSectionsList.Clear;
+  ChangeControlsState(False);
 end;
 
 procedure TfrmMain.ClearFilesListControls;
@@ -385,11 +454,12 @@ begin
   SelectedItem  := lvTexturesList.Items[lvTexturesList.ItemIndex];
 
   // Load the proper picture
-  PVRConverter := lvTexturesList.ItemFocused.Data;
+  PVRConverter := SelectedItem.Data;
   if not Assigned(PVRConverter) then Exit;
 
   if frmTexPreview.Visible then begin
     with frmTexPreview do begin
+      LoadedFileName := PVRConverter.TargetFileName;
       ClientHeight := PVRConverter.Height;
       ClientWidth := PVRConverter.Width;
       iTexture.Picture.LoadFromFile(PVRConverter.TargetFileName);
