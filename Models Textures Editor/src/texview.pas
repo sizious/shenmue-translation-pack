@@ -7,8 +7,8 @@ uses
   Dialogs, ExtCtrls, Img2Png, Menus;
 
 const
-  DEFAULT_HEIGHT = 128;
-  DEFAULT_WIDTH = 128;
+  DEFAULT_PREVIEW_HEIGHT = 128;
+  DEFAULT_PREVIEW_WIDTH = 128;
 
 type
   TfrmTexPreview = class(TForm)
@@ -48,8 +48,8 @@ end;
 procedure TfrmTexPreview.FormCreate(Sender: TObject);
 begin
   iBkgnd.Picture.LoadFromFile(InitializeWindow);
-  ClientHeight := DEFAULT_HEIGHT;
-  ClientWidth := DEFAULT_WIDTH;
+  ClientHeight := DEFAULT_PREVIEW_HEIGHT;
+  ClientWidth := DEFAULT_PREVIEW_WIDTH;
 end;
 
 procedure TfrmTexPreview.iTextureContextPopup(Sender: TObject; MousePos: TPoint;
