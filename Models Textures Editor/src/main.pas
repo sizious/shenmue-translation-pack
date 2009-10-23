@@ -280,8 +280,8 @@ begin
     // Clear preview window
     if Assigned(frmTexPreview) then begin
       frmTexPreview.iTexture.Picture := nil;
-      frmTexPreview.ClientHeight := DEFAULT_HEIGHT;
-      frmTexPreview.ClientWidth := DEFAULT_WIDTH;
+      frmTexPreview.ClientHeight := DEFAULT_PREVIEW_HEIGHT;
+      frmTexPreview.ClientWidth := DEFAULT_PREVIEW_WIDTH;
     end;
   end else
     SetStatus(FileEntry.ExtractedFileName + ' has been deleted!');
