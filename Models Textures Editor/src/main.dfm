@@ -32,7 +32,6 @@ object frmMain: TfrmMain
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
-    ExplicitHeight = 351
     DesignSize = (
       149
       383)
@@ -55,7 +54,6 @@ object frmMain: TfrmMain
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
-      ExplicitHeight = 303
     end
     object eFilesCount: TEdit
       Left = 70
@@ -67,7 +65,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
-      ExplicitTop = 322
     end
   end
   object StatusBar1: TStatusBar
@@ -76,8 +73,6 @@ object frmMain: TfrmMain
     Width = 592
     Height = 19
     Panels = <>
-    ExplicitTop = 465
-    ExplicitWidth = 590
   end
   object pcMain: TPageControl
     Left = 154
@@ -87,12 +82,8 @@ object frmMain: TfrmMain
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
-    ExplicitWidth = 436
-    ExplicitHeight = 351
     object TabSheet1: TTabSheet
       Caption = 'Textures'
-      ExplicitWidth = 428
-      ExplicitHeight = 323
       DesignSize = (
         430
         355)
@@ -125,8 +116,6 @@ object frmMain: TfrmMain
         OnClick = lvTexturesListClick
         OnContextPopup = lvTexturesListContextPopup
         OnKeyUp = lvTexturesListKeyUp
-        ExplicitWidth = 331
-        ExplicitHeight = 316
       end
       object bImport: TButton
         Left = 337
@@ -190,6 +179,8 @@ object frmMain: TfrmMain
     object Sections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 428
       ExplicitHeight = 323
       DesignSize = (
@@ -230,8 +221,6 @@ object frmMain: TfrmMain
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 3
-    ExplicitTop = 358
-    ExplicitWidth = 584
     DesignSize = (
       586
       105)
@@ -244,7 +233,6 @@ object frmMain: TfrmMain
       Color = clBtnFace
       ReadOnly = True
       TabOrder = 0
-      ExplicitWidth = 571
     end
   end
   object mmMain: TMainMenu
