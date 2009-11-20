@@ -100,7 +100,8 @@ echo     Select your virtual drive in nullDC and run the game to test it.
 :end
 echo.
 echo [*] Based on the Selfboot DATA Pack v1.3 by FamilyGuy
-echo     Thanks to FamilyGuy, Xzyx987X, ECHELON, M$, Neoblast, Indiket, DarkFalz and jj1odm.     
+echo     Thanks to FamilyGuy, Xzyx987X, ECHELON, M$, Neoblast, Indiket, DarkFalz 
+echo     and jj1odm.     
 echo     Press any key to exit...
 pause > nul
 
