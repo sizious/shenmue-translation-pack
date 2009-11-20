@@ -10,6 +10,8 @@ echo ===========================================================================
 echo.
 echo [i] Initializing...
 if not exist IP.BIN goto error
+if exist %OUTPUT_FILE% del %OUTPUT_FILE% > nul 2> nul
+if exist %OUTPUT_FILE% goto error_image_in_use
 goto auto_binhack
 
 :error
@@ -29,6 +31,12 @@ goto END
 echo.
 echo [!] Sorry, NO data session was made!
 echo     Please check that you have the copied the game data in the data folder.
+goto end
+
+:error_image_in_use
+echo.
+echo [!] Sorry, the output file "%OUTPUT_FILE%" is in use. 
+echo     Please unmount it from your Virtual Drive, and restart this process again.
 goto end
 
 :auto_binhack
@@ -85,13 +93,14 @@ goto finished
 
 :finished
 echo.
-echo [i] The %OUTPUT_FILE% image was built.
+echo [i] The "%OUTPUT_FILE%" image was built.
 echo     You can mount it with Daemon Tools or Alcohol.
 echo     Select your virtual drive in nullDC and run the game to test it.
 
 :end
 echo.
-echo [*] Based on the Selfboot DATA Pack v1.3 by FamilyGuy           
+echo [*] Based on the Selfboot DATA Pack v1.3 by FamilyGuy
+echo     Thanks to FamilyGuy, Xzyx987X, ECHELON, M$, Neoblast, Indiket, DarkFalz and jj1odm.     
 echo     Press any key to exit...
 pause > nul
 
