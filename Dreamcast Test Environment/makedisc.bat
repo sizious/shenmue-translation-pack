@@ -102,6 +102,6 @@ echo.
 echo [*] Based on the Selfboot DATA Pack v1.3 by FamilyGuy
 echo     Thanks to FamilyGuy, Xzyx987X, ECHELON, M$, Neoblast, Indiket, DarkFalz 
 echo     and jj1odm.     
-echo     Press any key to exit...
+echo [i] Press any key to exit...
 pause > nul
 
