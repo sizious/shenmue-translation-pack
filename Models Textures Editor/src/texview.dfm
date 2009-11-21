@@ -3,8 +3,8 @@ object frmTexPreview: TfrmTexPreview
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Texture preview'
-  ClientHeight = 104
-  ClientWidth = 122
+  ClientHeight = 232
+  ClientWidth = 250
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,8 +18,8 @@ object frmTexPreview: TfrmTexPreview
   object iBkgnd: TImage
     Left = 0
     Top = 0
-    Width = 122
-    Height = 104
+    Width = 250
+    Height = 232
     Align = alClient
     ExplicitLeft = 84
     ExplicitTop = 10
@@ -29,9 +29,10 @@ object frmTexPreview: TfrmTexPreview
   object iTexture: TImage
     Left = 0
     Top = 0
-    Width = 122
-    Height = 104
+    Width = 250
+    Height = 232
     Align = alClient
+    Center = True
     PopupMenu = pmTexture
     OnContextPopup = iTextureContextPopup
     ExplicitLeft = 84
@@ -44,12 +45,12 @@ object frmTexPreview: TfrmTexPreview
     Filter = 'Portable Network Graphics (*.PNG)|*.PNG|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save texture to...'
-    Left = 32
-    Top = 24
+    Left = 34
+    Top = 106
   end
   object pmTexture: TPopupMenu
     Left = 66
-    Top = 24
+    Top = 102
     object miSaveTex: TMenuItem
       Caption = '&Save...'
       OnClick = miSaveTexClick

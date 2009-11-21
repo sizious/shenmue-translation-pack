@@ -790,7 +790,7 @@ begin
       Seek(F, NextSectionOffset);
 //    end;
 
-    Done := EOF(F) and (Offset + SizeOf(TRawSectionHeader) < FileSize(F));
+    Done := (EOF(F) and (Offset + SizeOf(TRawSectionHeader) < FileSize(F))) or (RawEntry.Name[0] = #0);
   end; // while
 end;
 
@@ -888,7 +888,12 @@ begin
 {$ENDIF}
         
     except
-      Result := False;
+      on E:Exception do begin
+{$IFDEF DEBUG}
+        WriteLn('READ ERROR: "', ExtractFileName(FileName), '", message: "', E.Message, '"', sLineBreak);
+{$ENDIF}
+        Result := False;
+      end;
     end;
 
   finally
