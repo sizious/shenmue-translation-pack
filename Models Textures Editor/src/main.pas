@@ -58,7 +58,6 @@ type
     miExport: TMenuItem;
     N6: TMenuItem;
     miExportAll: TMenuItem;
-    exturespreviewontop1: TMenuItem;
     pmTextures: TPopupMenu;
     miImport2: TMenuItem;
     miExport2: TMenuItem;
@@ -70,6 +69,9 @@ type
     bUndo: TButton;
     odImportTexture: TOpenDialog;
     rgVersion: TRadioGroup;
+    exturesproperties1: TMenuItem;
+    N3: TMenuItem;
+    Configure1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Open1Click(Sender: TObject);
@@ -91,6 +93,7 @@ type
       var Handled: Boolean);
     procedure bImportClick(Sender: TObject);
     procedure bUndoClick(Sender: TObject);
+    procedure exturesproperties1Click(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -125,7 +128,7 @@ var
 implementation
 
 uses
-  MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools;
+  MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools, texprop;
 
 const
   DEFAULT_WIDTH = 600;
@@ -278,11 +281,8 @@ begin
     LoadFileInView; // load textures
 
     // Clear preview window
-    if Assigned(frmTexPreview) then begin
-      frmTexPreview.iTexture.Picture := nil;
-      frmTexPreview.ClientHeight := DEFAULT_PREVIEW_HEIGHT;
-      frmTexPreview.ClientWidth := DEFAULT_PREVIEW_WIDTH;
-    end;
+    if Assigned(frmTexPreview) then
+      frmTexPreview.Clear;
   end else
     SetStatus(FileEntry.ExtractedFileName + ' has been deleted!');
 end;
@@ -398,6 +398,12 @@ begin
   UpdateTexturePreviewWindow;
 end;
 
+procedure TfrmMain.exturesproperties1Click(Sender: TObject);
+begin
+  frmTexProp.Show;
+  UpdateTexturePreviewWindow;
+end;
+
 procedure TfrmMain.Open1Click(Sender: TObject);
 begin
   with odFileSelect do
@@ -457,14 +463,9 @@ begin
   PVRConverter := SelectedItem.Data;
   if not Assigned(PVRConverter) then Exit;
 
-  if frmTexPreview.Visible then begin
-    with frmTexPreview do begin
-      LoadedFileName := PVRConverter.TargetFileName;
-      ClientHeight := PVRConverter.Height;
-      ClientWidth := PVRConverter.Width;
-      iTexture.Picture.LoadFromFile(PVRConverter.TargetFileName);
-    end;
-  end;
+  // Refresh the window
+  frmTexPreview.UpdateTexture(PVRConverter);
+  frmTexProp.UpdateProperties(PVRConverter);
 
   Result := True;
 end;

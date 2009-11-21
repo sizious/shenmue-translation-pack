@@ -89,7 +89,7 @@ object frmMain: TfrmMain
         355)
       object lvTexturesList: TListView
         Left = 3
-        Top = 3
+        Top = 4
         Width = 333
         Height = 348
         Anchors = [akLeft, akTop, akRight, akBottom]
@@ -179,10 +179,6 @@ object frmMain: TfrmMain
     object Sections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 428
-      ExplicitHeight = 323
       DesignSize = (
         430
         355)
@@ -208,8 +204,6 @@ object frmMain: TfrmMain
         PopupMenu = pmSections
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitWidth = 423
-        ExplicitHeight = 316
       end
     end
   end
@@ -307,8 +301,9 @@ object frmMain: TfrmMain
         ShortCut = 114
         OnClick = exturespreview1Click
       end
-      object exturespreviewontop1: TMenuItem
-        Caption = '&Preview on top'
+      object exturesproperties1: TMenuItem
+        Caption = 'Textures properties...'
+        OnClick = exturesproperties1Click
       end
       object N4: TMenuItem
         Caption = '-'
@@ -327,6 +322,12 @@ object frmMain: TfrmMain
       end
       object Makebackup1: TMenuItem
         Caption = 'Make &backup'
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Configure1: TMenuItem
+        Caption = '&Configure...'
       end
     end
     object About1: TMenuItem

@@ -17,7 +17,8 @@ uses
   texview in 'texview.pas' {frmTexPreview},
   common in 'engine\common.pas',
   img2png in '..\..\Common\img2png.pas',
-  tools in 'tools.pas';
+  tools in 'tools.pas',
+  texprop in 'texprop.pas' {frmTexProp};
 
 {$R *.res}
 
@@ -28,12 +29,13 @@ var
 
 begin
   Application.Initialize;
-  Application.MainFormOnTaskbar := False;
+  Application.MainFormOnTaskbar := True;
   Application.Title := 'Shenmue Models Textures Editor';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmTexPreview, frmTexPreview);
+  Application.CreateForm(TfrmTexProp, frmTexProp);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // FIX for Delphi IDE...
   ReportMemoryLeaksOnShutdown := True;

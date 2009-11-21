@@ -4,11 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, Img2Png, Menus;
+  Dialogs, ExtCtrls, Img2Png, Menus, ComCtrls;
 
 const
-  DEFAULT_PREVIEW_HEIGHT = 128;
-  DEFAULT_PREVIEW_WIDTH = 128;
+  DEFAULT_PREVIEW_HEIGHT = 256;
+  DEFAULT_PREVIEW_WIDTH = 256;
 
 type
   TfrmTexPreview = class(TForm)
@@ -26,6 +26,8 @@ type
     { Déclarations privées }
   public
     { Déclarations publiques }
+    procedure Clear;
+    procedure UpdateTexture(var PVRConverter: TPVRConverter);
     property LoadedFileName: TFileName read fLoadedFileName write fLoadedFileName;
   end;
 
@@ -45,11 +47,18 @@ begin
   ExtractFile('BKGND', Result);
 end;
 
+procedure TfrmTexPreview.Clear;
+begin
+  frmTexPreview.iTexture.Picture := nil;
+end;
+
 procedure TfrmTexPreview.FormCreate(Sender: TObject);
 begin
   iBkgnd.Picture.LoadFromFile(InitializeWindow);
   ClientHeight := DEFAULT_PREVIEW_HEIGHT;
   ClientWidth := DEFAULT_PREVIEW_WIDTH;
+  Constraints.MinHeight := Height;
+  Constraints.MinWidth := Width;
 end;
 
 procedure TfrmTexPreview.iTextureContextPopup(Sender: TObject; MousePos: TPoint;
@@ -65,6 +74,16 @@ begin
     if Execute then begin
         CopyFile(PChar(LoadedFileName), PChar(FileName), False);
     end;
+  end;
+end;
+
+procedure TfrmTexPreview.UpdateTexture(var PVRConverter: TPVRConverter);
+begin
+  if Visible then begin
+    LoadedFileName := PVRConverter.TargetFileName;
+    ClientHeight := PVRConverter.Height;
+    ClientWidth := PVRConverter.Width;
+    iTexture.Picture.LoadFromFile(PVRConverter.TargetFileName);
   end;
 end;
 
