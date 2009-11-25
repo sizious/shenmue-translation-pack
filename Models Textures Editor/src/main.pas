@@ -70,8 +70,6 @@ type
     odImportTexture: TOpenDialog;
     rgVersion: TRadioGroup;
     exturesproperties1: TMenuItem;
-    N3: TMenuItem;
-    Configure1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Open1Click(Sender: TObject);
@@ -169,15 +167,18 @@ begin
       + Format('%2.2d', [SelectedTexture.Index + 1]);
 
     // Add the DDS for Shenmue 2X
-    if MTEditor.GameVersion = gvShenmue2X then
-      Filter := 'PowerVR Textures Files (*.PVR)|*.pvr|DirectDraw Surface Files (*.DDS)|*.dds|All Files (*.*)|*.*'
-    else
+    if MTEditor.GameVersion = gvShenmue2X then begin
+      DefaultExt := 'dds';
+      Filter := 'DirectDraw Surface Files (*.DDS)|*.dds|PowerVR Textures Files (*.PVR)|*.pvr|All Files (*.*)|*.*'
+    end else begin
+      DefaultExt := 'pvr';
       Filter := 'PowerVR Textures Files (*.PVR)|*.pvr|All Files (*.*)|*.*';
+    end;
     FilterIndex := 1;
 
     if Execute then begin
       OutputFormat := efPVR;
-      if (FilterIndex = 2) and (MTEditor.GameVersion = gvShenmue2X) then
+      if (FilterIndex = 1) and (MTEditor.GameVersion = gvShenmue2X) then
         OutputFormat := efDDS;
 
       SelectedTexture.ExportToFile(FileName, OutputFormat);
@@ -188,11 +189,24 @@ end;
 
 procedure TfrmMain.bImportClick(Sender: TObject);
 begin
-  with odImportTexture do
+  with odImportTexture do begin
+
+    // Add the DDS for Shenmue 2X
+    if MTEditor.GameVersion = gvShenmue2X then begin
+      DefaultExt := 'dds';
+      Filter := 'DirectDraw Surface Files (*.DDS)|*.dds|PowerVR Textures Files (*.PVR)|*.pvr|All Files (*.*)|*.*'
+    end else begin
+      DefaultExt := 'pvr';
+      Filter := 'PowerVR Textures Files (*.PVR)|*.pvr|All Files (*.*)|*.*';
+    end;
+    FilterIndex := 1;
+
+    // Execute
     if Execute then begin
       SelectedTexture.ImportFromFile(FileName);
       SelectedItem.SubItems[2] := 'Yes';
     end;
+  end;
 end;
 
 procedure TfrmMain.bUndoClick(Sender: TObject);
@@ -283,6 +297,8 @@ begin
     // Clear preview window
     if Assigned(frmTexPreview) then
       frmTexPreview.Clear;
+    if Assigned(frmTexProp) then
+      frmTexProp.Clear;
   end else
     SetStatus(FileEntry.ExtractedFileName + ' has been deleted!');
 end;
@@ -439,7 +455,7 @@ end;
 
 procedure TfrmMain.Save1Click(Sender: TObject);
 begin
-  MTEditor.SaveToFile('test.bin');
+  MTEditor.SaveToFile('C:\Documents and Settings\SiZiOUS\Bureau\hack\xbox\test.bin');
 end;
 
 procedure TfrmMain.SetStatus(const Text: string);
