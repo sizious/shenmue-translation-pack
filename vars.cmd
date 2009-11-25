@@ -9,4 +9,4 @@ REM Get the latest build at www.7-zip.org
 set SEVENZIP_BIN=C:\Program Files\7-Zip\7z.exe
 
 REM Defines the path to the UPX utility used to compress executables.
-set UPX_BIN=G:\Outils\UPX\UPX.EXE
+set UPX_BIN=E:\Outils\UPX\UPX.EXE

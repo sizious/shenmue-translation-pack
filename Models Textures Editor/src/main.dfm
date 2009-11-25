@@ -32,6 +32,7 @@ object frmMain: TfrmMain
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
+    ExplicitHeight = 443
     DesignSize = (
       149
       383)
@@ -54,6 +55,7 @@ object frmMain: TfrmMain
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
+      ExplicitHeight = 395
     end
     object eFilesCount: TEdit
       Left = 70
@@ -65,6 +67,7 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
+      ExplicitTop = 414
     end
   end
   object StatusBar1: TStatusBar
@@ -73,6 +76,7 @@ object frmMain: TfrmMain
     Width = 592
     Height = 19
     Panels = <>
+    ExplicitTop = 557
   end
   object pcMain: TPageControl
     Left = 154
@@ -82,8 +86,10 @@ object frmMain: TfrmMain
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
+    ExplicitHeight = 443
     object TabSheet1: TTabSheet
       Caption = 'Textures'
+      ExplicitHeight = 415
       DesignSize = (
         430
         355)
@@ -116,6 +122,7 @@ object frmMain: TfrmMain
         OnClick = lvTexturesListClick
         OnContextPopup = lvTexturesListContextPopup
         OnKeyUp = lvTexturesListKeyUp
+        ExplicitHeight = 408
       end
       object bImport: TButton
         Left = 337
@@ -215,6 +222,7 @@ object frmMain: TfrmMain
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 3
+    ExplicitTop = 450
     DesignSize = (
       586
       105)
@@ -322,12 +330,6 @@ object frmMain: TfrmMain
       end
       object Makebackup1: TMenuItem
         Caption = 'Make &backup'
-      end
-      object N3: TMenuItem
-        Caption = '-'
-      end
-      object Configure1: TMenuItem
-        Caption = '&Configure...'
       end
     end
     object About1: TMenuItem

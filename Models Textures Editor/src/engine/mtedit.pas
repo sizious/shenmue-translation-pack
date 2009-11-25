@@ -16,6 +16,7 @@ const
   DDS_PVR_HEADER                = 'DDS ';
   PVR_HEADER                    = 'PVRT';
   GBIX_PVR_HEADER_FIXED_SIZE    = 8; // 4 'GBIX' + 4 'GBIX size'
+  PVRT_HEADER_SIZE              = 16;
 
 type
   // The main class to use !
@@ -97,8 +98,9 @@ type
   // TXT7: Shenmue 2
   TTexturesList = class(TObject)
   private
+    fXboxTXT7HeaderPaddingSize: Integer; // padding size for the TXT7 header (padding before fXboxUnknowValueInEndingHeader value)
     fXboxUnknowValueInEndingHeader: Integer; // unknow value after the TXT7 header
-    fTexturesSectionSize_ValueToAdd: Integer; // For Xbox version, the size of the TXT7 version is different as the REAL section size... WHY???!!
+    fXboxTexturesSectionSize_ValueToAdd: Integer; // For Xbox version, the size of the TXT7 version is different as the REAL section size... WHY???!!
     fTexturesSectionIndex: Integer; // Index of the TXT section in the Section array (init by ParseTexturesSection)
     fOwner: TModelTexturedEditor;
     fTexturesList: TList;
@@ -114,7 +116,10 @@ type
     procedure Clear;
     function ComputePaddingSize(DataSize: Integer): Integer;
     function ParseTextureData(var F: file; const GBIX_Offset, GBIX_Size: Integer;
-      var PVRT_Offset, PVRT_DataOffset, PVRT_Size, PVRT_DataSize: Integer): Boolean;
+      var PVRT_Offset, PVRT_DataOffset, PVRT_Size, PVRT_DataSize,
+          Xbox_PaddingTextureSize: Integer): Boolean; overload;
+    function ParseTextureData(var F: file; const GBIX_Offset, GBIX_Size: Integer;
+      var PVRT_Offset, PVRT_DataOffset, PVRT_Size, PVRT_DataSize: Integer): Boolean; overload;
     procedure ParseTexturesSection_Shenmue2_MT7(var F: file);
     procedure ParseTexturesSection_Shenmue_MT5_MT6(var F: file);
     procedure WriteTexturesSection_Shenmue2_MT7(var InStream, OutStream: TFileStream);
@@ -275,6 +280,7 @@ begin
   end;
 
   Result := total_null_bytes;
+  if Result = 0 then Result := 32;
 end;
 
 constructor TTexturesList.Create;
@@ -308,10 +314,10 @@ end;
 
 function TTexturesList.ParseTextureData(var F: file; const GBIX_Offset,
   GBIX_Size: Integer; var PVRT_Offset, PVRT_DataOffset, PVRT_Size,
-  PVRT_DataSize: Integer): Boolean;
+  PVRT_DataSize, Xbox_PaddingTextureSize: Integer): Boolean;
 var
   RawHeader: TRawSectionHeader;
-
+  
   function GBIX_GetSectionSize(var F: file): Integer;
   begin
     BlockRead(F, RawHeader, SizeOf(TRawSectionHeader));
@@ -326,6 +332,11 @@ begin
   Seek(F, PVRT_Offset);
   BlockRead(F, RawHeader, SizeOf(TRawSectionHeader));
 
+  // Calculate padding for the Xbox version
+  Xbox_PaddingTextureSize := 0;
+  if Owner.GameVersion = gvShenmue2X then
+    Xbox_PaddingTextureSize := ComputePaddingSize(RawHeader.Size);
+      
   PVRT_DataOffset := FilePos(F) + 8; // Data offset (skipping PVRT header)
   PVRT_DataSize := PVRT_Size - (PVRT_DataOffset - PVRT_Offset);
 
@@ -337,6 +348,17 @@ begin
 {$ENDIF}
 end;
 
+function TTexturesList.ParseTextureData(var F: file; const GBIX_Offset,
+  GBIX_Size: Integer; var PVRT_Offset, PVRT_DataOffset, PVRT_Size,
+  PVRT_DataSize: Integer): Boolean;
+var
+  NotUsedCrap: Integer;
+  
+begin
+  Result := ParseTextureData(F, GBIX_Offset, GBIX_Size, PVRT_Offset, PVRT_DataOffset,
+    PVRT_Size, PVRT_DataSize, NotUsedCrap);  
+end;
+
 procedure TTexturesList.ParseTexturesSection_Shenmue2_MT7(var F: file);
 var
   i, TexturesSectionOffset, TexturesCount,
@@ -344,7 +366,9 @@ var
   PVRT_HeaderOffset, PVRT_DataOffset,
   PVRT_Size, PVRT_DataSize,
   TexturesNameTableStartOffset, SavedOffset,
-  TXT7_SectionHeaderSize, XboxPaddingSize: Integer;
+  TXT7_SectionHeaderSize,
+  Xbox_PaddingTextureSize,
+  LastTextureIndex: Integer;
   TexturesSectionItem: TSectionsListEntry;
   CurrentTexture, TmpTextItem: TTexturesListEntry;
 
@@ -371,7 +395,8 @@ begin
     + (TexturesCount * TXT7_TEXTURE_NAME_SIZE)) - TexturesSectionItem.Offset;
 
   // Reading all textures offset info from the back <- to the start
-  for i := TexturesCount - 1 downto 0 do begin
+  LastTextureIndex := TexturesCount - 1;
+  for i := LastTextureIndex downto 0 do begin
     // reading current texture entry
     Seek(F, FilePos(F) - GAME_INTEGER_SIZE);
     BlockRead(F, GBIX_TextureInnerOffset, GAME_INTEGER_SIZE);
@@ -384,9 +409,18 @@ begin
     SavedOffset := FilePos(F);
     GBIX_HeaderOffset := TexturesSectionItem.Offset + GBIX_TextureInnerOffset; // GBIX offset
     ParseTextureData(F, GBIX_HeaderOffset, GBIX_CalcSize, PVRT_HeaderOffset,
-      PVRT_DataOffset, PVRT_Size, PVRT_DataSize);
+      PVRT_DataOffset, PVRT_Size, PVRT_DataSize, Xbox_PaddingTextureSize);      
     Seek(F, SavedOffset);
 
+    // Xbox version
+    // Padding is not for the last texture (read in the first position)
+    if (Owner.GameVersion = gvShenmue2X) and (i <> LastTextureIndex) then begin
+      Inc(Xbox_PaddingTextureSize, 4); // "4" is for the "unknow value" after padding
+      Dec(GBIX_CalcSize, Xbox_PaddingTextureSize);
+      Dec(PVRT_Size, Xbox_PaddingTextureSize);
+      Dec(PVRT_DataSize, Xbox_PaddingTextureSize);
+    end;
+    
     // Adding the new texture entry
     Add(i, GBIX_TextureInnerOffset, GBIX_HeaderOffset, PVRT_HeaderOffset,
       PVRT_DataOffset, GBIX_CalcSize, PVRT_Size, PVRT_DataSize);
@@ -411,28 +445,29 @@ begin
   end;
 
   // Special XBox...
-  XboxPaddingSize := -1;
+  fXboxTXT7HeaderPaddingSize := -1;
   if Owner.GameVersion = gvShenmue2X then begin
     // Skipping padding zone
-    XboxPaddingSize := ComputePaddingSize(TXT7_SectionHeaderSize);
-    Seek(F, TXT7_SectionHeaderSize + XboxPaddingSize);
+    fXboxTXT7HeaderPaddingSize := ComputePaddingSize(TXT7_SectionHeaderSize);
+    Seek(F, TexturesSectionItem.Offset + TXT7_SectionHeaderSize + fXboxTXT7HeaderPaddingSize);
 
     // Value after TXT7 section padding...
     BlockRead(F, fXboxUnknowValueInEndingHeader, GAME_INTEGER_SIZE);
 
     // This value was filled in ParseTexturesSection_Shenmue2_MT7
     // I keep only the 'surplus' value
-    Dec(fTexturesSectionSize_ValueToAdd, TexturesSectionItem.Size);
+    // Will be summed in the SaveToFile method.
+    Dec(fXboxTexturesSectionSize_ValueToAdd, TexturesSectionItem.Size);
   end else
-    fTexturesSectionSize_ValueToAdd := 0; // if not Shenmue2X, this is not necessary
+    fXboxTexturesSectionSize_ValueToAdd := 0; // if not Shenmue2X, this is not necessary
 
 {$IFDEF DEBUG}
   if Owner.GameVersion = gvShenmue2X then begin
     WriteLn(
-      'TXT7 Padding Size: ', XboxPaddingSize, sLineBreak,
+      'TXT7 Padding Size: ', fXboxTXT7HeaderPaddingSize, sLineBreak,
       'TXT7 Header Size: ', TXT7_SectionHeaderSize, sLineBreak,
       'TXT7 Xbox Unknow Value: ', fXboxUnknowValueInEndingHeader, sLineBreak,
-      'TXT7 Textures Size to Add in Header: ', fTexturesSectionSize_ValueToAdd, sLineBreak
+      'TXT7 Textures Size to Add in Header: ', fXboxTexturesSectionSize_ValueToAdd, sLineBreak
     );
   end;
 
@@ -494,8 +529,10 @@ var
   TXT7_Section_Size_Offset, TXT7_Section_Size_Value,
   TXT7_Textures_Table_Offset, Saved_Offset,
   TXT7_Section_Offset, Texture_Size, GBIX_Offset,
-  IntBuf: LongWord;
+  PVRT_Offset, PVRT_HeaderSizeOffset, IntBuf, 
+  TextureDataSize_ForPaddingCalc, TotalPaddingSize: LongWord;
   StrBuf: AnsiString;
+  Padding: array[0..31] of Char;
 
   function GBIX_GetSectionSize(var Stream: TFileStream): Integer;
   begin
@@ -505,11 +542,11 @@ var
     Stream.Seek(Saved_Offset, soFromBeginning); // we know now the GBIX section size
     Result := GBIX_PVR_HEADER_FIXED_SIZE + IntBuf;
   end;
-
-
+  
 begin
   TXT7_Section_Offset := OutStream.Position;
-
+  TotalPaddingSize := 0; // total padding size for the xbox version
+  
   // Write TXT7 section name
   StrBuf := GraphicSection.Name;
   OutStream.Write(StrBuf[1], 4);
@@ -533,6 +570,19 @@ begin
   for i := 0 to Count - 1 do
     OutStream.Write(Items[i].fTextureName, TXT7_TEXTURE_NAME_SIZE);
 
+  // Xbox special header operations...
+  if Owner.GameVersion = gvShenmue2X then begin
+    // Write padding
+    ZeroMemory(@Padding, fXboxTXT7HeaderPaddingSize);
+    OutStream.Write(Padding, fXboxTXT7HeaderPaddingSize);
+
+    // Write unknow value...
+    OutStream.Write(fXboxUnknowValueInEndingHeader, GAME_INTEGER_SIZE);
+
+    // Storing padding size
+    Inc(TotalPaddingSize, fXboxTXT7HeaderPaddingSize + GAME_INTEGER_SIZE);
+  end;
+
   // Write Textures
   TXT7_Section_Size_Value := 0;
   for i := 0 to Count - 1 do begin
@@ -554,13 +604,21 @@ begin
       IntBuf := GBIX_GetSectionSize(InStream);
       OutStream.CopyFrom(InStream, IntBuf);
       Inc(TXT7_Section_Size_Value, IntBuf); // adding the GBIX header size to the TXT7 section total size
-
+      PVRT_Offset := GBIX_Offset + IntBuf;
+       
       // Load the imported texture file
       ImportedFileStream := TFileStream.Create(CurrentTexture.ImportFileName, fmOpenRead);
       try
         Texture_Size := ImportedFileStream.Size; // adding the new imported PVR texture size to the TXT7 total size
 
+        (*
+          InStream = The source MTx file
+          OutStream = The new destination (hacked) MTx file
+          ImportedFileStream = The new texture data to write in the OutStream
+        *)
+        
         // Skip GBIX header (don't needed)
+        // This header is skipped if the imported file is Xbox or Dreamcast
         ImportedFileStream.Read(StrBuf[1], 4);
         if StrBuf = GBIX_PVR_HEADER then begin
           ImportedFileStream.Seek(0, soFromBeginning); // to beginning of the file
@@ -568,7 +626,41 @@ begin
           ImportedFileStream.Seek(IntBuf, soFromBeginning); // skip GBIX header
           Dec(Texture_Size, IntBuf); // dec GBIX size
         end;
+                  
+        (* 
+          Now we are positionned on the PVRT header in the ImportedFileStream
+          In Dreamcast version, the work is done, we can copy the stream to the output file
+          In Xbox version, if the file imported is a DDS (DirectDraw Surface), so without
+          the PVRT header, we must copy it from the InStream (source stream) and
+          update the PVRT header data size.
+        *)
+        
+        // Xbox version (create a PVRT header if needed)
+        TextureDataSize_ForPaddingCalc := Texture_Size;
+        if Owner.GameVersion = gvShenmue2X then begin
+          ImportedFileStream.Seek(0, soBeginning);
+          ImportedFileStream.Read(StrBuf[1], 4);
+          
+          // if imported texture is DDS...
+          if StrBuf = DDS_PVR_HEADER then begin
+            // We must dump PVRT header from source
+            PVRT_HeaderSizeOffset := OutStream.Position + 4; // 4 for the "PVRT" signature
 
+            // Writing PVRT header from source [16 bytes]
+            InStream.Seek(PVRT_Offset, soFromBeginning);
+            OutStream.CopyFrom(InStream, PVRT_HEADER_SIZE);
+
+            // Updating PVRT section size with the imported texture size
+            OutStream.Seek(PVRT_HeaderSizeOffset, soFromBeginning);
+            OutStream.Write(Texture_Size, GAME_INTEGER_SIZE);
+            InStream.Seek(PVRT_Offset + PVRT_HEADER_SIZE, soFromBeginning);
+            OutStream.Seek(OutStream.Size, soFromBeginning); // we wrote the new Texture_Size, skip to the end of the OutStream file
+          end; 
+
+          ImportedFileStream.Seek(0, soBeginning);            
+        end;
+
+        // Copy the new texture data stream to the MT file
         OutStream.CopyFrom(ImportedFileStream, Texture_Size);
       finally
         ImportedFileStream.Free;
@@ -578,8 +670,23 @@ begin
       // Write original texture
       // Section.Offset + InsideTexture.Offset because texture offset are in relative format (not absolute)
       Texture_Size := CurrentTexture.Size;
+      TextureDataSize_ForPaddingCalc := CurrentTexture.DataSize;
       InStream.Seek(GraphicSection.Offset + CurrentTexture.RelativeOffset, soFromBeginning);
       OutStream.CopyFrom(InStream, Texture_Size);
+    end;
+
+    // Writing Padding (for Xbox)
+    if (Owner.GameVersion = gvShenmue2X) and (i <> Count - 1) then begin
+      // Computing value...
+      IntBuf := ComputePaddingSize(TextureDataSize_ForPaddingCalc);
+      ZeroMemory(@Padding, IntBuf);
+      OutStream.Write(Padding, IntBuf);
+
+      // Write unknow value...
+      OutStream.Write(fXboxUnknowValueInEndingHeader, GAME_INTEGER_SIZE);
+
+      // Storing padding size
+      Inc(TotalPaddingSize, IntBuf + GAME_INTEGER_SIZE);            
     end;
 
     // Adding the texture size
@@ -588,7 +695,15 @@ begin
 
   // Updating texture section size!
   Inc(TXT7_Section_Size_Value, TXT7_HEADER_FIXED_SIZE); // adding TXT7 header fixed size (12 bytes, 4 for TXT7 sign, 4 for TXT7 section size and 4 for textures count)
-  Inc(TXT7_Section_Size_Value, Count * (TXT7_TEXTURE_NAME_SIZE + GAME_INTEGER_SIZE)); // adding textures info: textures count * (4 [texture offset] + 8 [texture name])     
+  Inc(TXT7_Section_Size_Value, Count * (TXT7_TEXTURE_NAME_SIZE + GAME_INTEGER_SIZE)); // adding textures info: textures count * (4 [texture offset] + 8 [texture name])
+
+  // Special Xbox...
+  if Owner.GameVersion = gvShenmue2X then begin
+    Inc(TXT7_Section_Size_Value, Self.fXboxTexturesSectionSize_ValueToAdd);
+    Inc(TXT7_Section_Size_Value, TotalPaddingSize); // size of the padding bytes + the unknow value (4 bytes)    
+  end;
+
+  // Writing updated TXT7 section size
   OutStream.Seek(TXT7_Section_Size_Offset, soFromBeginning);
   OutStream.Write(TXT7_Section_Size_Value, GAME_INTEGER_SIZE);
 end;
@@ -668,7 +783,7 @@ function TSectionsList.GetTexturesSectionSize(var F: file;
   TexturesSectionOffset: Integer; var GameVersion: TGameVersion): Integer;
 var
   TexturesCount, LastTextureOffset, PVRT_DataSize,
-  PVRT_Offset, LastTextureOffsetValue_HeaderOffset: Integer;
+  PVRT_Offset, LastTextureOffsetValue_HeaderTableOffset: Integer;
   TexturesSectionHeader: TRawSectionHeader;
 
 begin
@@ -705,9 +820,9 @@ begin
     if TexturesCount > 0 then begin
     
       // Go to the last texture inside the TXT7 section
-      LastTextureOffsetValue_HeaderOffset := FilePos(F)
+      LastTextureOffsetValue_HeaderTableOffset := FilePos(F)
         + ((TexturesCount - 1) * GAME_INTEGER_SIZE);
-      Seek(F, LastTextureOffsetValue_HeaderOffset);
+      Seek(F, LastTextureOffsetValue_HeaderTableOffset);
       BlockRead(F, LastTextureOffset, GAME_INTEGER_SIZE);
       LastTextureOffset := TexturesSectionOffset + LastTextureOffset;
       Seek(F, LastTextureOffset);
@@ -727,11 +842,16 @@ begin
       
       // Read the texture data signature
       BlockRead(F, TexturesSectionHeader, SizeOf(TRawSectionHeader));
-      if TexturesSectionHeader.Name = DDS_PVR_HEADER then
-        GameVersion := gvShenmue2X;
 
       // Skip to the next section
-      Result := (LastTextureOffset + PVRT_DataSize) - TexturesSectionOffset;
+      Result := ((LastTextureOffset + PVRT_DataSize) - TexturesSectionOffset);
+
+      if TexturesSectionHeader.Name = DDS_PVR_HEADER then
+        GameVersion := gvShenmue2X
+      else
+        Dec(Result, 4); // fix for the DC version ...
+        // the PVRT data size is computed from the DDS signature for the XBOX version
+        // the PVRT data size is computed from after the "pvrt data size" entry for the DC version (-4 bytes compared to the XB version)
     end; // TexturesCount > 0
 
   end;
@@ -748,6 +868,16 @@ var
   RawEntry: TRawSectionHeader;
   Offset, NextSectionOffset, SectionIndex, RealTexturesSectionSize: Integer;
   Done: Boolean;
+
+  function IsValidSection(var Entry: TRawSectionHeader): Boolean;
+  var
+    i: Integer;
+
+  begin
+    Result := True;
+    for i := Low(Entry.Name) to High(Entry.Name) do
+      Result := Result and (Entry.Name[i] <> #0);     rajouter le fait que si apres un passage de boucle le pointeur de fichier au meme endroit, sortir
+  end;
 
 begin
   Result := gvUndef;
@@ -779,7 +909,7 @@ begin
 
         // For the xbox version, the size in the header doesn't match the REAL section size... F?CK! 
         Items[SectionIndex].fSize := RealTexturesSectionSize;
-        Owner.Textures.fTexturesSectionSize_ValueToAdd := RawEntry.Size; // will be computed in 'ParseTexturesSection_Shenmue2_MT7'
+        Owner.Textures.fXboxTexturesSectionSize_ValueToAdd := RawEntry.Size; // will be computed in 'ParseTexturesSection_Shenmue2_MT7'
       end;
 
       // If Shenmue 1, we ignore TEXN sections (the TEXD section is the header)
@@ -790,7 +920,8 @@ begin
       Seek(F, NextSectionOffset);
 //    end;
 
-    Done := (EOF(F) and (Offset + SizeOf(TRawSectionHeader) < FileSize(F))) or (RawEntry.Name[0] = #0);
+//  Done := (EOF(F) and (Offset + SizeOf(TRawSectionHeader) < FileSize(F))) or (not IsValidSectionName(RawEntry.Name));
+    Done := EOF(F) and (not IsValidSection(RawEntry));
   end; // while
 end;
 
@@ -950,6 +1081,9 @@ begin
             Textures.WriteTexturesSection_Shenmue_MT5_MT6(InStream, OutStream);
 
           gvShenmue2:
+            Textures.WriteTexturesSection_Shenmue2_MT7(InStream, OutStream);
+
+          gvShenmue2X:
             Textures.WriteTexturesSection_Shenmue2_MT7(InStream, OutStream);
         end;
 
