@@ -1,0 +1,37 @@
+Generic Header Layout:
+
+
+The Header has a dynamic length, Byte 0x0020 shows the Generic Header Length, but it has a reserved byte-area of 4096 bytes to store infos about the original file and other infos...
+
+0x0000 - Magic Word "GENH"
+0x0004 - Channels
+0x0008 - Interleave
+0x000C - Frequency
+0x0010 - Loop Start (In Samples)
+0x0014 - Loop End (In Samples)
+0x0018 - Identifer Byte
+0x001C - Audio Start Offset
+0x0020 - Generic Header Length (in the actual spec minimal 0x24 bytes)
+
+0x0200 - Original File Name (256 Bytes)
+0x0300 - Original File Length (4 Bytes)
+0x0304 - Generic Header Creator Version (4 Bytes)
+
+
+
+Identifer Byte could be:
+
+0x00 - PlayStation 4-bit ADPCM (PS1, PS2)
+0x01 - XBOX 4-bit IMA ADPCM (XBOX, XBOX360)
+0x02 - GameCube ADP/DTK 4-bit ADPCM (NGC, Wii)
+0x03 - PCM RAW (Big Endian) (Various)
+0x04 - PCM RAW (Little Endian) (Various)
+0x05 - PCM RAW (8Bit) (Various)
+0x06 - Squareroot-delta-exact 8-bit DPCM (3DO)
+0x07 - Intel DVI 4-Bit IMA ADPCM (Various)
+0x08 - MPEG X Layer X (Various)
+0x09 - 4-bit IMA ADPCM  (Various)
+0x0A - Yamaha AICA 4-bit ADPCM (Dreamcast)
+0x0B - Microsoft 4-bit IMA ADPCM (Various)
+0x0C - Nintendo GameCube DSP 4-bit ADPCM (NGC/WII)
+0x0D - PCM RAW (8-Bit Unsigned) (Various)
