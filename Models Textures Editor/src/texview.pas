@@ -7,8 +7,8 @@ uses
   Dialogs, ExtCtrls, Img2Png, Menus, ComCtrls;
 
 const
-  DEFAULT_PREVIEW_HEIGHT = 256;
-  DEFAULT_PREVIEW_WIDTH = 256;
+  DEFAULT_PREVIEW_HEIGHT = 64;
+  DEFAULT_PREVIEW_WIDTH = 64;
 
 type
   TfrmTexPreview = class(TForm)

@@ -3,8 +3,8 @@ object frmTexPreview: TfrmTexPreview
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Texture preview'
-  ClientHeight = 232
-  ClientWidth = 250
+  ClientHeight = 104
+  ClientWidth = 122
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,8 +18,8 @@ object frmTexPreview: TfrmTexPreview
   object iBkgnd: TImage
     Left = 0
     Top = 0
-    Width = 250
-    Height = 232
+    Width = 122
+    Height = 104
     Align = alClient
     ExplicitLeft = 84
     ExplicitTop = 10
@@ -29,8 +29,8 @@ object frmTexPreview: TfrmTexPreview
   object iTexture: TImage
     Left = 0
     Top = 0
-    Width = 250
-    Height = 232
+    Width = 122
+    Height = 104
     Align = alClient
     Center = True
     PopupMenu = pmTexture

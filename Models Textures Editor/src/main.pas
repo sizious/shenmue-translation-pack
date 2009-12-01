@@ -7,37 +7,38 @@ uses
   Dialogs, MTEdit, StdCtrls, Menus, ComCtrls, FilesLst, JvBaseDlg,
   JvBrowseFolder, ExtCtrls;
 
+{$IFDEF DEBUG}
 const
-  APP_VERSION = '0.1a';
-  
+  APP_VERSION_DEBUG = 'a';
+{$ENDIF}
+
 type
   TfrmMain = class(TForm)
     mmMain: TMainMenu;
     miFile: TMenuItem;
-    About1: TMenuItem;
-    About2: TMenuItem;
-    Quit1: TMenuItem;
-    Open1: TMenuItem;
+    miHelp: TMenuItem;
+    miAbout: TMenuItem;
+    miQuit: TMenuItem;
+    miOpenFiles: TMenuItem;
     N1: TMenuItem;
     GroupBox1: TGroupBox;
-    StatusBar1: TStatusBar;
     odFileSelect: TOpenDialog;
-    Opendirectory1: TMenuItem;
+    miOpenDirectory: TMenuItem;
     lbFilesList: TListBox;
     Label9: TLabel;
     eFilesCount: TEdit;
     miOptions: TMenuItem;
-    Autosave1: TMenuItem;
-    Makebackup1: TMenuItem;
-    Save1: TMenuItem;
+    miAutoSave: TMenuItem;
+    miMakeBackup: TMenuItem;
+    miSave: TMenuItem;
     N2: TMenuItem;
-    Saveas1: TMenuItem;
-    exturespreview1: TMenuItem;
+    miSaveAs: TMenuItem;
+    miTexturesPreview: TMenuItem;
     sdExportTex: TSaveDialog;
     bfdExportAllTex: TJvBrowseForFolderDialog;
     miView: TMenuItem;
     pmFilesList: TPopupMenu;
-    Refresh1: TMenuItem;
+    miRefresh: TMenuItem;
     pcMain: TPageControl;
     TabSheet1: TTabSheet;
     Sections: TTabSheet;
@@ -49,9 +50,9 @@ type
     GroupBox2: TGroupBox;
     mDebug: TMemo;
     N4: TMenuItem;
-    Savedebuglog1: TMenuItem;
-    Cleardebuglog1: TMenuItem;
-    Edit1: TMenuItem;
+    miSaveDebug: TMenuItem;
+    miClearDebug: TMenuItem;
+    miEdit: TMenuItem;
     miUndo: TMenuItem;
     N5: TMenuItem;
     miImport: TMenuItem;
@@ -69,29 +70,56 @@ type
     bUndo: TButton;
     odImportTexture: TOpenDialog;
     rgVersion: TRadioGroup;
-    exturesproperties1: TMenuItem;
+    miTexturesProperties: TMenuItem;
+    sbMain: TStatusBar;
+    N3: TMenuItem;
+    miTexturesPreview2: TMenuItem;
+    miTexturesProperties2: TMenuItem;
+    miUndo2: TMenuItem;
+    N8: TMenuItem;
+    miLocateOnDisk: TMenuItem;
+    miReload2: TMenuItem;
+    miClose2: TMenuItem;
+    N9: TMenuItem;
+    miCloseAll2: TMenuItem;
+    miExportFilesList: TMenuItem;
+    miBrowseDirectory: TMenuItem;
+    miClose: TMenuItem;
+    miCloseAll: TMenuItem;
+    N10: TMenuItem;
+    sdExportList: TSaveDialog;
+    miReload: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Open1Click(Sender: TObject);
+    procedure miOpenFilesClick(Sender: TObject);
     procedure bExportClick(Sender: TObject);
-    procedure Opendirectory1Click(Sender: TObject);
+    procedure miOpenDirectoryClick(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Quit1Click(Sender: TObject);
+    procedure miQuitClick(Sender: TObject);
     procedure bExportAllClick(Sender: TObject);
-    procedure exturespreview1Click(Sender: TObject);
+    procedure miTexturesPreviewClick(Sender: TObject);
     procedure lvTexturesListClick(Sender: TObject);
-    procedure Refresh1Click(Sender: TObject);
+    procedure miRefreshClick(Sender: TObject);
     procedure lvTexturesListKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure Save1Click(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
     procedure miDumpSectionClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvTexturesListContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
     procedure bImportClick(Sender: TObject);
     procedure bUndoClick(Sender: TObject);
-    procedure exturesproperties1Click(Sender: TObject);
+    procedure miTexturesPropertiesClick(Sender: TObject);
+    procedure miMakeBackupClick(Sender: TObject);
+    procedure miAutoSaveClick(Sender: TObject);
+    procedure miLocateOnDiskClick(Sender: TObject);
+    procedure miBrowseDirectoryClick(Sender: TObject);
+    procedure miExportFilesListClick(Sender: TObject);
+    procedure lbFilesListContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure miCloseAllClick(Sender: TObject);
+    procedure miReloadClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -99,24 +127,46 @@ type
     fExportDirectory: TFileName;
     fSelectedTexture: TTexturesListEntry;
     fSelectedItem: TListItem;
+    fSelectedFileEntry: TFileEntry;
+    fMakeBackup: Boolean;
+    fAutoSave: Boolean;
+    fFileModified: Boolean;
+    fSelectedFileTexturesModifiedCount: Integer;
+    function GetStatus: string;
+    procedure SetAutoSave(const Value: Boolean);
+    procedure SetMakeBackup(const Value: Boolean);
+    procedure SetStatus(const Value: string);
+    procedure SetFileModified(const Value: Boolean);
   protected
     procedure ChangeControlsState(State: Boolean);
     procedure ChangeExportAllControlsState(State: Boolean);
     procedure ChangeUndoImportControlsState(State: Boolean);
-    procedure LoadFileInView;
+    procedure LoadFileEntry(FileEntry: TFileEntry);
+    procedure LoadSelectedFileInView;
+    function SaveCurrentFileOnDemand(CancelButton: Boolean): Boolean;
+    procedure SetApplicationConfigParameters;
+    property SelectedFileTexturesModifiedCount: Integer
+      read fSelectedFileTexturesModifiedCount write fSelectedFileTexturesModifiedCount; 
   public
     { Déclarations publiques }
+    procedure AddDebug(Text: string);
     procedure Clear;
     procedure ClearFilesListControls;
     procedure ClearFilesInfos;
+    procedure ClearImportedTexturesStatus;    
     function UpdateTexturePreviewWindow: Boolean;
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
-    procedure SetStatus(const Text: string);
+    procedure ResetStatus;
+    property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property ExportDirectory: TFileName read fExportDirectory write fExportDirectory;
     property FilesList: TFilesList read fFilesList;
-    property SelectedItem: TListItem read fSelectedItem write fSelectedItem;
+    property FileModified: Boolean read fFileModified write SetFileModified;
+    property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
+    property SelectedFileEntry: TFileEntry read fSelectedFileEntry write fSelectedFileEntry;
+    property SelectedTextureUI: TListItem read fSelectedItem write fSelectedItem;
     property SelectedTexture: TTexturesListEntry read fSelectedTexture write fSelectedTexture;
     property SourceDirectory: TFileName read fSourceDirectory write fSourceDirectory;
+    property Status: string read GetStatus write SetStatus;
   end;
 
 var
@@ -126,13 +176,18 @@ var
 implementation
 
 uses
-  MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools, texprop;
+  ShellApi, MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools, texprop;
 
 const
   DEFAULT_WIDTH = 600;
   DEFAULT_HEIGHT = 570;
    
 {$R *.dfm}
+
+procedure TfrmMain.AddDebug(Text: string);
+begin
+  mDebug.Lines.Add('[' + DateToStr(Date) + ' ' + TimeToStr(Now) + '] ' + Text);
+end;
 
 procedure TfrmMain.bExportAllClick(Sender: TObject);
 var
@@ -144,10 +199,15 @@ begin
       ExportDirectory := IncludeTrailingPathDelimiter(ExtractFilePath(MTEditor.SourceFileName));
     Directory := ExportDirectory;
     if Execute then begin
+      Status := 'Exporting textures...';
       Directory := IncludeTrailingPathDelimiter(Directory);
       ExportDirectory := Directory;
       for i := 0 to MTEditor.Textures.Count - 1 do
         MTEditor.Textures[i].ExportToFolder(Directory);
+
+      ResetStatus;
+      AddDebug('Textures from the "' + ExtractFileName(MTEditor.SourceFileName) +
+        '" successfully exported into the "' + Directory + '" directory.');
     end;
   end;
 end;
@@ -181,7 +241,11 @@ begin
       if (FilterIndex = 1) and (MTEditor.GameVersion = gvShenmue2X) then
         OutputFormat := efDDS;
 
+      Status := 'Exporting texture...';
       SelectedTexture.ExportToFile(FileName, OutputFormat);
+
+      ResetStatus;
+      AddDebug('File texture succesfully exported to "' + FileName + '".');
     end;
 
   end;
@@ -203,15 +267,43 @@ begin
 
     // Execute
     if Execute then begin
+      Status := 'Importing new texture file...';
       SelectedTexture.ImportFromFile(FileName);
-      SelectedItem.SubItems[2] := 'Yes';
+
+      // Updating GUI
+      if SelectedTextureUI.SubItems[2] = '' then begin
+        Inc(fSelectedFileTexturesModifiedCount);
+        SelectedTextureUI.SubItems[2] := 'Yes';
+        FileModified := True;
+      end;
+
+      // updating debug
+      ResetStatus;
+      AddDebug('Texture file successfully imported from "' + FileName + '".');
     end;
   end;
 end;
 
 procedure TfrmMain.bUndoClick(Sender: TObject);
+var
+  CanDo: Integer;
+
 begin
+  CanDo := MsgBox('Are you sure to cancel the texture remplacement ?',
+    'Question', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2);
+  if CanDo = IDNO then Exit;
+
+  Status := 'Cancelling...';
+
+  bUndo.Enabled := False;
   SelectedTexture.CancelImport;
+  SelectedTextureUI.SubItems[2] := '';
+  Dec(fSelectedFileTexturesModifiedCount);
+  FileModified := (SelectedFileTexturesModifiedCount > 0);
+
+  ResetStatus;
+  AddDebug('Import for the texture #' + IntToStr(SelectedTextureUI.Index + 1) + ' of the file "' +
+    SelectedFileEntry.ExtractedFileName + '" cancelled.');
 end;
 
 procedure TfrmMain.ChangeControlsState(State: Boolean);
@@ -249,11 +341,26 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SaveConfig;
+  if not SaveCurrentFileOnDemand(True) then
+    Action := caNone;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  AppVersion: TApplicationFileVersion;
+  DebugStr: string;
+
 begin
-  Caption := Application.Title + ' - v' + APP_VERSION + ' - (C)reated by [big_fury]SiZiOUS';
+{$IFDEF DEBUG}
+  DebugStr := '/' + APP_VERSION_DEBUG;
+{$ELSE}
+  DebugStr := '';
+{$ENDIF}
+
+  // Application title and version
+  AppVersion := GetApplicationFileVersion;
+  Caption := Application.Title + ' - v' + IntToStr(AppVersion.Major) + '.'
+    + IntToStr(AppVersion.Minor) + DebugStr + ' - (C)reated by [big_fury]SiZiOUS';
   Clear;
 
   // Initialization of the engine
@@ -267,6 +374,9 @@ begin
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
   pcMain.TabIndex := 0;
+
+  FileModified := False;
+  SelectedFileEntry := nil;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -279,31 +389,65 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   Application.Title := frmMain.Caption;
-  LoadConfig;
+  SetApplicationConfigParameters;
+end;
+
+function TfrmMain.GetStatus: string;
+begin
+  Result := sbMain.Panels[2].Text;
 end;
 
 procedure TfrmMain.lbFilesListClick(Sender: TObject);
-var
-  FileEntry: TFileEntry;
-
 begin
   if lbFilesList.ItemIndex = -1 then Exit;
-  
-  FileEntry := FilesList[lbFilesList.ItemIndex];
+
+  if Assigned(SelectedFileEntry) then begin
+    // Check if another file is selected
+    if SelectedFileEntry.ExtractedFileName = lbFilesList.Items[lbFilesList.ItemIndex] then Exit;
+
+    // Autosaving the previous file
+    SaveCurrentFileOnDemand(False);
+  end;
+
+  // Loading the next file
+  SelectedFileEntry := FilesList[lbFilesList.ItemIndex];
+  LoadFileEntry(SelectedFileEntry);
+end;
+
+procedure TfrmMain.lbFilesListContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+var
+  Point : TPoint;
+
+begin
+  // enable right-click selection
+  GetCursorPos(Point);
+  Mouse_Event(MOUSEEVENTF_LEFTDOWN, Point.X, Point.Y, 0, 0);
+  Mouse_Event(MOUSEEVENTF_LEFTUP, Point.X, Point.Y, 0, 0);
+  Application.ProcessMessages;
+end;
+
+procedure TfrmMain.LoadFileEntry(FileEntry: TFileEntry);
+begin
   if FileEntry.Exists then begin
+    Status := 'Loading...';
     MTEditor.LoadFromFile(FileEntry.FileName);
-    LoadFileInView; // load textures
+    LoadSelectedFileInView; // load textures
 
     // Clear preview window
     if Assigned(frmTexPreview) then
       frmTexPreview.Clear;
+
+    // Clear properties window
     if Assigned(frmTexProp) then
       frmTexProp.Clear;
+
+    ResetStatus;
   end else
-    SetStatus(FileEntry.ExtractedFileName + ' has been deleted!');
+    AddDebug('ERROR: ' + FileEntry.ExtractedFileName + ' has been deleted!');
 end;
 
-procedure TfrmMain.LoadFileInView;
+procedure TfrmMain.LoadSelectedFileInView;
 var
   i: Integer;
   TmpPvr: TFileName;
@@ -354,6 +498,12 @@ begin
 
   // Enable or disable Import / export options
   ChangeControlsState(TextureSelected);
+
+  if TextureSelected then begin
+    bUndo.Enabled := SelectedTextureUI.SubItems[2] = 'Yes';
+    miUndo.Enabled := bUndo.Enabled;
+    miUndo2.Enabled := miUndo.Enabled;
+  end;
 end;
 
 procedure TfrmMain.lvTexturesListContextPopup(Sender: TObject; MousePos: TPoint;
@@ -383,6 +533,11 @@ begin
   lvTexturesList.Clear;
   lvSectionsList.Clear;
   ChangeControlsState(False);
+  SelectedFileTexturesModifiedCount := 0;
+  FileModified := False;
+  SelectedFileEntry := nil;
+  SelectedTextureUI := nil;
+  SelectedTexture := nil;  
 end;
 
 procedure TfrmMain.ClearFilesListControls;
@@ -394,6 +549,38 @@ begin
     FilesList.Clear;
 end;
 
+procedure TfrmMain.ClearImportedTexturesStatus;
+var
+  i: Integer;
+
+begin
+  for i := 0 to lvTexturesList.Items.Count - 1 do
+    lvTexturesList.Items[i].SubItems[2] := '';
+end;
+
+procedure TfrmMain.miAutoSaveClick(Sender: TObject);
+begin
+  AutoSave := not AutoSave;
+end;
+
+procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'explorer', PChar(SourceDirectory), '', SW_SHOWNORMAL);
+end;
+
+procedure TfrmMain.miCloseAllClick(Sender: TObject);
+var
+  CanDo: Integer;
+
+begin
+  CanDo := MsgBox('Are you sure to clear all the files list?'  + sLineBreak
+  + 'Changes not saved will be LOST!', 'Warning',
+    + MB_ICONWARNING + MB_DEFBUTTON2 + MB_YESNO);
+  if CanDo = IDNO then Exit;
+
+  Clear;
+end;
+
 procedure TfrmMain.miDumpSectionClick(Sender: TObject);
 var
   Target: TSectionsListEntry;
@@ -403,37 +590,86 @@ begin
   with sdDumpSection do begin
     Target := MTEditor.Sections[lvSectionsList.Selected.Index];
     FileName := MTEditor.SourceFileName + '_' + Target.Name;
-    if Execute then
+    if Execute then begin
+      Status := 'Dumping section...';
+
       Target.SaveToFile(FileName);
+
+      ResetStatus;
+      AddDebug('Section ' + Target.Name + ' successfully dumped from "'
+        + SelectedFileEntry.ExtractedFileName + '" saved to "' + FileName + '".');
+    end;
   end;
 end;
 
-procedure TfrmMain.exturespreview1Click(Sender: TObject);
+procedure TfrmMain.miExportFilesListClick(Sender: TObject);
+begin
+  with sdExportList do begin
+    FileName := ExtremeRight('\', Copy(SourceDirectory, 1, Length(SourceDirectory) - 1)) + '_FilesList.txt';
+    if Execute then
+      lbFilesList.Items.SaveToFile(FileName);
+  end;
+end;
+
+procedure TfrmMain.miLocateOnDiskClick(Sender: TObject);
+var
+  FName: string;
+
+begin
+  FName := MTEditor.SourceFileName;
+  ShellExecute(Handle, 'open', 'explorer', PChar('/e,/select,' + FName), '', SW_SHOWNORMAL);
+end;
+
+procedure TfrmMain.miMakeBackupClick(Sender: TObject);
+begin
+  MakeBackup := not MakeBackup;
+end;
+
+procedure TfrmMain.miTexturesPreviewClick(Sender: TObject);
 begin
   frmTexPreview.Show;
   UpdateTexturePreviewWindow;
 end;
 
-procedure TfrmMain.exturesproperties1Click(Sender: TObject);
+procedure TfrmMain.miTexturesPropertiesClick(Sender: TObject);
 begin
   frmTexProp.Show;
   UpdateTexturePreviewWindow;
 end;
 
-procedure TfrmMain.Open1Click(Sender: TObject);
+procedure TfrmMain.miOpenFilesClick(Sender: TObject);
+var
+  i: Integer;
+  ValidFile: Boolean;
+  
 begin
   with odFileSelect do
     if Execute then begin
       Clear;
-      MTEditor.LoadFromFile(FileName);
-      FilesList.Add(FileName);
-      lbFilesList.Items.Add(ExtractFileName(FileName));
-      lbFilesList.ItemIndex := 0;
-      LoadFileInView;
+
+      // scanning every selected file
+      for i := 0 to Files.Count - 1 do
+        if MTEditor.LoadFromFile(Files[i]) then begin
+          ValidFile := MTEditor.Textures.Count > 0;
+          MTEditor.Close;
+
+          // if the file opened is valid then add it to the software
+          if ValidFile then begin
+            FilesList.Add(Files[i]);
+            lbFilesList.Items.Add(ExtractFileName(Files[i]));
+            eFilesCount.Text := IntToStr(FilesList.Count);
+          end;
+        end;
+
+      // loading the first item
+      if lbFilesList.Items.Count > 0 then begin
+        lbFilesList.ItemIndex := 0;
+        lbFilesListClick(Self);
+      end;
     end;
 end;
 
-procedure TfrmMain.Opendirectory1Click(Sender: TObject);
+procedure TfrmMain.miOpenDirectoryClick(Sender: TObject);
 begin
   with frmSelectDir do begin
     if Execute(SourceDirectory) then begin
@@ -443,24 +679,117 @@ begin
   end;
 end;
 
-procedure TfrmMain.Quit1Click(Sender: TObject);
+procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TfrmMain.Refresh1Click(Sender: TObject);
+procedure TfrmMain.miRefreshClick(Sender: TObject);
 begin
   ScanDirectory(SourceDirectory);
 end;
 
-procedure TfrmMain.Save1Click(Sender: TObject);
+procedure TfrmMain.miReloadClick(Sender: TObject);
+var
+  CanDo: Integer;
+  FName: TFileName;
+
 begin
-  MTEditor.SaveToFile('C:\Documents and Settings\SiZiOUS\Bureau\hack\xbox\test.bin');
+  FName := SelectedFileEntry.ExtractedFileName;
+  CanDo := MsgBox(
+    'Reload the "' + FName + '" file ? '
+    + sLineBreak + 'Changes not saved will be LOST!',
+    'Warning',
+    MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
+  if (CanDo = IDNO) then Exit;
+
+  LoadFileEntry(SelectedFileEntry);
+  AddDebug('File "' + SelectedFileEntry.ExtractedFileName + '" successfully reloaded from disk.');
 end;
 
-procedure TfrmMain.SetStatus(const Text: string);
+procedure TfrmMain.ResetStatus;
 begin
+  Status := 'Ready';
+end;
 
+procedure TfrmMain.miSaveClick(Sender: TObject);
+begin
+  Status := 'Saving...';
+  if MTEditor.Save then begin
+    AddDebug('File "' + ExtractFileName(MTEditor.SourceFileName) + '" successfully saved.');
+    FileModified := False;
+  end else begin
+    AddDebug('Error when saving the "' +  MTEditor.SourceFileName + ' file !');
+  end;
+  ResetStatus;
+end;
+
+function TfrmMain.SaveCurrentFileOnDemand(CancelButton: Boolean): Boolean;
+var
+  CanDo, MsgButtons, MsgIcon: Integer;
+
+begin
+  Result := True;
+  
+  if CancelButton then begin
+    MsgButtons := MB_YESNOCANCEL;
+    MsgIcon := MB_ICONWARNING;
+  end else begin
+    MsgButtons := MB_YESNO;
+    MsgIcon := MB_ICONQUESTION;
+  end;
+
+  if FileModified then
+    if AutoSave then
+      miSave.Click  // no problem, we save the file
+    else begin
+      CanDo := MsgBox('The file was modified. Save changes ?', 'File modified not saved', MsgIcon + MsgButtons);
+      case CanDo of
+        IDYES:
+          miSave.Click;
+        IDCANCEL:
+          Result := False;
+      end;
+    end;
+end;
+
+procedure TfrmMain.SetApplicationConfigParameters;
+begin
+  if not LoadConfig then begin
+    AutoSave := False;
+    SourceDirectory := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
+    MakeBackup := True;
+  end;
+end;
+
+procedure TfrmMain.SetAutoSave(const Value: Boolean);
+begin
+  fAutoSave := Value;
+  miAutoSave.Checked := Value;
+end;
+
+procedure TfrmMain.SetFileModified(const Value: Boolean);
+begin
+  fFileModified := Value;
+  if Value then
+    sbMain.Panels[1].Text := 'Modified'
+  else begin
+    ClearImportedTexturesStatus;
+    sbMain.Panels[1].Text := '';
+  end;
+end;
+
+procedure TfrmMain.SetMakeBackup(const Value: Boolean);
+begin
+  fMakeBackup := Value;
+  miMakeBackup.Checked := Value;
+  MTEditor.MakeBackup := Value;
+end;
+
+procedure TfrmMain.SetStatus(const Value: string);
+begin
+  sbMain.Panels[2].Text := Value;
+  Application.ProcessMessages;
 end;
 
 function TfrmMain.UpdateTexturePreviewWindow: Boolean;
@@ -473,10 +802,10 @@ begin
 
   // Set the current item selected
   SelectedTexture := MTEditor.Textures[lvTexturesList.ItemIndex];
-  SelectedItem  := lvTexturesList.Items[lvTexturesList.ItemIndex];
+  SelectedTextureUI  := lvTexturesList.Items[lvTexturesList.ItemIndex];
 
   // Load the proper picture
-  PVRConverter := SelectedItem.Data;
+  PVRConverter := SelectedTextureUI.Data;
   if not Assigned(PVRConverter) then Exit;
 
   // Refresh the window

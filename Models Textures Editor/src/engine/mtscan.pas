@@ -84,7 +84,7 @@ begin
       fOnStart(Self, fFilesList.Count);
 
     i := 0;
-    while (not Terminated) and (i < fFilesList.Count - 1) do begin
+    while (not Terminated) and (i < fFilesList.Count) do begin
       FName := fFilesList[i];
 
       if Assigned(fOnFileFound) then
