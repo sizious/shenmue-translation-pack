@@ -25,6 +25,7 @@ uses
 {$IFDEF DEBUG}
 var
   AppTitle: string;
+  AppVersion: TApplicationFileVersion;
 {$ENDIF}
 
 begin
@@ -36,14 +37,23 @@ begin
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmTexPreview, frmTexPreview);
   Application.CreateForm(TfrmTexProp, frmTexProp);
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // FIX for Delphi IDE...
   ReportMemoryLeaksOnShutdown := True;
-  if AllocConsole then
+  if AllocConsole then begin
     SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
-  {$ENDIF}
+    AppVersion := GetApplicationFileVersion;
+    WriteLn('Welcome to ', AppTitle, ' !', sLineBreak,
+      '  Version       : ', AppVersion.Major, '.', AppVersion.Minor, '.',
+        AppVersion.Release, '.', AppVersion.Build, sLineBreak,
+      '  Debug release : ', APP_VERSION_DEBUG, sLineBreak
+    );
+  end;
+{$ENDIF}
 
   Application.Run;
 
-  {$IFDEF DEBUG}FreeConsole;{$ENDIF}
+{$IFDEF DEBUG}
+  FreeConsole;
+{$ENDIF}
 end.

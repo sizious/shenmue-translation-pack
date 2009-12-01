@@ -45,7 +45,7 @@ begin
   if not DirectoryExists(Directory) then Exit;
   with frmMain do begin
     Clear;
-    SetStatus('Scanning directory ... Please wait.');
+    Status := 'Scanning directory ... Please wait.';
   end;
 
   // We create a 'listener' (check the class in the beginning of this file)
@@ -120,6 +120,7 @@ end;
 procedure TMTScanDirectoryThreadListener.OnInitGettingFilesList(
   Sender: TObject);
 begin
+  frmMain.Status := 'Retrieving files list...';
   frmProgress.SetProgressEvent('Retrieving files list... Please wait.');
 end;
 
@@ -139,6 +140,8 @@ begin
     frmProgress.Terminated := True;  // notify the form that the thread is over so it can close
     frmProgress.Close;
   end;
+  frmMain.ResetStatus;
+  frmMain.AddDebug('Scan finished. ' + IntToStr(frmMain.FilesList.Count) + ' file(s) found.');
 end;
 
 //------------------------------------------------------------------------------

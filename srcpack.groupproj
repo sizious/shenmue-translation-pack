@@ -20,6 +20,15 @@
     <BorlandProject>
 <BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
+  <Target Name="idxwrite">
+    <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="" />
+  </Target>
+  <Target Name="idxwrite:Clean">
+    <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="idxwrite:Make">
+    <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="Make" />
+  </Target>
   <Target Name="idxmaker">
     <MSBuild Projects="IDX Creator\src\idxmaker.dproj" Targets="" />
   </Target>
@@ -38,24 +47,6 @@
   <Target Name="sfqsubed:Make">
     <MSBuild Projects="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Make" />
   </Target>
-  <Target Name="convert">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="" />
-  </Target>
-  <Target Name="convert:Clean">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="convert:Make">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="Make" />
-  </Target>
-  <Target Name="preview">
-    <MSBuild Projects="Shenmue Subtitles Preview\src\debug\preview.dproj" Targets="" />
-  </Target>
-  <Target Name="preview:Clean">
-    <MSBuild Projects="Shenmue Subtitles Preview\src\debug\preview.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="preview:Make">
-    <MSBuild Projects="Shenmue Subtitles Preview\src\debug\preview.dproj" Targets="Make" />
-  </Target>
   <Target Name="scinsube">
     <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="" />
   </Target>
@@ -65,6 +56,15 @@
   <Target Name="scinsube:Make">
     <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
+  <Target Name="convert">
+    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="" />
+  </Target>
+  <Target Name="convert:Clean">
+    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="convert:Make">
+    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="Make" />
+  </Target>
   <Target Name="mteditor">
     <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="" />
   </Target>
@@ -73,15 +73,6 @@
   </Target>
   <Target Name="mteditor:Make">
     <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="Make" />
-  </Target>
-  <Target Name="idxwrite">
-    <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="" />
-  </Target>
-  <Target Name="idxwrite:Clean">
-    <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="idxwrite:Make">
-    <MSBuild Projects="IDX Creator\src\idxwrite.dproj" Targets="Make" />
   </Target>
   <Target Name="afsutils">
     <MSBuild Projects="AFS Utils\src\afsutils.dproj" Targets="" />
@@ -101,14 +92,23 @@
   <Target Name="sprutils:Make">
     <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Make" />
   </Target>
+  <Target Name="preview">
+    <MSBuild Projects="Shenmue Subtitles Preview\src\debug\preview.dproj" Targets="" />
+  </Target>
+  <Target Name="preview:Clean">
+    <MSBuild Projects="Shenmue Subtitles Preview\src\debug\preview.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="preview:Make">
+    <MSBuild Projects="Shenmue Subtitles Preview\src\debug\preview.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxmaker;sfqsubed;convert;preview;scinsube;mteditor;idxwrite;afsutils;sprutils" />
+    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;convert;mteditor;afsutils;sprutils;preview" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxmaker:Clean;sfqsubed:Clean;convert:Clean;preview:Clean;scinsube:Clean;mteditor:Clean;idxwrite:Clean;afsutils:Clean;sprutils:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;convert:Clean;mteditor:Clean;afsutils:Clean;sprutils:Clean;preview:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxmaker:Make;sfqsubed:Make;convert:Make;preview:Make;scinsube:Make;mteditor:Make;idxwrite:Make;afsutils:Make;sprutils:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;convert:Make;mteditor:Make;afsutils:Make;sprutils:Make;preview:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

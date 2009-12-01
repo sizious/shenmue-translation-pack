@@ -186,6 +186,9 @@ type
     fSections: TSectionsList;
     fTextures: TTexturesList;
     fFileLoaded: Boolean;
+    fMakeBackup: Boolean;
+  protected
+    function GetTempFileName: TFileName;
   public
     constructor Create;
     destructor Destroy; override;
@@ -194,8 +197,9 @@ type
     function Reload: Boolean;
     function Save: Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
-    property GameVersion: TGameVersion read fGameVersion;
     property FileLoaded: Boolean read fFileLoaded;
+    property GameVersion: TGameVersion read fGameVersion;
+    property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
     property SourceFileName: TFileName read fLoadedFileName;
     property Sections: TSectionsList read fSections;
     property Textures: TTexturesList read fTextures;
@@ -876,7 +880,8 @@ var
   begin
     Result := True;
     for i := Low(Entry.Name) to High(Entry.Name) do
-      Result := Result and (Entry.Name[i] <> #0);     rajouter le fait que si apres un passage de boucle le pointeur de fichier au meme endroit, sortir
+      Result := Result and (Entry.Name[i] <> #0);
+    Result := Result and (Entry.Size <> 0);
   end;
 
 begin
@@ -921,7 +926,7 @@ begin
 //    end;
 
 //  Done := (EOF(F) and (Offset + SizeOf(TRawSectionHeader) < FileSize(F))) or (not IsValidSectionName(RawEntry.Name));
-    Done := EOF(F) and (not IsValidSection(RawEntry));
+    Done := (not IsValidSection(RawEntry)) or EOF(F);
   end; // while
 end;
 
@@ -952,6 +957,22 @@ begin
   fSections.Free;
   fTextures.Free;
   inherited;
+end;
+
+function TModelTexturedEditor.GetTempFileName: TFileName;
+
+  function GetTempDir : string;
+  var
+    Dir: array[0..MAX_PATH] of Char;
+
+  begin
+    Result := '';
+    if GetTempPath(SizeOf(Dir), Dir) <> 0 then
+      Result := IncludeTrailingPathDelimiter(StrPas(Dir));
+  end;
+
+begin
+  Result := GetTempDir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
 end;
 
 function TModelTexturedEditor.LoadFromFile(const FileName: TFileName): Boolean;
@@ -1023,7 +1044,7 @@ begin
 {$IFDEF DEBUG}
         WriteLn('READ ERROR: "', ExtractFileName(FileName), '", message: "', E.Message, '"', sLineBreak);
 {$ENDIF}
-        Result := False;
+//        Result := False;
       end;
     end;
 
@@ -1031,6 +1052,10 @@ begin
     CloseFile(F);
   end;
 
+  // A valid loaded file contains textures.
+  Result := Textures.Count > 0;
+  if not Result then Close; // invalid file!!
+  
 //  end {$IFNDEF DEBUG}; {$ELSE} else WriteLn('UNDEFINED FILE FORMAT !!'); {$ENDIF}
 end;
 
@@ -1048,17 +1073,20 @@ function TModelTexturedEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
   i: Integer;
   InStream, OutStream: TFileStream;
+  TempFileName: TFileName;
 
 begin
   Result := False;
   if not FileExists(SourceFileName) then Exit;
+
+  TempFileName := GetTempFileName;
 
 {$IFDEF DEBUG}
   WriteLn('*** SAVING AND PATCHING FILE ***');
 {$ENDIF}
 
   InStream := TFileStream.Create(SourceFileName, fmOpenRead);
-  OutStream := TFileStream.Create(FileName, fmCreate);
+  OutStream := TFileStream.Create(TempFileName, fmCreate);
   try
 
     for i := 0 to Sections.Count - 1 do begin
@@ -1105,6 +1133,17 @@ begin
   finally
     InStream.Free;
     OutStream.Free;
+  end;
+
+  // Same filename for source and destination
+  if FileName = SourceFileName then
+    if MakeBackup then
+      CopyFile(PChar(SourceFileName), PChar(SourceFileName + '.BAK'), False);
+
+  // Saving to the target file name
+  if FileExists(TempFileName) then begin
+    Result := CopyFile(PChar(TempFileName), PChar(FileName), False);
+    DeleteFile(TempFileName);
   end;
 
 end;

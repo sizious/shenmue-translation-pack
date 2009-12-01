@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   Caption = 
     '< Generated Name > // MT Editor // (C)reated by [big_fury]SiZiOU' +
     'S'
-  ClientHeight = 516
+  ClientHeight = 536
   ClientWidth = 592
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,24 +21,24 @@ object frmMain: TfrmMain
   OnShow = FormShow
   DesignSize = (
     592
-    516)
+    536)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 2
     Top = 4
     Width = 149
-    Height = 383
+    Height = 403
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
-    ExplicitHeight = 443
+    ExplicitHeight = 463
     DesignSize = (
       149
-      383)
+      403)
     object Label9: TLabel
       Left = 6
-      Top = 357
+      Top = 377
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -49,17 +49,18 @@ object frmMain: TfrmMain
       Left = 6
       Top = 16
       Width = 137
-      Height = 335
+      Height = 355
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
-      ExplicitHeight = 395
+      OnContextPopup = lbFilesListContextPopup
+      ExplicitHeight = 415
     end
     object eFilesCount: TEdit
       Left = 70
-      Top = 354
+      Top = 374
       Width = 73
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -67,37 +68,29 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
-      ExplicitTop = 414
+      ExplicitTop = 434
     end
-  end
-  object StatusBar1: TStatusBar
-    Left = 0
-    Top = 497
-    Width = 592
-    Height = 19
-    Panels = <>
-    ExplicitTop = 557
   end
   object pcMain: TPageControl
     Left = 154
     Top = 4
     Width = 438
-    Height = 383
+    Height = 403
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 2
-    ExplicitHeight = 443
+    TabOrder = 1
+    ExplicitHeight = 463
     object TabSheet1: TTabSheet
       Caption = 'Textures'
-      ExplicitHeight = 415
+      ExplicitHeight = 435
       DesignSize = (
         430
-        355)
+        375)
       object lvTexturesList: TListView
         Left = 3
         Top = 4
         Width = 333
-        Height = 348
+        Height = 368
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -122,7 +115,7 @@ object frmMain: TfrmMain
         OnClick = lvTexturesListClick
         OnContextPopup = lvTexturesListContextPopup
         OnKeyUp = lvTexturesListKeyUp
-        ExplicitHeight = 408
+        ExplicitHeight = 428
       end
       object bImport: TButton
         Left = 337
@@ -159,7 +152,7 @@ object frmMain: TfrmMain
       end
       object bUndo: TButton
         Left = 337
-        Top = 99
+        Top = 98
         Width = 92
         Height = 25
         Anchors = [akTop, akRight]
@@ -173,6 +166,7 @@ object frmMain: TfrmMain
         Top = 126
         Width = 91
         Height = 87
+        Anchors = [akTop, akRight]
         Caption = ' Version : '
         Enabled = False
         Items.Strings = (
@@ -188,12 +182,12 @@ object frmMain: TfrmMain
       ImageIndex = 1
       DesignSize = (
         430
-        355)
+        375)
       object lvSectionsList: TListView
         Left = 3
         Top = 3
         Width = 425
-        Height = 348
+        Height = 368
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -216,13 +210,13 @@ object frmMain: TfrmMain
   end
   object GroupBox2: TGroupBox
     Left = 2
-    Top = 390
+    Top = 410
     Width = 586
     Height = 105
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
-    TabOrder = 3
-    ExplicitTop = 450
+    TabOrder = 2
+    ExplicitTop = 470
     DesignSize = (
       586
       105)
@@ -234,46 +228,81 @@ object frmMain: TfrmMain
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
       ReadOnly = True
+      ScrollBars = ssBoth
       TabOrder = 0
     end
+  end
+  object sbMain: TStatusBar
+    Left = 0
+    Top = 517
+    Width = 592
+    Height = 19
+    Panels = <
+      item
+        Text = 'Status:'
+        Width = 50
+      end
+      item
+        Text = 'Modified'
+        Width = 70
+      end
+      item
+        Text = 'Ready'
+        Width = 50
+      end>
+    ExplicitTop = 577
   end
   object mmMain: TMainMenu
     Left = 20
     Top = 34
     object miFile: TMenuItem
       Caption = '&File'
-      object Opendirectory1: TMenuItem
-        Caption = '&Open directory...'
+      object miOpenDirectory: TMenuItem
+        Caption = 'Open &directory...'
         ShortCut = 16463
-        OnClick = Opendirectory1Click
+        OnClick = miOpenDirectoryClick
       end
-      object Open1: TMenuItem
-        Caption = '&Open single file...'
+      object miOpenFiles: TMenuItem
+        Caption = 'O&pen files...'
         ShortCut = 49231
-        OnClick = Open1Click
+        OnClick = miOpenFilesClick
+      end
+      object miReload: TMenuItem
+        Caption = '&Reload...'
+        OnClick = miReloadClick
       end
       object N1: TMenuItem
         Caption = '-'
       end
-      object Save1: TMenuItem
+      object miSave: TMenuItem
         Caption = '&Save'
         ShortCut = 16467
-        OnClick = Save1Click
+        OnClick = miSaveClick
       end
-      object Saveas1: TMenuItem
-        Caption = '&Save as...'
+      object miSaveAs: TMenuItem
+        Caption = 'S&ave as...'
         ShortCut = 49235
+      end
+      object N10: TMenuItem
+        Caption = '-'
+      end
+      object miClose: TMenuItem
+        Caption = 'C&lose'
+      end
+      object miCloseAll: TMenuItem
+        Caption = '&Close all...'
+        OnClick = miCloseAllClick
       end
       object N2: TMenuItem
         Caption = '-'
       end
-      object Quit1: TMenuItem
+      object miQuit: TMenuItem
         Caption = '&Quit'
         ShortCut = 16465
-        OnClick = Quit1Click
+        OnClick = miQuitClick
       end
     end
-    object Edit1: TMenuItem
+    object miEdit: TMenuItem
       Caption = '&Edit'
       object miUndo: TMenuItem
         Caption = '&Undo changes...'
@@ -304,37 +333,40 @@ object frmMain: TfrmMain
     end
     object miView: TMenuItem
       Caption = '&View'
-      object exturespreview1: TMenuItem
+      object miTexturesPreview: TMenuItem
         Caption = '&Textures preview...'
         ShortCut = 114
-        OnClick = exturespreview1Click
+        OnClick = miTexturesPreviewClick
       end
-      object exturesproperties1: TMenuItem
+      object miTexturesProperties: TMenuItem
         Caption = 'Textures properties...'
-        OnClick = exturesproperties1Click
+        ShortCut = 115
+        OnClick = miTexturesPropertiesClick
       end
       object N4: TMenuItem
         Caption = '-'
       end
-      object Savedebuglog1: TMenuItem
+      object miSaveDebug: TMenuItem
         Caption = '&Save debug log...'
       end
-      object Cleardebuglog1: TMenuItem
+      object miClearDebug: TMenuItem
         Caption = '&Clear debug log...'
       end
     end
     object miOptions: TMenuItem
       Caption = '&Options'
-      object Autosave1: TMenuItem
+      object miAutoSave: TMenuItem
         Caption = 'A&uto-save'
+        OnClick = miAutoSaveClick
       end
-      object Makebackup1: TMenuItem
+      object miMakeBackup: TMenuItem
         Caption = 'Make &backup'
+        OnClick = miMakeBackupClick
       end
     end
-    object About1: TMenuItem
+    object miHelp: TMenuItem
       Caption = '&Help'
-      object About2: TMenuItem
+      object miAbout: TMenuItem
         Caption = 'A&bout...'
         ShortCut = 123
       end
@@ -346,7 +378,7 @@ object frmMain: TfrmMain
       'Shenmue Models Files (*.MT5;*.MT6;*.MT7)|*.MT5;*.MT6;*.MT7|Shenm' +
       'ue I Models Files (*.MT5;*.MT6)|*.MT5;*.MT6|Shenmue II Models Fi' +
       'les (*.MT7)|*.MT7|All Files (*.*)|*.*'
-    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the Shenmue Textured Model file...'
     Left = 20
     Top = 64
@@ -361,27 +393,79 @@ object frmMain: TfrmMain
   end
   object bfdExportAllTex: TJvBrowseForFolderDialog
     Title = 'Please select the output directory to store exported textures...'
-    Left = 50
+    Left = 52
     Top = 34
   end
   object pmFilesList: TPopupMenu
-    Left = 14
-    Top = 158
-    object Refresh1: TMenuItem
+    Left = 22
+    Top = 160
+    object miLocateOnDisk: TMenuItem
+      Caption = '&Locate on disk...'
+      ShortCut = 16460
+      OnClick = miLocateOnDiskClick
+    end
+    object miReload2: TMenuItem
+      Caption = 'Re&load...'
+      OnClick = miReloadClick
+    end
+    object miClose2: TMenuItem
+      Caption = 'Close...'
+    end
+    object N9: TMenuItem
+      Caption = '-'
+    end
+    object miCloseAll2: TMenuItem
+      Caption = '&Close all...'
+      OnClick = miCloseAllClick
+    end
+    object miExportFilesList: TMenuItem
+      Caption = 'Ex&port files list...'
+      ShortCut = 49221
+      OnClick = miExportFilesListClick
+    end
+    object miBrowseDirectory: TMenuItem
+      Caption = '&Browse directory...'
+      ShortCut = 16450
+      OnClick = miBrowseDirectoryClick
+    end
+    object miRefresh: TMenuItem
       Caption = '&Refresh'
       ShortCut = 116
-      OnClick = Refresh1Click
+      OnClick = miRefreshClick
     end
   end
   object pmTextures: TPopupMenu
     Left = 508
     Top = 296
+    object miTexturesPreview2: TMenuItem
+      Caption = 'Preview...'
+      ShortCut = 114
+      OnClick = miTexturesPreviewClick
+    end
+    object miTexturesProperties2: TMenuItem
+      Caption = 'Properties...'
+      ShortCut = 115
+      OnClick = miTexturesPropertiesClick
+    end
+    object N8: TMenuItem
+      Caption = '-'
+    end
+    object miUndo2: TMenuItem
+      Caption = '&Undo...'
+      ShortCut = 16474
+      OnClick = bUndoClick
+    end
+    object N3: TMenuItem
+      Caption = '-'
+    end
     object miImport2: TMenuItem
       Caption = '&Import...'
+      ShortCut = 16457
       OnClick = bImportClick
     end
     object miExport2: TMenuItem
       Caption = '&Export...'
+      ShortCut = 16453
       OnClick = bExportClick
     end
     object N7: TMenuItem
@@ -389,6 +473,7 @@ object frmMain: TfrmMain
     end
     object miExportAll2: TMenuItem
       Caption = '&Export all...'
+      ShortCut = 16449
       OnClick = bExportAllClick
     end
   end
@@ -415,5 +500,13 @@ object frmMain: TfrmMain
     Title = 'Select your texture file...'
     Left = 20
     Top = 198
+  end
+  object sdExportList: TSaveDialog
+    DefaultExt = 'txt'
+    Filter = 'Text Files (*.txt)|*.txt|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Export the files list to...'
+    Left = 20
+    Top = 94
   end
 end
