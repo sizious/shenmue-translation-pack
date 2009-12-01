@@ -68,7 +68,7 @@
   
   Structure of the "data" directory:
     - chars_list_one.csv : Support des caractères accentués pour Shenmue I.
-	- chars_list_two.csv : Support des caractères accentués pour Shenmue II.
+    - chars_list_two.csv : Support des caractères accentués pour Shenmue II.
  __           _________________________________________________________________
  __| CONTACT |_________________________________________________________________
 

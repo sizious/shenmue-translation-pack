@@ -47,7 +47,7 @@
   structure of the AFS is most of time the following:
   
     - Several audio files (".str" or ".ahx")
-	- One or more SRF files.
+    - One or more SRF files.
   
    Once you've completed the translation of the SRF, save your modified SRF  
    file in place of the original SRF file. Rebuild the modified AFS with 
@@ -67,7 +67,7 @@
   
   Structure of the "data" directory:
     - chars_list_one.csv : Shenmue I accentuated characters support
-	- chars_list_two.csv : Shenmue II accentuated characters support
+    - chars_list_two.csv : Shenmue II accentuated characters support
  __           _________________________________________________________________
  __| CONTACT |_________________________________________________________________
 
