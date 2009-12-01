@@ -1,0 +1,33 @@
+#include <winver.h>
+#include <windows.h>
+
+1 VERSIONINFO
+FILEVERSION 0,1,0,0
+PRODUCTVERSION 0,1,0,0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+
+BEGIN
+
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040C04E4"
+		BEGIN
+			VALUE "Comments", "http://sbibuilder.shorturl.com/ - Based on original wav2adpcm code (c)2002 by BERO\0"
+			VALUE "CompanyName", "Created by [big_fury]SiZiOUS\0"
+			VALUE "FileDescription", "Waveform to Shenmue Yamaha AICA ADPCM Stream Encoder\0"
+			VALUE "FileVersion", "0.1.0.0"
+			VALUE "InternalName", "wav2str.exe\0"
+			VALUE "LegalCopyright", "© Copyleft 2002, 2009\0"
+			VALUE "OriginalFilename", "wav2str.exe\0"
+			VALUE "ProductName", "WAV2STR\0"
+			VALUE "ProductVersion", "0.1.0.0"
+		END
+	END
+
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 1036, 1252
+	END
+
+END
