@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   Caption = 
     '< Generated Name > // MT Editor // (C)reated by [big_fury]SiZiOU' +
     'S'
-  ClientHeight = 536
+  ClientHeight = 516
   ClientWidth = 592
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,24 +21,23 @@ object frmMain: TfrmMain
   OnShow = FormShow
   DesignSize = (
     592
-    536)
+    516)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 2
     Top = 4
     Width = 149
-    Height = 403
+    Height = 383
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Files list : '
     TabOrder = 0
-    ExplicitHeight = 463
     DesignSize = (
       149
-      403)
+      383)
     object Label9: TLabel
       Left = 6
-      Top = 377
+      Top = 357
       Width = 58
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -49,18 +48,17 @@ object frmMain: TfrmMain
       Left = 6
       Top = 16
       Width = 137
-      Height = 355
+      Height = 335
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       PopupMenu = pmFilesList
       TabOrder = 0
       OnClick = lbFilesListClick
       OnContextPopup = lbFilesListContextPopup
-      ExplicitHeight = 415
     end
     object eFilesCount: TEdit
       Left = 70
-      Top = 374
+      Top = 354
       Width = 73
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -68,29 +66,26 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       Text = '100'
-      ExplicitTop = 434
     end
   end
   object pcMain: TPageControl
     Left = 154
     Top = 4
     Width = 438
-    Height = 403
+    Height = 383
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
-    ExplicitHeight = 463
     object TabSheet1: TTabSheet
       Caption = 'Textures'
-      ExplicitHeight = 435
       DesignSize = (
         430
-        375)
+        355)
       object lvTexturesList: TListView
         Left = 3
-        Top = 4
+        Top = 3
         Width = 333
-        Height = 368
+        Height = 348
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -98,9 +93,11 @@ object frmMain: TfrmMain
           end
           item
             Caption = 'Offset'
+            Width = 85
           end
           item
             Caption = 'Size'
+            Width = 85
           end
           item
             Caption = 'Updated'
@@ -115,7 +112,6 @@ object frmMain: TfrmMain
         OnClick = lvTexturesListClick
         OnContextPopup = lvTexturesListContextPopup
         OnKeyUp = lvTexturesListKeyUp
-        ExplicitHeight = 428
       end
       object bImport: TButton
         Left = 337
@@ -182,22 +178,25 @@ object frmMain: TfrmMain
       ImageIndex = 1
       DesignSize = (
         430
-        375)
+        355)
       object lvSectionsList: TListView
         Left = 3
         Top = 3
-        Width = 425
-        Height = 368
+        Width = 333
+        Height = 348
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
             Caption = 'Name'
+            Width = 100
           end
           item
             Caption = 'Offset'
+            Width = 100
           end
           item
             Caption = 'Size'
+            Width = 100
           end>
         ColumnClick = False
         ReadOnly = True
@@ -205,18 +204,38 @@ object frmMain: TfrmMain
         PopupMenu = pmSections
         TabOrder = 0
         ViewStyle = vsReport
+        ExplicitHeight = 388
+      end
+      object bDump: TButton
+        Left = 337
+        Top = 17
+        Width = 92
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = '&Dump...'
+        Enabled = False
+        TabOrder = 1
+      end
+      object bDumpAll: TButton
+        Left = 337
+        Top = 44
+        Width = 92
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = 'D&ump all...'
+        Enabled = False
+        TabOrder = 2
       end
     end
   end
   object GroupBox2: TGroupBox
     Left = 2
-    Top = 410
+    Top = 390
     Width = 586
     Height = 105
     Anchors = [akLeft, akRight, akBottom]
     Caption = ' Debug : '
     TabOrder = 2
-    ExplicitTop = 470
     DesignSize = (
       586
       105)
@@ -234,7 +253,7 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 517
+    Top = 497
     Width = 592
     Height = 19
     Panels = <
@@ -250,7 +269,6 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
-    ExplicitTop = 577
   end
   object mmMain: TMainMenu
     Left = 20
@@ -282,12 +300,14 @@ object frmMain: TfrmMain
       object miSaveAs: TMenuItem
         Caption = 'S&ave as...'
         ShortCut = 49235
+        OnClick = miSaveAsClick
       end
       object N10: TMenuItem
         Caption = '-'
       end
       object miClose: TMenuItem
         Caption = 'C&lose'
+        OnClick = miCloseClick
       end
       object miCloseAll: TMenuItem
         Caption = '&Close all...'
@@ -410,6 +430,7 @@ object frmMain: TfrmMain
     end
     object miClose2: TMenuItem
       Caption = 'Close...'
+      OnClick = miCloseClick
     end
     object N9: TMenuItem
       Caption = '-'

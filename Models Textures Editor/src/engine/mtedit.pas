@@ -9,7 +9,7 @@ const
   SHENMUE2_MT7_TEXTURE_SECTION  = 'TXT7'; // Shenmue II Textures Section
   SHENMUE1_MT6_TEXTURE_SECTION  = 'TEXD'; // Shenmue I Textures Section
   SHENMUE1_SECTION_IGNORE       = 'TEXN'; // Because it's written with the TEXD section
-  TEXN_SECTION_SIZE             = 16;
+  TEXN_HEADER_SECTION_SIZE      = 16;
   TXT7_HEADER_FIXED_SIZE        = 12;     // TXT7 header size is variable but it 16 bytes length almost
   TXT7_TEXTURE_NAME_SIZE        = 8;
   GBIX_PVR_HEADER               = 'GBIX';
@@ -115,6 +115,7 @@ type
       PVRT_DataOffset, GBIX_Size, PVRT_Size, PVRT_DataSize: Integer): Integer; overload;
     procedure Clear;
     function ComputePaddingSize(DataSize: Integer): Integer;
+    function GBIX_GetSectionSize(var FileStream: TFileStream): Integer;
     function ParseTextureData(var F: file; const GBIX_Offset, GBIX_Size: Integer;
       var PVRT_Offset, PVRT_DataOffset, PVRT_Size, PVRT_DataSize,
           Xbox_PaddingTextureSize: Integer): Boolean; overload;
@@ -299,6 +300,19 @@ begin
   Clear;
   fTexturesList.Free;
   inherited;
+end;
+
+function TTexturesList.GBIX_GetSectionSize(var FileStream: TFileStream): Integer;
+var
+  Saved_Offset,
+  HeaderReadSize: Integer;
+  
+begin
+  Saved_Offset := FileStream.Position;
+  FileStream.Seek(Saved_Offset + 4, soFromBeginning); // 4 for 'GBIX' signature
+  FileStream.Read(HeaderReadSize, GAME_INTEGER_SIZE); // read GBIX size (after signature)
+  FileStream.Seek(Saved_Offset, soFromBeginning); // we know now the GBIX section size
+  Result := GBIX_PVR_HEADER_FIXED_SIZE + HeaderReadSize;
 end;
 
 function TTexturesList.GetCount: Integer;
@@ -496,7 +510,8 @@ begin
 {$ENDIF}
 
   // Get TEXD infos
-  if fTexturesSectionIndex <> -1 then begin
+  // the Sections.Count > 1 is for controlling there is at least one TEXN section... maybe.
+  if (fTexturesSectionIndex <> -1) and (Owner.Sections.Count > 1) then begin
     // Read the textures TEXN count in the TEXD section
     Seek(F, Owner.Sections[fTexturesSectionIndex].Offset + TEXD_SIGN_SIZE); // skip "TEXD" sign + "TEXD" size
     BlockRead(F, TexturesCount, GAME_INTEGER_SIZE);
@@ -508,9 +523,9 @@ begin
       // Get the GBIX PVR size
       Seek(F, SectionItem.Offset + 4);
       BlockRead(F, GBIX_Size, GAME_INTEGER_SIZE);
-      Dec(GBIX_Size, TEXN_SECTION_SIZE); // 16 is the "TEXN" section header
+      Dec(GBIX_Size, TEXN_HEADER_SECTION_SIZE); // 16 is the "TEXN" section header
 
-      GBIX_HeaderOffset := SectionItem.Offset + TEXN_SECTION_SIZE;
+      GBIX_HeaderOffset := SectionItem.Offset + TEXN_HEADER_SECTION_SIZE;
 
       // Computing the PVRT header offset and the PVRT data offset
       SavedOffset := FilePos(F);
@@ -535,25 +550,17 @@ var
   TXT7_Section_Offset, Texture_Size, GBIX_Offset,
   PVRT_Offset, PVRT_HeaderSizeOffset, IntBuf, 
   TextureDataSize_ForPaddingCalc, TotalPaddingSize: LongWord;
-  StrBuf: AnsiString;
+  SignBuf: array[0..3] of Char;
+  TextureName: string;
   Padding: array[0..31] of Char;
-
-  function GBIX_GetSectionSize(var Stream: TFileStream): Integer;
-  begin
-    Saved_Offset := Stream.Position;
-    Stream.Seek(Saved_Offset + 4, soFromBeginning); // 4 for 'GBIX' signature
-    Stream.Read(IntBuf, GAME_INTEGER_SIZE); // read GBIX size (after signature)
-    Stream.Seek(Saved_Offset, soFromBeginning); // we know now the GBIX section size
-    Result := GBIX_PVR_HEADER_FIXED_SIZE + IntBuf;
-  end;
   
 begin
   TXT7_Section_Offset := OutStream.Position;
   TotalPaddingSize := 0; // total padding size for the xbox version
   
   // Write TXT7 section name
-  StrBuf := GraphicSection.Name;
-  OutStream.Write(StrBuf[1], 4);
+  TextureName := GraphicSection.Name;
+  OutStream.Write(TextureName[1], 4);
 
   // Write TXT7 section size
   TXT7_Section_Size_Value := $FFFFFFFF;
@@ -623,13 +630,14 @@ begin
         
         // Skip GBIX header (don't needed)
         // This header is skipped if the imported file is Xbox or Dreamcast
-        ImportedFileStream.Read(StrBuf[1], 4);
-        if StrBuf = GBIX_PVR_HEADER then begin
+        ImportedFileStream.Read(SignBuf, SizeOf(SignBuf));
+        if SignBuf = GBIX_PVR_HEADER then begin
           ImportedFileStream.Seek(0, soFromBeginning); // to beginning of the file
           IntBuf := GBIX_GetSectionSize(ImportedFileStream);
           ImportedFileStream.Seek(IntBuf, soFromBeginning); // skip GBIX header
           Dec(Texture_Size, IntBuf); // dec GBIX size
-        end;
+        end else
+          ImportedFileStream.Seek(0, soFromBeginning);
                   
         (* 
           Now we are positionned on the PVRT header in the ImportedFileStream
@@ -643,10 +651,10 @@ begin
         TextureDataSize_ForPaddingCalc := Texture_Size;
         if Owner.GameVersion = gvShenmue2X then begin
           ImportedFileStream.Seek(0, soBeginning);
-          ImportedFileStream.Read(StrBuf[1], 4);
-          
+          ImportedFileStream.Read(SignBuf, SizeOf(SignBuf));
+
           // if imported texture is DDS...
-          if StrBuf = DDS_PVR_HEADER then begin
+          if SignBuf = DDS_PVR_HEADER then begin
             // We must dump PVRT header from source
             PVRT_HeaderSizeOffset := OutStream.Position + 4; // 4 for the "PVRT" signature
 
@@ -715,7 +723,11 @@ end;
 procedure TTexturesList.WriteTexturesSection_Shenmue_MT5_MT6(var InStream,
   OutStream: TFileStream);
 var
-  i: Integer;
+  i, Texture_Section_Size, IntBuf,
+  TEXN_SizeOffset, GBIX_OriginalSize: Integer;
+  ImportedFileStream: TFileStream;
+  SignBuf: array[0..3] of Char;
+  CurrentTexture: TTexturesListEntry;
 
 begin
   // Saving the "TEXD" section
@@ -724,14 +736,60 @@ begin
 
   // Saving "TEXN" sections
   for i := 0 to Count - 1 do begin
+    CurrentTexture := Items[i];
     // Write the texture section header "TEXN"
-    InStream.Seek(Items[i].Section.Offset, soFromBeginning);
-    OutStream.CopyFrom(InStream, TEXN_SECTION_SIZE); // 16 is the size of the TEXN header section
+    InStream.Seek(CurrentTexture.Section.Offset, soFromBeginning);
+    TEXN_SizeOffset := OutStream.Position + 4; // 4 for the "TEXN" signature
+    OutStream.CopyFrom(InStream, TEXN_HEADER_SECTION_SIZE); // 16 is the size of the TEXN header section
 
-    // Write the texture
-    InStream.Seek(Items[i].Offset, soFromBeginning);
-    OutStream.CopyFrom(InStream, Items[i].Size);
-  end;
+    (*
+      InStream = The source MTx file
+      OutStream = The new destination (hacked) MTx file
+      ImportedFileStream = The new texture data to write in the OutStream
+    *)
+
+    if Items[i].Updated then begin
+
+      // Writing GBIX header from source
+      GBIX_OriginalSize := (CurrentTexture.TextureOffset - CurrentTexture.Offset);      
+      InStream.Seek(CurrentTexture.Offset, soFromBeginning);
+      OutStream.CopyFrom(InStream, GBIX_OriginalSize);
+       
+      // Load the imported texture file
+      ImportedFileStream := TFileStream.Create(CurrentTexture.ImportFileName, fmOpenRead);
+      try
+        Texture_Section_Size := ImportedFileStream.Size; // adding the new imported PVR texture size to the TXT7 total size
+
+        // Skip GBIX header (don't needed)
+        // This header is skipped if the imported file is "GBIX" / "PVRT"
+        ImportedFileStream.Read(SignBuf, 4);
+        if SignBuf = GBIX_PVR_HEADER then begin
+          ImportedFileStream.Seek(0, soFromBeginning); // to beginning of the file
+          IntBuf := GBIX_GetSectionSize(ImportedFileStream);
+          ImportedFileStream.Seek(IntBuf, soFromBeginning); // skip GBIX header
+          Dec(Texture_Section_Size, IntBuf); // dec GBIX size
+        end else
+          ImportedFileStream.Seek(0, soBeginning);       
+
+        // Copy the new texture data stream to the MT file
+        OutStream.CopyFrom(ImportedFileStream, Texture_Section_Size);
+      finally
+        ImportedFileStream.Free;
+      end;
+
+      // Updating TEXN section size
+      Inc(Texture_Section_Size, GBIX_OriginalSize); // adding the original GBIX size
+      Inc(Texture_Section_Size, TEXN_HEADER_SECTION_SIZE); // adding the TEXN header size
+      OutStream.Seek(TEXN_SizeOffset, soBeginning);
+      OutStream.Write(Texture_Section_Size, GAME_INTEGER_SIZE);
+      OutStream.Seek(0, soFromEnd); // positionning at the end of the stream to continue the texture writing.
+    end else begin
+      // Write the original texture
+      InStream.Seek(CurrentTexture.Offset, soFromBeginning);
+      OutStream.CopyFrom(InStream, CurrentTexture.Size);
+    end; // if texture updated
+
+  end; // for
 end;
 
 { TSectionsList }
@@ -1146,6 +1204,8 @@ begin
     DeleteFile(TempFileName);
   end;
 
+  // Reloading the file
+  LoadFromFile(SourceFileName);
 end;
 
 { TTexturesListEntry }

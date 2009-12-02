@@ -89,6 +89,8 @@ type
     N10: TMenuItem;
     sdExportList: TSaveDialog;
     miReload: TMenuItem;
+    bDump: TButton;
+    bDumpAll: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miOpenFilesClick(Sender: TObject);
@@ -120,6 +122,8 @@ type
       var Handled: Boolean);
     procedure miCloseAllClick(Sender: TObject);
     procedure miReloadClick(Sender: TObject);
+    procedure miCloseClick(Sender: TObject);
+    procedure miSaveAsClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -153,7 +157,8 @@ type
     procedure Clear;
     procedure ClearFilesListControls;
     procedure ClearFilesInfos;
-    procedure ClearImportedTexturesStatus;    
+    procedure ClearImportedTexturesStatus;
+    procedure RemoveSelectedFile;
     function UpdateTexturePreviewWindow: Boolean;
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
     procedure ResetStatus;
@@ -376,7 +381,6 @@ begin
   pcMain.TabIndex := 0;
 
   FileModified := False;
-  SelectedFileEntry := nil;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -443,8 +447,11 @@ begin
       frmTexProp.Clear;
 
     ResetStatus;
-  end else
-    AddDebug('ERROR: ' + FileEntry.ExtractedFileName + ' has been deleted!');
+  end else begin
+    // The file on the disk was deleted...
+    AddDebug('ERROR: "' + FileEntry.ExtractedFileName + '" has been DELETED from the disk!');
+    RemoveSelectedFile;
+  end;
 end;
 
 procedure TfrmMain.LoadSelectedFileInView;
@@ -478,6 +485,12 @@ begin
   end;
 
   ChangeExportAllControlsState(HasTextures);
+
+  (*if HasTextures then begin
+    lvTexturesList.ItemIndex := 0;
+    lvTexturesList.SetFocus;
+    lvTexturesListClick(Self);
+  end;*)
 
   // Sections
   for i := 0 to MTEditor.Sections.Count - 1 do begin
@@ -535,13 +548,13 @@ begin
   ChangeControlsState(False);
   SelectedFileTexturesModifiedCount := 0;
   FileModified := False;
-  SelectedFileEntry := nil;
   SelectedTextureUI := nil;
-  SelectedTexture := nil;  
+  SelectedTexture := nil;    
 end;
 
 procedure TfrmMain.ClearFilesListControls;
 begin
+  SelectedFileEntry := nil;
   lbFilesList.Clear;
   eFilesCount.Text := '0';
 //  SourceDirectory := '';
@@ -579,6 +592,11 @@ begin
   if CanDo = IDNO then Exit;
 
   Clear;
+end;
+
+procedure TfrmMain.miCloseClick(Sender: TObject);
+begin
+  RemoveSelectedFile;
 end;
 
 procedure TfrmMain.miDumpSectionClick(Sender: TObject);
@@ -695,6 +713,8 @@ var
   FName: TFileName;
 
 begin
+  if not Assigned(SelectedFileEntry) then Exit;
+
   FName := SelectedFileEntry.ExtractedFileName;
   CanDo := MsgBox(
     'Reload the "' + FName + '" file ? '
@@ -707,9 +727,22 @@ begin
   AddDebug('File "' + SelectedFileEntry.ExtractedFileName + '" successfully reloaded from disk.');
 end;
 
+procedure TfrmMain.RemoveSelectedFile;
+begin
+  ClearFilesInfos;
+  SelectedFileEntry.RemoveEntry;
+  SelectedFileEntry := nil;
+  lbFilesList.DeleteSelected;
+end;
+
 procedure TfrmMain.ResetStatus;
 begin
   Status := 'Ready';
+end;
+
+procedure TfrmMain.miSaveAsClick(Sender: TObject);
+begin
+// LoadFileEntry(SelectedFileEntry);
 end;
 
 procedure TfrmMain.miSaveClick(Sender: TObject);
@@ -718,6 +751,7 @@ begin
   if MTEditor.Save then begin
     AddDebug('File "' + ExtractFileName(MTEditor.SourceFileName) + '" successfully saved.');
     FileModified := False;
+    LoadFileEntry(SelectedFileEntry);
   end else begin
     AddDebug('Error when saving the "' +  MTEditor.SourceFileName + ' file !');
   end;
