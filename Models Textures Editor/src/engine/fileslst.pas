@@ -8,17 +8,24 @@ uses
   Windows, SysUtils, Classes;
 
 type
+  TFilesList = class;
+
   TFileEntry = class(TObject)
   private
     fFileName: TFileName;
+    fOwner: TFilesList;
+    function GetIndex: Integer;
   public
-    constructor Create(const FileName: TFileName);
+    constructor Create(Owner: TFilesList; const FileName: TFileName);
     function Exists: Boolean;
     function ExtractedPath: TFileName;
     function ExtractedFileName: TFileName; overload;
     function ExtractedFileName(NewExtension: string): TFileName; overload;
     function ExtractedFileName(NewExtension: string; AppendNewExtension: Boolean): TFileName; overload;
+    procedure RemoveEntry;
     property FileName: TFileName read fFileName write fFileName;
+    property Index: Integer read GetIndex;
+    property Owner: TFilesList read fOwner;
   end;
 
   TFilesList = class(TObject)
@@ -46,8 +53,8 @@ var
   Item: TFileEntry;
 
 begin
-  Item := TFileEntry.Create(FileName);
-  fList.Add(Item)
+  Item := TFileEntry.Create(Self, FileName);
+  fList.Add(Item);
 end;
 
 procedure TFilesList.Assign(Source: TFilesList);
@@ -98,8 +105,9 @@ end;
 
 { TFileEntry }
 
-constructor TFileEntry.Create(const FileName: TFileName);
+constructor TFileEntry.Create(Owner: TFilesList; const FileName: TFileName);
 begin
+  fOwner := Owner;
   fFileName := FileName;
 end;
 
@@ -130,6 +138,17 @@ end;
 function TFileEntry.ExtractedPath: TFileName;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(FileName));
+end;
+
+function TFileEntry.GetIndex: Integer;
+begin
+  Result := Owner.fList.IndexOf(Self);
+end;
+
+procedure TFileEntry.RemoveEntry;
+begin
+  Owner.fList.Delete(Index);
+  Free;
 end;
 
 end.
