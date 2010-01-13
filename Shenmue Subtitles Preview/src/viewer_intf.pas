@@ -5,6 +5,8 @@ interface
 uses
   Windows, SysUtils, Classes, Forms, Graphics, Viewer;
 
+// Thanks to IlDucci for the patch
+  
 //------------------------------------------------------------------------------
 // SUBTITLES VIEWER API
 //------------------------------------------------------------------------------
@@ -43,7 +45,7 @@ const
                     '1234567890é,äÁÍëÈöÓüÑß¿¡''.*' +
                     'abcdefghijklmnopqrstuvwxyzñ' +
                     'ÄâÂáÀàïÏîÎíËêÊéÉèÖôÔÜûÛùÙçÇ' +
-                    '«»?!:@=;()-****************';
+                    '«»?!:@=;()-ÓóúÚ************';
 
 { TSubtitlesPreviewWindow }
 
