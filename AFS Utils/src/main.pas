@@ -8,8 +8,8 @@ uses
   JvBrowseFolder, StrUtils;
 
 const
-  APP_VERSION = '2.1';
-  COMPIL_DATE_TIME = 'March 17, 2009 @00:36 AM';
+  APP_VERSION = '2.2';
+  COMPIL_DATE_TIME = 'January 14, 2010 @06:06PM';
 
 type
   TfrmMain = class(TForm)
