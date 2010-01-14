@@ -40,9 +40,9 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.2' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.3' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'September 14, 2009 @11:32PM';
+  COMPIL_DATE_TIME = 'January 14, 2010 @05:48PM';
 
 type
   TGlobalTranslationModule = class;
@@ -1135,6 +1135,7 @@ begin
   miFileProperties2.Enabled := miFileProperties.Enabled;
   miReloadDir.Enabled := DirectoryExists(SelectedDirectory);
   miReloadDir2.Enabled := miReloadDir.Enabled;
+  miBrowseDirectory.Enabled := miReloadDir.Enabled;
   miExportFilesList.Enabled := lbFilesList.Items.Count > 0;
   miCloseFile2.Enabled := (lbFilesList.ItemIndex <> -1);
   miCloseFile.Enabled := miCloseFile2.Enabled;
