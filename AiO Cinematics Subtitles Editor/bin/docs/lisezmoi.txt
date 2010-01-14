@@ -15,11 +15,6 @@
                                       |  S H E N T R A D  |
  __                                           _________________________________
  __| Shenmue AiO Cinematics Subtitles Editor |_________________________________
-
-  Version...: 1.1
-  Date......: 8 avril 2009
- __               _____________________________________________________________
- __| DESCRiPTiON |_____________________________________________________________
  
   Shenmue AiO Cinematics Subtitles Editor est un logiciel Open Source qui 
   permet de modifier les sous-titres des cinématiques se déroulant dans la 
@@ -82,4 +77,8 @@
   Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
   Code additionnel....: Manic
   Tests Alpha/Beta....: Shendream, Sadako
+  Merci à.............: Manic, Shendream, Sadako, Hiei-, kogami-san, Dark_Neo, 
+                        mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, 
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+			PlusTuta et tous ceux qui nous supportent.
  _____________________________________________________________________[ FIN ]___
