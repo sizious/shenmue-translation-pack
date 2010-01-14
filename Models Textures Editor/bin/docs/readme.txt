@@ -63,5 +63,5 @@
   Thanks to...........: Manic, Shendream, Sadako, Hiei-, kogami-san, Dark_Neo, 
                         mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, 
                         alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
-						PlusTuta and everyone supporting us.										
+			PlusTuta and everyone supporting us.										
  _____________________________________________________________________[ EOF ]___
