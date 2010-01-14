@@ -18,7 +18,8 @@ uses
   common in 'engine\common.pas',
   img2png in '..\..\Common\img2png.pas',
   tools in 'tools.pas',
-  texprop in 'texprop.pas' {frmTexProp};
+  texprop in 'texprop.pas' {frmTexProp},
+  about in 'about.pas' {frmAbout};
 
 {$R *.res}
 
@@ -37,7 +38,7 @@ begin
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmTexPreview, frmTexPreview);
   Application.CreateForm(TfrmTexProp, frmTexProp);
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // FIX for Delphi IDE...
   ReportMemoryLeaksOnShutdown := True;
   if AllocConsole then begin

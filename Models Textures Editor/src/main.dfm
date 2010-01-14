@@ -55,6 +55,7 @@ object frmMain: TfrmMain
       TabOrder = 0
       OnClick = lbFilesListClick
       OnContextPopup = lbFilesListContextPopup
+      OnDblClick = miPropertiesClick
     end
     object eFilesCount: TEdit
       Left = 70
@@ -204,9 +205,10 @@ object frmMain: TfrmMain
         PopupMenu = pmSections
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitHeight = 388
+        OnClick = lvSectionsListClick
+        OnContextPopup = lvSectionsListContextPopup
       end
-      object bDump: TButton
+      object bDumpSection: TButton
         Left = 337
         Top = 17
         Width = 92
@@ -215,6 +217,7 @@ object frmMain: TfrmMain
         Caption = '&Dump...'
         Enabled = False
         TabOrder = 1
+        OnClick = miDumpSectionClick
       end
       object bDumpAll: TButton
         Left = 337
@@ -225,6 +228,7 @@ object frmMain: TfrmMain
         Caption = 'D&ump all...'
         Enabled = False
         TabOrder = 2
+        OnClick = bDumpAllClick
       end
     end
   end
@@ -313,6 +317,14 @@ object frmMain: TfrmMain
         Caption = '&Close all...'
         OnClick = miCloseAllClick
       end
+      object N13: TMenuItem
+        Caption = '-'
+      end
+      object miProperties: TMenuItem
+        Caption = '&Properties...'
+        ShortCut = 115
+        OnClick = miPropertiesClick
+      end
       object N2: TMenuItem
         Caption = '-'
       end
@@ -360,35 +372,52 @@ object frmMain: TfrmMain
       end
       object miTexturesProperties: TMenuItem
         Caption = 'Textures properties...'
-        ShortCut = 115
+        ShortCut = 117
         OnClick = miTexturesPropertiesClick
       end
       object N4: TMenuItem
         Caption = '-'
       end
-      object miSaveDebug: TMenuItem
-        Caption = '&Save debug log...'
-      end
       object miClearDebug: TMenuItem
         Caption = '&Clear debug log...'
+        OnClick = miClearDebugClick
+      end
+      object miSaveDebug: TMenuItem
+        Caption = '&Save debug log...'
+        OnClick = miSaveDebugClick
       end
     end
     object miOptions: TMenuItem
       Caption = '&Options'
       object miAutoSave: TMenuItem
         Caption = 'A&uto-save'
+        ShortCut = 118
         OnClick = miAutoSaveClick
       end
       object miMakeBackup: TMenuItem
         Caption = 'Make &backup'
+        ShortCut = 119
         OnClick = miMakeBackupClick
       end
     end
     object miHelp: TMenuItem
       Caption = '&Help'
+      object miProjectHome: TMenuItem
+        Caption = '&Project home...'
+        ShortCut = 112
+        OnClick = miProjectHomeClick
+      end
+      object miCheckForUpdate: TMenuItem
+        Caption = '&Check for update...'
+        OnClick = miCheckForUpdateClick
+      end
+      object N14: TMenuItem
+        Caption = '-'
+      end
       object miAbout: TMenuItem
         Caption = 'A&bout...'
         ShortCut = 123
+        OnClick = miAboutClick
       end
     end
   end
@@ -404,7 +433,7 @@ object frmMain: TfrmMain
     Top = 64
   end
   object sdExportTex: TSaveDialog
-    DefaultExt = 'pvr'
+    DefaultExt = 'PVR'
     Filter = 'PowerVR Textures Files (*.pvr)|*.pvr|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Export the selected texture to...'
@@ -419,6 +448,15 @@ object frmMain: TfrmMain
   object pmFilesList: TPopupMenu
     Left = 22
     Top = 160
+    object miProperties2: TMenuItem
+      Caption = '&Properties...'
+      Default = True
+      ShortCut = 115
+      OnClick = miPropertiesClick
+    end
+    object N12: TMenuItem
+      Caption = '-'
+    end
     object miLocateOnDisk: TMenuItem
       Caption = '&Locate on disk...'
       ShortCut = 16460
@@ -465,7 +503,7 @@ object frmMain: TfrmMain
     end
     object miTexturesProperties2: TMenuItem
       Caption = 'Properties...'
-      ShortCut = 115
+      ShortCut = 117
       OnClick = miTexturesPropertiesClick
     end
     object N8: TMenuItem
@@ -505,12 +543,19 @@ object frmMain: TfrmMain
       Caption = '&Dump...'
       OnClick = miDumpSectionClick
     end
+    object N11: TMenuItem
+      Caption = '-'
+    end
+    object miDumpAll2: TMenuItem
+      Caption = 'D&ump all...'
+      OnClick = bDumpAllClick
+    end
   end
   object sdDumpSection: TSaveDialog
-    DefaultExt = '.bin'
-    Filter = 'Generic Binary File (*.BIN)|*.bin|All Files (*.*)|*.*'
+    DefaultExt = 'BIN'
+    Filter = 'Generic Binary File (*.BIN)|*.BIN|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Title = 'Dump the selected section to...'
+    Title = 'Select the output file where to dump the section...'
     Left = 540
     Top = 298
   end
@@ -529,5 +574,30 @@ object frmMain: TfrmMain
     Title = 'Export the files list to...'
     Left = 20
     Top = 94
+  end
+  object sdSaveAs: TSaveDialog
+    DefaultExt = '(generated)'
+    Filter = '(generated)'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Save the current editor state to the file...'
+    Left = 52
+    Top = 94
+  end
+  object sdSaveDebug: TSaveDialog
+    DefaultExt = 'log'
+    Filter = 
+      'Debug Log Files (*.log)|*.log|Text Files (*.txt)|*.txt|All Files' +
+      ' (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Save debug log as...'
+    Left = 20
+    Top = 230
+  end
+  object bfdDumpSections: TJvBrowseForFolderDialog
+    Title = 
+      'Please select the output directory to store the dumped sections.' +
+      '..'
+    Left = 52
+    Top = 230
   end
 end

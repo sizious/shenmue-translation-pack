@@ -81,7 +81,7 @@ end;
 
 function TfrmSelectDir.GetSelectedDirectory: string;
 begin
-  Result := eDirectory.Text;
+  Result := IncludeTrailingPathDelimiter(eDirectory.Text);
 end;
 
 function TfrmSelectDir.MsgBox(Text, Caption: string; Flags: Integer): Integer;
