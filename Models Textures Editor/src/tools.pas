@@ -15,16 +15,18 @@ type
 
 function ExtremeRight(SubStr: string ; S: string): string;
 function GetApplicationFileVersion: TApplicationFileVersion;
+function GetApplicationStringVersion: string;
 function LoadConfig: Boolean;
 function Right(SubStr: string ; S: string): string;
 procedure SaveConfig;
+procedure ShellOpenPropertiesDialog(FileName: TFileName);
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main, ShellApi;
 
 var
   AppDir,
@@ -225,6 +227,18 @@ End;
 
 //------------------------------------------------------------------------------
 
+function GetApplicationStringVersion: string;
+var
+  Version: TApplicationFileVersion;
+
+begin
+  Version := GetApplicationFileVersion;
+  Result := IntToStr(Version.Major) + '.' + IntToStr(Version.Minor) + '.' +
+    IntToStr(Version.Release) + '.' + IntToStr(Version.Build);
+end;
+
+//------------------------------------------------------------------------------
+
 function Right(SubStr: string ; S: string): string;
 begin
   if pos(substr,s)=0 then result:='' else
@@ -239,6 +253,21 @@ begin
     S:= Right(substr,s);
   until pos(substr,s)=0;
   result:=S;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure ShellOpenPropertiesDialog(FileName: TFileName);
+var
+  ShellExecuteInfo: TShellExecuteInfo;
+
+begin
+  FillChar(ShellExecuteInfo, SizeOf(ShellExecuteInfo), 0);
+  ShellExecuteInfo.cbSize := SizeOf(ShellExecuteInfo);
+  ShellExecuteInfo.fMask := SEE_MASK_INVOKEIDLIST;
+  ShellExecuteInfo.lpVerb := 'properties';
+  ShellExecuteInfo.lpFile := PChar(FileName);
+  ShellExecuteEx(@ShellExecuteInfo);
 end;
 
 //------------------------------------------------------------------------------

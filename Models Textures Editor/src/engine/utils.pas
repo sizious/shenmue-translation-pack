@@ -92,6 +92,8 @@ begin
   Result := True;
   ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
   StartupInfo.cb := SizeOf(StartupInfo);
+  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
+  StartupInfo.wShowWindow := SW_HIDE;
   if CreateProcess(
     nil, PChar(TargetFileName), nil, nil, True, 0, nil, nil, StartupInfo,
     ProcessInformation

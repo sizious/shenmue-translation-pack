@@ -148,6 +148,7 @@ type
     property MTEditor: TModelTexturedEditor read GetModelTexturedEditor;
   public
     constructor Create(Owner: TSectionsList);
+    procedure ExportToFile(const Directory: TFileName);
     procedure SaveToFile(const FileName: TFileName);
     property Ignored: Boolean read fIgnore;
     property IsTextures: Boolean read fIsTextures;
@@ -1343,6 +1344,16 @@ begin
   fOwner := Owner;
   fIsTextures := False;
   fIgnore := False;
+end;
+
+procedure TSectionsListEntry.ExportToFile(const Directory: TFileName);
+var
+  FileName: TFileName;
+  
+begin
+  FileName := IncludeTrailingPathDelimiter(Directory)
+    + ExtractFileName(MTEditor.SourceFileName) + '_' + Name + '.BIN';
+  SaveToFile(FileName);  
 end;
 
 function TSectionsListEntry.GetModelTexturedEditor: TModelTexturedEditor;

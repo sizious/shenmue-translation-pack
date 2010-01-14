@@ -1,0 +1,48 @@
+Main coder: 
+[big_fury]SiZiOUS
+
+Thanks to:
+Manic, Shendream, Sadako, 
+Hiei-, kogami-san, Dark_Neo, 
+mimix, Sunmingzhao, MagicSeb, 
+Ayla, L@Cible, Ti Dragon, 
+alphaphoenix55, FamilyGuy, 
+Ryo Suzuki, IlDucci, 
+PlusTuta and everyone 
+supporting us!
+
+Thanks to everyone in 
+MetaGames-EU forums!
+
+The SHENTRAD Team is Manic 
+(Quebec) and SiZiOUS (France). 
+
+Icon "Graphic" was made by 
+Phuzion.
+
+This tool contains an embedded 
+version of Pvr2Png by Gzav.
+
+The embedded PvrX2Png tool 
+was made by SiZiOUS. Based on 
+the libsquish, libpng and libz 
+libraries. Thanks going to Simon 
+Brown (dds2png sample), 
+sabishirop (nut2png) and 
+Gregory Smith (Aorta).
+
+Ryô is saying "Now, I can speak 
+every language!" in French.
+
+Check for news and updates:
+shenmuesubs.sourceforge.net
+
+Cheers !
+
+The SHENTRAD Team, here to 
+breake the language barrier!
+
+Special smack à ma petite
+bestiole!
+
+-- The End --

@@ -89,8 +89,20 @@ type
     N10: TMenuItem;
     sdExportList: TSaveDialog;
     miReload: TMenuItem;
-    bDump: TButton;
+    bDumpSection: TButton;
     bDumpAll: TButton;
+    sdSaveAs: TSaveDialog;
+    N11: TMenuItem;
+    miDumpAll2: TMenuItem;
+    sdSaveDebug: TSaveDialog;
+    bfdDumpSections: TJvBrowseForFolderDialog;
+    N12: TMenuItem;
+    miProperties2: TMenuItem;
+    miProperties: TMenuItem;
+    N13: TMenuItem;
+    miProjectHome: TMenuItem;
+    N14: TMenuItem;
+    miCheckForUpdate: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miOpenFilesClick(Sender: TObject);
@@ -124,6 +136,16 @@ type
     procedure miReloadClick(Sender: TObject);
     procedure miCloseClick(Sender: TObject);
     procedure miSaveAsClick(Sender: TObject);
+    procedure lvSectionsListContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure lvSectionsListClick(Sender: TObject);
+    procedure miClearDebugClick(Sender: TObject);
+    procedure miSaveDebugClick(Sender: TObject);
+    procedure bDumpAllClick(Sender: TObject);
+    procedure miPropertiesClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure miProjectHomeClick(Sender: TObject);
+    procedure miCheckForUpdateClick(Sender: TObject);
   private
     { Déclarations privées }
     fFilesList: TFilesList;
@@ -136,21 +158,32 @@ type
     fAutoSave: Boolean;
     fFileModified: Boolean;
     fSelectedFileTexturesModifiedCount: Integer;
+    procedure FilesListEvent_ListCleared(Sender: TObject);
+    procedure FilesListEvent_ItemAdded(Sender: TObject; FileName: TFileName;
+      ListIndex: Integer);
     function GetStatus: string;
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
     procedure SetStatus(const Value: string);
     procedure SetFileModified(const Value: Boolean);
+    procedure SetSelectedFileEntry(const Value: TFileEntry);
+    procedure SetSourceDirectory(const Value: TFileName);
   protected
     procedure ChangeControlsState(State: Boolean);
     procedure ChangeExportAllControlsState(State: Boolean);
+    procedure ChangeMultiDumpOperationsControlsState(State: Boolean);
+    procedure ChangeSingleDumpOperationsControlsState(State: Boolean);
+    procedure ChangeMultiFileOperationsControlsState(State: Boolean);
+    procedure ChangeSingleFileOperationsControlsState(State: Boolean);
+    procedure ChangeSingleFileSaveOperationsControlsState(State: Boolean);
+    procedure ChangeSelectedFolderOperationsControlsState(State: Boolean);
     procedure ChangeUndoImportControlsState(State: Boolean);
     procedure LoadFileEntry(FileEntry: TFileEntry);
     procedure LoadSelectedFileInView;
     function SaveCurrentFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetApplicationConfigParameters;
     property SelectedFileTexturesModifiedCount: Integer
-      read fSelectedFileTexturesModifiedCount write fSelectedFileTexturesModifiedCount; 
+      read fSelectedFileTexturesModifiedCount write fSelectedFileTexturesModifiedCount;
   public
     { Déclarations publiques }
     procedure AddDebug(Text: string);
@@ -167,10 +200,10 @@ type
     property FilesList: TFilesList read fFilesList;
     property FileModified: Boolean read fFileModified write SetFileModified;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
-    property SelectedFileEntry: TFileEntry read fSelectedFileEntry write fSelectedFileEntry;
+    property SelectedFileEntry: TFileEntry read fSelectedFileEntry write SetSelectedFileEntry;
     property SelectedTextureUI: TListItem read fSelectedItem write fSelectedItem;
     property SelectedTexture: TTexturesListEntry read fSelectedTexture write fSelectedTexture;
-    property SourceDirectory: TFileName read fSourceDirectory write fSourceDirectory;
+    property SourceDirectory: TFileName read fSourceDirectory write SetSourceDirectory;
     property Status: string read GetStatus write SetStatus;
   end;
 
@@ -181,7 +214,8 @@ var
 implementation
 
 uses
-  ShellApi, MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools, texprop;
+  ShellApi, MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools, texprop,
+  about;
 
 const
   DEFAULT_WIDTH = 600;
@@ -194,10 +228,33 @@ begin
   mDebug.Lines.Add('[' + DateToStr(Date) + ' ' + TimeToStr(Now) + '] ' + Text);
 end;
 
-procedure TfrmMain.bExportAllClick(Sender: TObject);
+procedure TfrmMain.bDumpAllClick(Sender: TObject);
 var
   i: Integer;
   
+begin
+  with bfdDumpSections do begin
+    if ExportDirectory = '' then
+      ExportDirectory := IncludeTrailingPathDelimiter(ExtractFilePath(MTEditor.SourceFileName));
+    Directory := ExportDirectory;
+    if Execute then begin
+      Status := 'Dumping sections...';
+      Directory := IncludeTrailingPathDelimiter(Directory);
+      ExportDirectory := Directory;
+      for i := 0 to MTEditor.Textures.Count - 1 do
+        MTEditor.Sections[i].ExportToFile(Directory);
+
+      ResetStatus;
+      AddDebug('Sections from the "' + ExtractFileName(MTEditor.SourceFileName) +
+        '" successfully dumped into the "' + Directory + '" directory.');
+    end;
+  end;
+end;
+
+procedure TfrmMain.bExportAllClick(Sender: TObject);
+var
+  i: Integer;
+
 begin
   with bfdExportAllTex do begin
     if ExportDirectory = '' then
@@ -328,10 +385,53 @@ begin
   miExportAll2.Enabled := State;
 end;
 
+procedure TfrmMain.ChangeMultiDumpOperationsControlsState(State: Boolean);
+begin
+  bDumpAll.Enabled := State;
+  miDumpAll2.Enabled := State;
+end;
+
+procedure TfrmMain.ChangeMultiFileOperationsControlsState(State: Boolean);
+begin
+  miCloseAll.Enabled := State;
+  miCloseAll2.Enabled := State;
+  miExportFilesList.Enabled := State;
+end;
+
+procedure TfrmMain.ChangeSelectedFolderOperationsControlsState(State: Boolean);
+begin
+  miBrowseDirectory.Enabled := State;
+  miRefresh.Enabled := State;
+end;
+
+procedure TfrmMain.ChangeSingleDumpOperationsControlsState(State: Boolean);
+begin
+  bDumpSection.Enabled := State;
+  miDumpSection.Enabled := State;
+end;
+
+procedure TfrmMain.ChangeSingleFileOperationsControlsState(State: Boolean);
+begin
+  miLocateOnDisk.Enabled := State;
+  miReload.Enabled := State;
+  miReload2.Enabled := State;
+  miClose.Enabled := State;
+  miClose2.Enabled := State;
+  miProperties.Enabled := State;
+  miProperties2.Enabled := State;
+end;
+
+procedure TfrmMain.ChangeSingleFileSaveOperationsControlsState(State: Boolean);
+begin
+  miSave.Enabled := State;
+  miSaveAs.Enabled := State;
+end;
+
 procedure TfrmMain.ChangeUndoImportControlsState(State: Boolean);
 begin
   bUndo.Enabled := State;
   miUndo.Enabled := State;
+  miUndo2.Enabled := State;
 end;
 
 procedure TfrmMain.Clear;
@@ -341,6 +441,17 @@ begin
   ChangeUndoImportControlsState(False);
   ChangeControlsState(False);
   ChangeExportAllControlsState(False);
+end;
+
+procedure TfrmMain.FilesListEvent_ItemAdded(Sender: TObject;
+  FileName: TFileName; ListIndex: Integer);
+begin
+  ChangeMultiFileOperationsControlsState(True);
+end;
+
+procedure TfrmMain.FilesListEvent_ListCleared(Sender: TObject);
+begin
+  ChangeMultiFileOperationsControlsState(False);
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -373,6 +484,9 @@ begin
 
   // Initialization of the FileList object
   fFilesList := TFilesList.Create;
+  fFilesList.OnListCleared := FilesListEvent_ListCleared;
+  fFilesList.OnItemAdded := FilesListEvent_ItemAdded;
+  ChangeMultiFileOperationsControlsState(False); // first run
 
   Height := DEFAULT_HEIGHT;
   Width := DEFAULT_WIDTH;
@@ -392,7 +506,7 @@ end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
-  Application.Title := frmMain.Caption;
+//  Application.Title := frmMain.Caption;
   SetApplicationConfigParameters;
 end;
 
@@ -415,6 +529,8 @@ begin
 
   // Loading the next file
   SelectedFileEntry := FilesList[lbFilesList.ItemIndex];
+  // changing source directory in case of the directory is different...
+//  SourceDirectory := FilesList[lbFilesList.ItemIndex].ExtractedPath; [EDIT: NOT NEEDED]
   LoadFileEntry(SelectedFileEntry);
 end;
 
@@ -499,7 +615,20 @@ begin
       SubItems.Add(IntToStr(MTEditor.Sections[i].Offset));
       SubItems.Add(IntToStr(MTEditor.Sections[i].Size));
     end;
+    ChangeMultiDumpOperationsControlsState(True);
   end;
+
+end;
+
+procedure TfrmMain.lvSectionsListClick(Sender: TObject);
+begin
+  ChangeSingleDumpOperationsControlsState(lvSectionsList.ItemIndex <> -1);  
+end;
+
+procedure TfrmMain.lvSectionsListContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  lvSectionsListClick(Self);
 end;
 
 procedure TfrmMain.lvTexturesListClick(Sender: TObject);
@@ -536,6 +665,11 @@ begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
 end;
 
+procedure TfrmMain.miProjectHomeClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'http://shenmuesubs.sourceforge.net/', '', '', SW_SHOWNORMAL);
+end;
+
 procedure TfrmMain.ClearFilesInfos;
 var
   i: Integer;
@@ -545,6 +679,8 @@ begin
     TPVRConverter(lvTexturesList.Items[i].Data).Free;
   lvTexturesList.Clear;
   lvSectionsList.Clear;
+  ChangeMultiDumpOperationsControlsState(False);
+  ChangeSingleDumpOperationsControlsState(False);
   ChangeControlsState(False);
   SelectedFileTexturesModifiedCount := 0;
   FileModified := False;
@@ -571,6 +707,16 @@ begin
     lvTexturesList.Items[i].SubItems[2] := '';
 end;
 
+procedure TfrmMain.miAboutClick(Sender: TObject);
+begin
+  frmAbout := TfrmAbout.Create(Application);
+  try
+    frmAbout.ShowModal;
+  finally
+    frmAbout.Free;
+  end;
+end;
+
 procedure TfrmMain.miAutoSaveClick(Sender: TObject);
 begin
   AutoSave := not AutoSave;
@@ -579,6 +725,23 @@ end;
 procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', 'explorer', PChar(SourceDirectory), '', SW_SHOWNORMAL);
+end;
+
+procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open',
+    'http://sourceforge.net/projects/shenmuesubs/files/', '', '',
+    SW_SHOWNORMAL);
+end;
+
+procedure TfrmMain.miClearDebugClick(Sender: TObject);
+var
+  CanDo: Integer;
+
+begin
+  CanDo := MsgBox('Clear debug log ?', 'Confirm', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2);
+  if CanDo = IDNO then Exit;
+  mDebug.Clear;
 end;
 
 procedure TfrmMain.miCloseAllClick(Sender: TObject);
@@ -595,7 +758,16 @@ begin
 end;
 
 procedure TfrmMain.miCloseClick(Sender: TObject);
+var
+  CanDo: Integer;
+
 begin
+  if FileModified then begin
+    CanDo := MsgBox('Close the selected file? Changes not saved will be LOST!', 'Warning',
+      MB_OKCANCEL + MB_ICONWARNING + MB_DEFBUTTON2);
+    if CanDo = IDCANCEL then Exit;
+  end;
+  
   RemoveSelectedFile;
 end;
 
@@ -623,7 +795,8 @@ end;
 procedure TfrmMain.miExportFilesListClick(Sender: TObject);
 begin
   with sdExportList do begin
-    FileName := ExtremeRight('\', Copy(SourceDirectory, 1, Length(SourceDirectory) - 1)) + '_FilesList.txt';
+    FileName := ExtremeRight('\', Copy(SourceDirectory, 1, Length(SourceDirectory) - 1))
+      + '_FilesList.txt';
     if Execute then
       lbFilesList.Items.SaveToFile(FileName);
   end;
@@ -658,33 +831,48 @@ end;
 procedure TfrmMain.miOpenFilesClick(Sender: TObject);
 var
   i: Integer;
-  ValidFile: Boolean;
+  FileLoaded, FileValid: Boolean;
   
 begin
+  if not SaveCurrentFileOnDemand(True) then Exit;
+
   with odFileSelect do
     if Execute then begin
       Clear;
 
       // scanning every selected file
-      for i := 0 to Files.Count - 1 do
-        if MTEditor.LoadFromFile(Files[i]) then begin
-          ValidFile := MTEditor.Textures.Count > 0;
+      for i := 0 to Files.Count - 1 do begin
+        FileLoaded := MTEditor.LoadFromFile(Files[i]);
+        if FileLoaded then begin
+          FileValid := MTEditor.Textures.Count > 0;
           MTEditor.Close;
 
           // if the file opened is valid then add it to the software
-          if ValidFile then begin
+          if FileValid then begin
             FilesList.Add(Files[i]);
             lbFilesList.Items.Add(ExtractFileName(Files[i]));
             eFilesCount.Text := IntToStr(FilesList.Count);
-          end;
-        end;
+          end; // FileValid
+        end; // FileLoaded
+
+        if (not FileLoaded) or (not FileValid) then
+          AddDebug('The "' + ExtractFileName(Files[i]) + '" isn''t an editable MT package.');            
+      end; // for
 
       // loading the first item
       if lbFilesList.Items.Count > 0 then begin
+        SourceDirectory := FilesList[0].ExtractedPath;
         lbFilesList.ItemIndex := 0;
         lbFilesListClick(Self);
-      end;
-    end;
+      end else
+        MsgBox('No editable MT package was selected.', 'Warning', MB_ICONWARNING);
+    end; // if Execute
+end;
+
+procedure TfrmMain.miPropertiesClick(Sender: TObject);
+begin
+  if Assigned(SelectedFileEntry) then
+    ShellOpenPropertiesDialog(SelectedFileEntry.FileName);
 end;
 
 procedure TfrmMain.miOpenDirectoryClick(Sender: TObject);
@@ -741,8 +929,23 @@ begin
 end;
 
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
+const
+  FILTER_ALL = 'Shenmue Models Files (*.???)|*.???|All Files (*.*)|*.*';
+
 begin
-// LoadFileEntry(SelectedFileEntry);
+  with sdSaveAs do begin
+
+    Filter := StringReplace(FILTER_ALL, '???',
+      SelectedFileEntry.ExtractedExtension, [rfReplaceAll]);
+    DefaultExt := SelectedFileEntry.ExtractedExtension;
+
+    if Execute then
+      if MTEditor.SaveToFile(FileName) then
+        AddDebug('Current editor state successfully saved to the file "' + FileName + '".')
+      else
+        AddDebug('Failed when saving the editor state to "' + FileName + '" !');
+
+  end; // with
 end;
 
 procedure TfrmMain.miSaveClick(Sender: TObject);
@@ -756,6 +959,13 @@ begin
     AddDebug('Error when saving the "' +  MTEditor.SourceFileName + ' file !');
   end;
   ResetStatus;
+end;
+
+procedure TfrmMain.miSaveDebugClick(Sender: TObject);
+begin
+  with sdSaveDebug do
+    if Execute then
+      mDebug.Lines.SaveToFile(FileName);
 end;
 
 function TfrmMain.SaveCurrentFileOnDemand(CancelButton: Boolean): Boolean;
@@ -811,6 +1021,7 @@ begin
     ClearImportedTexturesStatus;
     sbMain.Panels[1].Text := '';
   end;
+  ChangeSingleFileSaveOperationsControlsState(Value);
 end;
 
 procedure TfrmMain.SetMakeBackup(const Value: Boolean);
@@ -818,6 +1029,18 @@ begin
   fMakeBackup := Value;
   miMakeBackup.Checked := Value;
   MTEditor.MakeBackup := Value;
+end;
+
+procedure TfrmMain.SetSelectedFileEntry(const Value: TFileEntry);
+begin
+  fSelectedFileEntry := Value;
+  ChangeSingleFileOperationsControlsState(Value <> nil);
+end;
+
+procedure TfrmMain.SetSourceDirectory(const Value: TFileName);
+begin
+  fSourceDirectory := Value;
+  ChangeSelectedFolderOperationsControlsState(DirectoryExists(SourceDirectory));
 end;
 
 procedure TfrmMain.SetStatus(const Value: string);

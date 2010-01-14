@@ -1,0 +1,10 @@
+To generate the fonts used in text files:
+
+Go to:
+http://www.network-science.de/ascii/
+
+- Title font:
+CHUNKY
+
+- Section font:
+SMSLANT

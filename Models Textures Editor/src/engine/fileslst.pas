@@ -9,6 +9,8 @@ uses
 
 type
   TFilesList = class;
+  TFilesListAddedEvent = procedure(Sender: TObject; FileName: TFileName;
+    ListIndex: Integer) of object;
 
   TFileEntry = class(TObject)
   private
@@ -18,6 +20,7 @@ type
   public
     constructor Create(Owner: TFilesList; const FileName: TFileName);
     function Exists: Boolean;
+    function ExtractedExtension: string;
     function ExtractedPath: TFileName;
     function ExtractedFileName: TFileName; overload;
     function ExtractedFileName(NewExtension: string): TFileName; overload;
@@ -31,6 +34,8 @@ type
   TFilesList = class(TObject)
   private
     fList: TList;
+    fItemAdded: TFilesListAddedEvent;
+    fListCleared: TNotifyEvent;
     function GetItem(Index: Integer): TFileEntry;
     procedure SetItem(Index: Integer; const Value: TFileEntry);
     function GetCount: Integer;
@@ -40,8 +45,14 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
+
+    // Properties
     property Count: Integer read GetCount;
     property Files[Index: Integer]: TFileEntry read GetItem write SetItem; default;
+
+    // Events
+    property OnListCleared: TNotifyEvent read fListCleared write fListCleared;
+    property OnItemAdded: TFilesListAddedEvent read fItemAdded write fItemAdded;
   end;
 
 implementation
@@ -51,10 +62,15 @@ implementation
 procedure TFilesList.Add(const FileName: TFileName);
 var
   Item: TFileEntry;
+  Index: Integer;
 
 begin
   Item := TFileEntry.Create(Self, FileName);
-  fList.Add(Item);
+  Index := fList.Add(Item);
+
+  // send the event
+  if Assigned(fItemAdded) then
+    fItemAdded(Self, FileName, Index);
 end;
 
 procedure TFilesList.Assign(Source: TFilesList);
@@ -74,6 +90,10 @@ begin
   for i := 0 to Count - 1 do
     TFilesList(fList[i]).Free;
   fList.Clear;
+
+  // send the event
+  if Assigned(fListCleared) then
+    fListCleared(Self);
 end;
 
 constructor TFilesList.Create;
@@ -124,6 +144,13 @@ end;
 function TFileEntry.ExtractedFileName(NewExtension: string): TFileName;
 begin
   Result := ChangeFileExt(ExtractedFileName, NewExtension);
+end;
+
+function TFileEntry.ExtractedExtension: string;
+begin
+  Result := ExtractFileExt(FileName);
+  if Result <> '' then
+    Result := Copy(Result, 2, Length(Result) - 1);
 end;
 
 function TFileEntry.ExtractedFileName(NewExtension: string;

@@ -1,0 +1,68 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                                  ___________________________________________
+ __| Shenmue Models Textures Editor |___________________________________________
+
+  Shenmue Models Textures Editor est un logiciel libre qui permet de modifier 
+  les textures contenues dans les objets du jeu. Les objets sont contenus dans 
+  les fichiers MT5/MT6/MT7.
+  
+  Les jeux supportés sont:
+    - What's Shenmue (DC)
+    - Shenmue I (DC)
+    - Shenmue II (DC / XBOX)
+
+  Cet éditeur peut être utile si vous avez besoin de modifier des textures 
+  contenant du texte devant être traduit, comme des "lettres" ou encore des
+  messages.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+ 
+  Les fichiers MTx peuvent être localisés dans divers dossiers. Le plus courant
+  est le dossier "\MODEL\" situé à la racine du CD. Seulement les fichiers MTx
+  contenant des textures peuvent être édités dans ce logiciel.
+  
+  Vous pouvez importer/exporter des textures depuis/vers le fichier MTx. Notez 
+  que vous devez posséder un éditeur graphique externe comme Adobe Photoshop.   
+  Les formats sont le Dremcast PVR et le Microsoft Xbox DDS (DirectX). Vous 
+  pouvez si vous le souhaitez vous rendre sur le site de la SHENTRAD Team pour
+  télécharger des outils complémentaires pour ce point.  
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône "Graphic" a été créée par Phuzion.
+  
+  Cet outil contient une version embarquée de Pvr2Png par Gzav.
+
+  L'outil embarqué PvrX2Png a été écrit par SiZiOUS, basé sur les bibliothèques
+  libsquish, libpng et libz. Merci à Simon Brown (exemple dds2png), sabishirop 
+  (nut2png) et Gregory Smith (Aorta).
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, Hiei-, kogami-san, Dark_Neo, 
+                        mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, 
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+						PlusTuta et tous ceux qui nous supportent.	
+ _____________________________________________________________________[ FIN ]___
