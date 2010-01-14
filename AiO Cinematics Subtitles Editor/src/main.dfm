@@ -357,9 +357,13 @@ object frmMain: TfrmMain
     object Help1: TMenuItem
       Caption = 'Help'
       object ProjectHome1: TMenuItem
-        Caption = 'Project Home...'
+        Caption = '&Project Home...'
         ShortCut = 112
         OnClick = ProjectHome1Click
+      end
+      object Checkforupdate1: TMenuItem
+        Caption = '&Check for update...'
+        OnClick = Checkforupdate1Click
       end
       object N5: TMenuItem
         Caption = '-'

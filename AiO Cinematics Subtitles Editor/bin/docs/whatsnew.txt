@@ -1,0 +1,42 @@
+                Shenmue AiO Cinematics Subtitles Editor
+              ______ __                                  
+             |      |  |--.---.-.-----.-----.-----.-----.
+             |   ---|     |  _  |     |  _  |  -__|__ --|
+             |______|__|__|___._|__|__|___  |_____|_____|
+                                      |_____| What's new?
+___                           __________________________________________________
+___| Version 1.2: 2010-01-14 |__________________________________________________
+
+FIXED:
+- Shenmue Subtitles Viewer: "-", "Ó", "ó", "Ú", "ú" characters added (Thanks 
+  IlDucci)
+- Some minor changes
+
+ADDED:
+- "Check for update" menu item
+- About Box
+___                           __________________________________________________
+___| Version 1.1: 2009-04-08 |__________________________________________________
+    
+First [big_fury]SiZiOUS release
+
+MODIFIED:
+- Added the encoding/decoding of "=@" to "..."
+- Shenmue Subtitles Viewer
+- Adding the "Cinematics" label to the proggy title
+
+FIXED:
+- Replacing simple listbox with multicolumn listview
+- Break line character in the listview is translated to "<br>"
+- New funny icon
+___                                      _______________________________________
+___| Version 1.01: Last Manic's release |_______________________________________
+
+MODIFIED: 
+- "Characters modification" option taken in count when opening file.
+- "Close all files" and "Mass exportation" activated when files are in the 
+  files list but are not loaded.
+
+ADDED:
+- Mass subtitles exportation.
+- Subtitles count verification when importing a txt file.

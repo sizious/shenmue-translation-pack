@@ -23,7 +23,6 @@ uses
   JvBrowseFolder, Viewer_Intf, ShellApi;
 
 const
-  APP_VERSION = '1.1';
   COMPIL_DATE_TIME = 'April 8, 2009 @11:49PM';
 
 type
@@ -82,6 +81,7 @@ type
     lvSub: TListView;
     mOldSub: TMemo;
     Label1: TLabel;
+    Checkforupdate1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
@@ -105,6 +105,7 @@ type
     procedure ProjectHome1Click(Sender: TObject);
     procedure lvSubClick(Sender: TObject);
     procedure lvSubKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure Checkforupdate1Click(Sender: TObject);
   private
     { Déclarations privées }
     SrfList: TStringList;
@@ -143,7 +144,7 @@ var
   Previewer: TSubtitlesPreviewWindow;
   
 implementation
-uses charsutils, subutils;
+uses charsutils, subutils, tools, about;
 {$R *.dfm}
 
 function TfrmMain.MsgBox(const Text: string; const Caption: string; Flags: Integer): Integer;
@@ -206,6 +207,13 @@ begin
   Activated := lbMain.Count > 0;
   Massexportation1.Enabled := Activated;
   Closeallfiles1.Enabled := Activated;
+end;
+
+procedure TfrmMain.Checkforupdate1Click(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open',
+    'http://sourceforge.net/projects/shenmuesubs/files/', '', '',
+    SW_SHOWNORMAL);
 end;
 
 procedure TfrmMain.ClearInfos;
@@ -408,7 +416,13 @@ end;
 
 procedure TfrmMain.About1Click(Sender: TObject);
 begin
-  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+'Updated by [big_fury]SiZiOUS'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
+  //  MsgBox('Version '+ GetShortStringVersion +#13#10+'Created by Manic'+#13#10+'Updated by [big_fury]SiZiOUS'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
+  frmAbout := TfrmAbout.Create(Application);
+  try
+    frmAbout.ShowModal;
+  finally
+    frmAbout.Free;
+  end;
 end;
 
 procedure TfrmMain.ShenmueI1Click(Sender: TObject);
@@ -602,8 +616,8 @@ begin
   MenuActivation(False);
   SetModified(False);
   ClearInfos;
-  Caption := Application.Title + ' v' + APP_VERSION;
-  Application.Title := Caption;
+  Caption := Application.Title + ' v' + GetShortStringVersion;
+//  Application.Title := Caption;
 
   Previewer := TSubtitlesPreviewWindow.Create;
   Previewer.OnWindowClosed := PreviewerWindowCloseEvent;

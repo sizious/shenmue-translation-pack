@@ -16,11 +16,6 @@
  __                                           _________________________________
  __| Shenmue AiO Cinematics Subtitles Editor |_________________________________
 
-  Version...: 1.1
-  Date......: April 8, 2009
- __               _____________________________________________________________
- __| DESCRiPTiON |_____________________________________________________________
-
   Shenmue AiO Cinematics Subtitles Editor is an Open Source software used to 
   modify in-game cinematics subtitles text of Shenmue Series, including:
   
@@ -81,4 +76,8 @@
   Main code...........: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
   Additional code.....: Manic (Project founder)
   Alpha/Beta test.....: Shendream, Sadako
+  Thanks to...........: Manic, Shendream, Sadako, Hiei-, kogami-san, Dark_Neo, 
+                        mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, 
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+			PlusTuta and everyone supporting us.
  _____________________________________________________________________[ EOF ]___
