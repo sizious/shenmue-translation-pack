@@ -1,5 +1,6 @@
 @ECHO OFF
 @ECHO Batch Shenmue IDX Maker by FamilyGuy '09
+echo Modified by SiZ! of the SHENTRAD Team
 :START
 ECHO.
 TITLE= MAKING IDX 2 - FamilyGuy '09
