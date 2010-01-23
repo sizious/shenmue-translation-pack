@@ -1,0 +1,71 @@
+OBJ_DIR = obj/
+BIN_DIR = ../
+
+PROG = 7zDec
+
+CXX = g++
+STRIP = strip
+LIB =
+RM = rm -f
+CFLAGS = -c -O3 -Wall -DRELEASE
+
+OBJS = 	$(OBJ_DIR)7zAlloc.o $(OBJ_DIR)7zBuf.o $(OBJ_DIR)7zBuf2.o \
+		$(OBJ_DIR)7zCrc.o $(OBJ_DIR)7zDecode.o $(OBJ_DIR)7zExtract.o \
+		$(OBJ_DIR)7zHeader.o $(OBJ_DIR)7zIn.o $(OBJ_DIR)7zItem.o \
+		$(OBJ_DIR)7zMain.o $(OBJ_DIR)LzmaDec.o $(OBJ_DIR)Bra86.o \
+		$(OBJ_DIR)Bcj2.o $(OBJ_DIR)7zFile.o $(OBJ_DIR)7zStream.o
+
+all: $(PROG)
+
+$(PROG): $(OBJS)
+	$(CXX) -o $(BIN_DIR)$(PROG).exe $(LDFLAGS) $(OBJS) $(LIB)
+	$(STRIP) $(BIN_DIR)$(PROG).exe
+
+$(OBJ_DIR)7zAlloc.o: 7zAlloc.c
+	$(CXX) $(CFLAGS) 7zAlloc.c -o $(OBJ_DIR)7zAlloc.o
+
+$(OBJ_DIR)7zBuf.o: lzmalib/7zBuf.c
+	$(CXX) $(CFLAGS) lzmalib/7zBuf.c -o $(OBJ_DIR)7zBuf.o
+
+$(OBJ_DIR)7zBuf2.o: lzmalib/7zBuf2.c
+	$(CXX) $(CFLAGS) lzmalib/7zBuf2.c -o $(OBJ_DIR)7zBuf2.o
+
+$(OBJ_DIR)7zCrc.o: lzmalib/7zCrc.c
+	$(CXX) $(CFLAGS) lzmalib/7zCrc.c -o $(OBJ_DIR)7zCrc.o
+
+$(OBJ_DIR)7zDecode.o: 7zDecode.c
+	$(CXX) $(CFLAGS) 7zDecode.c -o $(OBJ_DIR)7zDecode.o
+
+$(OBJ_DIR)7zExtract.o: 7zExtract.c
+	$(CXX) $(CFLAGS) 7zExtract.c -o $(OBJ_DIR)7zExtract.o
+
+$(OBJ_DIR)7zHeader.o: 7zHeader.c
+	$(CXX) $(CFLAGS) 7zHeader.c -o $(OBJ_DIR)7zHeader.o
+
+$(OBJ_DIR)7zIn.o: 7zIn.c
+	$(CXX) $(CFLAGS) 7zIn.c -o $(OBJ_DIR)7zIn.o
+
+$(OBJ_DIR)7zItem.o: 7zItem.c
+	$(CXX) $(CFLAGS) 7zItem.c -o $(OBJ_DIR)7zItem.o
+
+$(OBJ_DIR)7zMain.o: 7zMain.c
+	$(CXX) $(CFLAGS) 7zMain.c -o $(OBJ_DIR)7zMain.o
+
+$(OBJ_DIR)LzmaDec.o: lzmalib/LzmaDec.c
+	$(CXX) $(CFLAGS) lzmalib/LzmaDec.c -o $(OBJ_DIR)LzmaDec.o
+
+$(OBJ_DIR)Bra86.o: lzmalib/Bra86.c
+	$(CXX) $(CFLAGS) lzmalib/Bra86.c -o $(OBJ_DIR)Bra86.o
+
+$(OBJ_DIR)Bcj2.o: lzmalib/Bcj2.c
+	$(CXX) $(CFLAGS) lzmalib/Bcj2.c -o $(OBJ_DIR)Bcj2.o
+
+$(OBJ_DIR)7zFile.o: lzmalib/7zFile.c
+	$(CXX) $(CFLAGS) lzmalib/7zFile.c -o $(OBJ_DIR)7zFile.o
+
+$(OBJ_DIR)7zStream.o: lzmalib/7zStream.c
+	$(CXX) $(CFLAGS) lzmalib/7zStream.c -o $(OBJ_DIR)7zStream.o
+
+clean:
+	-$(RM) $(PROG) $(OBJS)
+
