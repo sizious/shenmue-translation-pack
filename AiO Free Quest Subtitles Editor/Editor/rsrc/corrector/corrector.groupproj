@@ -1,0 +1,54 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{198050ba-6b1a-4719-b57d-421b7ecd81ac}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="datagen\datasgen.dproj" />
+    <Projects Include="makeidx\makeidx.dproj" />
+    <Projects Include="movepks\movepks.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="movepks">
+    <MSBuild Projects="movepks\movepks.dproj" Targets="" />
+  </Target>
+  <Target Name="movepks:Clean">
+    <MSBuild Projects="movepks\movepks.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="movepks:Make">
+    <MSBuild Projects="movepks\movepks.dproj" Targets="Make" />
+  </Target>
+  <Target Name="datasgen">
+    <MSBuild Projects="datagen\datasgen.dproj" Targets="" />
+  </Target>
+  <Target Name="datasgen:Clean">
+    <MSBuild Projects="datagen\datasgen.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="datasgen:Make">
+    <MSBuild Projects="datagen\datasgen.dproj" Targets="Make" />
+  </Target>
+  <Target Name="makeidx">
+    <MSBuild Projects="makeidx\makeidx.dproj" Targets="" />
+  </Target>
+  <Target Name="makeidx:Clean">
+    <MSBuild Projects="makeidx\makeidx.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="makeidx:Make">
+    <MSBuild Projects="makeidx\makeidx.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="movepks;datasgen;makeidx" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="movepks:Clean;datasgen:Clean;makeidx:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="movepks:Make;datasgen:Make;makeidx:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

@@ -1298,7 +1298,7 @@ begin
 
   except
 {$IFDEF DEBUG}
-    on E: Exception do WriteLn('Exception LoadFromFile: ', E.Message);
+    on E: Exception do WriteLn('Exception LoadFromFile [File: "', fSourceFileName, '"]: ', E.Message);
 {$ENDIF} 
   end;
 end;
