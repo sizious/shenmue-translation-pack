@@ -49,6 +49,8 @@ function IsFileValidScnf(const FileName: TFileName): Boolean;
 function Right(SubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
 function GameVersionToStr(GameVersion: TGameVersion): string;
+function GameVersionToCodeStr(GameVersion: TGameVersion): string;
+function StrToGameVersion(S: string): TGameVersion;
 
 //------------------------------------------------------------------------------
 implementation
@@ -56,6 +58,41 @@ implementation
 
 uses
   ScnfEdit;
+
+//------------------------------------------------------------------------------
+
+function StrToGameVersion(S: string): TGameVersion;
+begin
+  S := LowerCase(S);
+  Result := gvUndef;
+        if S = 'dc_jap_wh' then
+    Result := gvWhatsShenmue
+  else  if S = 'dc_jap_s1' then
+    Result := gvShenmueJ
+  else  if S = 'dc_pal_s1' then
+    Result := gvShenmue
+  else  if S = 'dc_jap_s2' then
+    Result := gvShenmue2J
+  else  if S = 'dc_pal_s2' then
+    Result := gvShenmue2
+  else  if S = 'xb_pal_s2' then
+    Result := gvShenmue2X;
+end;
+
+//------------------------------------------------------------------------------
+
+function GameVersionToCodeStr(GameVersion: TGameVersion): string;
+begin
+  Result := 'XX_XXX_Undefined';
+  case GameVersion of
+    gvWhatsShenmue  : Result := 'DC_JAP_Whats_Shenmue';
+    gvShenmueJ      : Result := 'DC_JAP_Shenmue';
+    gvShenmue       : Result := 'DC_PAL_Shenmue';
+    gvShenmue2J     : Result := 'DC_JAP_Shenmue';
+    gvShenmue2      : Result := 'DC_PAL_Shenmue2';
+    gvShenmue2X     : Result := 'XB_PAL_Shenmue2X';
+  end;
+end;
 
 //------------------------------------------------------------------------------
 

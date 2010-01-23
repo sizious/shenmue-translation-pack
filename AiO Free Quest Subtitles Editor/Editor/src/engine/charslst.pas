@@ -83,6 +83,7 @@ end;
 constructor TSubsCharsList.Create;
 begin
   fList := TList.Create;
+  fActive := False;
   fCharsListLoaded := False;
 end;
 
