@@ -21,17 +21,16 @@ uses
 const
   WORK_DIRECTORY = '.\';
   OUTPUT_FILE = 'dc_pal_shenmue2.dbi';
-  BASE_FILENAME = 'dc_pal_shenmue2';
+//  BASE_FILENAME = 'dc_pal_shenmue2';
   GAME_VERSION: TGameVersion = gvShenmue2;
 
 var
   XMLOutputIndex, XMLInput: IXMLDocument;
   InfoNode, Node,
   ContainerDiscsRootNode,
-  DiscRootNode,
   InputFileNamesNode: IXMLNode;
-  DiscNumberRead, i, j,
-  DiscNumber, MaxDatabaseFiles: Integer;
+  i, j,
+  DiscNumber, MaxDatabaseFiles, NumFiles: Integer;
   InputFileEntry: string;
   XMLFileName: TFileName;
   
@@ -79,15 +78,18 @@ begin
         Node := XMLOutputIndex.DocumentElement.AddChild('GameVersion');
         Node.NodeValue := GameVersionToCodeStr(GAME_VERSION);
 
-        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Discs');
+(*        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Discs');
         ContainerDiscsRootNode.Attributes['Count'] := '1';
 
         DiscRootNode := ContainerDiscsRootNode.AddChild('Disc');
-        DiscRootNode.Attributes['Number'] := DiscNumber;
+        DiscRootNode.Attributes['Number'] := DiscNumber; *)
+
+        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Entries');
+        ContainerDiscsRootNode.Attributes['Count'] := 0;
       end else begin
         XMLOutputIndex.LoadFromFile(OUTPUT_FILE);
 
-        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.ChildNodes.FindNode('Discs');
+(*        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.ChildNodes.FindNode('Discs');
         if not Assigned(ContainerDiscsRootNode) then
           ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Discs');
 
@@ -105,18 +107,27 @@ begin
           DiscRootNode.Attributes['Number'] := DiscNumber;
           ContainerDiscsRootNode.Attributes['Count'] := Integer(ContainerDiscsRootNode.Attributes['Count']) + 1;
         end;
+*)
+
+        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.ChildNodes.FindNode('Entries');
+        if not Assigned(ContainerDiscsRootNode) then
+          ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Entries');
       end;
 
+      NumFiles := 0;
+      
       // lire les XML
       for i := 1 to MaxDatabaseFiles do begin
-        XMLFileName := WORK_DIRECTORY + BASE_FILENAME + '_disc'
-          + IntToStr(DiscNumber) + '_' + IntToStr(i) + '.tcd';
+        (*XMLFileName := WORK_DIRECTORY + BASE_FILENAME + '_disc'
+          + IntToStr(DiscNumber) + '_' + IntToStr(i) + '.tcd';*)
+        XMLFileName := WORK_DIRECTORY + IntToStr(i) + '.tcd';
 
         if not FileExists(XMLFileName) then
           Continue;
           
         XMLInput.LoadFromFile(XMLFileName);
-
+        Inc(NumFiles);
+        
         // c'est bon
         if XMLInput.DocumentElement.NodeName = 'TextCorrectorDatabase' then begin
           InputFileNamesNode := XMLInput.DocumentElement.ChildNodes.FindNode('FileNames');
@@ -125,15 +136,18 @@ begin
 
             InputFileEntry := InputFileNamesNode.ChildNodes[j].NodeName;
 
-            Node := DiscRootNode.ChildNodes.FindNode(InputFileEntry);
+            Node := ContainerDiscsRootNode.ChildNodes.FindNode(InputFileEntry);
             if not Assigned(Node) then
-              Node := DiscRootNode.AddChild(InputFileEntry);
+              Node := ContainerDiscsRootNode.AddChild(InputFileEntry);
             Node.Attributes['i'] := i;
+            Node.Attributes['d'] := DiscNumber;
           end;
 
         end;
 
       end;
+
+      ContainerDiscsRootNode.Attributes['Count'] := Integer(ContainerDiscsRootNode.Attributes['Count']) + NumFiles;
 
       XMLOutputIndex.SaveToFile(OUTPUT_FILE);
     except
