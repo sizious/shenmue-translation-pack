@@ -179,6 +179,7 @@ type
     DumpMultiTranslationCacheList1: TMenuItem;
     miOptions: TMenuItem;
     miReloadDirAtStartup: TMenuItem;
+    InitTextDatabase1: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -241,6 +242,7 @@ type
     procedure miDumpMultiTranslationTextDataClick(Sender: TObject);
     procedure DumpMultiTranslationCacheList1Click(Sender: TObject);
     procedure miReloadDirAtStartupClick(Sender: TObject);
+    procedure InitTextDatabase1Click(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -495,7 +497,7 @@ uses
   {$IFDEF DEBUG} TypInfo, {$ENDIF}
   {$IFDEF OLD_MULTI_TRANSLATION_STYLE} MultiTrd, {$ENDIF}
   SelDir, SCNFUtil, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
-  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI;
+  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI, LZMADEC;
 
 {$R *.dfm}
 
@@ -714,11 +716,16 @@ begin
 {$ENDIF}
 end;
 
+procedure TfrmMain.InitTextDatabase1Click(Sender: TObject);
+begin
+  ShowMessage(InitTextDatabase(gvShenmue2));
+end;
+
 procedure TfrmMain.DumpMultiTranslationCacheList1Click(Sender: TObject);
 {$IFDEF DEBUG}
 var
   FName: string;
-  
+
 begin
   FName := ExtractFilePath(application.ExeName) + IntToHex(Random($FFFFFFF), 8) + '.csv';
   MultiTranslation.CurrentLoadedFile.DumpCacheList(FName);

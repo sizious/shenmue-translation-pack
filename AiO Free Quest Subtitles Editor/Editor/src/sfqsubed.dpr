@@ -41,7 +41,8 @@ uses
   iconsui in 'engine\multitrd\ui\iconsui.pas',
   multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
   mtexec in 'multitrd\mtexec.pas',
-  lzmadec in 'engine\textdb\lzmadec.pas';
+  lzmadec in 'engine\textdb\lzmadec.pas',
+  systools in '..\..\..\Common\systools.pas';
 
 {$R *.res}
 

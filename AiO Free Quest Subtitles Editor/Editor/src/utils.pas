@@ -11,30 +11,56 @@ uses
 procedure SaveConfig;
 function LoadConfig: Boolean;
 
-function HexToInt(Hex: string): Integer;
-function HexToInt64(Hex: string): Int64;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 function GetConfigFileName: TFileName;
 function GetPreviousSelectedPathFileName: TFileName;
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 function WrapStr: string;
+function GetWorkingTempDirectory: TFileName;
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Main, Warning, VistaUI;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Main, Warning, VistaUI, SysTools;
 
 const
-  HexValues = '0123456789ABCDEF';
-  
+  WORKING_TEMP_DIR = 'FQEditor';
+
 var
   AppDir: TFileName;
   ConfigFileName: TFileName;
   PreviousSelectedPathFileName: TFileName;
   sWrapStr: string; // used for MsgBox
+  sWorkingTempDirectory: TFileName;
+
+//------------------------------------------------------------------------------
+
+procedure InitWorkingDirectory;
+begin
+  sWorkingTempDirectory := GetTempDir + WORKING_TEMP_DIR + '\';
+  if not DirectoryExists(sWorkingTempDirectory) then
+    ForceDirectories(sWorkingTempDirectory);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure DeleteWorkingDirectory;
+begin
+  if DirectoryExists(sWorkingTempDirectory) then
+    DeleteDirectory(sWorkingTempDirectory);
+end;
+  
+//------------------------------------------------------------------------------
+
+function GetWorkingTempDirectory: TFileName;
+begin
+  if sWorkingTempDirectory = '' then
+    InitWorkingDirectory;
+  Result := sWorkingTempDirectory; 
+end;
 
 //------------------------------------------------------------------------------
 
@@ -172,42 +198,6 @@ end;
 
 //------------------------------------------------------------------------------
 
-// By CodePedia
-// http://www.codepedia.com/1/HexToInt
-function HexToInt(Hex: string): Integer;
-var
-  i: integer;
-begin
-  Result := 0;
-  case Length(Hex) of
-    0: Result := 0;
-    1..8: for i:=1 to Length(Hex) do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
-    else for i:=1 to 8 do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-// By CodePedia
-// http://www.codepedia.com/1/HexToInt
-function HexToInt64(Hex: string): Int64;
-var
-  i: integer;
-begin
-  Result := 0;
-  case Length(Hex) of
-    0: Result := 0;
-    1..16: for i:=1 to Length(Hex) do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
-    else for i:=1 to 16 do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 var
   ShellExecuteInfo: TShellExecuteInfo;
@@ -275,10 +265,16 @@ end;
 //------------------------------------------------------------------------------
 
 initialization
+  sWorkingTempDirectory := ''; // see GetWorkingTempDirectory
   AppDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
   ConfigFileName := AppDir + 'config.xml';
   PreviousSelectedPathFileName := AppDir + 'selpath.ini';
   InitWrapStr;
+
+//------------------------------------------------------------------------------
+
+finalization
+  DeleteWorkingDirectory;
 
 //------------------------------------------------------------------------------
 
