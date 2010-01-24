@@ -39,7 +39,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Common, Utils;
+  Common, SysTools;
 
 function InitializeWindow: TFileName;
 begin

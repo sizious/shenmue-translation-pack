@@ -2,6 +2,7 @@ program sfqsubed;
 
 {$R '..\..\..\Shenmue Subtitles Preview\src\font.res' '..\..\..\Shenmue Subtitles Preview\src\font.rc'}
 {$R 'engine\npcpakf\pakfbin.res' 'engine\npcpakf\pakfbin.rc'}
+{$R 'engine\textdb\lzmabin.res' 'engine\textdb\lzmabin.rc'}
 
 uses
   Windows,
@@ -39,7 +40,8 @@ uses
   facesext in 'facesext.pas' {frmFacesExtractor},
   iconsui in 'engine\multitrd\ui\iconsui.pas',
   multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
-  mtexec in 'multitrd\mtexec.pas';
+  mtexec in 'multitrd\mtexec.pas',
+  lzmadec in 'engine\textdb\lzmadec.pas';
 
 {$R *.res}
 

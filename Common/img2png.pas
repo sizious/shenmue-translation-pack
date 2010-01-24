@@ -72,7 +72,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  Common, Utils;
+  Common, SysTools;
 
 var
   PVR_EngineFile,

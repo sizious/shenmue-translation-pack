@@ -206,8 +206,10 @@ type
     property Sections: TSectionsList read fSections;
     property Textures: TTexturesList read fTextures;
   end;
-  
+
+ //------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
 
 uses
   SysTools;
@@ -248,6 +250,8 @@ begin
   Result := fTexturesList.Add(Item);
 end;
 
+//------------------------------------------------------------------------------
+
 function TTexturesList.Add(const Index, GBIX_RelativeOffset, GBIX_Offset, PVRT_Offset,
   PVRT_DataOffset, GBIX_Size, PVRT_Size, PVRT_DataSize: Integer): Integer;
 begin
@@ -255,6 +259,8 @@ begin
   Result := Add(Index, GBIX_RelativeOffset, GBIX_Offset, PVRT_Offset, PVRT_DataOffset,
     GBIX_Size, PVRT_Size, PVRT_DataSize, False, -1);
 end;
+
+//------------------------------------------------------------------------------
 
 procedure TTexturesList.Clear;
 var
@@ -289,6 +295,8 @@ begin
   if Result = 0 then Result := 32;
 end;
 
+//------------------------------------------------------------------------------
+
 constructor TTexturesList.Create;
 begin
   fOwner := AOwner;
@@ -296,12 +304,16 @@ begin
   fTexturesSectionIndex  := -1;
 end;
 
+//------------------------------------------------------------------------------
+
 destructor TTexturesList.Destroy;
 begin
   Clear;
   fTexturesList.Free;
   inherited;
 end;
+
+//------------------------------------------------------------------------------
 
 function TTexturesList.GBIX_GetSectionSize(var FileStream: TFileStream): Integer;
 var
@@ -316,20 +328,28 @@ begin
   Result := GBIX_PVR_HEADER_FIXED_SIZE + HeaderReadSize;
 end;
 
+//------------------------------------------------------------------------------
+
 function TTexturesList.GetCount: Integer;
 begin
   Result := fTexturesList.Count;
 end;
+
+//------------------------------------------------------------------------------
 
 function TTexturesList.GetItem(Index: Integer): TTexturesListEntry;
 begin
   Result := TTexturesListEntry(fTexturesList[Index]);
 end;
 
+//------------------------------------------------------------------------------
+
 function TTexturesList.GetTexturesSectionEntry: TSectionsListEntry;
 begin
   Result := Owner.Sections[fTexturesSectionIndex];
 end;
+ 
+//------------------------------------------------------------------------------
 
 function TTexturesList.ParseTextureData(var F: file; const GBIX_Offset,
   GBIX_Size: Integer; var PVRT_Offset, PVRT_DataOffset, PVRT_Size,
