@@ -836,6 +836,7 @@ var
 begin
   if not SaveCurrentFileOnDemand(True) then Exit;
 
+  FileValid := False;
   with odFileSelect do
     if Execute then begin
       Clear;

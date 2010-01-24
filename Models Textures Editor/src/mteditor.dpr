@@ -8,7 +8,6 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   mtedit in 'engine\mtedit.pas',
-  utils in 'engine\utils.pas',
   mtscan in 'engine\mtscan.pas',
   mtscan_intf in 'intf\mtscan_intf.pas',
   progress in 'intf\progress.pas' {frmProgress},
@@ -19,7 +18,8 @@ uses
   img2png in '..\..\Common\img2png.pas',
   tools in 'tools.pas',
   texprop in 'texprop.pas' {frmTexProp},
-  about in 'about.pas' {frmAbout};
+  about in 'about.pas' {frmAbout},
+  systools in '..\..\Common\systools.pas';
 
 {$R *.res}
 
