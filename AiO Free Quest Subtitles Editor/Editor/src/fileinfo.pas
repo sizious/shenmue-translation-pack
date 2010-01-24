@@ -65,7 +65,7 @@ var
 implementation
 
 uses
-  Main, Utils, NPCInfo;
+  Main, Utils, NPCInfo, SysTools;
   
 {$R *.dfm}
 

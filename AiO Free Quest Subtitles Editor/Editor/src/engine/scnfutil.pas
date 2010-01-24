@@ -65,17 +65,17 @@ function StrToGameVersion(S: string): TGameVersion;
 begin
   S := LowerCase(S);
   Result := gvUndef;
-        if S = 'dc_jap_wh' then
+        if (S = 'dc_jap_wh') or (S = 'dc_jap_whats_shenmue') then
     Result := gvWhatsShenmue
-  else  if S = 'dc_jap_s1' then
+  else  if (S = 'dc_jap_s1') or (S = 'dc_jap_shenmue') then
     Result := gvShenmueJ
-  else  if S = 'dc_pal_s1' then
+  else  if (S = 'dc_pal_s1') or (S = 'dc_pal_shenmue') then
     Result := gvShenmue
-  else  if S = 'dc_jap_s2' then
+  else  if (S = 'dc_jap_s2') or (S = 'dc_jap_shenmue') then
     Result := gvShenmue2J
-  else  if S = 'dc_pal_s2' then
+  else  if (S = 'dc_pal_s2') or (S = 'dc_pal_shenmue2') then
     Result := gvShenmue2
-  else  if S = 'xb_pal_s2' then
+  else  if (S = 'xb_pal_s2') or (S = 'xb_pal_shenmue2x') then
     Result := gvShenmue2X;
 end;
 

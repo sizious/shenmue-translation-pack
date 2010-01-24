@@ -1,10 +1,14 @@
 unit systools;
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 interface
 
 uses
   Windows, SysUtils, Classes, PNGImage;
 
+function HexToInt(Hex: string): Integer;
+function HexToInt64(Hex: string): Int64;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 function GetTempDir: TFileName;
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
@@ -16,6 +20,45 @@ function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 
 //------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
+
+const
+  HexValues = '0123456789ABCDEF';
+
+// By CodePedia
+// http://www.codepedia.com/1/HexToInt
+function HexToInt(Hex: string): Integer;
+var
+  i: integer;
+begin
+  Result := 0;
+  case Length(Hex) of
+    0: Result := 0;
+    1..8: for i:=1 to Length(Hex) do
+      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+    else for i:=1 to 8 do
+      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+// By CodePedia
+// http://www.codepedia.com/1/HexToInt
+function HexToInt64(Hex: string): Int64;
+var
+  i: integer;
+begin
+  Result := 0;
+  case Length(Hex) of
+    0: Result := 0;
+    1..16: for i:=1 to Length(Hex) do
+      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+    else for i:=1 to 16 do
+      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);

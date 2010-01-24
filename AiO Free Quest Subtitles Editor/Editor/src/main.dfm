@@ -835,6 +835,10 @@ object frmMain: TfrmMain
         Caption = 'Dump Multi-Translation Cache List'
         OnClick = DumpMultiTranslationCacheList1Click
       end
+      object InitTextDatabase1: TMenuItem
+        Caption = 'InitTextDatabase'
+        OnClick = InitTextDatabase1Click
+      end
     end
   end
   object odMain: TOpenDialog
