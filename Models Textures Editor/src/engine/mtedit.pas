@@ -210,7 +210,7 @@ type
 implementation
 
 uses
-  Utils;
+  SysTools;
   
 const
   GAME_INTEGER_SIZE = 4;

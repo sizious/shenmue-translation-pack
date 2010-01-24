@@ -12,7 +12,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  Utils;
+  SysTools;
   
 const
   WORKING_DIRECTORY = 'MTEditor';
