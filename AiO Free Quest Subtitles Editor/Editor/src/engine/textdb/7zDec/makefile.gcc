@@ -32,7 +32,7 @@ TARGET = $(BIN_DIR)$(PROJECT)$(OS:Windows_NT=.exe)
 all: $(PROJECT)
 
 $(PROJECT): $(OBJS)
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(LIB) $(OBJS)
+	$(CXX) -o $(TARGET) $(LDFLAGS) $(OBJS) $(LIB)
 	$(STRIP) $(TARGET)
 
 # Compile source
