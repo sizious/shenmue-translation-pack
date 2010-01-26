@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "liblzma/7z.h"
 #include "liblzma/7zCrc.h"
@@ -11,13 +12,15 @@
 
 #include "7zAlloc.h"
 
+#include "patch.h"
+
 #ifndef USE_WINDOWS_FILE
 /* for mkdir */
 #ifdef _WIN32
 #include <direct.h>
 #else
 #include <sys/stat.h>
-#include <errno.h>
+// #include <errno.h>
 #endif
 #endif
 
@@ -275,7 +278,7 @@ int MY_CDECL main(int numargs, char *args[])
   if (numargs == 1)
   {
     printf(
-      "Usage: 7zDec <command> <archive_name>\n\n"
+      "Usage: 7zDec <command> <archive_name> <output_directory>\n\n"
       "<Commands>\n"
       "  e: Extract files from archive (without using directory names)\n"
       "  l: List contents of archive\n"
@@ -283,11 +286,11 @@ int MY_CDECL main(int numargs, char *args[])
       "  x: eXtract files with full paths\n");
     return 0;
   }
-  if (numargs < 3)
+  if (numargs < 4)
   {
     PrintError("incorrect command");
     return 1;
-  }
+  } 
 
   allocImp.Alloc = SzAlloc;
   allocImp.Free = SzFree;
@@ -325,6 +328,22 @@ int MY_CDECL main(int numargs, char *args[])
       res = SZ_ERROR_FAIL;
     }
 
+	// change directory [SiZ! patch]
+	res = changeCurrentPath(args[3]);
+	switch(res) {
+		case SZ_PATCH_CURRENT_PATH_NOT_SAVED:
+			fprintf(stderr, "Unable to save the current directory (Error Code = %d) !\n", GetLastError());
+			break;
+		case SZ_PATCH_PATH_BUFFER_TOO_SHORT:		
+			fprintf(stderr, "Unable to save current directory !\n");		
+			break;
+		case SZ_PATCH_OUTPUT_PATH_DOESNT_EXISTS:
+			fprintf(stderr, "Unable to change to the output directory (Error Code = %d) !\n", GetLastError());		
+			break;
+		default:
+			break;
+	}
+	  
     if (res == SZ_OK)
     {
       UInt32 i;
@@ -336,7 +355,7 @@ int MY_CDECL main(int numargs, char *args[])
       UInt32 blockIndex = 0xFFFFFFFF; /* it can have any value before first call (if outBuffer = 0) */
       Byte *outBuffer = 0; /* it must be 0 before first call for each new archive. */
       size_t outBufferSize = 0;  /* it can have any value before first call (if outBuffer = 0) */
-
+		  
       for (i = 0; i < db.db.NumFiles; i++)
       {
         size_t offset = 0;
@@ -391,14 +410,16 @@ int MY_CDECL main(int numargs, char *args[])
           if (res != SZ_OK)
             break;
         }
-        if (!testCommand)
+        if (!testCommand) // extracting
         {
           CSzFile outFile;
           size_t processedSize;
           size_t j;
           UInt16 *name = (UInt16 *)temp;
           const UInt16 *destPath = (const UInt16 *)name;
-          for (j = 0; name[j] != 0; j++)
+	  
+		  // creating directory
+		  for (j = 0; name[j] != 0; j++)
             if (name[j] == '/')
             {
               if (fullPaths)
@@ -446,6 +467,13 @@ int MY_CDECL main(int numargs, char *args[])
   SzFree(NULL, temp);
 
   File_Close(&archiveStream.file);
+  
+  // restoring path [SiZ! patch]
+  if (!restoreCurrentPath()) {
+	fprintf(stderr, "Unable to restore the saved directory path (Code = %d) !\n", GetLastError());
+	res = SZ_PATCH_RESTORE_CURRENT_PATH_ERROR;
+  }
+  
   if (res == SZ_OK)
   {
     printf("\nEverything is Ok\n");

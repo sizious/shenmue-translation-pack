@@ -16,7 +16,8 @@ OBJS_DIR = obj/
 BIN_DIR = ../
 
 # *** Project files ************************************************************
-OBJS = 	$(OBJS_DIR)7zMain.o	$(OBJS_DIR)7zAlloc.o $(OBJS_DIR)version.o
+OBJS = 	$(OBJS_DIR)patch.o $(OBJS_DIR)7zMain.o $(OBJS_DIR)7zAlloc.o \
+		$(OBJS_DIR)version.o
 		
 # *** Tools configuration ******************************************************
 CXX = g++
