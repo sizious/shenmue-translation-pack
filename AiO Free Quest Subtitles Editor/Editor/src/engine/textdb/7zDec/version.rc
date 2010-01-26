@@ -13,12 +13,12 @@ BEGIN
 	BEGIN
 		BLOCK "040C04E4"
 		BEGIN
-			VALUE "Comments", "Version 9.10 beta (2009-12-22). Compiled by [big_fury]SiZiOUS of the SHENTRAD Team\0"
-			VALUE "CompanyName", "Igor Pavlov.\0"
+			VALUE "Comments", "Version 9.10 beta (2009-12-22). Compiled and adapted under MinGW by [big_fury]SiZiOUS of the SHENTRAD Team.\0"
+			VALUE "CompanyName", "Igor Pavlov\0"
 			VALUE "FileDescription", "7z ANSI-C Decoder\0"
 			VALUE "FileVersion", "9.1.0.0"
 			VALUE "InternalName", "7zDec\0"
-			VALUE "LegalCopyright", "Igor Pavlov : Public domain\0"
+			VALUE "LegalCopyright", "Igor Pavlov: Public domain\0"
 			VALUE "OriginalFilename", "7zDec.exe\0"
 			VALUE "ProductName", "7z ANSI-C Decoder\0"
 			VALUE "ProductVersion", "9.1.0.0"

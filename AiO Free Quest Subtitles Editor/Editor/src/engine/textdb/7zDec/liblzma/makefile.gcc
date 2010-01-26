@@ -1,5 +1,12 @@
 # ******************************************************************************
-# ***    7 Z D E C  M A K E F i L E  B Y  T H E  S H E N T R A D  T E A M    ***
+# ***                      7 Z D E C  M A K E F i L E                        ***
+# ***                                                                        ***
+# ***    Please use the MinGW compiler to generate the binary output.        ***
+# ***                       http://www.mingw.org/                            ***
+# ***                                                                        ***
+# ***      Makefile written by [big_fury]SiZiOUS of the SHENTRAD Team.       ***
+# ***          Thanks to Igor Pavlov for his LZMA Public Domain SDK.         ***
+# ***                                                                        ***
 # ******************************************************************************
 
 # *** Project information ******************************************************
