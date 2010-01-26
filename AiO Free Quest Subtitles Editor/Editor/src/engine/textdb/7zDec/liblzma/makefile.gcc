@@ -3,13 +3,17 @@
 # ******************************************************************************
 
 # *** Project information ******************************************************
-PROJECT = 7zDec
+PROJECT = liblzma
 
 OBJS_DIR = obj/
-BIN_DIR = ../
+BIN_DIR = ../obj/
 
 # *** Project files ************************************************************
-OBJS = 	$(OBJS_DIR)7zMain.o	$(OBJS_DIR)7zAlloc.o $(OBJS_DIR)version.o
+OBJS = 	$(OBJS_DIR)7zBuf.o $(OBJS_DIR)7zBuf2.o $(OBJS_DIR)7zCrc.o \
+		$(OBJS_DIR)7zDec.o $(OBJS_DIR)7zIn.o $(OBJS_DIR)CpuArch.o \
+		$(OBJS_DIR)LzmaDec.o $(OBJS_DIR)Lzma2Dec.o $(OBJS_DIR)Bra86.o \
+		$(OBJS_DIR)Bcj2.o $(OBJS_DIR)7zFile.o $(OBJS_DIR)7zStream.o \
+		$(OBJS_DIR)7zCrcOpt.o
 		
 # *** Tools configuration ******************************************************
 CXX = g++
@@ -19,33 +23,30 @@ RM = rm
 
 # *** Tools Flags **************************************************************
 LIB = -llzma
-CFLAGS = -c -O3 -Wall -DRELEASE -D_WIN32
-LDFLAGS = -I"./liblzma" -L"obj"
-RMFLAGS = -f
+CFLAGS = -c -O3 -Wall -DRELEASE -fexpensive-optimizations
 #CFLAGS = -c -O2 -Wall
+LDFLAGS = 
+RMFLAGS = -f
+ARFLAGS = rcs
 	
 # *** Implicit variables *******************************************************
-TARGET = $(BIN_DIR)$(PROJECT)$(OS:Windows_NT=.exe)
+TARGET = $(BIN_DIR)$(PROJECT).a
 
 # *** Rules ********************************************************************
 	
 all: $(PROJECT)
 
 $(PROJECT): $(OBJS)
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(LIB) $(OBJS)
-	$(STRIP) $(TARGET)
+	$(AR) $(ARFLAGS) $(TARGET) $(OBJS)
 
 # Compile source
 $(OBJS_DIR)%.o: %.c
 	$(CXX) $(CFLAGS) -c $< -o $@
-	
-# include win32 resources
-$(OBJS_DIR)version.o: version.rc
-	$(WINDRES) -i $< -o $@
-	
+		
 clean:
 #	-$(RM) $(PROG) $(OBJS)
 	$(RM) $(RMFLAGS) $(OBJS)
 	
 clean-all:
 	$(RM) $(RMFLAGS) $(OBJS) $(TARGET)
+ 	
