@@ -1,0 +1,33 @@
+#include <winver.h>
+#include <windows.h>
+
+1 VERSIONINFO
+FILEVERSION 0,1,0,0
+PRODUCTVERSION 0,1,0,0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+
+BEGIN
+
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040C04E4"
+		BEGIN
+			VALUE "Comments", "http://sbibuilder.shorturl.com/\0"
+			VALUE "CompanyName", "Created by [big_fury]SiZiOUS\0"
+			VALUE "FileDescription", "MDS4DC - Dreamcast Selfboot Media Descriptor Disc Generator\0"
+			VALUE "FileVersion", "0.1.0.0"
+			VALUE "InternalName", "mds4dc.exe\0"
+			VALUE "LegalCopyright", "© Copyright 2002, 2007\0"
+			VALUE "OriginalFilename", "mds4dc.exe\0"
+			VALUE "ProductName", "MDS4DC\0"
+			VALUE "ProductVersion", "0.1.0.0"
+		END
+	END
+
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 1036, 1252
+	END
+
+END
