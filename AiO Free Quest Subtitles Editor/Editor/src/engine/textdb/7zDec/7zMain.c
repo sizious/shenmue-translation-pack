@@ -14,7 +14,7 @@
 #ifndef USE_WINDOWS_FILE
 /* for mkdir */
 #ifdef _WIN32
-#include <direct.h>jj
+#include <direct.h>
 #else
 #include <sys/stat.h>
 #include <errno.h>
@@ -118,7 +118,7 @@ static WRes Utf16_To_Char(CBuf *buf, const UInt16 *s, int fileMode)
       char defaultChar = '_';
       BOOL defUsed;
       int numChars = WideCharToMultiByte(fileMode ? (AreFileApisANSI() ? CP_ACP : CP_OEMCP) : CP_OEMCP,
-          0, s, len, (char *)buf->data, size, &defaultChar, &defUsed);
+          0, (WCHAR*)s, len, (char *)buf->data, size, &defaultChar, &defUsed);
       if (numChars == 0 || numChars >= size)
         return SZ_ERROR_FAIL;
       buf->data[numChars] = 0;
@@ -135,7 +135,7 @@ static WRes MyCreateDir(const UInt16 *name)
 {
   #ifdef USE_WINDOWS_FILE
   
-  return CreateDirectoryW(name, NULL) ? 0 : GetLastError();
+  return CreateDirectoryW((WCHAR*)name, NULL) ? 0 : GetLastError();
   
   #else
 
@@ -160,7 +160,7 @@ static WRes MyCreateDir(const UInt16 *name)
 static WRes OutFile_OpenUtf16(CSzFile *p, const UInt16 *name)
 {
   #ifdef USE_WINDOWS_FILE
-  return OutFile_OpenW(p, name);
+  return OutFile_OpenW(p, (WCHAR*)name);
   #else
   CBuf buf;
   WRes res;
