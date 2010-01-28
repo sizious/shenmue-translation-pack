@@ -5,7 +5,7 @@ interface
 uses
   SysUtils, ScnfUtil;
 
-function InitTextDatabase(GameVersion: TGameVersion): TFileName;
+function GetTextDatabaseIndexFile(GameVersion: TGameVersion): TFileName;
 
 implementation
 
@@ -18,30 +18,34 @@ const
 var
   SevenZipDecExec: TFileName;
 
-function InitTextDatabase(GameVersion: TGameVersion): TFileName;
+function GetTextDatabaseIndexFile(GameVersion: TGameVersion): TFileName;
 var
-  SavedCurrentDir,
-  BaseFileName: TFileName;
+  BaseFileName, DatabaseSourceFileName, DatabaseDestDirectory: TFileName;
 
 begin
   BaseFileName := LowerCase(GameVersionToCodeStr(GameVersion));
-  Result := GetDatasDirectory + TEXT_DATABASE_ROOT_DIR + '\'
+  DatabaseDestDirectory := GetWorkingTempDirectory + BaseFileName;
+  DatabaseSourceFileName := GetDatasDirectory + TEXT_DATABASE_ROOT_DIR + '\'
     + BaseFileName + '.db';
 
-  SavedCurrentDir := GetCurrentDir;
-  SetCurrentDir(GetWorkingTempDirectory);
-
-  if RunAndWait(SevenZipDecExec + ' e "' + Result + '"') then
-    Result := GetWorkingTempDirectory + BaseFileName + '.dbi';
+  if not DirectoryExists(DatabaseDestDirectory) then
+    ForceDirectories(DatabaseDestDirectory);
+  
+  if RunAndWait(SevenZipDecExec
+    + ' x "' + DatabaseSourceFileName + '" "' + DatabaseDestDirectory + '"') then
+    Result := DatabaseDestDirectory + '\' + BaseFileName + '.dbi';
 
   if not FileExists(Result) then
     Result := '';
-    
-  SetCurrentDir(SavedCurrentDir);
 end;
 
 initialization
   SevenZipDecExec := GetWorkingTempDirectory + '7zDec.exe';
   ExtractFile('LZMA', SevenZipDecExec);
+
+(*  finalization section:
+    not needed: everything is cleaned up in the DeleteWorkingTempDirectory
+    function of the utils.pas file
+*)
 
 end.
