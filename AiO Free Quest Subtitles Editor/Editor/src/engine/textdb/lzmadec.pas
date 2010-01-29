@@ -21,21 +21,30 @@ var
 function GetTextDatabaseIndexFile(GameVersion: TGameVersion): TFileName;
 var
   BaseFileName, DatabaseSourceFileName, DatabaseDestDirectory: TFileName;
+{$IFDEF DEBUG}
+  ExecResult: Boolean;
+{$ENDIF}
 
 begin
   BaseFileName := LowerCase(GameVersionToCodeStr(GameVersion));
   DatabaseDestDirectory := GetWorkingTempDirectory + BaseFileName;
   DatabaseSourceFileName := GetDatasDirectory + TEXT_DATABASE_ROOT_DIR + '\'
     + BaseFileName + '.db';
-
-  if not DirectoryExists(DatabaseDestDirectory) then
-    ForceDirectories(DatabaseDestDirectory);
+  Result := DatabaseDestDirectory + '\' + BaseFileName + '.dbi';
   
-  if RunAndWait(SevenZipDecExec
-    + ' x "' + DatabaseSourceFileName + '" "' + DatabaseDestDirectory + '"') then
-    Result := DatabaseDestDirectory + '\' + BaseFileName + '.dbi';
+  if not DirectoryExists(DatabaseDestDirectory) then begin
+    ForceDirectories(DatabaseDestDirectory);
+{$IFDEF DEBUG}
+    ExecResult :=
+{$ENDIF}
+    RunAndWait(SevenZipDecExec + ' x "' + DatabaseSourceFileName
+      + '" "' + DatabaseDestDirectory + '"');
+{$IFDEF DEBUG}
+    WriteLn('RunAndWait Result on 7zDec: ', ExecResult);
+{$ENDIF}
+  end;
 
-  if not FileExists(Result) then
+  if not FileExists(Result) then // if not exist the DBI (index file)
     Result := '';
 end;
 
