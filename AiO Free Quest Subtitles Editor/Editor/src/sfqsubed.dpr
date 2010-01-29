@@ -42,7 +42,10 @@ uses
   multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
   mtexec in 'multitrd\mtexec.pas',
   lzmadec in 'engine\textdb\lzmadec.pas',
-  systools in '..\..\..\Common\systools.pas';
+  systools in '..\..\..\Common\systools.pas',
+  textdb in 'engine\textdb\textdb.pas',
+  dbindex in 'engine\textdb\dbindex.pas',
+  dbinlay in 'engine\textdb\dbinlay.pas';
 
 {$R *.res}
 

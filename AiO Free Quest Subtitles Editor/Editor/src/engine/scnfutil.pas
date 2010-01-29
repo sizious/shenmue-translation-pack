@@ -83,14 +83,14 @@ end;
 
 function GameVersionToCodeStr(GameVersion: TGameVersion): string;
 begin
-  Result := 'XX_XXX_Undefined';
+  Result := 'XX_XXX_UNDEF';
   case GameVersion of
-    gvWhatsShenmue  : Result := 'DC_JAP_Whats_Shenmue';
-    gvShenmueJ      : Result := 'DC_JAP_Shenmue';
-    gvShenmue       : Result := 'DC_PAL_Shenmue';
-    gvShenmue2J     : Result := 'DC_JAP_Shenmue';
-    gvShenmue2      : Result := 'DC_PAL_Shenmue2';
-    gvShenmue2X     : Result := 'XB_PAL_Shenmue2X';
+    gvWhatsShenmue  : Result := 'DC_JAP_WHATS';
+    gvShenmueJ      : Result := 'DC_JAP_SHENMUE';
+    gvShenmue       : Result := 'DC_PAL_SHENMUE';
+    gvShenmue2J     : Result := 'DC_JAP_SHENMUE2';
+    gvShenmue2      : Result := 'DC_PAL_SHENMUE2';
+    gvShenmue2X     : Result := 'XB_PAL_SHENMUE2';
   end;
 end;
 

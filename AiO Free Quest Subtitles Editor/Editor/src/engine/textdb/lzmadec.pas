@@ -13,7 +13,7 @@ uses
   Common, SysTools, Utils;
 
 const
-  TEXT_DATABASE_ROOT_DIR = 'orgtext';
+  TEXT_DATABASE_ROOT_DIR = 'textdb';
     
 var
   SevenZipDecExec: TFileName;
