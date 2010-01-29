@@ -47,7 +47,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure DeleteWorkingDirectory;
+procedure DeleteWorkingTempDirectory;
 begin
   if DirectoryExists(sWorkingTempDirectory) then
     DeleteDirectory(sWorkingTempDirectory);
@@ -85,23 +85,23 @@ var
   CurrentNode: IXMLNode;
   procedure WriteXMLNode(var XML: IXMLDocument; const Key, Value: string); overload;
   begin
-    CurrentNode := XMLDoc.CreateNode(Key);
+    CurrentNode := XML.CreateNode(Key);
     CurrentNode.NodeValue := Value;
-    XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
+    XML.DocumentElement.ChildNodes.Add(CurrentNode);
   end;
 
   procedure WriteXMLNode(var XML: IXMLDocument; const Key: string; const Value: Integer); overload;
   begin
-    CurrentNode := XMLDoc.CreateNode(Key);
+    CurrentNode := XML.CreateNode(Key);
     CurrentNode.NodeValue := Value;
-    XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
+    XML.DocumentElement.ChildNodes.Add(CurrentNode);
   end;
 
   procedure WriteXMLNode(var XML: IXMLDocument; const Key: string; const Value: Boolean); overload;
   begin
-    CurrentNode := XMLDoc.CreateNode(Key);
+    CurrentNode := XML.CreateNode(Key);
     CurrentNode.NodeValue := Value;
-    XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
+    XML.DocumentElement.ChildNodes.Add(CurrentNode);
   end;
   
 begin
@@ -119,12 +119,13 @@ begin
     XMLDoc.DocumentElement := XMLDoc.CreateNode('freequestcfg'); // On crée la racine
 
     WriteXMLNode(XMLDoc, 'autosave', frmMain.AutoSave);
-    WriteXMLNode(XMLDoc, 'makebackup', frmMain.MakeBackup);
     WriteXMLNode(XMLDoc, 'directory', frmMain.SelectedDirectory);
     WriteXMLNode(XMLDoc, 'decodesubs', frmMain.EnableCharsMod);
-    WriteXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);
+    WriteXMLNode(XMLDoc, 'makebackup', frmMain.MakeBackup);
     WriteXMLNode(XMLDoc, 'multitranslate', frmMain.MultiTranslation.Active);
     WriteXMLNode(XMLDoc, 'rescandirstartup', frmMain.ReloadDirectoryAtStartup);
+    WriteXMLNode(XMLDoc, 'originalsubs', frmMain.EnableOriginalSubtitlesView);
+    WriteXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);    
 
     XMLDoc.SaveToFile(ConfigFileName);
   finally
@@ -144,7 +145,7 @@ var
   begin
     Result := '';
     try
-      Node := XMLDoc.DocumentElement.ChildNodes.FindNode(Key);
+      Node := XML.DocumentElement.ChildNodes.FindNode(Key);
       if Assigned(Node) then
         if not VarIsNull(Node.NodeValue) then
           Result := Node.NodeValue;
@@ -188,6 +189,8 @@ begin
     frmMain.SelectedDirectory := ReadXMLNodeString(XMLDoc, 'directory');
     frmMain.MultiTranslation.Active := ReadXMLNodeBoolean(XMLDoc, 'multitranslate');
     frmMain.ReloadDirectoryAtStartup := ReadXMLNodeBoolean(XMLDoc, 'rescandirstartup');
+    frmMain.EnableOriginalSubtitlesView :=
+      ReadXMLNodeBoolean(XMLDoc, 'originalsubs');
 
     Result := True;
   finally
@@ -274,7 +277,7 @@ initialization
 //------------------------------------------------------------------------------
 
 finalization
-  DeleteWorkingDirectory;
+  DeleteWorkingTempDirectory;
 
 //------------------------------------------------------------------------------
 

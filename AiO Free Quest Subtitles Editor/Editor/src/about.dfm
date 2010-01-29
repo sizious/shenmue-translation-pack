@@ -1549,7 +1549,8 @@ object frmAbout: TfrmAbout
     Left = 311
     Top = 110
     Width = 190
-    Height = 106
+    Height = 103
+    Alignment = taCenter
     Color = clBtnFace
     Lines.Strings = (
       'Main coder: '
@@ -1571,7 +1572,7 @@ object frmAbout: TfrmAbout
       'Thanks to everyone in '
       'MetaGames-EU forums!'
       ''
-      'The ShenTrad Team is Manic '
+      'The SHENTRAD Team is Manic '
       'and [big_fury]SiZiOUS (or '
       'SiZiOUS if you prefer...).'
       ''
@@ -1593,8 +1594,8 @@ object frmAbout: TfrmAbout
       ''
       'Cheers !'
       ''
-      'The ShenTrad Team, Here to '
-      'breake the Language Barrier!'
+      'The SHENTRAD Team, here to '
+      'breake the language barrier!'
       ''
       'Special smack '#224' ma petite'
       'bestiole!'

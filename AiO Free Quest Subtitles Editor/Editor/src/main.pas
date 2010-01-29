@@ -29,10 +29,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, Menus, ScnfEdit, MultiScan, ExtCtrls, ScnfScan,
+  Dialogs, ComCtrls, StdCtrls, Menus, SCNFEdit, SCNFUtil, MultiScan, ExtCtrls, ScnfScan,
   MultiTrad, JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
   AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf, TextData,
-  ImgList, ViewUpd, Progress;
+  ImgList, ViewUpd, Progress, TextDB;
 
 const
 {$IFDEF DEBUG}
@@ -40,9 +40,9 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.3' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.4' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'January 14, 2010 @05:48PM';
+  COMPIL_DATE_TIME = 'January 29, 2010 @10:45AM';
 
 type
   TGlobalTranslationModule = class;
@@ -130,7 +130,7 @@ type
     ApplicationEvents: TApplicationEvents;
     bfdExportSubs: TJvBrowseForFolderDialog;
     mOldSubEd: TMemo;
-    Label18: TLabel;
+    lOldText: TLabel;
     lGender: TLabel;
     rbMale: TRadioButton;
     rbFemale: TRadioButton;
@@ -180,6 +180,9 @@ type
     miOptions: TMenuItem;
     miReloadDirAtStartup: TMenuItem;
     InitTextDatabase1: TMenuItem;
+    N17: TMenuItem;
+    TextDatabaseCorrector1: TMenuItem;
+    miShowOriginalText: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -243,6 +246,8 @@ type
     procedure DumpMultiTranslationCacheList1Click(Sender: TObject);
     procedure miReloadDirAtStartupClick(Sender: TObject);
     procedure InitTextDatabase1Click(Sender: TObject);
+    procedure TextDatabaseCorrector1Click(Sender: TObject);
+    procedure miShowOriginalTextClick(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -261,6 +266,11 @@ type
     fCanEnableCharsMod2: Boolean;
     fMultiTranslation: TMultiTranslationModule;
     fReloadDirectoryAtStartup: Boolean;
+    fTextDatabaseCorrector: TTextDatabaseCorrector;
+    fPreviousLoadedGameVersion: TGameVersion;
+    fOldSelectedSubtitleText: string;
+    fOriginalSelectedSubtitleText: string;
+    fEnableOriginalSubtitlesView: Boolean;
 //    fWrapStr: string;
     procedure SetFileOperationMenusItemEnabledState(const State: Boolean);
     procedure SetAutoSave(const Value: Boolean);
@@ -272,6 +282,7 @@ type
     procedure BatchExportSubtitles(const OutputDirectory: TFileName);
     procedure SetEnableCharsMod(const Value: Boolean);
     procedure SetReloadDirectoryAtStartup(const Value: Boolean);
+    procedure SetEnableOriginalSubtitlesView(const Value: Boolean);
   protected
     procedure CheckIfSubLengthIsCorrect(const Value: Integer; Field: TEdit);
     procedure FreeApplication;
@@ -279,6 +290,7 @@ type
     procedure PreviewWindowClosedEvent(Sender: TObject);
     procedure SetModifiedIndicator(State: Boolean);
     procedure SetApplicationHint(const HintStr: string);
+    procedure UpdateOldSubtitleField;
   public
     { Déclarations publiques }
     procedure AddDebug(m: string);
@@ -331,6 +343,18 @@ type
     property MultiTranslation: TMultiTranslationModule read fMultiTranslation
       write fMultiTranslation;
 //    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
+
+    // Properties for Text Correction DataBase (Original text from the game)
+    property PreviousLoadedGameVersion: TGameVersion
+      read fPreviousLoadedGameVersion write fPreviousLoadedGameVersion;
+    property TextDatabaseCorrector: TTextDatabaseCorrector
+      read fTextDatabaseCorrector;
+    property OriginalSelectedSubtitleText: string
+      read fOriginalSelectedSubtitleText write fOriginalSelectedSubtitleText; // ORIGINAL text from AM2 developers
+    property OldSelectedSubtitleText: string
+      read fOldSelectedSubtitleText write fOldSelectedSubtitleText; // PREVIOUS text from the user (the translator)...
+    property EnableOriginalSubtitlesView: Boolean
+      read fEnableOriginalSubtitlesView write SetEnableOriginalSubtitlesView;      
   end;
 
   // This class implements the Multi-Translation function.
@@ -494,10 +518,10 @@ implementation
 {$ENDIF}
 
 uses
-  {$IFDEF DEBUG} TypInfo, {$ENDIF}
+  {$IFDEF DEBUG} TypInfo, LzmaDec, {$ENDIF}
   {$IFDEF OLD_MULTI_TRANSLATION_STYLE} MultiTrd, {$ENDIF}
-  SelDir, SCNFUtil, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
-  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI, LZMADEC;
+  SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
+  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI;
 
 {$R *.dfm}
 
@@ -678,6 +702,8 @@ end;
 
 procedure TfrmMain.Clear;
 begin
+  OriginalSelectedSubtitleText := '';
+  OldSelectedSubtitleText := '';
   SubtitleSelected := -1;
   SetFileOperationMenusItemEnabledState(False);
   SetFileSaveOperationsMenusItemEnabledState(False);
@@ -718,7 +744,7 @@ end;
 
 procedure TfrmMain.InitTextDatabase1Click(Sender: TObject);
 begin
-  ShowMessage(InitTextDatabase(gvShenmue2));
+{$IFDEF DEBUG} ShowMessage(GetTextDatabaseIndexFile(gvShenmue2)); {$ENDIF}
 end;
 
 procedure TfrmMain.DumpMultiTranslationCacheList1Click(Sender: TObject);
@@ -912,6 +938,10 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title + ' - v' + APP_VERSION + ' - by [big_fury]SiZiOUS';
 
+  // Initialize the Text Corrector Database
+  PreviousLoadedGameVersion := gvUndef;
+  fTextDatabaseCorrector := TTextDatabaseCorrector.Create;
+  
 //  WorkFilesList := TFilesList.Create;
 
   // Create the control object for the GlobalTranslation module
@@ -1013,6 +1043,8 @@ begin
 
   SCNFEditor.Free;
 //  WorkFilesList.Free;
+
+  TextDatabaseCorrector.Free;
 end;
 
 procedure TfrmMain.FormKeyPress(Sender: TObject; var Key: Char);
@@ -1290,6 +1322,27 @@ begin
       miEnableCharsMod.Enabled := False;
     end;
 
+  // ---- TEXT DB --------------------------------------------------------------
+
+  // Initializing the text corrector database (which contains the original subtitles)
+  if PreviousLoadedGameVersion <> SCNFEditor.GameVersion then begin
+    if not TextDatabaseCorrector.LoadDatabase(SCNFEditor.GameVersion) then
+      AddDebug('WARNING: Unable to load the original subtitles information database for the "'
+        + GameVersionToStr(SCNFEditor.GameVersion) + '" game version !')
+    else
+      AddDebug('Original subtitles information database for the "'
+        + GameVersionToStr(SCNFEditor.GameVersion) + '" game version successfully loaded.');
+    PreviousLoadedGameVersion := SCNFEditor.GameVersion;
+  end;
+
+  // Loading original text data from the TextDB
+  if not TextDatabaseCorrector.LoadTableForNPC(SCNFEditor.VoiceShortID, SCNFEditor.CharacterID) then
+      AddDebug('WARNING: Unable to retrieve original subtitles information from '
+        + 'the database for the entry "' + SCNFEditor.VoiceShortID + '_'
+        + SCNFEditor.CharacterID + '" !');
+
+  // ---- UPDATING VIEW --------------------------------------------------------
+
   // Show game info
   eGame.Text := GameVersionToStr(SCNFEditor.GameVersion);
   eCharID.Text := SCNFEditor.CharacterID;
@@ -1352,7 +1405,7 @@ begin
   // Multi-translating...
   if MultiTranslation.Active then
     MultiTranslation.CurrentLoadedFile.BuildCache;
-    
+
 //  SetStatus('Ready');
   SetStatusReady;
 end;
@@ -1375,7 +1428,18 @@ begin
   if SubtitleSelected <> -1 then begin
     Sub := SCNFEditor.Subtitles[SubtitleSelected].Text;
     mSubText.Text := StringReplace(Sub, '<br>', #13#10, [rfReplaceAll]);
-    mOldSubEd.Text := mSubText.Text;
+    OldSelectedSubtitleText := mSubText.Text;
+
+    // Loading the original text for this subtitle from the database
+    if TextDatabaseCorrector.Loaded then
+      OriginalSelectedSubtitleText :=
+        StringReplace(TextDatabaseCorrector.Subtitles[SubtitleSelected].Text,
+          '<br>', sLineBreak, [rfReplaceAll])
+    else
+      OriginalSelectedSubtitleText := '~~ Not available... ~~';
+
+    // Update the OldSubEd edit
+    UpdateOldSubtitleField;
   end;
 end;
 
@@ -1918,6 +1982,17 @@ begin
     frmFileInfo.UpdateSubtitles;
 end;
 
+procedure TfrmMain.SetEnableOriginalSubtitlesView(const Value: Boolean);
+begin
+  fEnableOriginalSubtitlesView := Value;
+  miShowOriginalText.Checked := Value;
+  UpdateOldSubtitleField;
+  if Value then
+    lOldText.Caption := 'Original text:'
+  else
+    lOldText.Caption := 'Old text:';
+end;
+
 procedure TfrmMain.SetFileOperationMenusItemEnabledState(const State: Boolean);
 begin
   miCloseFile.Enabled := State;
@@ -1990,6 +2065,37 @@ begin
   SetStatus('Ready');
 end;
 
+procedure TfrmMain.miShowOriginalTextClick(Sender: TObject);
+begin
+  EnableOriginalSubtitlesView := not EnableOriginalSubtitlesView; 
+end;
+
+procedure TfrmMain.TextDatabaseCorrector1Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  DB: TTextDatabaseCorrector;
+
+begin
+  if SubtitleSelected = -1 then begin
+    ShowMessage('select a subtitle in the list!!!');
+    Exit;
+  end;
+
+  DB := TTextDatabaseCorrector.Create;
+  try
+    DB.LoadDatabase(gvShenmue2);
+    if DB.LoadTableForNPC(SCNFEditor.VoiceShortID, SCNFEditor.CharacterID) then
+      ShowMessage(DB.Subtitles[SubtitleSelected].Text)
+    else
+      ShowMessage('ENTRY NOT FOUND!!!');
+  finally
+    DB.Free;
+  end;
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
 procedure TfrmMain.tvMultiSubsClick(Sender: TObject);
 begin
   GlobalTranslation.LoadSelectedSubtitle;
@@ -2013,6 +2119,14 @@ procedure TfrmMain.tvMultiSubsKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   tvMultiSubsClick(Sender);
+end;
+
+procedure TfrmMain.UpdateOldSubtitleField;
+begin
+  if EnableOriginalSubtitlesView then
+    mOldSubEd.Text := OriginalSelectedSubtitleText
+  else
+    mOldSubEd.Text := OldSelectedSubtitleText;
 end;
 
 procedure TfrmMain.UpdateSubtitleLengthControls(SubtitleText: string;

@@ -9,9 +9,6 @@
   Free Quest characters subtitles editor for Shenmue I, What's Shenmue,
   Shenmue II XBOX & DC
 
-  Version.............: 3.3.6
-  Release date........: September 14, 2009 @09:58PM
-
   Main code...........: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
   Additional code.....: Manic
   Beta test...........: Shendream, Sadako
@@ -20,6 +17,9 @@
 }
 (*
   Short history:
+
+  3.3.7
+    - Some little tweaks
 
   3.3.6
     - Adding the TSubEntry.IsEquals method
@@ -64,8 +64,8 @@ uses
   ;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.3.6';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'September 14, 2009 @09:58PM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.3.7';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'January 29, 2010 @10:12AM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -172,8 +172,9 @@ type
     fCharsDecodeTable: TSCNFCharsDecodeTable;
     function GetItem(Index: Integer): TSubEntry;
     function GetCount: Integer;
-    procedure AddEntry(SubEntry: TSubRawBinaryEntry);
     procedure WriteSubtitlesTable(var F: file);
+  protected
+    procedure AddEntry(SubEntry: TSubRawBinaryEntry);  
     procedure Clear;
   public
     constructor Create(Owner: TSCNFEditor);

@@ -146,14 +146,14 @@ object frmMain: TfrmMain
         AutoSize = False
         Caption = 'Char ID:'
       end
-      object Label18: TLabel
+      object lOldText: TLabel
         Left = 8
         Top = 248
-        Width = 65
+        Width = 86
         Height = 13
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
-        Caption = 'Old text:'
+        Caption = '<Generated>'
       end
       object lGender: TLabel
         Left = 8
@@ -397,10 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)
@@ -485,13 +481,12 @@ object frmMain: TfrmMain
           Caption = 'Text:'
         end
         object Label16: TLabel
-          Left = 8
+          Left = 9
           Top = 102
           Width = 77
           Height = 13
           Anchors = [akLeft, akBottom]
           Caption = 'First line length:'
-          ExplicitTop = 130
         end
         object Label17: TLabel
           Left = 148
@@ -503,7 +498,7 @@ object frmMain: TfrmMain
           ExplicitTop = 130
         end
         object eMTFirstLineLength: TEdit
-          Left = 91
+          Left = 95
           Top = 99
           Width = 41
           Height = 21
@@ -552,8 +547,8 @@ object frmMain: TfrmMain
           OnChange = mMTNewSubChange
         end
         object bMultiTranslate: TButton
-          Left = 306
-          Top = 99
+          Left = 304
+          Top = 97
           Width = 92
           Height = 25
           Anchors = [akRight, akBottom]
@@ -728,15 +723,6 @@ object frmMain: TfrmMain
         Hint = 'Save the debug history.'
         OnClick = miSaveDebugLogClick
       end
-      object N5: TMenuItem
-        Caption = '-'
-      end
-      object miReloadDir2: TMenuItem
-        Caption = '&Refresh'
-        Hint = 'Rescan the selected directory to find files.'
-        ShortCut = 116
-        OnClick = miReloadDirClick
-      end
       object N15: TMenuItem
         Caption = '-'
       end
@@ -746,6 +732,23 @@ object frmMain: TfrmMain
         Hint = 'Translate the Shenmue charset to Windows charset and vice-versa.'
         ShortCut = 117
         OnClick = miEnableCharsModClick
+      end
+      object miShowOriginalText: TMenuItem
+        Caption = 'Show original text'
+        Hint = 
+          'Show untouched original subtitles extracted from the game in the' +
+          ' old text field'
+        ShortCut = 122
+        OnClick = miShowOriginalTextClick
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object miReloadDir2: TMenuItem
+        Caption = '&Refresh'
+        Hint = 'Rescan the selected directory to find files.'
+        ShortCut = 116
+        OnClick = miReloadDirClick
       end
     end
     object miTools: TMenuItem
@@ -827,17 +830,26 @@ object frmMain: TfrmMain
     end
     object miDEBUG: TMenuItem
       Caption = 'DEBUG'
+      object InitTextDatabase1: TMenuItem
+        Caption = 'InitTextDatabase'
+        OnClick = InitTextDatabase1Click
+      end
+      object TextDatabaseCorrector1: TMenuItem
+        Caption = 'Test TextDatabaseCorrector'
+        OnClick = TextDatabaseCorrector1Click
+      end
+      object N17: TMenuItem
+        Caption = '-'
+      end
       object miDumpMultiTranslationTextData: TMenuItem
         Caption = 'Dump Multi-Translation Text Data'
+        Enabled = False
         OnClick = miDumpMultiTranslationTextDataClick
       end
       object DumpMultiTranslationCacheList1: TMenuItem
         Caption = 'Dump Multi-Translation Cache List'
+        Enabled = False
         OnClick = DumpMultiTranslationCacheList1Click
-      end
-      object InitTextDatabase1: TMenuItem
-        Caption = 'InitTextDatabase'
-        OnClick = InitTextDatabase1Click
       end
     end
   end

@@ -126,7 +126,6 @@ begin
           Continue;
           
         XMLInput.LoadFromFile(XMLFileName);
-        Inc(NumFiles);
         
         // c'est bon
         if XMLInput.DocumentElement.NodeName = 'TextCorrectorDatabase' then begin
@@ -141,6 +140,7 @@ begin
               Node := ContainerDiscsRootNode.AddChild(InputFileEntry);
             Node.Attributes['i'] := i;
             Node.Attributes['d'] := DiscNumber;
+            Inc(NumFiles);            
           end;
 
         end;

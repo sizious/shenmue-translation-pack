@@ -1,27 +1,26 @@
+(*
+  T E X T D B  M O D U L E
+  This file is part of the TextDB Module, the Text Correction Database.
+
+  The Text Correction Database is a module made to store EVERY original subtitles
+  in order for you to correct the subtitles.
+
+  This file is the main unit using every files in the textdb directory.
+*)
 unit textdb;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, ScnfEdit, ScnfUtil, CharsLst;
+  Windows, SysUtils, Classes, ScnfUtil, DBIndex, DBInlay;
 
 type
-  TSubtitlesContainer = class(TSubList)
-  public
-    constructor Create; overload;
-  end;
-
-  TTextDatabaseIndex = class
-  public
-
-  end;
-
   TTextDatabaseCorrector = class
   private
+    fDatabaseIndex: TTextDatabaseIndex;
     fGameVersion: TGameVersion;
     fLoaded: Boolean;
     fIndexFileName: TFileName;
-    fCharsList: TSubsCharsList;
     fSubtitles: TSubtitlesContainer;
   public
     constructor Create;
@@ -34,32 +33,33 @@ type
     property IndexFileName: TFileName read fIndexFileName;
     property GameVersion: TGameVersion read fGameVersion;
     property Loaded: Boolean read fLoaded;
-    property CharsList: TSubsCharsList read fCharsList;
     property Subtitles: TSubtitlesContainer read fSubtitles;
   end;
 
 implementation
 
 uses
-  LzmaDec, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
+  LzmaDec, Common;
 
 { TTextDatabaseCorrector }
 
 procedure TTextDatabaseCorrector.Clear;
 begin
-
+  fLoaded := False;
+  fGameVersion := gvUndef;
+  fIndexFileName := '';
 end;
 
 constructor TTextDatabaseCorrector.Create;
 begin
   fSubtitles := TSubtitlesContainer.Create;
-  fCharsList := TSubsCharsList.Create;
+  fDatabaseIndex := TTextDatabaseIndex.Create;
 end;
 
 destructor TTextDatabaseCorrector.Destroy;
 begin
+  fDatabaseIndex.Free;
   fSubtitles.Free;
-  fCharsList.Free;
   inherited;
 end;
 
@@ -69,7 +69,11 @@ function TTextDatabaseCorrector.LoadDatabase(
 var
   fnIndexFileName: TFileName;
 
+  
 begin
+  Result := False;
+  Clear;
+  
   // Extracting the LZMA archive
   fnIndexFileName := GetTextDatabaseIndexFile(GameVersion);
   if FileExists(fnIndexFileName) then begin
@@ -77,23 +81,26 @@ begin
     fLoaded := True;
     fGameVersion := GameVersion;
     fIndexFileName := fnIndexFileName;
-
-    // parsing the XML index file
-    
+    fSubtitles.CharsList.Active :=
+      fSubtitles.CharsList.LoadFromFile(GetCorrectCharsList(GameVersion));
+    Result := fDatabaseIndex.LoadDatabaseIndex(fnIndexFileName);
   end;
 end;
 
 function TTextDatabaseCorrector.LoadTableForNPC(const ShortVoiceID,
   CharID: string): Boolean;
+var
+  NPCIndex: TTextDatabaseIndexItem;
+  SubtitlesFile: TFileName;
+  
 begin
-
-end;
-
-{ TSubsListX }
-
-constructor TSubtitlesContainer.Create;
-begin
-  inherited Create(nil);
+  Result := False;
+  NPCIndex := fDatabaseIndex.FindNPC(ShortVoiceID, CharID);
+  if Assigned(NPCIndex) then begin
+    SubtitlesFile := NPCIndex.TextDatabaseFileName;
+    if FileExists(SubtitlesFile) then
+      Result := fSubtitles.LoadNPCSubtitlesFile(ShortVoiceID, CharID, SubtitlesFile);
+  end;
 end;
 
 end.
