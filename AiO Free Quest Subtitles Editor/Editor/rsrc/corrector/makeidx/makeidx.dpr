@@ -19,33 +19,42 @@ uses
   scnfutil in '..\..\..\src\engine\scnfutil.pas';
 
 const
-  WORK_DIRECTORY = '.\';
-  OUTPUT_FILE = 'xb_pal_shenmue2.dbi';
-  GAME_VERSION: TGameVersion = gvShenmue2X;
-
+  OUTPUT_FILE_EXT = '.dbi';
+  MAX_DATABASE_FILES = 256;
+  
 var
   XMLOutputIndex, XMLInput: IXMLDocument;
   InfoNode, Node,
   ContainerDiscsRootNode,
   InputFileNamesNode: IXMLNode;
   i, j,
-  DiscNumber, MaxDatabaseFiles, NumFiles: Integer;
+  DiscNumber, NumFiles: Integer;
   InputFileEntry: string;
-  XMLFileName: TFileName;
-  
+  WorkDirectory, XMLFileName, DBIOutputFile: TFileName;
+  GameVersion: TGameVersion;
+
 begin
-  if ParamCount < 2 then begin
-    WriteLn('Usage: makeidx <DiscNumber> <MaxDatabaseFiles>');
+   WRITELN('THIS PROGRAM IS OUTDATED. PLEASE USE THE DATASGEN PROGRAM ONLY INSTEAD.');
+   READLN;
+   EXIT;
+   
+  if ParamCount < 3 then begin
+    WriteLn('Usage: makeidx <Directory> <GameVersion> <DiscNumber>');
     Exit;
   end;
 
   try
-    DiscNumber := StrToInt(ParamStr(1));
-    MaxDatabaseFiles := StrToInt(ParamStr(2));
+    WorkDirectory := IncludeTrailingPathDelimiter(ParamStr(1));
+    GameVersion := StrToGameVersion(ParamStr(2));
+    if GameVersion = gvUndef then raise Exception.Create('INVALID VERSION');    
+    DiscNumber := StrToInt(ParamStr(3));
   except
     WriteLn('Invalid parameters');
     Exit;
   end;
+
+  DBIOutputFile := WorkDirectory + LowerCase(GameVersionToCodeStr(GameVersion))
+    + OUTPUT_FILE_EXT;
 
   CoInitialize(nil);
   XMLOutputIndex := TXMLDocument.Create(nil);
@@ -63,7 +72,7 @@ begin
         Encoding := 'utf-8'; //'ISO-8859-1';
       end;
 
-      if not FileExists(OUTPUT_FILE) then begin
+      if not FileExists(DBIOutputFile) then begin
         // Creating the root
         XMLOutputIndex.DocumentElement := XMLOutputIndex.CreateNode('TextCorrectorDatabaseIndex');
 
@@ -75,7 +84,7 @@ begin
         Node.NodeValue := BASE_FILENAME;
 *)
         Node := XMLOutputIndex.DocumentElement.AddChild('GameVersion');
-        Node.NodeValue := GameVersionToCodeStr(GAME_VERSION);
+        Node.NodeValue := GameVersionToCodeStr(GameVersion);
 
 (*        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Discs');
         ContainerDiscsRootNode.Attributes['Count'] := '1';
@@ -86,7 +95,7 @@ begin
         ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.AddChild('Entries');
         ContainerDiscsRootNode.Attributes['Count'] := 0;
       end else begin
-        XMLOutputIndex.LoadFromFile(OUTPUT_FILE);
+        XMLOutputIndex.LoadFromFile(DBIOutputFile);
 
 (*        ContainerDiscsRootNode := XMLOutputIndex.DocumentElement.ChildNodes.FindNode('Discs');
         if not Assigned(ContainerDiscsRootNode) then
@@ -116,10 +125,10 @@ begin
       NumFiles := 0;
       
       // lire les XML
-      for i := 1 to MaxDatabaseFiles do begin
+      for i := 1 to MAX_DATABASE_FILES do begin
         (*XMLFileName := WORK_DIRECTORY + BASE_FILENAME + '_disc'
           + IntToStr(DiscNumber) + '_' + IntToStr(i) + '.tcd';*)
-        XMLFileName := WORK_DIRECTORY + IntToStr(i) + '.tcd';
+        XMLFileName := WorkDirectory + IntToStr(i) + '.tcd';
 
         if not FileExists(XMLFileName) then
           Continue;
@@ -139,7 +148,9 @@ begin
               Node := ContainerDiscsRootNode.AddChild(InputFileEntry);
             Node.Attributes['i'] := i;
             Node.Attributes['d'] := DiscNumber;
-            Inc(NumFiles);            
+            Inc(NumFiles);
+
+            writeln(InputFileEntry, ';', Node.Attributes['i'], ';', Node.Attributes['d']);
           end;
 
         end;
@@ -148,7 +159,7 @@ begin
 
       ContainerDiscsRootNode.Attributes['Count'] := Integer(ContainerDiscsRootNode.Attributes['Count']) + NumFiles;
 
-      XMLOutputIndex.SaveToFile(OUTPUT_FILE);
+      XMLOutputIndex.SaveToFile(DBIOutputFile);
     except
       on E:Exception do
         Writeln(E.Classname, ': ', E.Message);
