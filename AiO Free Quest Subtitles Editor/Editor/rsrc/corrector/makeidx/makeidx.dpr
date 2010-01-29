@@ -20,9 +20,8 @@ uses
 
 const
   WORK_DIRECTORY = '.\';
-  OUTPUT_FILE = 'dc_pal_shenmue2.dbi';
-//  BASE_FILENAME = 'dc_pal_shenmue2';
-  GAME_VERSION: TGameVersion = gvShenmue2;
+  OUTPUT_FILE = 'xb_pal_shenmue2.dbi';
+  GAME_VERSION: TGameVersion = gvShenmue2X;
 
 var
   XMLOutputIndex, XMLInput: IXMLDocument;
