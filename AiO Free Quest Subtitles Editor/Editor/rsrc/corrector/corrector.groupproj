@@ -5,7 +5,6 @@
   <ItemGroup />
   <ItemGroup>
     <Projects Include="datagen\datasgen.dproj" />
-    <Projects Include="makeidx\makeidx.dproj" />
     <Projects Include="movepks\movepks.dproj" />
   </ItemGroup>
   <ProjectExtensions>
@@ -32,23 +31,14 @@
   <Target Name="datasgen:Make">
     <MSBuild Projects="datagen\datasgen.dproj" Targets="Make" />
   </Target>
-  <Target Name="makeidx">
-    <MSBuild Projects="makeidx\makeidx.dproj" Targets="" />
-  </Target>
-  <Target Name="makeidx:Clean">
-    <MSBuild Projects="makeidx\makeidx.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="makeidx:Make">
-    <MSBuild Projects="makeidx\makeidx.dproj" Targets="Make" />
-  </Target>
   <Target Name="Build">
-    <CallTarget Targets="movepks;datasgen;makeidx" />
+    <CallTarget Targets="movepks;datasgen" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="movepks:Clean;datasgen:Clean;makeidx:Clean" />
+    <CallTarget Targets="movepks:Clean;datasgen:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="movepks:Make;datasgen:Make;makeidx:Make" />
+    <CallTarget Targets="movepks:Make;datasgen:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
