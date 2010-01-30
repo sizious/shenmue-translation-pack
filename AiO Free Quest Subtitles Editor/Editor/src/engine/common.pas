@@ -31,31 +31,41 @@ const
   // Default text when not translated...
   MT_NOT_TRANSLATED_YET       = '# Not translated yet... #';
 
-function GetDatasDirectory: TFileName;
 function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
-function IsCharsModAvailable(GameVersion: TGameVersion): Boolean;
-function IsTheSameCharsList(GameVersion1, GameVersion2: TGameVersion): Boolean;
+function GetDatasDirectory: TFileName;
 function GetFacesDirectory(GameVersion: TGameVersion): TFileName;
 function GetNPCInfoFile: TFileName;
+function GetTextCorrectorDatabasesDirectory: TFileName;
+function IsCharsModAvailable(GameVersion: TGameVersion): Boolean;
+function IsTheSameCharsList(GameVersion1, GameVersion2: TGameVersion): Boolean;
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 const
-  DATA_BASE_DIR       = 'data';
+  DATA_BASE_DIR           = 'data';
 
-  NPC_INFO_FILE       = 'npc_info.csv';
-  CHR_LIST_1          = 'chrlist1.csv'; // for Shenmue, US Shenmue, What's Shenmue
-  CHR_LIST_2          = 'chrlist2.csv'; // for Shenmue II
+  NPC_INFO_FILE           = 'npc_info.csv';
+  CHR_LIST_1              = 'chrlist1.csv'; // for Shenmue, US Shenmue, What's Shenmue
+  CHR_LIST_2              = 'chrlist2.csv'; // for Shenmue II
 
-  FACES_BASE_DIR      = 'faces';
-  FACES_WHATS_DIR     = 'whats';
-  FACES_SHENMUE_DIR   = 'shenmue';
-  FACES_SHENMUE2_DIR  = 'shenmue2';
+  FACES_BASE_DIR          = 'faces';
+  FACES_WHATS_DIR         = 'whats';
+  FACES_SHENMUE_DIR       = 'shenmue';
+  FACES_SHENMUE2_DIR      = 'shenmue2';
 
+  TEXT_DATABASE_ROOT_DIR  = 'textdb';       // directory where are stored subtitles correction DB
+  
 var
   DatasDirectory: TFileName;
+
+//------------------------------------------------------------------------------
+
+function GetTextCorrectorDatabasesDirectory: TFileName;
+begin
+  Result := GetDatasDirectory + TEXT_DATABASE_ROOT_DIR + '\';
+end;
 
 //------------------------------------------------------------------------------
 

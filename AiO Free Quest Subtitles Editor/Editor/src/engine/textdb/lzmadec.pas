@@ -12,9 +12,6 @@ implementation
 uses
   Common, SysTools, Utils;
 
-const
-  TEXT_DATABASE_ROOT_DIR = 'textdb';
-    
 var
   SevenZipDecExec: TFileName;
 
@@ -28,7 +25,7 @@ var
 begin
   BaseFileName := LowerCase(GameVersionToCodeStr(GameVersion));
   DatabaseDestDirectory := GetWorkingTempDirectory + BaseFileName;
-  DatabaseSourceFileName := GetDatasDirectory + TEXT_DATABASE_ROOT_DIR + '\'
+  DatabaseSourceFileName := GetTextCorrectorDatabasesDirectory
     + BaseFileName + '.db';
   Result := DatabaseDestDirectory + '\' + BaseFileName + '.dbi';
   
