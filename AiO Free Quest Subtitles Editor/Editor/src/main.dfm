@@ -744,6 +744,12 @@ object frmMain: TfrmMain
       object N5: TMenuItem
         Caption = '-'
       end
+      object miBrowseDirectory2: TMenuItem
+        Caption = '&Browse directory...'
+        Hint = 'Open the selected directory inside the Windows Explorer.'
+        ShortCut = 16450
+        OnClick = miBrowseDirectoryClick
+      end
       object miReloadDir2: TMenuItem
         Caption = '&Refresh'
         Hint = 'Rescan the selected directory to find files.'
@@ -850,6 +856,13 @@ object frmMain: TfrmMain
         Caption = 'Dump Multi-Translation Cache List'
         Enabled = False
         OnClick = DumpMultiTranslationCacheList1Click
+      end
+      object N18: TMenuItem
+        Caption = '-'
+      end
+      object GenerateTestException1: TMenuItem
+        Caption = 'Generate Test Exception'
+        OnClick = GenerateTestException1Click
       end
     end
   end
@@ -970,6 +983,7 @@ object frmMain: TfrmMain
     end
   end
   object ApplicationEvents: TApplicationEvents
+    OnException = ApplicationEventsException
     OnHint = ApplicationEventsHint
     Left = 16
     Top = 66

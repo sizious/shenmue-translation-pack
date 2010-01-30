@@ -16,6 +16,7 @@ ADDED:
 - Updated the npc_info.csv list with the Shenmue 1 NPC (Thanks Shendream).
 - Updated the chrlist1.csv with new characters ("-", "Ó", "ó", "Ú", "ú"),
   we forgot to update the chars list in the same time as the Previewer.
+- A Bugs Handler was added to manage fatal errors when occuring.
 
 FIXED:
 - The "View" main menu was re-organized.

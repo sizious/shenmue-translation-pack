@@ -183,6 +183,9 @@ type
     N17: TMenuItem;
     TextDatabaseCorrector1: TMenuItem;
     miShowOriginalText: TMenuItem;
+    miBrowseDirectory2: TMenuItem;
+    N18: TMenuItem;
+    GenerateTestException1: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -248,6 +251,8 @@ type
     procedure InitTextDatabase1Click(Sender: TObject);
     procedure TextDatabaseCorrector1Click(Sender: TObject);
     procedure miShowOriginalTextClick(Sender: TObject);
+    procedure GenerateTestException1Click(Sender: TObject);
+    procedure ApplicationEventsException(Sender: TObject; E: Exception);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -521,7 +526,8 @@ uses
   {$IFDEF DEBUG} TypInfo, LzmaDec, {$ENDIF}
   {$IFDEF OLD_MULTI_TRANSLATION_STYLE} MultiTrd, {$ENDIF}
   SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
-  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI;
+  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,
+  BugsMgr;
 
 {$R *.dfm}
 
@@ -550,6 +556,11 @@ procedure TfrmMain.miAutoSaveClick(Sender: TObject);
 begin
   AutoSave := not AutoSave;
   {$IFDEF DEBUG} WriteLn('AutoSave: ', AutoSave); {$ENDIF}
+end;
+
+procedure TfrmMain.ApplicationEventsException(Sender: TObject; E: Exception);
+begin
+  RunBugsHandler(Sender, E);
 end;
 
 procedure TfrmMain.ApplicationEventsHint(Sender: TObject);
@@ -1095,6 +1106,15 @@ begin
   // FreeTreeViewUI;
 end;
 
+procedure TfrmMain.GenerateTestException1Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  raise EDivByZero.Create('TEST EXCEPTION MESSAGE COOL!');
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
 function TfrmMain.GetTargetDirectory: string;
 begin
   Result := fSelectedDirectory;
@@ -1175,6 +1195,7 @@ begin
   miReloadDir.Enabled := DirectoryExists(SelectedDirectory);
   miReloadDir2.Enabled := miReloadDir.Enabled;
   miBrowseDirectory.Enabled := miReloadDir.Enabled;
+  miBrowseDirectory2.Enabled := miBrowseDirectory.Enabled;
   miExportFilesList.Enabled := lbFilesList.Items.Count > 0;
   miCloseFile2.Enabled := (lbFilesList.ItemIndex <> -1);
   miCloseFile.Enabled := miCloseFile2.Enabled;
