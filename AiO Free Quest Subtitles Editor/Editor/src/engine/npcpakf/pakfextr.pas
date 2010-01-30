@@ -7,7 +7,9 @@ uses
   
 function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName): Boolean;
 
+//------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
 
 const
   PAKF_SIGN = 'PAKF';
@@ -26,6 +28,8 @@ type
     Size: Integer;
     TextureName: array[0..7] of Char;
   end;
+
+//------------------------------------------------------------------------------
   
 procedure DumpBlockToFile(var Stream: TFileStream; Size: Integer;
   const OutFile: TFileName);
@@ -40,6 +44,8 @@ begin
     TargetFile.Free;    
   end;
 end;
+
+//------------------------------------------------------------------------------
 
 function IsFaceTexture(TextureName: string): Boolean;
 const
@@ -65,6 +71,8 @@ begin
     Result :=  (Pos(SM2_FACE_TEXN_SIGN, TextureName) > 0);
   end;
 end;
+
+//------------------------------------------------------------------------------
 
 function GetCharID(var Stream: TFileStream; IpacOffset: Integer): string;
 type
@@ -162,7 +170,9 @@ begin
     Stream.Seek(SavedPos, soFromBeginning);
   end;
 end;
-  
+
+//------------------------------------------------------------------------------
+
 function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName): Boolean;
 var
   PAKFStream: TFileStream;
@@ -236,5 +246,7 @@ begin
     PAKFStream.Free;
   end;
 end;
+
+//------------------------------------------------------------------------------
 
 end.
