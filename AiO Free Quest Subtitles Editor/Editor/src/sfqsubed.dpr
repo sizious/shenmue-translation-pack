@@ -45,7 +45,8 @@ uses
   systools in '..\..\..\Common\systools.pas',
   textdb in 'engine\textdb\textdb.pas',
   dbindex in 'engine\textdb\dbindex.pas',
-  dbinlay in 'engine\textdb\dbinlay.pas';
+  dbinlay in 'engine\textdb\dbinlay.pas',
+  bugsmgr in 'bugsmgr.pas' {frmBugsHandler};
 
 {$R *.res}
 
