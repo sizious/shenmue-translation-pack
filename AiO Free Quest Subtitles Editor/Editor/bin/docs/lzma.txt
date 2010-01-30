@@ -1,0 +1,12 @@
+LZMA ANSI-C Decompressor v9.10 beta
+-----------------------------------
+
+This software uses the LZMA decompression algorithm by Igor Pavlov.
+The LZMA SDK is written and placed in the public domain by the author.
+
+Thanks Igor Pavlov for this great piece of software.
+
+---
+
+http://www.7-zip.org
+

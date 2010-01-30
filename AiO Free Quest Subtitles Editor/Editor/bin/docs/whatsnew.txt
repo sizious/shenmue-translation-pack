@@ -5,6 +5,25 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           _________________________________________________
+___| Version 2.4: 2010- |_________________________________________________
+
+ADDED:
+- New powerful function: The Subtitles Corrector.
+  When pressing F11 (Item "View" > "Show original text"), you can view the 
+  original subtitle as it was in the game before any modification. The original 
+  subtitle is displayed in the "Old text" field. Press F11 again to go back 
+  as normal (Thanks Shendream for the idea).
+- Updated the npc_info.csv list with the Shenmue 1 NPC (Thanks Shendream).
+- Updated the chrlist1.csv with new characters ("-", "Ó", "ó", "Ú", "ú"),
+  we forgot to update the chars list in the same time as the Previewer.
+
+FIXED:
+- The "View" main menu was re-organized.
+- Some little tweaks and optimization in the SCNF Editor engine.
+- Application configuration manager was optimized and updated.
+- About box was reviewed (new credits, and more).
+- Some code clean-up.
+___                           _________________________________________________
 ___| Version 2.3: 2010-01-14 |_________________________________________________
 
 FIXED:
