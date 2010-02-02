@@ -7,16 +7,17 @@ interface
 uses
   Windows, SysUtils, Classes, PNGImage;
 
+procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
+procedure DeleteDirectory(DirectoryToRemove: TFileName);
+function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
+function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
+function GetFileSize(const FileName: TFileName): Int64;
+function GetTempDir: TFileName;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
-procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
-function GetTempDir: TFileName;
-function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
-function RunAndWait(const TargetFileName: TFileName) : Boolean;
-procedure DeleteDirectory(DirectoryToRemove: TFileName);
-function Right(SubStr: string; S: string): string;
 function Left(SubStr: string; S: string): string;
-function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
+function Right(SubStr: string; S: string): string;
+function RunAndWait(const TargetFileName: TFileName) : Boolean;
 
 //------------------------------------------------------------------------------
 implementation
@@ -87,6 +88,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel
 function GetTempDir: TFileName;
 var
   Dir: array[0..MAX_PATH] of Char;
@@ -99,6 +101,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 var
  ResourceStream : TResourceStream;
@@ -126,6 +129,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
 var
   StartupInfo: TStartupInfo;
@@ -148,6 +152,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks (?)
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 var
   aResult : Integer;
@@ -188,6 +193,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel (Phidels.com)
 function Right(SubStr: string; S: string): string;
 begin
   if pos(substr,s)=0 then result:='' else
@@ -196,6 +202,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel (Phidels.com)
 function Left(SubStr: string; S: string): string;
 begin
   result:=copy(s, 1, pos(substr, s)-1);
@@ -206,6 +213,21 @@ end;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 begin
   Result := Left(RightSubStr, Right(LeftSubStr, S));
+end;
+
+//------------------------------------------------------------------------------
+
+function GetFileSize(const FileName: TFileName): Int64;
+var
+  Stream: TFileStream;
+  
+begin
+  Stream := TFileStream.Create(FileName, fmOpenRead);
+  try
+    Result := Stream.Size;
+  finally
+    Stream.Free;
+  end;
 end;
 
 //------------------------------------------------------------------------------

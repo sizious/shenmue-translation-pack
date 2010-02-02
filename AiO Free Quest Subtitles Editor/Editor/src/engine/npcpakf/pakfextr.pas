@@ -4,12 +4,20 @@ interface
 
 uses
   Windows, SysUtils, Classes;
-  
-function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName): Boolean;
 
+type
+  TPAKFExtractionResult = (perUnknow, perNotValidFile, perTargetAlreadyExists,
+    perConversionFailed, perSuccess);
+  
+function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName
+  {$IFDEF DEBUG};var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
+  
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
+
+uses
+  PakfUtil;
 
 const
   PAKF_SIGN = 'PAKF';
@@ -47,11 +55,35 @@ end;
 
 //------------------------------------------------------------------------------
 
+function IsValueInArray(SourceArray: array of string;
+  ValueToSearch: string; var ArrayIndexResult: Integer): Boolean;
+var
+  i: Integer;
+  
+begin
+  Result := False;
+  i := Low(SourceArray);
+  while (not Result) and (i <= High(SourceArray)) do begin
+    Result := (Pos(SourceArray[i], ValueToSearch) > 0);
+    if not Result then
+      Inc(i);
+  end;
+  if Result then
+    ArrayIndexResult := i
+  else
+    ArrayIndexResult := -1;
+end; 
+
+//------------------------------------------------------------------------------
+
 function IsFaceTexture(TextureName: string): Boolean;
 const
-  SM1_FACE_TEXN_SIGN: array[0..5] of string = (
-    'KAO', 'HED', 'KAA', 'FAC', 'KAF', 'KAJ');
+  SM1_FACE_TEXN_SIGN: array[0..12] of string = (
+    'KAO', 'HED', 'KAA', 'FAC', 'KAF',
+    'KAJ', 'MET', 'HIR', 'FCF', 'KAK',
+    'RKA', 'NFA', 'KAC'); // 'MUF', 'ALL', 'AAA', 'L'
   SM2_FACE_TEXN_SIGN = '}Y_1';
+
 
 var
   i: Integer;
@@ -74,7 +106,22 @@ end;
 
 //------------------------------------------------------------------------------
 
-function GetCharID(var Stream: TFileStream; IpacOffset: Integer): string;
+(*  I don't know how to retrieve the CharID inside the CHRM section... for now.
+    But I know that in the most case, the CharID is located at 0x30 position
+    inside the CHRM section.
+
+    In special cases (INE_.PKF in the Shenmue 1 for example), the position
+    become 0x50 inside the CHRM. AND I DON'T KNOW WHY.
+
+    The function below is my try to retrieve logically (not "bruteforce") the
+    CharID, but it doesn't work. I kept it here, if I (or you) want to try.
+
+    The new GetCharID function is "bruteforce". It handle special case. It sucks,
+    but it doesn't matter really, because it's only for reading and extracting
+    PVR files. Right ?
+*)
+
+(*function GetCharID(var Stream: TFileStream; IpacOffset: Integer): string;
 type
   TSection = packed record
     Name: array[0..3] of Char;
@@ -169,31 +216,107 @@ begin
     StringList.Free;
     Stream.Seek(SavedPos, soFromBeginning);
   end;
+end;*)
+
+function GetCharID(var Stream: TFileStream; IpacOffset: Integer): string;
+var
+  SavedPos: Int64;
+  CharID: array[0..3] of Char;
+  
+begin
+  SavedPos := Stream.Position;
+  Stream.Seek(IpacOffset, soBeginning);
+
+  // Read the CharID inside the CHRM section... sucks but I don't care!
+  Stream.Seek(IpacOffset + $60, soBeginning);
+  Stream.Read(CharID, SizeOf(CharID));
+
+  // Handling special cases (sucks!!)
+  if (CharID = 'INE_') or (CharID = 'FUKU') then
+    Result := CharID
+  else begin
+    Stream.Seek(IpacOffset + $40, soBeginning);
+    Stream.Read(CharID, SizeOf(CharID));
+    Result := CharID;
+  end;
+
+  Stream.Seek(SavedPos, soFromBeginning);  
 end;
 
 //------------------------------------------------------------------------------
 
-function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName): Boolean;
+// Sucks function but who cares???
+function HandleSpecialCharID(const CharID: string;
+  var TextureNumber: Integer): Boolean;
+const
+  EXCLUDE_CHARIDS: array[0..11] of string = (
+    'CATA', 'CATB', 'CATC', 'DOOR', 'DORG',
+    'FUKU', 'KYHN', 'MRIG', 'SBNK', 'SONZ',
+    'TOMC', 'TOMD'
+  );
+
+  SPECIAL_CHARIDS: array[0..3] of string = (
+    'HDEI', 'KOGA', 'MORN', 'YMGC'
+  );
+
+  SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX: array[0..3] of Integer = (
+    4, 4, 4, 4
+  );
+  
+var
+  i: Integer;
+  
+begin
+  // Setting default texture number (By Default, it will search for the texture name)
+  TextureNumber := -1;
+
+  (*  Exclude these PKF files
+      If the CharID is in the EXCLUDE_CHARIDS array, the result will be FALSE
+      aka not a valid CharID *)
+  Result := not IsValueInArray(EXCLUDE_CHARIDS, CharID, i);
+
+{$IFDEF DEBUG}
+  // Not a valid CharID then
+  if not Result then begin
+    WriteLn('*** NOT A VALID CHARID: "', CharID, '"');
+  end;  
+{$ENDIF}
+
+  // Handling special CharID (sucks too much... I know)
+  if Result and (IsValueInArray(SPECIAL_CHARIDS, CharID, i)) then begin
+    TextureNumber := SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX[i];
+{$IFDEF DEBUG}
+    WriteLn('*** SPECIAL CHARID: "', CharID, '", TextureNumber: ', TextureNumber);
+{$ENDIF}
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName
+  {$IFDEF DEBUG};var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
 var
   PAKFStream: TFileStream;
   Header: TFileHeader;
   SectionEntry: TSectionEntry;
-  TexturesCount,
-  TextureNumber,
-  CurrentOffset: Integer;
-  FaceFound: Boolean;
-  OutFile: TFileName;
-
+  TexturesCount, TextureNumber,
+  CurrentOffset, SpecialCharID_TextureIndex: Integer;
+  FaceFound, ValidCharID: Boolean;
+  OutFile, JPEGOutFile: TFileName;
+  CharID: string;
+  
 begin
 {$IFDEF DEBUG}
+  DebugStringResult := '';
   WriteLn(#13#10, 'PAKF File: "', ExtractFileName(PAKFInFile), '"');
 {$ENDIF}
 
   OutDir := IncludeTrailingPathDelimiter(OutDir);
   if OutDir = '\' then OutDir := '.\';
+
   PAKFStream := TFileStream.Create(PAKFInFile, fmOpenRead);
   try
-    Result := False;
+    Result := perUnknow;
     try
       // Read the header
       PAKFStream.Read(Header, SizeOf(Header));
@@ -203,44 +326,77 @@ begin
       TextureNumber := 0;
       FaceFound := False;
 
-      // For each section in this file
-      repeat
-        CurrentOffset := PAKFStream.Position;
-        PAKFStream.Read(SectionEntry, SizeOf(SectionEntry));
+      // Handling the CharID
+      Result := perNotValidFile;
+      CharID := GetCharID(PAKFStream, Header.Size);
+      ValidCharID := HandleSpecialCharID(CharID, SpecialCharID_TextureIndex);  // very important function
 
-        // TEXN section found
-        if SectionEntry.Name = TEXN_SIGN then begin
-          Inc(TextureNumber);
-          FaceFound := IsFaceTexture(SectionEntry.TextureName);
-          
-{$IFDEF DEBUG}
-          WriteLn('  Name: "', SectionEntry.Name, ', Size: "', SectionEntry.Size,
-            '", Texture #', TextureNumber, ': "', 
-            SectionEntry.TextureName, '", IsFace: ', FaceFound);
-{$ENDIF}
-          // The texture face was found
-          if FaceFound then begin
-            OutFile := OutDir + GetCharID(PAKFStream, Header.Size) + '.PVR';          
-{$IFDEF DEBUG}
-            WriteLn('Output File: "', ExtractFileName(OutFile), '"');
-{$ENDIF}
-            DumpBlockToFile(PAKFStream, SectionEntry.Size - SizeOf(SectionEntry), 
-              OutFile);
-            Result := True;
-          end;
-{$IFDEF DEBUG}
-        end else
-          WriteLn('  Name: "', SectionEntry.Name, '", Size: "', SectionEntry.Size, 
-            '"');
-{$ELSE}
+      // Tests if the JPEG image file already exists, if yes, we skip it
+      if ValidCharID then begin
+        JPEGOutFile := OutDir + CharID + '.JPG';
+
+        // The JPEG File for the CharID is already there, we don't need to do it
+        if IsValidFaceImage(JPEGOutFile) then begin
+          Result := perTargetAlreadyExists;
+          ValidCharID := False; // exits the function           
         end;
-{$ENDIF}        
-        
-        PAKFStream.Seek(CurrentOffset + SectionEntry.Size, soBeginning);
-      until (TextureNumber >= TexturesCount) or (FaceFound);
+      end;
+      
+      // This CharID is a valid PKF file !
+      if ValidCharID then begin
+        // For each section in this file
+        repeat
+          CurrentOffset := PAKFStream.Position;
+          PAKFStream.Read(SectionEntry, SizeOf(SectionEntry));
+
+          // TEXN section found
+          if SectionEntry.Name = TEXN_SIGN then begin
+            Inc(TextureNumber);
+
+            // Handling special chars
+            if SpecialCharID_TextureIndex <> -1 then
+              FaceFound := TextureNumber = SpecialCharID_TextureIndex
+            else // General chars
+              FaceFound := IsFaceTexture(SectionEntry.TextureName);
+
+{$IFDEF DEBUG}
+            WriteLn('  Name: "', SectionEntry.Name, ', Size: "', SectionEntry.Size,
+              '", Texture #', TextureNumber, ': "',
+              SectionEntry.TextureName, '", IsFace: ', FaceFound);
+{$ENDIF}
+            // The texture face was found
+            if FaceFound then begin
+              OutFile := OutDir + CharID + '.PVR';
+{$IFDEF DEBUG}
+              DebugStringResult := '"' + CharID + '";"'
+                + SectionEntry.TextureName + '"';
+              WriteLn('Output File: "', ExtractFileName(OutFile), '"');
+{$ENDIF}
+              DumpBlockToFile(PAKFStream, SectionEntry.Size - SizeOf(SectionEntry),
+                OutFile);
+
+              // Convert the extracted PVR
+              if ConvertFaceTexture(OutDir, OutFile) then
+                Result := perSuccess
+              else
+                Result := perConversionFailed;
+
+            end;
+{$IFDEF DEBUG}
+          end else
+            WriteLn('  Name: "', SectionEntry.Name, '", Size: "',
+              SectionEntry.Size, '"');
+{$ELSE}
+          end;
+{$ENDIF}
+
+          PAKFStream.Seek(CurrentOffset + SectionEntry.Size, soBeginning);
+        until (TextureNumber >= TexturesCount) or (FaceFound);
+
+      end; // ValidCharID
 
     except
-      Result := False;
+      Result := perNotValidFile;
     end;
   finally
     PAKFStream.Free;
