@@ -479,6 +479,9 @@ begin
     + IntToStr(AppVersion.Minor) + DebugStr + ' - (C)reated by [big_fury]SiZiOUS';
   Clear;
 
+  // Extract the Engine for the PVR / PVR-X conversion
+  PVRConverter_ExtractEngine(GetWorkingDirectory);
+
   // Initialization of the engine
   MTEditor := TModelTexturedEditor.Create;
 
@@ -592,7 +595,7 @@ begin
       SubItems.Add('');
 
       // Decoding the PVR texture to PNG...
-      Data := TPVRConverter.Create;
+      Data := TPVRConverter.Create(GetWorkingDirectory);
       PVRConverter := TPVRConverter(Data);
       TmpPvr := MTEditor.Textures[i].ExportToFolder(GetWorkingDirectory, efPVR);
       if PVRConverter.LoadFromFile(TmpPvr) then

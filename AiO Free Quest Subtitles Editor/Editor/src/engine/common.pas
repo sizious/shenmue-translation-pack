@@ -5,6 +5,8 @@
 
 unit common;
 
+{$DEFINE DEBUG_FACES_DIR}
+
 interface
 
 uses
@@ -30,6 +32,8 @@ type
 const
   // Default text when not translated...
   MT_NOT_TRANSLATED_YET       = '# Not translated yet... #';
+  FACE_WIDTH                  = 96; // used in pakfutil
+  FACE_HEIGHT                 = 96;
 
 function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
 function GetDatasDirectory: TFileName;
@@ -56,6 +60,10 @@ const
   FACES_SHENMUE2_DIR      = 'shenmue2';
 
   TEXT_DATABASE_ROOT_DIR  = 'textdb';       // directory where are stored subtitles correction DB
+
+{$IFDEF DEBUG}{$IFDEF DEBUG_FACES_DIR}
+  FACES_DEBUG_DIR         = 'G:\Shenmue\~pakf\';
+{$ENDIF}{$ENDIF}
   
 var
   DatasDirectory: TFileName;
@@ -71,7 +79,11 @@ end;
 
 function GetFacesDirectory(GameVersion: TGameVersion): TFileName;
 begin
+{$IFDEF DEBUG}{$IFDEF DEBUG_FACES_DIR}
+  Result := FACES_DEBUG_DIR + FACES_BASE_DIR + '\';
+{$ENDIF}{$ELSE}
   Result := GetDatasDirectory + FACES_BASE_DIR + '\';
+{$ENDIF}
   case GameVersion of
     gvWhatsShenmue  : Result := Result + FACES_WHATS_DIR    + '\';
     gvShenmue       : Result := Result + FACES_SHENMUE_DIR  + '\';

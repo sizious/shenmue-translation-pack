@@ -1,5 +1,11 @@
 unit facesext;
 
+// Auto-select right directory for debug purpose
+// {$DEFINE DEBUG_PAKF_SHENMUE1}
+{$DEFINE DEBUG_PAKF_SHENMUE2}
+// {$DEFINE DEBUG_PAKF_SHENMUE2_XB}
+// {$DEFINE DEBUG_PAKF_WHATS_SHENMUE}  // OK
+
 interface
 
 uses
@@ -130,7 +136,22 @@ end;
 procedure TfrmFacesExtractor.FormCreate(Sender: TObject);
 begin
 {$IFDEF DEBUG}
-  eDirectory.Text := 'C:\Users\SiZiOUS\Desktop\PAKF\S1';
+{$IFDEF DEBUG_PAKF_SHENMUE1}
+  eDirectory.Text := 'G:\Shenmue\Humans\SHENMUE PAL\DISC1\PKF\';
+  rgGameVersion.ItemIndex := 0;
+{$ENDIF}
+{$IFDEF DEBUG_PAKF_SHENMUE2}
+  eDirectory.Text := 'G:\Shenmue\Humans\SHENMUE 2 PAL\DISC1\PKF\';
+  rgGameVersion.ItemIndex := 1;
+{$ENDIF}
+{$IFDEF DEBUG_PAKF_SHENMUE2_XB}
+  eDirectory.Text := 'G:\Shenmue\Humans\SHENMUE 2 PAL UK XBOX\DISC1\PKF\';
+  rgGameVersion.ItemIndex := 1;
+{$ENDIF}
+{$IFDEF DEBUG_PAKF_WHATS_SHENMUE}
+  eDirectory.Text := 'G:\Shenmue\Humans\WHATS SHENMUE JAP\PKF';
+  rgGameVersion.ItemIndex := 2;
+{$ENDIF}
 {$ENDIF}
 end;
 

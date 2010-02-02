@@ -46,7 +46,8 @@ uses
   textdb in 'engine\textdb\textdb.pas',
   dbindex in 'engine\textdb\dbindex.pas',
   dbinlay in 'engine\textdb\dbinlay.pas',
-  bugsmgr in 'bugsmgr.pas' {frmBugsHandler};
+  bugsmgr in 'bugsmgr.pas' {frmBugsHandler},
+  img2png in '..\..\..\Common\img2png.pas';
 
 {$R *.res}
 

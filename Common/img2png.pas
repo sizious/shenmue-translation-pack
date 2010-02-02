@@ -11,6 +11,8 @@ uses
   Windows, SysUtils, Classes;
 
 type
+  EPVRConverterEngineNotExists = class(Exception);
+
   TTextureType = (
     ttUnknow, ttSmallVQ128, ttSmallVQ64, ttSmallVQ32,
     ttSmallVQ16, ttVQ, ttTwiddle, ttRectangle,
@@ -42,17 +44,24 @@ type
     fLoaded: Boolean;
     fFileType: TFileType;
     fFileFormat: TFileFormat;
+    fWorkingDirectory: TFileName;
+    fClearTargetFileName: Boolean;
   protected
     function GetFileSystemType(const FileName: TFileName): TFileType;
     function RunEngine: Boolean;
     procedure ParseConsoleOutputFile_Dreamcast;
     procedure ParseConsoleOutputFile_Xbox;
   public
+    constructor Create(const WorkingTempDirectory: TFileName); overload;
+    constructor Create(const WorkingTempDirectory: TFileName;
+      ClearTargetFileName: Boolean); overload;
     destructor Destroy; override;
     
     procedure Clear;
     function LoadFromFile(const SourceFileName: TFileName): Boolean;
 
+    property ClearTargetFileName: Boolean
+      read fClearTargetFileName write fClearTargetFileName;
     property DataSize: Integer read fDataSize;
     property Encoding: TTextureType read fEncoding;
     property FileFormat: TFileFormat read fFileFormat;
@@ -65,7 +74,12 @@ type
     property SourceFileName: TFileName read fSourceFileName;
     property TargetFileName: TFileName read fTargetFileName;
     property Width: Integer read fWidth;
+    property WorkingDirectory: TFileName
+      read fWorkingDirectory write fWorkingDirectory;
   end;
+
+procedure PVRConverter_ExtractEngine(WorkingTempDirectory: TFileName);
+procedure PVRConverter_DeleteEngine;
 
 //------------------------------------------------------------------------------
 implementation
@@ -74,11 +88,36 @@ implementation
 uses
   Common, SysTools;
 
+//==============================================================================
+
 var
   PVR_EngineFile,
   PVRX_EngineFile: TFileName;
 
+//------------------------------------------------------------------------------
+
+procedure PVRConverter_ExtractEngine(WorkingTempDirectory: TFileName);
+begin
+  WorkingTempDirectory := IncludeTrailingPathDelimiter(WorkingTempDirectory);
+  PVR_EngineFile := WorkingTempDirectory + 'pvr2png.exe';
+  ExtractFile('PVR2PNG', PVR_EngineFile);
+  PVRX_EngineFile := WorkingTempDirectory + 'pvrx2png.exe';
+  ExtractFile('PVRX2PNG', PVRX_EngineFile);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure PVRConverter_DeleteEngine;
+begin
+  if FileExists(PVR_EngineFile) then
+    DeleteFile(PVR_EngineFile);
+  if FileExists(PVRX_EngineFile) then
+    DeleteFile(PVRX_EngineFile);
+end;
+
+//==============================================================================
 { TPVRConverter }
+//==============================================================================
 
 function TPVRConverter.LoadFromFile(const SourceFileName: TFileName): Boolean;
 var
@@ -95,7 +134,7 @@ begin
     Clear;
 
     fSourceFileName := SourceFileName;
-    RadicalName := GetWorkingDirectory + ChangeFileExt(ExtractFileName(SourceFileName), '');
+    RadicalName := WorkingDirectory + ChangeFileExt(ExtractFileName(SourceFileName), '');
     fTargetFileName := RadicalName + '.png';
     fConsoleOutputFileName := RadicalName + '.out';
 
@@ -119,6 +158,8 @@ begin
 {$ENDIF}
   end;
 end;
+
+//------------------------------------------------------------------------------
 
 procedure TPVRConverter.ParseConsoleOutputFile_Dreamcast;
 var
@@ -172,6 +213,8 @@ begin
   end;
 end;
 
+//------------------------------------------------------------------------------
+
 procedure TPVRConverter.ParseConsoleOutputFile_Xbox;
 var
   ConvResults: TStringList;
@@ -219,6 +262,8 @@ begin
   end;
 end;
 
+//------------------------------------------------------------------------------
+
 function TPVRConverter.RunEngine: Boolean;
 var
   BatchContent: TStringList;
@@ -232,6 +277,11 @@ begin
     ftDreamcast: EngineFile := PVR_EngineFile;
     ftXBox: EngineFile := PVRX_EngineFile;
   end;
+
+  // Exception raised if the Engine doesn't exists
+  if not FileExists(EngineFile) then
+    raise EPVRConverterEngineNotExists
+      .Create('PVRConverter.RunEngine: The PVR conversion engine doesn''t exists!');
 
   // Creating the batch file
   BatchTarget := ChangeFileExt(fTargetFileName, '.bat');
@@ -258,10 +308,13 @@ begin
     DeleteFile(BatchTarget);
 end;
 
+//------------------------------------------------------------------------------
+
 procedure TPVRConverter.Clear;
 begin
-  if FileExists(TargetFileName) then
-    DeleteFile(TargetFileName);
+  if ClearTargetFileName then
+    if FileExists(TargetFileName) then
+      DeleteFile(TargetFileName);
     
   fLoaded := False;
   fTargetFileName := '';
@@ -276,11 +329,31 @@ begin
   fPixelFormat := pfUnknow;
 end;
 
+//------------------------------------------------------------------------------
+
+constructor TPVRConverter.Create(const WorkingTempDirectory: TFileName;
+  ClearTargetFileName: Boolean);
+begin
+  Self.fWorkingDirectory := WorkingTempDirectory;
+  fClearTargetFileName := ClearTargetFileName;
+end;
+
+//------------------------------------------------------------------------------
+
+constructor TPVRConverter.Create(const WorkingTempDirectory: TFileName);
+begin
+  Create(WorkingTempDirectory, True);
+end;
+
+//------------------------------------------------------------------------------
+
 destructor TPVRConverter.Destroy;
 begin
   Clear;
   inherited Destroy;
 end;
+
+//------------------------------------------------------------------------------
 
 function TPVRConverter.GetFileSystemType(const FileName: TFileName): TFileType;
 type
@@ -324,11 +397,15 @@ begin
   end;
 end;
 
+//==============================================================================
+
 initialization
-  PVR_EngineFile := GetWorkingDirectory + 'pvr2png.exe';
-  ExtractFile('PVR2PNG', PVR_EngineFile);
-  
-  PVRX_EngineFile := GetWorkingDirectory + 'pvrx2png.exe';
-  ExtractFile('PVRX2PNG', PVRX_EngineFile);
+
+//------------------------------------------------------------------------------
+
+finalization
+  PVRConverter_DeleteEngine; // auto-cleanup the engine
+
+//==============================================================================
 
 end.
