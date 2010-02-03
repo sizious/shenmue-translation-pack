@@ -35,7 +35,7 @@ ___| Version 2.3: 2010-01-14 |_________________________________________________
 FIXED:
 - Shenmue Subtitles Viewer: "-", "Ó", "ó", "Ú", "ú" characters added (Thanks 
   IlDucci)
-- The "Browse directory" context menu enabled/disabled bug was fixed. 									  
+- The "Browse directory" context menu enabled/disabled bug was fixed.
 ___                           _________________________________________________
 ___| Version 2.2: 2009-09-14 |_________________________________________________
     
