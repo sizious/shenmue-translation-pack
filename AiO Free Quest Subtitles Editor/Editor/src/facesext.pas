@@ -2,15 +2,17 @@ unit facesext;
 
 // Auto-select right directory for debug purpose
 
-// 295 faces extracted
+// 251 faces extracted (+7 from shenmue.ptc)
 // {$DEFINE DEBUG_PAKF_SHENMUE1}
 
-{$DEFINE DEBUG_PAKF_SHENMUE2}
+// 592 faces extracted (everything extracted)
+// {$DEFINE DEBUG_PAKF_SHENMUE2}
 
+// 592 faces extracted (everything extracted)
 // {$DEFINE DEBUG_PAKF_SHENMUE2_XB}
 
-// 105 faces extracted
-// {$DEFINE DEBUG_PAKF_WHATS_SHENMUE}
+// 68 faces extracted (+1 from whats.ptc)
+{$DEFINE DEBUG_PAKF_WHATS_SHENMUE}
 
 interface
 
@@ -46,8 +48,8 @@ type
     fPAKFExtractorThread: TPAKFExtractorThread;
     fProcessCanceled: Boolean;
     fCanceledByButton: Boolean;
-    procedure ExtractionFinished(Sender: TObject; SuccessFiles, ErrornousFiles,
-      TotalFiles: Integer);
+    procedure ExtractionFinished(Sender: TObject; ProcessCanceled: Boolean;
+      SuccessFiles, ErrornousFiles, TotalFiles: Integer);
   protected
     procedure ExtractFaces;
     procedure SetFormCanceledState(CancelInProgress: Boolean);
@@ -81,8 +83,11 @@ uses
 
 procedure TfrmFacesExtractor.bBrowseClick(Sender: TObject);
 begin
-  with JvBrowseForFolderDialog do
+  with JvBrowseForFolderDialog do begin
+    if DirectoryExists(eDirectory.Text) then
+      Directory := eDirectory.Text;
     if Execute then eDirectory.Text := Directory;
+  end;
 end;
 
 procedure TfrmFacesExtractor.bCancelClick(Sender: TObject);
@@ -120,33 +125,35 @@ begin
   ExtractorThread.Resume;
 end;
 
-procedure TfrmFacesExtractor.ExtractionFinished(Sender: TObject; SuccessFiles,
-  ErrornousFiles, TotalFiles: Integer);
+procedure TfrmFacesExtractor.ExtractionFinished(Sender: TObject;
+  ProcessCanceled: Boolean; SuccessFiles, ErrornousFiles, TotalFiles: Integer);
 var
   Errors, MsgTitle: string;
   Icon: Integer;
 
 begin
-  MsgTitle := 'Extraction finished';
-  if ErrornousFiles > 0 then begin
-    Errors := ' ' + IntToStr(ErrornousFiles) + ' error(s).';
-    Icon := MB_ICONWARNING;
-    MsgTitle := ' with errors';
-  end else begin
-    Errors := ' no errors.';
-    Icon := MB_ICONINFORMATION;
-  end;
+  if not ProcessCanceled then begin
+    MsgTitle := 'Extraction finished';
+    if (SuccessFiles > 0) and (ErrornousFiles > 0) then begin
+      Errors := ' ' + IntToStr(ErrornousFiles) + ' error(s).';
+      Icon := MB_ICONWARNING;
+      MsgTitle := ' with errors';
+    end else begin
+      Errors := ' no errors.';
+      Icon := MB_ICONINFORMATION;
+    end;
 
-  if SuccessFiles > 0 then
-    MsgBox(IntToStr(SuccessFiles) + ' file(s) successfully extracted with' + Errors,
-      MsgTitle,
-      Icon + MB_OK)
-  else
-    MsgBox('No NPC faces need to be extracted for the '
-      + rgGameVersion.Items[rgGameVersion.ItemIndex] + ' game.',
-      MsgTitle,
-      Icon + MB_OK
-    );
+    if SuccessFiles > 0 then
+      MsgBox(IntToStr(SuccessFiles) + ' file(s) successfully extracted with' + Errors,
+        MsgTitle,
+        Icon + MB_OK)
+    else
+      MsgBox('No NPC faces need to be extracted for '
+        + rgGameVersion.Items[rgGameVersion.ItemIndex] + '.',
+        MsgTitle,
+        Icon + MB_OK
+      );
+  end; // ProcessCanceled
 end;
 
 procedure TfrmFacesExtractor.FormClose(Sender: TObject;
@@ -175,19 +182,19 @@ procedure TfrmFacesExtractor.FormCreate(Sender: TObject);
 begin
 {$IFDEF DEBUG}
 {$IFDEF DEBUG_PAKF_SHENMUE1}
-  eDirectory.Text := 'G:\Shenmue\Humans\SHENMUE PAL\DISC1\PKF\';
+  eDirectory.Text := 'G:\Shenmue\Humans\03-SHENMUE PAL\DISC1\PKF\';
   rgGameVersion.ItemIndex := 0;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_SHENMUE2}
-  eDirectory.Text := 'G:\Shenmue\Humans\SHENMUE 2 PAL\DISC1\PKF\';
+  eDirectory.Text := 'G:\Shenmue\Humans\05-SHENMUE 2 PAL\DISC1\PKF\';
   rgGameVersion.ItemIndex := 1;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_SHENMUE2_XB}
-  eDirectory.Text := 'G:\Shenmue\Humans\SHENMUE 2 PAL UK XBOX\DISC1\PKF\';
+  eDirectory.Text := 'G:\Shenmue\Humans\06-SHENMUE 2 PAL UK XBOX\DISC1\PKF\';
   rgGameVersion.ItemIndex := 1;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_WHATS_SHENMUE}
-  eDirectory.Text := 'G:\Shenmue\Humans\WHATS SHENMUE JAP\PKF';
+  eDirectory.Text := 'G:\Shenmue\Humans\01-WHATS SHENMUE JAP\PKF';
   rgGameVersion.ItemIndex := 2;
 {$ENDIF}
 {$ENDIF}

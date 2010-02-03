@@ -29,10 +29,6 @@ object frmFileInfo: TfrmFileInfo
     TabOrder = 0
     object tsGeneral: TTabSheet
       Caption = '&Header'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvHeader: TJvListView
         AlignWithMargins = True
         Left = 3
@@ -67,10 +63,6 @@ object frmFileInfo: TfrmFileInfo
     object tsIpac: TTabSheet
       Caption = 'F&ooter'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvIpac: TJvListView
         AlignWithMargins = True
         Left = 3
@@ -80,15 +72,11 @@ object frmFileInfo: TfrmFileInfo
         Align = alClient
         Columns = <
           item
-            Caption = 'CharID'
-            Width = 80
+            Caption = 'ID'
+            Width = 135
           end
           item
-            Caption = 'Flag'
-            Width = 80
-          end
-          item
-            Caption = 'Name'
+            Caption = 'Type'
             Width = 80
           end
           item
@@ -103,9 +91,15 @@ object frmFileInfo: TfrmFileInfo
         RowSelect = True
         TabOrder = 0
         ViewStyle = vsReport
-        ColumnsOrder = '0=80,1=80,2=80,3=80,4=138'
+        ColumnsOrder = '0=135,1=80,2=80,3=163'
         Groups = <>
         ExtendedColumns = <
+          item
+          end
+          item
+          end
+          item
+          end
           item
           end>
         ExplicitHeight = 73
@@ -114,10 +108,6 @@ object frmFileInfo: TfrmFileInfo
     object tsCharsIdDecode: TTabSheet
       Caption = 'CharID &table'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvCharsId: TJvListView
         AlignWithMargins = True
         Left = 3
@@ -152,10 +142,6 @@ object frmFileInfo: TfrmFileInfo
     object tsSubsInfo: TTabSheet
       Caption = '&Subtitles table'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvSubs: TJvListView
         AlignWithMargins = True
         Left = 1

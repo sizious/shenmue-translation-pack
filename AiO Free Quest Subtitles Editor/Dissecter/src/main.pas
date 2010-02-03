@@ -23,6 +23,7 @@ type
     Panel1: TPanel;
     XPManifest1: TXPManifest;
     CheckBox1: TCheckBox;
+    cbSCNF: TCheckBox;
     procedure browse_input_btClick(Sender: TObject);
     procedure browse_output_btClick(Sender: TObject);
     procedure dissect_btClick(Sender: TObject);
@@ -31,13 +32,13 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    fSCNFEditor: TSCNFEditor;
+    SCNFEditor: TSCNFEditor;
     procedure dissect_file(var ResumeTextFileHandle: TextFile;
       var ResumeCsvHandle: TextFile; filename, out_dir: string; OnlyResume: Boolean);
     procedure ChangeApplicationState(Idle: Boolean);
     function GetFilesCount(Folder, WildCard: string): Integer;
     //function null_bytes_length(data_size:Integer): Integer;
-    procedure dissect_humans(in_dir, out_dir:String; OnlyResume: Boolean);
+    procedure dissect_humans(in_dir, out_dir:String; OnlyResume, OnlySCNF: Boolean);
     procedure GetCharactersID(FileName: TFileName; var ChrID1, ChrID2: string);
     { Déclarations privées }
   public
@@ -229,8 +230,8 @@ begin
 
           // Writing subtitles count
           SubtitlesCount := '';
-          if fSCNFEditor.LoadFromFile(filename) then
-            SubtitlesCount := IntToStr(fSCNFEditor.Subtitles.Count);
+          if SCNFEditor.LoadFromFile(filename) then
+            SubtitlesCount := IntToStr(SCNFEditor.Subtitles.Count);
 
           // write to resume file
           Write(ResumeTextFileHandle, ExtractFileName(filename), ': ',
@@ -288,6 +289,9 @@ begin
                           Inc(null_cnt);
                           Inc(current_offset);
                           finput.Position := current_offset;
+                          if null_cnt > 255 then
+                            Break; // empêche de tourner en boucle
+                          
                   end;
           end;
 
@@ -311,16 +315,18 @@ begin
   //Clearing and modifying variables
   finput.Free;
   except
-    on E: Exception do MessageDlg(ExtractFileName(filename) + ': ' +E.Message, mtError, [mbOk], 0); //Self.StatusBar1.SimpleText := E.Message;
+    on E: Exception do
+      MessageDlg(ExtractFileName(filename) + ': ' +E.Message, mtError, [mbOk], 0); //Self.StatusBar1.SimpleText := E.Message;
   end;
 end;
 
-procedure TForm1.dissect_humans(in_dir, out_dir:String; OnlyResume: Boolean);
+procedure TForm1.dissect_humans(in_dir, out_dir:String; OnlyResume, OnlySCNF: Boolean);
 var
   searchResult: TSearchRec;
   ResumeFileHandle: TextFile;
   ResumeCsvHandle: TextFile;
-  
+  filename: TFileName;
+
 begin
   ChangeApplicationState(False);
 
@@ -343,15 +349,41 @@ begin
   WriteLn(ResumeFileHandle, 'Source dir: ', in_dir);
   WriteLn(ResumeFileHandle, 'Output dir: ', out_dir, #13#10);
 
-  WriteLn(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Subtitles Count;',
-    'Section #1;Section #2;Section #3;Section #4;Section #5');
+  if OnlySCNF then
+    Write(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Real CharID;Subtitles Count')
+  else
+    Write(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Subtitles Count');
 
   if FindFirst(in_dir + '*.*', faAnyFile, searchResult) = 0 then
   begin
     repeat
       if not (SearchResult.Attr and faDirectory = faDirectory) then begin
         StatusBar1.Panels[0].Text := 'Parsing and dissecting... '+SearchResult.Name;
-        dissect_file(ResumeFileHandle, ResumeCsvHandle, in_dir + SearchResult.Name, out_dir, OnlyResume);
+
+        filename := in_dir + SearchResult.Name;
+
+        if not OnlySCNF then begin
+          WriteLn(ResumeCsvHandle, 'Section #1;Section #2;Section #3;Section #4;Section #5');
+          dissect_file(ResumeFileHandle, ResumeCsvHandle, filename, out_dir,
+            OnlyResume)
+        end else begin
+          if SCNFEditor.LoadFromFile(filename) then begin
+
+            WriteLn(ResumeFileHandle, ExtractFileName(filename), ': ',
+              'CharID #1: ', SCNFEditor.Sections[0].CharID, ', CharID #2: ',
+                SCNFEditor.Sections[1].CharID, ', Real CharID: ', SCNFEditor.CharacterID,
+                ', Subs Count: ', SCNFEditor.Subtitles.Count);
+
+            Write(ResumeCsvHandle,
+              sLineBreak,
+              ExtractFileName(filename), ';',
+              SCNFEditor.Sections[0].CharID, ';',
+              SCNFEditor.Sections[1].CharID, ';',
+              SCNFEditor.CharacterID, ';',
+              SCNFEditor.Subtitles.Count);
+          end;
+        end;          
+
         Self.ProgressBar1.Position := Self.ProgressBar1.Position + 1;
         Panel1.Caption := IntToStr(Round((100*ProgressBar1.Position)/ProgressBar1.Max))+'%';
         Application.ProcessMessages;
@@ -377,12 +409,12 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   DoubleBuffered := True;
   Caption := StringReplace(Caption, '#VERSION#', APP_VERSION, [rfReplaceAll]);
-  fSCNFEditor := TSCNFEditor.Create;
+  SCNFEditor := TSCNFEditor.Create;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  fSCNFEditor.Free;
+  SCNFEditor.Free;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -393,6 +425,9 @@ end;
 procedure TForm1.browse_input_btClick(Sender: TObject);
 var selected_dir:String;
 begin
+  selected_dir := input_dir_edit.Text;
+  if not DirectoryExists(selected_dir) then selected_dir := '';
+  
         if SelectDirectory('Select input folder', '*', selected_dir) then
         begin
                 input_dir_edit.Text := selected_dir;
@@ -410,6 +445,7 @@ end;
 
 procedure TForm1.ChangeApplicationState(Idle: Boolean);
 begin
+  cbSCNF.Enabled := Idle;
   input_dir_edit.Enabled := Idle;
   browse_input_bt.Enabled := Idle;
   output_dir_edit.Enabled := Idle;
@@ -429,7 +465,8 @@ procedure TForm1.dissect_btClick(Sender: TObject);
 begin
         if DirectoryExists(input_dir_edit.Text) and DirectoryExists(output_dir_edit.Text) then
         begin
-                dissect_humans(input_dir_edit.Text, output_dir_edit.Text, CheckBox1.Checked);
+                dissect_humans(input_dir_edit.Text, output_dir_edit.Text,
+                  CheckBox1.Checked, cbSCNF.Checked);
         end
         else
         begin

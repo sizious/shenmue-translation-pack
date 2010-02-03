@@ -19,6 +19,12 @@
   Short history:
 
   3.3.7
+    - TSection updated. The "UnknowValue" field is in fact the "CharID" field in
+      8 bytes (not 4 as I set before). This include TSectionRawBinaryEntry type
+      too.
+    - Correction in the SCNF detect function. Some PAKS contains the "BIN " entry
+      in the footer but DOESN'T contains valid SCNF section (then not editable
+      subtitles).
     - Some little tweaks
 
   3.3.6
@@ -65,14 +71,14 @@ uses
 
 const
   SCNF_EDITOR_ENGINE_VERSION = '3.3.7';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'January 29, 2010 @10:12AM';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'February 3, 2010 @05:39PM';
 
 type
   // Structure to read IPAC sections info from footer
   TSectionRawBinaryEntry = record
-    CharID: array[0..3] of Char;
-    UnknowValue: Integer;
-    Name: array[0..3] of Char;
+    CharID: array[0..7] of Char;
+//    UnknowValue: Integer;
+    Name: array[0..3] of Char; // type of the footer entry ('BIN ', 'CHRM...')
     Offset: Integer;
     Size: Integer;
   end;
@@ -199,12 +205,12 @@ type
     fSize: Integer;
     fOffset: Integer;
     fCharID: string;
-    fUnknowValue: Integer;
+//    fUnknowValue: Integer;
     procedure WriteFooterEntry(var F: file);
   public
     constructor Create(Owner: TSectionsList);
     property CharID: string read fCharID;
-    property UnknowValue: Integer read fUnknowValue;
+//    property UnknowValue: Integer read fUnknowValue;
     property Name: string read fName;
     property Offset: Integer read fOffset;
     property Size: Integer read fSize;
@@ -261,13 +267,15 @@ type
     function GetSubList: TSubList;
     function GetGameVersion: TGameVersion;
     function GetCharacterID: string;
-    function null_bytes_length(dataSize: Integer): Integer;
     function GetSectionsList: TSectionsList;
-    procedure ParseScnfSection(var F: file; ScnfOffset: Integer);
+  protected
     procedure CopyFileBlock(var SrcF, DestF: file; SrcStartOffset, SrcBlockSize: Integer);
-    function GetTempFileName: TFileName;
-    procedure WriteSectionPadding(var F: file; DataSize: Integer);
     function GetGameVersionFromVoiceID(const FullVoiceID: string): TGameVersion;
+    function GetTempFileName: TFileName;
+    function IsValidScnfFooterEntry(var F: file; Section: TSectionItem): Boolean;
+    function null_bytes_length(dataSize: Integer): Integer;    
+    procedure ParseScnfSection(var F: file; ScnfOffset: Integer);
+    procedure WriteSectionPadding(var F: file; DataSize: Integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -971,185 +979,193 @@ var
   BytesToRead: Integer;
   
 begin
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('Loading file...');
-{$ENDIF}
+  try
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('Loading file...');
+  {$ENDIF}
 
-  // SCNF offset
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('SCNF offset: ', ScnfOffset);
-{$ENDIF}
+    // SCNF offset
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('SCNF offset: ', ScnfOffset);
+  {$ENDIF}
 
-  // ---------------------------------------------------------------------------
-  // READING "CharID" SECTION INSIDE SCNF SECTION
-  // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // READING "CharID" SECTION INSIDE SCNF SECTION
+    // ---------------------------------------------------------------------------
 
-  // CharID (Section Name)
-  CharIDSectionOffset := ScnfOffset + 16;
-  fScnfCharIdHeaderOffset := CharIDSectionOffset;
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('Char ID (in SCNF header) offset: ', fScnfCharIdHeaderOffset);
-{$ENDIF}
+    // CharID (Section Name)
+    CharIDSectionOffset := ScnfOffset + 16;
+    fScnfCharIdHeaderOffset := CharIDSectionOffset;
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('Char ID (in SCNF header) offset: ', fScnfCharIdHeaderOffset);
+  {$ENDIF}
 
-  // Reading the CharID within the SCNF section header
-  Seek(F, CharIDSectionOffset);
-  BlockRead(F, BufSubCode, SizeOf(BufSubCode));
-  Self.fCharacterID := BufSubCode;
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('Char ID: ', CharacterID);
-{$ENDIF}
-
-  // string table offset
-  Seek(F, CharIDSectionOffset + 24);
-  BlockRead(F, fScnfStrTableHeaderOffset, SizeOf(fScnfStrTableHeaderOffset));
-  fScnfStrTableHeaderOffset := CharIDSectionOffset + fScnfStrTableHeaderOffset;
-  fScnfCharIdHeaderSize := (fScnfStrTableHeaderOffset - CharIDSectionOffset) + 16;
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('StrTableHeaderOffset: ', fScnfStrTableHeaderOffset, #13#10, 'StrScnfCharIdHeaderSize: ',
-      fScnfCharIdHeaderSize, #13#10, 'CharIDSectionOffset: ', CharIDSectionOffset);
-{$ENDIF}
-
-  // Voice ID
-  Seek(F, CharIDSectionOffset + 16);
-  BlockRead(F, VoiceIDOffset, GAME_INTEGER_SIZE);   // start of the Voice ID string
-  BlockRead(F, VoiceIDLength, GAME_INTEGER_SIZE);   // size of the Voice ID string
-  VoiceIDLength := VoiceIDLength - VoiceIDOffset;
-
-  // reading VoiceID
-  Seek(F, CharIDSectionOffset + VoiceIDOffset);
-  BlockRead(F, Buffer[0], VoiceIDLength);
-  BufStr := PChar(@Buffer);
-  
-  fVoiceFullID := BufStr;
-  fVoiceShortID := ExtremeRight('/', fVoiceFullID);
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('VoiceFullID: ', VoiceFullID);
-{$ENDIF}
-
-  // Game version detection (NEW 3.1)
-  fGameVersion := GetGameVersionFromVoiceID(VoiceFullID);
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('Game version: ', GetEnumName(TypeInfo(TGameVersion), Ord(fGameVersion)));
-{$ENDIF}
-
-  // Filling the Characters ID decode table
-  Seek(F, CharIDSectionOffset + 32);
-  BlockRead(F, CharsIdTableOffset, GAME_INTEGER_SIZE);
-  CharsIdTableSize := VoiceIDOffset - CharsIdTableOffset;
-  j := (CharsIdTableSize div 4); // A CharID is ALWAYS on 4 chars
-  
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('CharsIdTableOffset: ', CharsIdTableOffset, ', CharsIdTableSize: ', CharsIdTableSize);
-{$ENDIF}
-
-  Seek(F, CharIDSectionOffset + CharsIdTableOffset);
-  for i := 0 to j - 1 do begin
+    // Reading the CharID within the SCNF section header
+    Seek(F, CharIDSectionOffset);
     BlockRead(F, BufSubCode, SizeOf(BufSubCode));
-    Subtitles.CharsIdDecodeTable.Add(BufSubCode);
-  end;
+    Self.fCharacterID := BufSubCode;
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('Char ID: ', CharacterID);
+  {$ENDIF}
 
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then begin
-    WriteLn('CharsID decode table:');
-    for i := 0 to Subtitles.CharsIdDecodeTable.Count - 1 do
-      WriteLn(' ', Subtitles.CharsIdDecodeTable[i].CharID, ': ',
-        Subtitles.CharsIdDecodeTable[i].Code
-      );
-  end;
-{$ENDIF}
+    // string table offset
+    Seek(F, CharIDSectionOffset + 24);
+    BlockRead(F, fScnfStrTableHeaderOffset, SizeOf(fScnfStrTableHeaderOffset));
+    fScnfStrTableHeaderOffset := CharIDSectionOffset + fScnfStrTableHeaderOffset;
+    fScnfCharIdHeaderSize := (fScnfStrTableHeaderOffset - CharIDSectionOffset) + 16;
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('StrTableHeaderOffset: ', fScnfStrTableHeaderOffset, #13#10, 'StrScnfCharIdHeaderSize: ',
+        fScnfCharIdHeaderSize, #13#10, 'CharIDSectionOffset: ', CharIDSectionOffset);
+  {$ENDIF}
 
-  //----------------------------------------------------------------------------
-  // SUBTITLES TABLE ENTRIES SCAN
-  //----------------------------------------------------------------------------
+    // Voice ID
+    Seek(F, CharIDSectionOffset + 16);
+    BlockRead(F, VoiceIDOffset, GAME_INTEGER_SIZE);   // start of the Voice ID string
+    BlockRead(F, VoiceIDLength, GAME_INTEGER_SIZE);   // size of the Voice ID string
+    VoiceIDLength := VoiceIDLength - VoiceIDOffset;
 
-  // Retrieving String Table Body Offset (that contains every subtitles text)
-  // Each sub entry starts with ShortVoiceID (Like "FEX20") and with a sub id (like "A001")
-  // Where all subs starting with "A" stand for Ryô and "B" is for the NPC character.
-  Seek(F, fScnfStrTableHeaderOffset + 4); // reading the first entry of the header table
-  BlockRead(F, fScnfStrTableBodyOffset, GAME_INTEGER_SIZE);
-  fScnfStrTableBodyOffset := CharIDSectionOffset + fScnfStrTableBodyOffset;
-
-  // Reading String Table Header
-  Seek(F, fScnfStrTableHeaderOffset);
-  SubTableHeaderReadingDone := False;
-  while not SubTableHeaderReadingDone do begin
-    // Reading raw entry from the table
-    BlockRead(F, SubRawBinaryEntry, SizeOf(TSubRawBinaryEntry));
-
-    // adding the new entry
-    Subtitles.AddEntry(SubRawBinaryEntry);
-
-    // To get the StrTableBodyOffset (where is stored all VoiceID and Subtitle datas)
-    // from file read the second value of first sub in the header table
-    // To summarize, the structure of the file is : [Subtitle Table (Header)] [Str Table (Body)]
-    SubTableHeaderReadingDone := (FilePos(F) = fScnfStrTableBodyOffset);
-  end;
-
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then begin
-    WriteLn(sLineBreak, 'String table header offset: ', fScnfStrTableHeaderOffset);
-    WriteLn('String table body offset: ', fScnfStrTableBodyOffset, sLineBreak);
-  end;
-{$ENDIF}
-
-  //----------------------------------------------------------------------------
-  // TABLE TEXT ENTRIES SCAN
-  //----------------------------------------------------------------------------
-
-  BytesToRead := FileSize(F) - FilePos(F);
-  SubSize := SizeOf(Buffer);
+    // reading VoiceID
+    Seek(F, CharIDSectionOffset + VoiceIDOffset);
+    BlockRead(F, Buffer[0], VoiceIDLength);
+    BufStr := PChar(@Buffer);
   
-  for i := 0 to Subtitles.Count - 1 do begin
-    // Reading Subtitle VoiceID
-    Seek(F, CharIDSectionOffset + Subtitles[i].CodeOffset);
-    VoiceIDLength := Subtitles[i].TextOffset - Subtitles[i].CodeOffset;
-    ZeroMemory(@Buffer, VoiceIDLength + 1);
-    BlockRead(F, Buffer, VoiceIDLength);
-    Subtitles[i].fVoiceID := Buffer;
+    fVoiceFullID := BufStr;
+    fVoiceShortID := ExtremeRight('/', fVoiceFullID);
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('VoiceFullID: ', VoiceFullID);
+  {$ENDIF}
 
-{$IFDEF DEBUG}
+    // Game version detection (NEW 3.1)
+    fGameVersion := GetGameVersionFromVoiceID(VoiceFullID);
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('Game version: ', GetEnumName(TypeInfo(TGameVersion), Ord(fGameVersion)));
+  {$ENDIF}
+
+    // Filling the Characters ID decode table
+    Seek(F, CharIDSectionOffset + 32);
+    BlockRead(F, CharsIdTableOffset, GAME_INTEGER_SIZE);
+    CharsIdTableSize := VoiceIDOffset - CharsIdTableOffset;
+    j := (CharsIdTableSize div 4); // A CharID is ALWAYS on 4 chars
+  
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('CharsIdTableOffset: ', CharsIdTableOffset, ', CharsIdTableSize: ', CharsIdTableSize);
+  {$ENDIF}
+
+    Seek(F, CharIDSectionOffset + CharsIdTableOffset);
+    for i := 0 to j - 1 do begin
+      BlockRead(F, BufSubCode, SizeOf(BufSubCode));
+      Subtitles.CharsIdDecodeTable.Add(BufSubCode);
+    end;
+
+  {$IFDEF DEBUG}
     if DebugParseScnfSection then begin
-      if Pos(VoiceShortID, Subtitles[i].fVoiceID) = 0 then
-        WriteLn('WARNING: Subtitle VoiceID beginning seems to be INVALID! ',
-          '(Found = "', Subtitles[i].fVoiceID, '", Excepted = "', VoiceShortID,
-          '"');
+      WriteLn('CharsID decode table:');
+      for i := 0 to Subtitles.CharsIdDecodeTable.Count - 1 do
+        WriteLn(' ', Subtitles.CharsIdDecodeTable[i].CharID, ': ',
+          Subtitles.CharsIdDecodeTable[i].Code
+        );
     end;
-{$ENDIF}
+  {$ENDIF}
 
-    // Reading raw subtitle text
-    Seek(F, CharIDSectionOffset + Subtitles[i].TextOffset);
-    ZeroMemory(@Buffer, SizeOf(Buffer));
+    //----------------------------------------------------------------------------
+    // SUBTITLES TABLE ENTRIES SCAN
+    //----------------------------------------------------------------------------
 
-    if BytesToRead > 0 then begin
-      BytesToRead := FileSize(F) - FilePos(F);
-      if BytesToRead < SizeOf(Buffer) then begin
-        SubSize := BytesToRead;
-      end else SubSize := SizeOf(Buffer);
+    // Retrieving String Table Body Offset (that contains every subtitles text)
+    // Each sub entry starts with ShortVoiceID (Like "FEX20") and with a sub id (like "A001")
+    // Where all subs starting with "A" stand for Ryô and "B" is for the NPC character.
+    Seek(F, fScnfStrTableHeaderOffset + 4); // reading the first entry of the header table
+    BlockRead(F, fScnfStrTableBodyOffset, GAME_INTEGER_SIZE);
+    fScnfStrTableBodyOffset := CharIDSectionOffset + fScnfStrTableBodyOffset;
+
+    // Reading String Table Header
+    Seek(F, fScnfStrTableHeaderOffset);
+    SubTableHeaderReadingDone := False;
+    while not SubTableHeaderReadingDone do begin
+      // Reading raw entry from the table
+      BlockRead(F, SubRawBinaryEntry, SizeOf(TSubRawBinaryEntry));
+
+      // adding the new entry
+      Subtitles.AddEntry(SubRawBinaryEntry);
+
+      // To get the StrTableBodyOffset (where is stored all VoiceID and Subtitle datas)
+      // from file read the second value of first sub in the header table
+      // To summarize, the structure of the file is : [Subtitle Table (Header)] [Str Table (Body)]
+      SubTableHeaderReadingDone := (FilePos(F) = fScnfStrTableBodyOffset);
     end;
 
-    BlockRead(F, Buffer, SubSize); // we can read in single time because each sub terminates with null terminal char ($00)...
-    Subtitles[i].FillSubtitleTextFromRaw(Buffer); // this will parse the raw subtitle and modify the Text properties with the real text.
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then begin
+      WriteLn(sLineBreak, 'String table header offset: ', fScnfStrTableHeaderOffset);
+      WriteLn('String table body offset: ', fScnfStrTableBodyOffset, sLineBreak);
+    end;
+  {$ENDIF}
 
-    // WriteLn(BytesToRead, ' ', SubSize, ' ', FilePos(F));
+    //----------------------------------------------------------------------------
+    // TABLE TEXT ENTRIES SCAN
+    //----------------------------------------------------------------------------
 
+    BytesToRead := FileSize(F) - FilePos(F);
+    SubSize := SizeOf(Buffer);
+  
+    for i := 0 to Subtitles.Count - 1 do begin
+      // Reading Subtitle VoiceID
+      Seek(F, CharIDSectionOffset + Subtitles[i].CodeOffset);
+      VoiceIDLength := Subtitles[i].TextOffset - Subtitles[i].CodeOffset;
+      ZeroMemory(@Buffer, VoiceIDLength + 1);
+      BlockRead(F, Buffer, VoiceIDLength);
+      Subtitles[i].fVoiceID := Buffer;
+
+  {$IFDEF DEBUG}
+      if DebugParseScnfSection then begin
+        if Pos(VoiceShortID, Subtitles[i].fVoiceID) = 0 then
+          WriteLn('WARNING: Subtitle VoiceID beginning seems to be INVALID! ',
+            '(Found = "', Subtitles[i].fVoiceID, '", Excepted = "', VoiceShortID,
+            '"');
+      end;
+  {$ENDIF}
+
+      // Reading raw subtitle text
+      Seek(F, CharIDSectionOffset + Subtitles[i].TextOffset);
+      ZeroMemory(@Buffer, SizeOf(Buffer));
+
+      if BytesToRead > 0 then begin
+        BytesToRead := FileSize(F) - FilePos(F);
+        if BytesToRead < SizeOf(Buffer) then begin
+          SubSize := BytesToRead;
+        end else SubSize := SizeOf(Buffer);
+      end;
+
+      BlockRead(F, Buffer, SubSize); // we can read in single time because each sub terminates with null terminal char ($00)...
+      Subtitles[i].FillSubtitleTextFromRaw(Buffer); // this will parse the raw subtitle and modify the Text properties with the real text.
+
+      // WriteLn(BytesToRead, ' ', SubSize, ' ', FilePos(F));
+
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn(Subtitles[i].Code, ': ', Subtitles[i].fText);
+  {$ENDIF}
+    end;
+
+  {$IFDEF DEBUG}
+    if DebugParseScnfSection then
+      WriteLn('');
+  {$ENDIF}
+  except
 {$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn(Subtitles[i].Code, ': ', Subtitles[i].fText);
+    on E: Exception do
+      WriteLn('EXCEPTION: TSCNFEditor.ParseScnfSection [File: "',
+        ExtractFileName(fSourceFileName), '"]: ', E.Message);
 {$ENDIF}
   end;
-  
-{$IFDEF DEBUG}
-  if DebugParseScnfSection then
-    WriteLn('');
-{$ENDIF}
 end;
 
 //------------------------------------------------------------------------------
@@ -1161,7 +1177,9 @@ var
   ScnfSectionEntry: Integer;
   SectionEntry: TSectionRawBinaryEntry;
   ScnfSectionFound: Boolean;
-  {$IFDEF DEBUG} NewSectionItem: TSectionItem; {$ENDIF}
+{$IFDEF DEBUG}
+  NewSectionItem: TSectionItem;
+{$ENDIF}
 
 begin
   Result := False;
@@ -1253,8 +1271,11 @@ begin
 {$IFDEF DEBUG}
       NewSectionItem := Sections[Sections.Add(SectionEntry)];
       if DebugLoadFromFile then
+(* fix 3.3.7: Unknow value is now know. It's in fact the CharID in 8 bytes, not 4
         WriteLn('  ', NewSectionItem.CharID, ' ', NewSectionItem.UnknowValue, ' ',
-          NewSectionItem.Name, ' ', NewSectionItem.Offset, ' ', NewSectionItem.Size);
+          NewSectionItem.Name, ' ', NewSectionItem.Offset, ' ', NewSectionItem.Size); *)
+        WriteLn('  ', NewSectionItem.CharID, ' ', NewSectionItem.Name, ' ',
+          NewSectionItem.Offset, ' ', NewSectionItem.Size);
 {$ELSE}
       Sections.Add(SectionEntry);
 {$ENDIF}
@@ -1269,7 +1290,12 @@ begin
     if Sections.Count > 0 then begin
       while (ScnfSectionEntry < Sections.Count - 1) and (not ScnfSectionFound) do begin
         Inc(ScnfSectionEntry);
-        ScnfSectionFound := (Sections[ScnfSectionEntry].Name = SCNF_FOOTER_SIGN);  // SCNF section is referenced by 'BIN ' tag name in footer
+        (*  Fix 3.3.7: Some PAKS (Shenmue 1) contains several "BIN " footer entries
+            but doesn't contains valid SCNF entries. So we need a more complex
+            function detection. *)
+          // SCNF section is referenced by 'BIN ' tag name in footer            
+//        ScnfSectionFound := (Sections[ScnfSectionEntry].Name = SCNF_FOOTER_SIGN);
+          ScnfSectionFound := IsValidScnfFooterEntry(F, Sections[ScnfSectionEntry]);
       end;
     end;
 
@@ -1284,23 +1310,28 @@ begin
       ParseScnfSection(F, IntBuf);  // launch parsing SCNF section to retrieve subtitles !
       fFileLoaded := True;
       Result := fFileLoaded;
-    end;
+
+      // Getting AgeType and Gender
+      if NPCInfos.Loaded then begin
+        IntBuf := NPCInfos.GetInfosFromCharID(CharacterID, GameVersion);
+        if IntBuf <> -1 then begin // found
+          Self.fGender := NPCInfos[IntBuf].Gender;
+          Self.fAgeType := NPCInfos[IntBuf].AgeType;
+        end;
+      end;
+      
+    end; // ScnfSectionFound
 
     CloseFile(F);
 
-    // getting AgeType and Gender
-    if NPCInfos.Loaded then begin
-      IntBuf := NPCInfos.GetInfosFromCharID(CharacterID, GameVersion);
-      if IntBuf <> -1 then begin // found
-        Self.fGender := NPCInfos[IntBuf].Gender;
-        Self.fAgeType := NPCInfos[IntBuf].AgeType;
-      end;
-    end;
+    // Fix 3.3.7: NPCInfos section code moved into the ScnfSectionFound block...
 
   except
 {$IFDEF DEBUG}
-    on E: Exception do WriteLn('Exception LoadFromFile [File: "', fSourceFileName, '"]: ', E.Message);
-{$ENDIF} 
+    on E: Exception do
+      WriteLn('EXCEPTION: TSCNFEditor.LoadFromFile [File: "',
+        ExtractFileName(fSourceFileName), '"]: ', E.Message);
+{$ENDIF}
   end;
 end;
 
@@ -1378,6 +1409,27 @@ function TSCNFEditor.GetTempFileName: TFileName;
 begin
   Result := GetTempDir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
 end;
+
+function TSCNFEditor.IsValidScnfFooterEntry(var F: file;
+  Section: TSectionItem): Boolean;
+var
+  SectionName: array[0..3] of Char;
+  SavedPosition: Int64;
+
+begin
+  Result := False;
+  SavedPosition := FilePos(F);
+
+  // Verifing if the section is valid
+  if Section.Name = SCNF_FOOTER_SIGN then begin
+    Seek(F, Section.Offset + 16); // 16 for PAKS header size
+    BlockRead(F, SectionName[0], SizeOf(SectionName));
+    Result := SectionName = SCNF_SIGN;     
+  end;
+
+  Seek(F, SavedPosition);
+end;
+
 
 procedure TSCNFEditor.WriteSectionPadding(var F: file; DataSize: Integer);
 var
@@ -1547,7 +1599,7 @@ var
 begin
   Item := TSectionItem.Create(Self);
   Item.fCharID := SectionEntry.CharID;
-  Item.fUnknowValue := SectionEntry.UnknowValue;
+//  Item.fUnknowValue := SectionEntry.UnknowValue;
   Item.fName := SectionEntry.Name;
   Item.fOffset := SectionEntry.Offset;
   Item.fSize := SectionEntry.Size;
@@ -1601,7 +1653,7 @@ var
 
 begin
   StrCopy(Raw.CharID, PChar(CharID));
-  Raw.UnknowValue := UnknowValue;
+//  Raw.UnknowValue := UnknowValue;
   StrCopy(Raw.Name, PChar(Name));
   Raw.Offset := Offset;
   Raw.Size := Size;

@@ -94,10 +94,6 @@ object frmMain: TfrmMain
     OnChange = pcSubsChange
     object tsEditor: TTabSheet
       Caption = '&Editor'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)

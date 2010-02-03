@@ -20,7 +20,12 @@ ADDED:
 
 FIXED:
 - The "View" main menu was re-organized.
-- Some little tweaks and optimization in the SCNF Editor engine.
+- The SCNF Editor engine was optimized and updated (v3.3.7):
+   + The "UnknowValue" field in the footer is in fact the "CharID" field with
+      8 bytes length (not 4 bytes as I thought before).
+   + Some PAKS (from Shenmue 1) contains "BIN " entries in the footer but 
+     doesn't contains valid editable SCNF section.
+   + Some little tweaks and optimizations.
 - Application configuration manager was optimized and updated.
 - About box was reviewed (new credits, and more).
 - Some code clean-up.

@@ -10,7 +10,9 @@ uses
 
 function ConvertFaceTexture(const OutputDir, PVRSourceFileName: TFileName): Boolean;
 function IsValidFaceImage(const JPEGFileName: TFileName): Boolean;
-
+function IsValueInArray(SourceArray: array of string;
+  ValueToSearch: string; var ArrayIndexResult: Integer): Boolean;
+  
 implementation
 
 uses
@@ -197,6 +199,27 @@ BEGIN
   BMP.Assign(BMPF);
 
   FINALLY BMPF.Free; TabScanlineBMP := nil ; TabScanlineBMPF := nil; END;
+end;
+
+//------------------------------------------------------------------------------
+
+function IsValueInArray(SourceArray: array of string;
+  ValueToSearch: string; var ArrayIndexResult: Integer): Boolean;
+var
+  i: Integer;
+
+begin
+  Result := False;
+  i := Low(SourceArray);
+  while (not Result) and (i <= High(SourceArray)) do begin
+    Result := (Pos(SourceArray[i], ValueToSearch) > 0);
+    if not Result then
+      Inc(i);
+  end;
+  if Result then
+    ArrayIndexResult := i
+  else
+    ArrayIndexResult := -1;
 end;
 
 //------------------------------------------------------------------------------

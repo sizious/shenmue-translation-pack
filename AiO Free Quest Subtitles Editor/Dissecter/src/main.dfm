@@ -70,7 +70,7 @@ object Form1: TForm1
   end
   object dissect_bt: TButton
     Left = 232
-    Top = 200
+    Top = 201
     Width = 89
     Height = 17
     Caption = 'Dissect !'
@@ -113,6 +113,16 @@ object Form1: TForm1
     Checked = True
     State = cbChecked
     TabOrder = 6
+  end
+  object cbSCNF: TCheckBox
+    Left = 176
+    Top = 179
+    Width = 145
+    Height = 17
+    Caption = 'Use only SCNF Editor'
+    Checked = True
+    State = cbChecked
+    TabOrder = 7
   end
   object XPManifest1: TXPManifest
     Left = 16
