@@ -49,7 +49,7 @@ uses
   img2png in '..\..\..\Common\img2png.pas',
   lzmadec in '..\..\..\Common\lzmadec.pas',
   dblzma in 'engine\textdb\dblzma.pas',
-  npcs_id in 'engine\npcpakf\npcs_id.pas';
+  npcsid in 'engine\npcpakf\npcsid.pas';
 
 {$R *.res}
 
@@ -60,10 +60,10 @@ var
 {$ENDIF}
 
 begin
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
   ConsoleCreated := AllocConsole;
   ReportMemoryLeaksOnShutdown := True;
-  {$ENDIF}
+{$ENDIF}
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
@@ -75,12 +75,14 @@ begin
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
-  {$ENDIF}
+{$ENDIF}
 
   // Show migration Warning
   ShowWarningIfNeeded;
 
   Application.Run;
 
-  {$IFDEF DEBUG}FreeConsole;{$ENDIF}
+{$IFDEF DEBUG}
+  FreeConsole;
+{$ENDIF}
 end.

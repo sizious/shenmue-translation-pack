@@ -165,7 +165,7 @@ procedure TfrmFileInfo.AddIpacSectionEntry(Section: TSectionItem);
 begin
   with lvIpac.Items.Add do begin
     Caption := Section.CharID;
-    SubItems.Add(IntToStr(Section.UnknowValue));
+//    SubItems.Add(IntToStr(Section.UnknowValue));
     SubItems.Add(Section.Name);
     SubItems.Add(IntToStr(Section.Offset));
     SubItems.Add(IntToStr(Section.Size));

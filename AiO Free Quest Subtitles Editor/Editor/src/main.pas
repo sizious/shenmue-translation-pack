@@ -742,7 +742,6 @@ end;
 procedure TfrmMain.InitApplicationReleaseType;
 begin
 {$IFNDEF DEBUG}
-  miFacesExtractor.Visible := False;
   miDebug.Visible := False;
 {$ENDIF}
 
@@ -2001,6 +2000,20 @@ begin
   // File Infos
   if Assigned(frmFileInfo) and frmFileInfo.Visible then
     frmFileInfo.UpdateSubtitles;
+
+  // Original text function
+  if Value then begin
+     OriginalSelectedSubtitleText := TextDatabaseCorrector
+      .Subtitles.CharsList.DecodeSubtitle(OriginalSelectedSubtitleText);
+     OldSelectedSubtitleText := TextDatabaseCorrector
+      .Subtitles.CharsList.DecodeSubtitle(OldSelectedSubtitleText);
+  end else begin
+     OriginalSelectedSubtitleText := TextDatabaseCorrector
+      .Subtitles.CharsList.EncodeSubtitle(OriginalSelectedSubtitleText);
+     OldSelectedSubtitleText := TextDatabaseCorrector
+      .Subtitles.CharsList.EncodeSubtitle(OldSelectedSubtitleText);
+  end;
+  TextDatabaseCorrector.Subtitles.CharsList.Active := Value;
 end;
 
 procedure TfrmMain.SetEnableOriginalSubtitlesView(const Value: Boolean);

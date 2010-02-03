@@ -9,8 +9,8 @@ uses
   Windows, SysUtils, Classes, ScnfUtil, PakfExtr;
 
 type
-  TExtractionFinishedEvent = procedure(Sender: TObject; SuccessFiles,
-    ErrornousFiles, TotalFiles: Integer) of object;
+  TExtractionFinishedEvent = procedure(Sender: TObject; ProcessCanceled: Boolean;
+    SuccessFiles, ErrornousFiles, TotalFiles: Integer) of object;
 
   TPAKFExtractorThread = class(TThread)
   private
@@ -79,6 +79,8 @@ procedure TPAKFExtractorThread.Execute;
 var
   SR : TSearchRec;
   i: Integer;
+  ProcessCanceled: Boolean;
+  
 {$IFDEF DEBUG}{$IFDEF CREATE_PAKF_LOG}
   F_CSV: TextFile;
 {$ENDIF}{$ENDIF}
@@ -90,6 +92,7 @@ begin
 
   fSuccessFilesCount := 0;
   fErrornousFilesCount := 0;
+  ProcessCanceled := False;
   
   fSourceDirectory := IncludeTrailingPathDelimiter(fSourceDirectory);
 //  GetFullPathName(
@@ -122,7 +125,10 @@ begin
 
     // Converting all found files
     for i := 0 to FilesList.Count - 1 do begin
-      if Terminated then Break;
+      if Terminated then begin
+        ProcessCanceled := True;
+        Break;
+      end;
       
       // Extracting the current PKF file entry
       fTargetFileListEntry := FilesList[i];
@@ -141,7 +147,8 @@ begin
 
     // Finished Event
     if Assigned(fExtractionFinished) then
-      fExtractionFinished(Self, fSuccessFilesCount, fErrornousFilesCount, fFilesList.Count);
+      fExtractionFinished(Self, ProcessCanceled, fSuccessFilesCount,
+        fErrornousFilesCount, fFilesList.Count);
 
   finally
     fFilesList.Free;
@@ -154,7 +161,7 @@ end;
 procedure TPAKFExtractorThread.ExtractCurrentEntry;
 begin
   fExtractionResult := ExtractFaceFromPAKF(fTargetFileListEntry,
-    OutputDir {$IFDEF DEBUG}, DebugStringResult{$ENDIF});
+    OutputDir, GameVersion {$IFDEF DEBUG}, DebugStringResult{$ENDIF});
   AddEntry(ExtractFileName(fTargetFileListEntry), fExtractionResult);
 end;
 

@@ -43,7 +43,7 @@ object frmFacesExtractor: TfrmFacesExtractor
     Top = 34
     Width = 385
     Height = 45
-    Caption = ' PAKF source directory : '
+    Caption = ' Select the PAKF source directory : '
     TabOrder = 0
     object eDirectory: TEdit
       Left = 6

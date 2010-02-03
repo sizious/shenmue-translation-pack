@@ -3,13 +3,14 @@ unit pakfextr;
 interface
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, ScnfUtil;
 
 type
   TPAKFExtractionResult = (perUnknow, perNotValidFile, perTargetAlreadyExists,
     perConversionFailed, perSuccess);
   
-function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName
+function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName;
+  const GameVersion: TGameVersion
   {$IFDEF DEBUG};var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
   
 //------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  PakfUtil;
+  PakfUtil, NPCSID;
 
 const
   PAKF_SIGN = 'PAKF';
@@ -50,68 +51,6 @@ begin
     TargetFile.CopyFrom(Stream, Size);
   finally
     TargetFile.Free;    
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-function IsValueInArray(SourceArray: array of string;
-  ValueToSearch: string; var ArrayIndexResult: Integer): Boolean;
-var
-  i: Integer;
-  
-begin
-  Result := False;
-  i := Low(SourceArray);
-  while (not Result) and (i <= High(SourceArray)) do begin
-    Result := (Pos(SourceArray[i], ValueToSearch) > 0);
-    if not Result then
-      Inc(i);
-  end;
-  if Result then
-    ArrayIndexResult := i
-  else
-    ArrayIndexResult := -1;
-end; 
-
-//------------------------------------------------------------------------------
-
-function IsFaceTexture(TextureName: string): Boolean;
-const
-  SM1_FACE_TEXN_SIGN: array[0..12] of string = (
-    'KAO', 'HED', 'KAA', 'FAC', 'KAF',
-    'KAJ', 'MET', 'HIR', 'FCF', 'KAK',
-    'RKA', 'NFA', 'KAC'); // 'MUF', 'ALL', 'AAA', 'L'
-    
-  SM2_FACE_TEXN_SIGN: array[0..1] of string = (
-    '}Y_1', '}Y¾‡'
-  );
-
-var
-  i: Integer;
-    
-begin
-//  Result := False;
-  TextureName := UpperCase(TextureName);
-
-  (*i := Low(SM1_FACE_TEXN_SIGN);
-  while (not Result) and (i <= High(SM1_FACE_TEXN_SIGN)) do begin
-    Result := (Pos(SM1_FACE_TEXN_SIGN[i], TextureName) > 0);
-    Inc(i);
-  end;
-
-  if not Result then begin
-    TextureName[6] := 'Y'; // fix for some Shenmue II PAKF...
-    Result :=  (Pos(SM2_FACE_TEXN_SIGN, TextureName) > 0);
-  end;*)
-
-  // Shenmue I
-  Result := IsValueInArray(SM1_FACE_TEXN_SIGN, TextureName, i);
-
-  // Shenmue II
-  if not Result then begin
-    TextureName[6] := 'Y'; // fix for some Shenmue II PAKF...
-    Result := IsValueInArray(SM2_FACE_TEXN_SIGN, TextureName, i);
   end;
 end;
 
@@ -251,88 +190,13 @@ begin
     Result := CharID;
   end;
 
-  Stream.Seek(SavedPos, soFromBeginning);  
+  Stream.Seek(SavedPos, soFromBeginning);
 end;
 
 //------------------------------------------------------------------------------
 
-// Sucks function but who cares???
-function HandleSpecialCharID(const CharID: string;
-  var TextureNumber: Integer): Boolean;
-const
-  // These CharIDs are invalid characters and/or are pre-extracted (too complex to handle)
-  EXCLUDE_CHARIDS: array[0..56] of string = (
-    'CATA', 'CATB', 'CATC', 'DOOR', 'DORG',
-    'FUKU', 'KYHN', 'MRIG', 'SBNK', 'SONZ',
-    'TOMC', 'TOMD', 'CAT0', 'CAT1', 'CAT2',
-    'CAT3', 'CAT4', 'BC01', 'BC02', 'BC03',
-    'BK01', 'BK02', 'BK03', 'CA00', 'CA01',
-    'CA02', 'CA03', 'CA04', 'CA05', 'CA06',
-    'CA07', 'CA08', 'CA09', 'CA10', 'CA11',
-    'CA12', 'CA13', 'CA14', 'CA15', 'CA16',
-    'CA17', 'CA18', 'CA19', 'DOG0', 'DOG1',
-    'DOG2', 'DOG3', 'DOG4', 'KEKB', 'KEMB',
-    'KNKB', 'MONB', 'RYOB', 'SF2B', 'SYEB',
-    'SYPB', 'TKRB'
-  );
-
-  (*  These CharIDs are errornous extracted if we don't set properly the right texture
-      to extract. Check the SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX array to know the
-      texture index to extract from the PAKF.
-
-      Example: In the HDEI PKF package, the Face texture is the N°4. The TextureNumber
-      starts at 1 (not 0), so the first texture in the PKF package is 1. *)
-  SPECIAL_CHARIDS: array[0..30] of string = (
-    'HDEI', 'KOGA', 'MORN', 'YMGC', '04B_',
-    'A01Q', 'A01_', 'KJN_', 'C07_', 'C08_',
-    'EDL_', 'KSMG', 'KSM_', 'KUN_', 'KYG_',
-    'MEY_', 'MM5_', 'RNP_', 'SN5_', 'SNM_',
-    'SYM_', 'TSK_', 'WTC_', 'KSY_', 'KUD_',
-    'SYP_', '05B_', '06B_', '07B_', '08B_',
-    '09B_'
-  );
-
-  SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX: array[0..30] of Integer = (
-    4, 4, 4, 4, 7,
-    1, 1, 7, 6, 2,
-    7, 5, 5, 7, 4,
-    7, 2, 6, 5, 7,
-    5, 6, 6, 3, 4,
-    4, 5, 5, 5, 5,
-    5
-  );
-  
-var
-  i: Integer;
-  
-begin
-  // Setting default texture number (By Default, it will search for the texture name)
-  TextureNumber := -1;
-
-  (*  Exclude these PKF files
-      If the CharID is in the EXCLUDE_CHARIDS array, the result will be FALSE
-      aka not a valid CharID *)
-  Result := not IsValueInArray(EXCLUDE_CHARIDS, CharID, i);
-
-{$IFDEF DEBUG}
-  // Not a valid CharID then
-  if not Result then begin
-    WriteLn('*** NOT A VALID CHARID: "', CharID, '"');
-  end;  
-{$ENDIF}
-
-  // Handling special CharID (sucks too much... I know)
-  if Result and (IsValueInArray(SPECIAL_CHARIDS, CharID, i)) then begin
-    TextureNumber := SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX[i];
-{$IFDEF DEBUG}
-    WriteLn('*** SPECIAL CHARID: "', CharID, '", TextureNumber: ', TextureNumber);
-{$ENDIF}
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName
+function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName;
+  const GameVersion: TGameVersion
   {$IFDEF DEBUG};var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
 var
   PAKFStream: TFileStream;
@@ -359,7 +223,10 @@ begin
     try
       // Read the header
       PAKFStream.Read(Header, SizeOf(Header));
-      if Header.Name <> PAKF_SIGN then Exit;
+      if Header.Name <> PAKF_SIGN then begin
+        Result := perNotValidFile;
+        Exit;
+      end;
 
       TexturesCount := Header.TexturesCount;
       TextureNumber := 0;
@@ -368,13 +235,14 @@ begin
       // Handling the CharID
       Result := perNotValidFile;
       CharID := GetCharID(PAKFStream, Header.Size);
-      ValidCharID := HandleSpecialCharID(CharID, SpecialCharID_TextureIndex);  // very important function
+
+      ValidCharID := IsValidCharID(GameVersion, CharID);
 
       // Tests if the JPEG image file already exists, if yes, we skip it
       if ValidCharID then begin
         JPEGOutFile := OutDir + CharID + '.JPG';
 
-        // The JPEG File for the CharID is already there, we don't need to do it
+        // The JPEG File for the CharID is already there, we don't need to create it
         if IsValidFaceImage(JPEGOutFile) then begin
           Result := perTargetAlreadyExists;
           ValidCharID := False; // exits the function           
@@ -383,6 +251,10 @@ begin
       
       // This CharID is a valid PKF file !
       if ValidCharID then begin
+
+        // This is to get the explicit texture number if automatic extraction fails
+        SpecialCharID_TextureIndex := GetTextureIndexForSpecialCharID(CharID);
+
         // For each section in this file
         repeat
           CurrentOffset := PAKFStream.Position;
