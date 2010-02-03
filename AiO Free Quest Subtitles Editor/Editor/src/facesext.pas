@@ -1,10 +1,16 @@
 unit facesext;
 
 // Auto-select right directory for debug purpose
+
+// 295 faces extracted
 // {$DEFINE DEBUG_PAKF_SHENMUE1}
+
 {$DEFINE DEBUG_PAKF_SHENMUE2}
+
 // {$DEFINE DEBUG_PAKF_SHENMUE2_XB}
-// {$DEFINE DEBUG_PAKF_WHATS_SHENMUE}  // OK
+
+// 105 faces extracted
+// {$DEFINE DEBUG_PAKF_WHATS_SHENMUE}
 
 interface
 
@@ -40,6 +46,8 @@ type
     fPAKFExtractorThread: TPAKFExtractorThread;
     fProcessCanceled: Boolean;
     fCanceledByButton: Boolean;
+    procedure ExtractionFinished(Sender: TObject; SuccessFiles, ErrornousFiles,
+      TotalFiles: Integer);
   protected
     procedure ExtractFaces;
     procedure SetFormCanceledState(CancelInProgress: Boolean);
@@ -108,7 +116,37 @@ begin
   end;
   ExtractorThread := TPAKFExtractorThread.Create(eDirectory.Text, GameVersion);
   ExtractorThread.OnTerminate := ProcessCompleted;
+  ExtractorThread.OnExtractionFinished := ExtractionFinished;
   ExtractorThread.Resume;
+end;
+
+procedure TfrmFacesExtractor.ExtractionFinished(Sender: TObject; SuccessFiles,
+  ErrornousFiles, TotalFiles: Integer);
+var
+  Errors, MsgTitle: string;
+  Icon: Integer;
+
+begin
+  MsgTitle := 'Extraction finished';
+  if ErrornousFiles > 0 then begin
+    Errors := ' ' + IntToStr(ErrornousFiles) + ' error(s).';
+    Icon := MB_ICONWARNING;
+    MsgTitle := ' with errors';
+  end else begin
+    Errors := ' no errors.';
+    Icon := MB_ICONINFORMATION;
+  end;
+
+  if SuccessFiles > 0 then
+    MsgBox(IntToStr(SuccessFiles) + ' file(s) successfully extracted with' + Errors,
+      MsgTitle,
+      Icon + MB_OK)
+  else
+    MsgBox('No NPC faces need to be extracted for the '
+      + rgGameVersion.Items[rgGameVersion.ItemIndex] + ' game.',
+      MsgTitle,
+      Icon + MB_OK
+    );
 end;
 
 procedure TfrmFacesExtractor.FormClose(Sender: TObject;

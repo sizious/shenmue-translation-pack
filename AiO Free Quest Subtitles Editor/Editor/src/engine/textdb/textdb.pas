@@ -39,7 +39,7 @@ type
 implementation
 
 uses
-  LzmaDec, Common;
+  DBLzma, Common;
 
 { TTextDatabaseCorrector }
 
