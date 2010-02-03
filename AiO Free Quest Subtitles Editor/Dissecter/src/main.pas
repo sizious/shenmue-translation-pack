@@ -4,8 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, FileCtrl, ExtCtrls, ComCtrls, cStreams, XPMan;
+  Dialogs, StdCtrls, FileCtrl, ExtCtrls, ComCtrls, cStreams, XPMan, SCNFEdit;
 
+const
+  APP_VERSION = '1.3';
+  
 type
   TForm1 = class(TForm)
     GroupBox1: TGroupBox;
@@ -26,7 +29,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    fSCNFEditor: TSCNFEditor;
     procedure dissect_file(var ResumeTextFileHandle: TextFile;
       var ResumeCsvHandle: TextFile; filename, out_dir: string; OnlyResume: Boolean);
     procedure ChangeApplicationState(Idle: Boolean);
@@ -163,12 +168,13 @@ var
   fname: string;
 
   chrID1, chrID2: string;
+  SubtitlesCount: string;
 
 begin
   if not IsFileValidScnf(filename) then Exit;
 
   GetCharactersID(filename, chrID1, chrID2);
-  
+
   //Resetting variable
   current_offset := 24;
   null_cnt := 0;
@@ -214,16 +220,24 @@ begin
             AssignFile(ftxt, out_dir+fname+'.txt');
             Rewrite(ftxt);
             while FileExists(out_dir+fname+'.txt') <> True do
-            begin
+            begin                                                         
                   Sleep(0);
             end;
             WriteLn(ftxt, 'File: '+ExtractFileName(filename));
             WriteLn(ftxt, 'Unknown number: '+IntToStr(int_buffer));
           end;
 
+          // Writing subtitles count
+          SubtitlesCount := '';
+          if fSCNFEditor.LoadFromFile(filename) then
+            SubtitlesCount := IntToStr(fSCNFEditor.Subtitles.Count);
+
           // write to resume file
-          Write(ResumeTextFileHandle, ExtractFileName(filename), ': CharID #1: ', chrID1, ', CharID #2: ', chrID2, ', Sections: ');
-          Write(ResumeCsvHandle,  ExtractFileName(filename), ';', chrID1, ';', chrID2);
+          Write(ResumeTextFileHandle, ExtractFileName(filename), ': ',
+            'CharID #1: ', chrID1, ', CharID #2: ', chrID2, ', Subs Count: ',
+            SubtitlesCount, ', Sections: ');
+          Write(ResumeCsvHandle,  ExtractFileName(filename), ';', chrID1, ';', chrID2,
+          ';', SubtitlesCount);
 
           //Loop to read each section until footer is reached
           while current_offset <> ftr_offset do
@@ -267,6 +281,7 @@ begin
                           finput.Position := current_offset;
 
                           first_section := False;
+                          
                   end
                   else
                   begin
@@ -290,7 +305,7 @@ begin
           end;
 
           WriteLn(ResumeTextFileHandle, '');
-          WriteLn(ResumeCsvHandle);
+          WriteLn(ResumeCsvHandle, '');
   end;
 
   //Clearing and modifying variables
@@ -328,7 +343,8 @@ begin
   WriteLn(ResumeFileHandle, 'Source dir: ', in_dir);
   WriteLn(ResumeFileHandle, 'Output dir: ', out_dir, #13#10);
 
-  WriteLn(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Section #1;Section #2;Section #3;Section #4;Section #5');
+  WriteLn(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Subtitles Count;',
+    'Section #1;Section #2;Section #3;Section #4;Section #5');
 
   if FindFirst(in_dir + '*.*', faAnyFile, searchResult) = 0 then
   begin
@@ -360,6 +376,13 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   DoubleBuffered := True;
+  Caption := StringReplace(Caption, '#VERSION#', APP_VERSION, [rfReplaceAll]);
+  fSCNFEditor := TSCNFEditor.Create;
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  fSCNFEditor.Free;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);

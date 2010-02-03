@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 203
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'HUMANS Dissecter v1.2'
+  Caption = 'HUMANS Dissecter v#VERSION#'
   ClientHeight = 243
   ClientWidth = 329
   Color = clBtnFace
@@ -16,6 +16,7 @@ object Form1: TForm1
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -109,6 +110,8 @@ object Form1: TForm1
     Width = 145
     Height = 17
     Caption = 'Generate only resume file'
+    Checked = True
+    State = cbChecked
     TabOrder = 6
   end
   object XPManifest1: TXPManifest
