@@ -1,0 +1,7 @@
+Source Codes
+~~~~~~~~~~~~
+
+The source of the tools are available in the "/Addons" SVN directory.
+
+You'll need MinGW installed to compile them.
+

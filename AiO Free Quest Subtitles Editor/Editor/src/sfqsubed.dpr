@@ -2,7 +2,6 @@ program sfqsubed;
 
 {$R '..\..\..\Shenmue Subtitles Preview\src\font.res' '..\..\..\Shenmue Subtitles Preview\src\font.rc'}
 {$R 'engine\npcpakf\pakfbin.res' 'engine\npcpakf\pakfbin.rc'}
-{$R 'engine\textdb\lzmabin.res' 'engine\textdb\lzmabin.rc'}
 
 uses
   Windows,
@@ -41,13 +40,13 @@ uses
   iconsui in 'engine\multitrd\ui\iconsui.pas',
   multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
   mtexec in 'multitrd\mtexec.pas',
-  lzmadec in 'engine\textdb\lzmadec.pas',
   systools in '..\..\..\Common\systools.pas',
   textdb in 'engine\textdb\textdb.pas',
   dbindex in 'engine\textdb\dbindex.pas',
   dbinlay in 'engine\textdb\dbinlay.pas',
   bugsmgr in 'bugsmgr.pas' {frmBugsHandler},
-  img2png in '..\..\..\Common\img2png.pas';
+  img2png in '..\..\..\Common\img2png.pas',
+  lzmadec in '..\..\..\Common\lzmadec.pas';
 
 {$R *.res}
 
