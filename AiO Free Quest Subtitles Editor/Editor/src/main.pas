@@ -523,7 +523,7 @@ implementation
 {$ENDIF}
 
 uses
-  {$IFDEF DEBUG} TypInfo, LzmaDec, {$ENDIF}
+  {$IFDEF DEBUG} TypInfo, DBLzma, {$ENDIF}
   {$IFDEF OLD_MULTI_TRANSLATION_STYLE} MultiTrd, {$ENDIF}
   SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,

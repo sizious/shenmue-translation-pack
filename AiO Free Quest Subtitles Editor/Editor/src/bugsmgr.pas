@@ -76,9 +76,8 @@ var
   CanDo : integer;
 
 begin
-  CanDo := MsgBox('Sure to quit the application ?'
-    + WrapStr + 'Warning, the configuration file''ll NOT be saved...',
-    'Exit application ?!', MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
+  CanDo := MsgBox('Are you sure to quit the application ?',
+    'Exit application ?', MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
   if CanDo = IDNO then Exit;
 
   ExitCode := 255;

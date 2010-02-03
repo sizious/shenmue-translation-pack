@@ -82,17 +82,19 @@ const
     'KAO', 'HED', 'KAA', 'FAC', 'KAF',
     'KAJ', 'MET', 'HIR', 'FCF', 'KAK',
     'RKA', 'NFA', 'KAC'); // 'MUF', 'ALL', 'AAA', 'L'
-  SM2_FACE_TEXN_SIGN = '}Y_1';
-
+    
+  SM2_FACE_TEXN_SIGN: array[0..1] of string = (
+    '}Y_1', '}Y¾‡'
+  );
 
 var
   i: Integer;
     
 begin
-  Result := False;
+//  Result := False;
   TextureName := UpperCase(TextureName);
 
-  i := Low(SM1_FACE_TEXN_SIGN);
+  (*i := Low(SM1_FACE_TEXN_SIGN);
   while (not Result) and (i <= High(SM1_FACE_TEXN_SIGN)) do begin
     Result := (Pos(SM1_FACE_TEXN_SIGN[i], TextureName) > 0);
     Inc(i);
@@ -101,6 +103,15 @@ begin
   if not Result then begin
     TextureName[6] := 'Y'; // fix for some Shenmue II PAKF...
     Result :=  (Pos(SM2_FACE_TEXN_SIGN, TextureName) > 0);
+  end;*)
+
+  // Shenmue I
+  Result := IsValueInArray(SM1_FACE_TEXN_SIGN, TextureName, i);
+
+  // Shenmue II
+  if not Result then begin
+    TextureName[6] := 'Y'; // fix for some Shenmue II PAKF...
+    Result := IsValueInArray(SM2_FACE_TEXN_SIGN, TextureName, i);
   end;
 end;
 
@@ -249,18 +260,46 @@ end;
 function HandleSpecialCharID(const CharID: string;
   var TextureNumber: Integer): Boolean;
 const
-  EXCLUDE_CHARIDS: array[0..11] of string = (
+  // These CharIDs are invalid characters and/or are pre-extracted (too complex to handle)
+  EXCLUDE_CHARIDS: array[0..56] of string = (
     'CATA', 'CATB', 'CATC', 'DOOR', 'DORG',
     'FUKU', 'KYHN', 'MRIG', 'SBNK', 'SONZ',
-    'TOMC', 'TOMD'
+    'TOMC', 'TOMD', 'CAT0', 'CAT1', 'CAT2',
+    'CAT3', 'CAT4', 'BC01', 'BC02', 'BC03',
+    'BK01', 'BK02', 'BK03', 'CA00', 'CA01',
+    'CA02', 'CA03', 'CA04', 'CA05', 'CA06',
+    'CA07', 'CA08', 'CA09', 'CA10', 'CA11',
+    'CA12', 'CA13', 'CA14', 'CA15', 'CA16',
+    'CA17', 'CA18', 'CA19', 'DOG0', 'DOG1',
+    'DOG2', 'DOG3', 'DOG4', 'KEKB', 'KEMB',
+    'KNKB', 'MONB', 'RYOB', 'SF2B', 'SYEB',
+    'SYPB', 'TKRB'
   );
 
-  SPECIAL_CHARIDS: array[0..3] of string = (
-    'HDEI', 'KOGA', 'MORN', 'YMGC'
+  (*  These CharIDs are errornous extracted if we don't set properly the right texture
+      to extract. Check the SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX array to know the
+      texture index to extract from the PAKF.
+
+      Example: In the HDEI PKF package, the Face texture is the N°4. The TextureNumber
+      starts at 1 (not 0), so the first texture in the PKF package is 1. *)
+  SPECIAL_CHARIDS: array[0..30] of string = (
+    'HDEI', 'KOGA', 'MORN', 'YMGC', '04B_',
+    'A01Q', 'A01_', 'KJN_', 'C07_', 'C08_',
+    'EDL_', 'KSMG', 'KSM_', 'KUN_', 'KYG_',
+    'MEY_', 'MM5_', 'RNP_', 'SN5_', 'SNM_',
+    'SYM_', 'TSK_', 'WTC_', 'KSY_', 'KUD_',
+    'SYP_', '05B_', '06B_', '07B_', '08B_',
+    '09B_'
   );
 
-  SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX: array[0..3] of Integer = (
-    4, 4, 4, 4
+  SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX: array[0..30] of Integer = (
+    4, 4, 4, 4, 7,
+    1, 1, 7, 6, 2,
+    7, 5, 5, 7, 4,
+    7, 2, 6, 5, 7,
+    5, 6, 6, 3, 4,
+    4, 5, 5, 5, 5,
+    5
   );
   
 var

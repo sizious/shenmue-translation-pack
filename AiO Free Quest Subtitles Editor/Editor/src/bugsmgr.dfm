@@ -187,8 +187,7 @@ object frmBugsHandler: TfrmBugsHandler
     Height = 39
     Caption = 
       'Please note the error message can be in French, because my compi' +
-      'ler is set in this language and I don'#39't know how to change the e' +
-      'rror messages language.'
+      'ler is set in this language and I don'#39't know how to change it.'
     WordWrap = True
   end
   object Label5: TLabel
@@ -211,8 +210,8 @@ object frmBugsHandler: TfrmBugsHandler
     Width = 288
     Height = 26
     Caption = 
-      'Please submit your debug log, and don'#39't forget to say what you a' +
-      're doing. Thank you very much !'
+      'Please submit your debug log, and don'#39't forget to say what you d' +
+      'id when the error occured. Thank you very much !'
     WordWrap = True
   end
   object mExceptionMessage: TMemo

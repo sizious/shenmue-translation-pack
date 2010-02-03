@@ -9,18 +9,24 @@ uses
   Windows, SysUtils, Classes, ScnfUtil, PakfExtr;
 
 type
+  TExtractionFinishedEvent = procedure(Sender: TObject; SuccessFiles,
+    ErrornousFiles, TotalFiles: Integer) of object;
+
   TPAKFExtractorThread = class(TThread)
   private
+{$IFDEF DEBUG}
+    DebugStringResult: string;
+{$ENDIF}  
     fTargetFileListEntry: TFileName;
+    fErrornousFilesCount: Integer;
     fGameVersion: TGameVersion;
     fFilesList: TStringList;
     fSourceDirectory: TFileName;
+    fSuccessFilesCount: Integer;
     fFileName: TFileName;
     fExtractionResult: TPAKFExtractionResult;
     fOutputDir: TFileName;
-{$IFDEF DEBUG}
-    DebugStringResult: string;
-{$ENDIF}    
+    fExtractionFinished: TExtractionFinishedEvent;
     procedure ExtractCurrentEntry;
     procedure SyncAddEntry;
     procedure SyncInitializeWindow;
@@ -40,6 +46,8 @@ type
   public
     constructor Create(const SourceDirectory: TFileName;
       GameVersion: TGameVersion);
+    property OnExtractionFinished: TExtractionFinishedEvent read
+      fExtractionFinished write fExtractionFinished;
   end;
 
 implementation
@@ -80,6 +88,9 @@ begin
   WriteLn(#13#10, '*** NPC FACES EXTRACTOR MODULE ***');
 {$ENDIF}
 
+  fSuccessFilesCount := 0;
+  fErrornousFilesCount := 0;
+  
   fSourceDirectory := IncludeTrailingPathDelimiter(fSourceDirectory);
 //  GetFullPathName(
   fFilesList := TStringList.Create;
@@ -128,6 +139,10 @@ begin
 {$ENDIF}{$ENDIF}
     end;
 
+    // Finished Event
+    if Assigned(fExtractionFinished) then
+      fExtractionFinished(Self, fSuccessFilesCount, fErrornousFilesCount, fFilesList.Count);
+
   finally
     fFilesList.Free;
 {$IFDEF DEBUG}{$IFDEF CREATE_PAKF_LOG}
@@ -159,27 +174,45 @@ end;
 
 procedure TPAKFExtractorThread.SyncAddEntry;
 begin
-  with frmFacesExtractor.lvFiles.Items.Add do begin
-    Caption := fFileName;
-    case fExtractionResult of
-      perUnknow:
-        SubItems.Add('UNKNOW');
-      perNotValidFile:
-        SubItems.Add('Unneeded');
-      perConversionFailed:
-        SubItems.Add('FAILED');
-      perTargetAlreadyExists:
-        SubItems.Add('Exists');
-      perSuccess:
-        SubItems.Add('Success');
+  with frmFacesExtractor.lvFiles do begin
+    with Items.Add do begin
+      Caption := fFileName;
+      case fExtractionResult of
+        perUnknow:
+          begin
+            SubItems.Add('UNKNOW');
+            Inc(fErrornousFilesCount);
+          end;
+        perNotValidFile:
+          SubItems.Add('Unneeded');
+        perConversionFailed:
+          begin
+            SubItems.Add('FAILED');
+            Inc(fErrornousFilesCount);
+          end;
+        perTargetAlreadyExists:
+          SubItems.Add('Exists');
+        perSuccess:
+          begin
+            SubItems.Add('Success');
+            Inc(fSuccessFilesCount);
+          end;
+      end;
+      Selected := True;
     end;
-    Selected := True;
+    ItemIndex := Items.Count - 1;
+    Scroll(0, 100);
   end;
 end;
 
 procedure TPAKFExtractorThread.SyncInitializeWindow;
 begin
   frmFacesExtractor.Reset(fFilesList.Count);
+  try
+    frmFacesExtractor.lvFiles.SetFocus;
+  except
+    // nothing
+  end;
 end;
 
 procedure TPAKFExtractorThread.SyncUpdateProgress;
