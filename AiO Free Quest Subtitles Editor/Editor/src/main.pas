@@ -1307,8 +1307,9 @@ end;
 procedure TfrmMain.LoadSubtitleFile(const FileName: TFileName);
 var
   PictFile: TFileName; //, GameVersionFolder: TFileName;
-  GenderChar, AgeChar: string;
+//  GenderChar, AgeChar: string;
   LoadRes: Boolean;
+  StrBuf: string;
 
 begin
   if not FileExists(FileName) then Exit;
@@ -1321,11 +1322,10 @@ begin
   LoadRes := SCNFEditor.LoadFromFile(FileName);
   if not LoadRes then begin
 //    Screen.Cursor := crDefault;
-    GenderChar := 'ERROR: File "' + FileName + '" is UNREADABLE!';
-    AgeChar := 'ERROR: File "' + ExtractFileName(FileName) + '" is UNREADABLE!';
-    AddDebug(GenderChar);
+    AddDebug('ERROR: File "' + FileName + '" is UNREADABLE!');
+    StrBuf := 'ERROR: File "' + ExtractFileName(FileName) + '" is UNREADABLE!';
     SetStatus('ERROR!');
-    MsgBox(AgeChar, 'FATAL ERROR !', MB_ICONERROR);
+    MsgBox(StrBuf, 'FATAL ERROR !', MB_ICONERROR);
 //    SetStatus('Ready');
     SetStatusReady;
     Exit;
@@ -1372,22 +1372,22 @@ begin
   rbatUnknow.Checked := True;
   case SCNFEditor.Gender of
     gtMale:   begin
-                GenderChar := 'M';
+//                GenderChar := 'M';
                 rbMale.Checked := True;
               end;
     gtFemale: begin
-                GenderChar := 'F';
+//                GenderChar := 'F';
                 rbFemale.Checked := True;
               end;
   end;
 
   case SCNFEditor.AgeType of
     atAdult:  begin
-                AgeChar := 'A';
+//                AgeChar := 'A';
                 rbAdult.Checked := True;
               end;
     atChild:  begin
-                AgeChar := 'C';
+//                AgeChar := 'C';
                 rbChild.Checked := True;
               end;
   end;
@@ -1411,7 +1411,8 @@ begin
     + GameVersionFolder + '\' + SCNFEditor.CharacterID + GenderChar + '_'
     + AgeChar + '.JPG';*)
   PictFile := GetFacesDirectory(SCNFEditor.GameVersion) +
-    SCNFEditor.CharacterID + GenderChar + '_' + AgeChar + '.JPG';
+//    SCNFEditor.CharacterID + GenderChar + '_' + AgeChar + '.JPG';
+    SCNFEditor.CharacterID + '.JPG';
 
   if FileExists(PictFile) then
     iFace.Picture.LoadFromFile(PictFile)

@@ -6,9 +6,10 @@ unit pakfutil;
 interface
 
 uses
-  Windows, SysUtils;
+  Windows, SysUtils, ScnfUtil;
 
 function ConvertFaceTexture(const OutputDir, PVRSourceFileName: TFileName): Boolean;
+procedure ExtractFacesPatch(const GameVersion: TGameVersion);
 function IsValidFaceImage(const JPEGFileName: TFileName): Boolean;
 function IsValueInArray(SourceArray: array of string;
   ValueToSearch: string; var ArrayIndexResult: Integer): Boolean;
@@ -16,7 +17,7 @@ function IsValueInArray(SourceArray: array of string;
 implementation
 
 uses
-  Classes, ExtCtrls, Graphics, Math, JPEG, Img2Png, Common, SysTools;
+  Classes, ExtCtrls, Graphics, Math, JPEG, Img2Png, Common, SysTools, LzmaDec;
 
 // For Rotate90 (Thanks to Jean-Yves Quéinec)
 type
@@ -199,6 +200,30 @@ BEGIN
   BMP.Assign(BMPF);
 
   FINALLY BMPF.Free; TabScanlineBMP := nil ; TabScanlineBMPF := nil; END;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure ExtractFacesPatch(const GameVersion: TGameVersion);
+var
+  PatchFileName: TFileName;
+  
+begin
+  PatchFileName := '';
+  case GameVersion of
+    gvShenmueJ:
+      PatchFileName := 'shenmue.ptc';
+    gvShenmue:
+      PatchFileName := 'shenmue.ptc';
+  end;
+
+  // no patch for this game
+  if PatchFileName = '' then
+    Exit;
+
+  // gvUndef to get the "faces" root
+  PatchFileName := GetFacesDirectory(gvUndef) + PatchFileName;
+  SevenZipExtract(PatchFileName, GetFacesDirectory(GameVersion));
 end;
 
 //------------------------------------------------------------------------------

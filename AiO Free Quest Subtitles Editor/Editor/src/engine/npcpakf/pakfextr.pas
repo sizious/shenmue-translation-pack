@@ -18,7 +18,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  PakfUtil, NPCSID;
+  PakfUtil, NPCsID;
 
 const
   PAKF_SIGN = 'PAKF';
