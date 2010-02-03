@@ -10,7 +10,7 @@ uses
 
 type
   TExtractionFinishedEvent = procedure(Sender: TObject; ProcessCanceled: Boolean;
-    SuccessFiles, ErrornousFiles, TotalFiles: Integer) of object;
+    ExistsFile, SuccessFiles, ErrornousFiles, TotalFiles: Integer) of object;
 
   TPAKFExtractorThread = class(TThread)
   private
@@ -23,6 +23,7 @@ type
     fFilesList: TStringList;
     fSourceDirectory: TFileName;
     fSuccessFilesCount: Integer;
+    fExistsFilesCount: Integer;
     fFileName: TFileName;
     fExtractionResult: TPAKFExtractionResult;
     fOutputDir: TFileName;
@@ -54,7 +55,7 @@ implementation
 
 uses
   {$IFDEF DEBUG}TypInfo, {$ENDIF}
-  Common, FacesExt, Img2Png, Utils;
+  Common, FacesExt, Img2Png, Utils, PakfUtil;
 
 { TPAKFExtractorThread }
 
@@ -90,6 +91,7 @@ begin
   WriteLn(#13#10, '*** NPC FACES EXTRACTOR MODULE ***');
 {$ENDIF}
 
+  fExistsFilesCount := 0;
   fSuccessFilesCount := 0;
   fErrornousFilesCount := 0;
   ProcessCanceled := False;
@@ -123,6 +125,9 @@ begin
     // Extracting the PVR conversion engine
     PVRConverter_ExtractEngine(GetWorkingTempDirectory);
 
+    // Extracting patchs if needed
+    ExtractFacesPatch(GameVersion);
+    
     // Converting all found files
     for i := 0 to FilesList.Count - 1 do begin
       if Terminated then begin
@@ -147,8 +152,8 @@ begin
 
     // Finished Event
     if Assigned(fExtractionFinished) then
-      fExtractionFinished(Self, ProcessCanceled, fSuccessFilesCount,
-        fErrornousFilesCount, fFilesList.Count);
+      fExtractionFinished(Self, ProcessCanceled, fExistsFilesCount,
+        fSuccessFilesCount, fErrornousFilesCount, fFilesList.Count);
 
   finally
     fFilesList.Free;
@@ -198,7 +203,10 @@ begin
             Inc(fErrornousFilesCount);
           end;
         perTargetAlreadyExists:
-          SubItems.Add('Exists');
+          begin
+            SubItems.Add('Exists');
+            Inc(fExistsFilesCount);
+          end;
         perSuccess:
           begin
             SubItems.Add('Success');

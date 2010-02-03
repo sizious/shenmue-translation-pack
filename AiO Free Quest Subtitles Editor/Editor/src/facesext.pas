@@ -2,23 +2,24 @@ unit facesext;
 
 // Auto-select right directory for debug purpose
 
-// 251 faces extracted (+7 from shenmue.ptc)
+// 249 faces extracted (+7 from shenmue.ptc)
 // {$DEFINE DEBUG_PAKF_SHENMUE1}
 
 // 592 faces extracted (everything extracted)
-// {$DEFINE DEBUG_PAKF_SHENMUE2}
+{$DEFINE DEBUG_PAKF_SHENMUE2}
 
 // 592 faces extracted (everything extracted)
 // {$DEFINE DEBUG_PAKF_SHENMUE2_XB}
 
-// 68 faces extracted (+1 from whats.ptc)
-{$DEFINE DEBUG_PAKF_WHATS_SHENMUE}
+// 68 faces extracted (everything extracted)
+// {$DEFINE DEBUG_PAKF_WHATS_SHENMUE}
 
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, PAKFExec, JvBaseDlg, JvBrowseFolder;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, PAKFExec, JvBaseDlg, JvBrowseFolder,
+  ScnfUtil;
 
 type
   TfrmFacesExtractor = class(TForm)
@@ -48,10 +49,16 @@ type
     fPAKFExtractorThread: TPAKFExtractorThread;
     fProcessCanceled: Boolean;
     fCanceledByButton: Boolean;
+    fSelectedGameVersion: TGameVersion;
+    fTotalFacesExtracted_SM1: Integer;
+    fTotalFacesExtracted_SM2: Integer;    
+    fTotalFacesExtracted_WSM: Integer;
     procedure ExtractionFinished(Sender: TObject; ProcessCanceled: Boolean;
-      SuccessFiles, ErrornousFiles, TotalFiles: Integer);
+      ExistsFiles, SuccessFiles, ErrornousFiles, TotalFiles: Integer);
   protected
     procedure ExtractFaces;
+    function GetSelectedGameVersion: TGameVersion;
+    function GetSelectedGameTitle: string;
     procedure SetFormCanceledState(CancelInProgress: Boolean);
     procedure SetFormControlsState(State: Boolean);
     procedure ProcessCompleted(Sender: TObject);
@@ -59,8 +66,16 @@ type
       write fCanceledByButton;
     property ExtractorThread: TPAKFExtractorThread read fPAKFExtractorThread
       write fPAKFExtractorThread;
+    property SelectedGameVersion: TGameVersion
+      read fSelectedGameVersion write fSelectedGameVersion;
     property ProcessBusy: Boolean read fProcessBusy write fProcessBusy;
     property ProcessCanceled: Boolean read fProcessCanceled write fProcessCanceled;
+    property TotalFacesExtracted_SM1: Integer
+      read fTotalFacesExtracted_SM1 write fTotalFacesExtracted_SM1;
+    property TotalFacesExtracted_SM2: Integer
+      read fTotalFacesExtracted_SM2 write fTotalFacesExtracted_SM2;
+    property TotalFacesExtracted_WSM: Integer
+      read fTotalFacesExtracted_WSM write fTotalFacesExtracted_WSM;
   public
     { Déclarations publiques }
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
@@ -77,7 +92,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Math, ScnfUtil;
+  Math, NPCsID;
   
 { TfrmFacesExtractor }
 
@@ -102,37 +117,71 @@ begin
     MsgBox('The specified directory doesn''t exists.', 'Warning', MB_ICONWARNING);
     Exit;
   end;
-  
+
   ExtractFaces;
 end;
 
 procedure TfrmFacesExtractor.ExtractFaces;
-var
-  GameVersion: TGameVersion;
-
 begin
   SetFormControlsState(False);
   ProcessBusy := True;
   ProcessCanceled := False;
-  GameVersion := gvShenmue;
-  case rgGameVersion.ItemIndex of
-    1: GameVersion := gvShenmue2;
-    2: GameVersion := gvWhatsShenmue;
-  end;
-  ExtractorThread := TPAKFExtractorThread.Create(eDirectory.Text, GameVersion);
+  SelectedGameVersion := GetSelectedGameVersion;
+
+  // Create and execute the thread
+  ExtractorThread := TPAKFExtractorThread.Create(eDirectory.Text, SelectedGameVersion);
   ExtractorThread.OnTerminate := ProcessCompleted;
   ExtractorThread.OnExtractionFinished := ExtractionFinished;
   ExtractorThread.Resume;
 end;
 
 procedure TfrmFacesExtractor.ExtractionFinished(Sender: TObject;
-  ProcessCanceled: Boolean; SuccessFiles, ErrornousFiles, TotalFiles: Integer);
+  ProcessCanceled: Boolean; ExistsFiles, SuccessFiles, ErrornousFiles,
+  TotalFiles: Integer);
 var
-  Errors, MsgTitle: string;
-  Icon: Integer;
+  Errors, MsgTitle,
+  MissingFaceText: string;
+  Icon, FacesCount,
+  MissingFacesCount,
+  TotalFacesExtracted: Integer;
 
 begin
   if not ProcessCanceled then begin
+
+    // Display the missing faces count
+    FacesCount := 0;
+    TotalFacesExtracted := 0;
+    case SelectedGameVersion of
+      gvShenmue: // Shenmue
+        begin
+          FacesCount := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
+          TotalFacesExtracted_SM1 := TotalFacesExtracted_SM1 + SuccessFiles;
+          TotalFacesExtracted := TotalFacesExtracted_SM1;          
+        end;
+      gvShenmue2: // Shenmue II
+        begin
+          FacesCount := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
+          TotalFacesExtracted_SM2 := TotalFacesExtracted_SM2 + SuccessFiles;
+          TotalFacesExtracted := TotalFacesExtracted_SM2;
+        end;
+      gvWhatsShenmue: // What's Shenmue
+        begin
+          FacesCount := VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT;
+          TotalFacesExtracted_WSM := TotalFacesExtracted_WSM + SuccessFiles;
+          TotalFacesExtracted := TotalFacesExtracted_WSM;
+        end;
+    end;
+    MissingFacesCount := FacesCount - TotalFacesExtracted;
+
+    if MissingFacesCount > 0 then
+      MissingFaceText := 'You are missing ' + IntToStr(MissingFacesCount) +
+        ' of ' + IntToStr(FacesCount) + ' face(s) files.' + sLineBreak
+        + 'Extract the missing faces from the others discs set!'
+    else
+      MissingFaceText := 'You have every NPC faces files for '
+        + GetSelectedGameTitle + ' !';
+
+    // The rest of the message box: displaying errornous files count
     MsgTitle := 'Extraction finished';
     if (SuccessFiles > 0) and (ErrornousFiles > 0) then begin
       Errors := ' ' + IntToStr(ErrornousFiles) + ' error(s).';
@@ -143,16 +192,22 @@ begin
       Icon := MB_ICONINFORMATION;
     end;
 
-    if SuccessFiles > 0 then
-      MsgBox(IntToStr(SuccessFiles) + ' file(s) successfully extracted with' + Errors,
-        MsgTitle,
-        Icon + MB_OK)
+    // Displaying the message box
+    if MissingFacesCount = 0 then
+      MsgBox(MissingFaceText, 'Faces extraction complete!', MB_ICONINFORMATION + MB_OK)
     else
-      MsgBox('No NPC faces need to be extracted for '
-        + rgGameVersion.Items[rgGameVersion.ItemIndex] + '.',
-        MsgTitle,
-        Icon + MB_OK
-      );
+      if SuccessFiles > 0 then
+        MsgBox(IntToStr(SuccessFiles) + ' file(s) successfully extracted with' + Errors
+          + sLineBreak + MissingFaceText,
+          MsgTitle,
+          Icon + MB_OK)
+      else
+        MsgBox('Every NPC for '
+          + GetSelectedGameTitle + ' were already extracted '
+          + 'from the selected folder.',
+          MsgTitle,
+          Icon + MB_OK
+        );
   end; // ProcessCanceled
 end;
 
@@ -211,6 +266,23 @@ end;
 procedure TfrmFacesExtractor.FormShow(Sender: TObject);
 begin
   Reset(0);
+  TotalFacesExtracted_SM1 := 0;
+  TotalFacesExtracted_SM2 := 0;
+  TotalFacesExtracted_WSM := 0;      
+end;
+
+function TfrmFacesExtractor.GetSelectedGameTitle: string;
+begin
+  Result := rgGameVersion.Items[rgGameVersion.ItemIndex];
+end;
+
+function TfrmFacesExtractor.GetSelectedGameVersion: TGameVersion;
+begin
+  Result := gvShenmue;
+  case rgGameVersion.ItemIndex of
+    1: Result := gvShenmue2;
+    2: Result := gvWhatsShenmue;
+  end;
 end;
 
 function TfrmFacesExtractor.MsgBox(const Text, Caption: string;

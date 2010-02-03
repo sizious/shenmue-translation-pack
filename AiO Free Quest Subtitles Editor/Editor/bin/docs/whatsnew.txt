@@ -17,6 +17,13 @@ ADDED:
 - Updated the chrlist1.csv with new characters ("-", "Ó", "ó", "Ú", "ú"),
   we forgot to update the chars list in the same time as the Previewer.
 - A Bugs Handler was added to manage fatal errors when they're occuring.
+- A NPC Faces Extractor is now included in the application. By pressing the
+  F9 hotkey ("Tools" > "Face extractor"), you have the possibility to extract
+  the NPC faces from the PAKF files (*.PKF). PKF files are inside the 
+  HUMANS.AFS archive on every disc. For each PAKS (*.PKS) file (which contains
+  the subtitles you can edit with the Free Quest Editor), you can extract the
+  corresponding PKF. Every game version are supported. We don't spread NPC
+  faces starting for now. If you want these, extract them yourself!
 
 FIXED:
 - The "View" main menu was re-organized.
