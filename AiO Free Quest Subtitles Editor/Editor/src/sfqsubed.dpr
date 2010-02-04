@@ -43,7 +43,12 @@ uses
   bugsmgr in 'bugsmgr.pas' {frmBugsHandler},
   img2png in '..\..\..\Common\img2png.pas',
   lzmadec in '..\..\..\Common\lzmadec.pas',
-  dblzma in 'engine\textdb\dblzma.pas';
+  dblzma in 'engine\textdb\dblzma.pas',
+  npcinfo in 'engine\npc\npcinfo.pas',
+  pakfexec in 'engine\npc\pakf\pakfexec.pas',
+  pakfextr in 'engine\npc\pakf\pakfextr.pas',
+  pakfutil in 'engine\npc\pakf\pakfutil.pas',
+  npcsid in 'engine\npc\npcsid.pas';
 
 {$R *.res}
 
