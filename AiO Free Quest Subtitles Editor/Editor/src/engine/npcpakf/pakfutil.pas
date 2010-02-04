@@ -39,9 +39,9 @@ type
   vaut 1.
 *)
 procedure BilinearResize(var BMP: TBitmap; const NewWidth, NewHeight: Integer);
-TYPE
+(*TYPE
   TRGBArray = ARRAY[0..0] OF TRGBTriple;
-  PRGBArray = ^TRGBArray;
+  PRGBArray = ^TRGBArray;*)
   
 VAR
   X, Y : integer; //coordonnées image source
