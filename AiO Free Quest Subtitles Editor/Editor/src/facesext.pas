@@ -237,19 +237,19 @@ procedure TfrmFacesExtractor.FormCreate(Sender: TObject);
 begin
 {$IFDEF DEBUG}
 {$IFDEF DEBUG_PAKF_SHENMUE1}
-  eDirectory.Text := 'G:\Shenmue\Humans\03-SHENMUE PAL\DISC1\PKF\';
+  eDirectory.Text := 'G:\Shenmue\Humans\04-Shenmue (PAL)\DISC1\PKF\';
   rgGameVersion.ItemIndex := 0;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_SHENMUE2}
-  eDirectory.Text := 'G:\Shenmue\Humans\05-SHENMUE 2 PAL\DISC1\PKF\';
+  eDirectory.Text := 'G:\Shenmue\Humans\06-Shenmue II (PAL)\DISC1\PKF\';
   rgGameVersion.ItemIndex := 1;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_SHENMUE2_XB}
-  eDirectory.Text := 'G:\Shenmue\Humans\06-SHENMUE 2 PAL UK XBOX\DISC1\PKF\';
+  eDirectory.Text := 'G:\Shenmue\Humans\08-Shenmue 2x (PAL) (UK)\DISC1\PKF\';
   rgGameVersion.ItemIndex := 1;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_WHATS_SHENMUE}
-  eDirectory.Text := 'G:\Shenmue\Humans\01-WHATS SHENMUE JAP\PKF';
+  eDirectory.Text := 'G:\Shenmue\Humans\01-What''s Shenmue (JAP)\PKF\';
   rgGameVersion.ItemIndex := 2;
 {$ENDIF}
 {$ENDIF}

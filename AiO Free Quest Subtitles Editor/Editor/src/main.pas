@@ -1457,7 +1457,7 @@ begin
         StringReplace(TextDatabaseCorrector.Subtitles[SubtitleSelected].Text,
           '<br>', sLineBreak, [rfReplaceAll])
     else
-      OriginalSelectedSubtitleText := '~~ Not available... ~~';
+      OriginalSelectedSubtitleText := ORIGINAL_TEXT_NOT_AVAILABLE;
 
     // Update the OldSubEd edit
     UpdateOldSubtitleField;

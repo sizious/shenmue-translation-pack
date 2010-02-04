@@ -34,6 +34,7 @@ const
   MT_NOT_TRANSLATED_YET       = '# Not translated yet... #';
   FACE_WIDTH                  = 96; // used in pakfutil
   FACE_HEIGHT                 = 96;
+  ORIGINAL_TEXT_NOT_AVAILABLE = '~~ Not available... ~~';
 
 function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
 function GetDatasDirectory: TFileName;

@@ -9,8 +9,7 @@ uses
   common in '..\..\Editor\src\engine\common.pas',
   scnfutil in '..\..\Editor\src\engine\scnfutil.pas',
   charslst in '..\..\Editor\src\engine\charslst.pas',
-  charscnt in '..\..\Editor\src\engine\charscnt.pas',
-  npcinfo in '..\..\Editor\src\engine\npcinfo.pas';
+  charscnt in '..\..\Editor\src\engine\charscnt.pas';
 
 {$R *.res}
 
@@ -29,8 +28,7 @@ begin
   Application.Initialize;
   Application.Title := 'HUMANS Dissecter';
   Application.CreateForm(TForm1, Form1);
-  
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
 {$ENDIF}
