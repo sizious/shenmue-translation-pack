@@ -32,6 +32,20 @@
     <Borland.ProjectType>VCLApplication</Borland.ProjectType>
     <BorlandProject>
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">3</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">4105</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Manic Corp.</VersionInfoKeys><VersionInfoKeys Name="FileDescription">HUMANS Dissecter</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.3.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName">humans_dissecter_v1.exe</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2002, 2010</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Created by Manic</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">hdissect.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">HUMANS Dissecter</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.3.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">Modified by SiZiOUS</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">hdissect.dpr</Source></Source><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages></Delphi.Personality></BorlandProject></BorlandProject>
@@ -41,9 +55,15 @@
     <DelphiCompile Include="hdissect.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="..\..\..\Common\img2png.pas" />
+    <DCCReference Include="..\..\..\Common\lzmadec.pas" />
+    <DCCReference Include="..\..\..\Common\systools.pas" />
     <DCCReference Include="..\..\Editor\src\engine\charscnt.pas" />
     <DCCReference Include="..\..\Editor\src\engine\charslst.pas" />
     <DCCReference Include="..\..\Editor\src\engine\common.pas" />
+    <DCCReference Include="..\..\Editor\src\engine\npc\npcinfo.pas" />
+    <DCCReference Include="..\..\Editor\src\engine\npc\npcsid.pas" />
+    <DCCReference Include="..\..\Editor\src\engine\npc\pakf\pakfutil.pas" />
     <DCCReference Include="..\..\Editor\src\engine\scnfedit.pas" />
     <DCCReference Include="..\..\Editor\src\engine\scnfutil.pas" />
     <DCCReference Include="config.pas" />

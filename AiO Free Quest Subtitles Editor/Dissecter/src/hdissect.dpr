@@ -9,7 +9,13 @@ uses
   common in '..\..\Editor\src\engine\common.pas',
   scnfutil in '..\..\Editor\src\engine\scnfutil.pas',
   charslst in '..\..\Editor\src\engine\charslst.pas',
-  charscnt in '..\..\Editor\src\engine\charscnt.pas';
+  charscnt in '..\..\Editor\src\engine\charscnt.pas',
+  npcinfo in '..\..\Editor\src\engine\npc\npcinfo.pas',
+  npcsid in '..\..\Editor\src\engine\npc\npcsid.pas',
+  pakfutil in '..\..\Editor\src\engine\npc\pakf\pakfutil.pas',
+  img2png in '..\..\..\Common\img2png.pas',
+  systools in '..\..\..\Common\systools.pas',
+  lzmadec in '..\..\..\Common\lzmadec.pas';
 
 {$R *.res}
 
