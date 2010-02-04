@@ -1,7 +1,6 @@
 program sfqsubed;
 
 {$R '..\..\..\Shenmue Subtitles Preview\src\font.res' '..\..\..\Shenmue Subtitles Preview\src\font.rc'}
-{$R 'engine\npcpakf\pakfbin.res' 'engine\npcpakf\pakfbin.rc'}
 {$R 'engine\lzmabin.res' 'engine\lzmabin.rc'}
 
 uses
@@ -22,7 +21,6 @@ uses
   fileslst in 'engine\fileslst.pas',
   massimp in 'massimp.pas' {frmMassImport},
   subsexp in 'engine\batch\subsexp.pas',
-  npcinfo in 'engine\npcinfo.pas',
   subsimp in 'engine\batch\subsimp.pas',
   common in 'engine\common.pas',
   warning in 'warning.pas' {frmWarning},
@@ -34,9 +32,6 @@ uses
   textdata in 'engine\multitrd\textdata.pas',
   about in 'about.pas' {frmAbout},
   viewupd in 'engine\multitrd\ui\viewupd.pas',
-  pakfexec in 'engine\npcpakf\pakfexec.pas',
-  pakfextr in 'engine\npcpakf\pakfextr.pas',
-  pakfutil in 'engine\npcpakf\pakfutil.pas',
   facesext in 'facesext.pas' {frmFacesExtractor},
   iconsui in 'engine\multitrd\ui\iconsui.pas',
   multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
@@ -48,8 +43,7 @@ uses
   bugsmgr in 'bugsmgr.pas' {frmBugsHandler},
   img2png in '..\..\..\Common\img2png.pas',
   lzmadec in '..\..\..\Common\lzmadec.pas',
-  dblzma in 'engine\textdb\dblzma.pas',
-  npcsid in 'engine\npcpakf\npcsid.pas';
+  dblzma in 'engine\textdb\dblzma.pas';
 
 {$R *.res}
 

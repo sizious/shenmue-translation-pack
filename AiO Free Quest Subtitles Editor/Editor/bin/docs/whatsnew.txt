@@ -10,12 +10,13 @@ ___| Version 2.4: 2010- |_________________________________________________
 ADDED:
 - New powerful function: The Subtitles Corrector.
   When pressing F11 (Item "View" > "Show original text"), you can view the 
-  original subtitle as it was in the game before any modification. The original 
+  original subtitle as it was in the game before any modification. The original
   subtitle is displayed in the "Old text" field. Press F11 again to go back 
   as normal (Thanks Shendream for the idea).
 - Updated the npc_info.csv list with the Shenmue 1 NPC (Thanks Shendream).
 - Updated the chrlist1.csv with new characters ("-", "Ó", "ó", "Ú", "ú"),
-  we forgot to update the chars list in the same time as the Previewer.
+  we forgot to update the chars list in the same time as the Previewer (Thanks
+  Ryo Suzuki & IlDucci).
 - A Bugs Handler was added to manage fatal errors when they're occuring.
 - A NPC Faces Extractor is now included in the application. By pressing the
   F9 hotkey ("Tools" > "Face extractor"), you have the possibility to extract
