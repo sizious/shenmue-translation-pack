@@ -42,7 +42,7 @@ const
   APP_VERSION =
     '2.4' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'February 9, 2010 @05:20PM';
+  COMPIL_DATE_TIME = 'February 9, 2010 @06:02PM';
 
 type
   TGlobalTranslationModule = class;
@@ -309,6 +309,7 @@ type
     procedure SetStatus(const Text: string);
     procedure SetStatusReady; // SetStatus('Ready')
     procedure SetModified(const State: Boolean);
+    procedure UpdateDirectoryControlsState;    
     procedure UpdateSubtitleLengthControls(SubtitleText: string; FirstLengthEditControl,
       SecondLengthEditControl: TEdit);
 
@@ -737,14 +738,11 @@ begin
   rbAdult.Checked := False;
   rbChild.Checked := False;
   iFace.Picture := nil;
+  UpdateDirectoryControlsState;
 end;
 
 procedure TfrmMain.InitApplicationReleaseType;
 begin
-{$IFNDEF DEBUG}
-  miDebug.Visible := False;
-{$ENDIF}
-
 {$IFDEF OLD_MULTI_TRANSLATION_STYLE}
   MultiTranslation.Active := False;
   miMultiTranslate.Caption := 'Multi-translation...';
@@ -948,9 +946,15 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title + ' - v' + APP_VERSION + ' - by [big_fury]SiZiOUS';
 
+{$IFNDEF DEBUG}
+  // Debug Menu
+  miDebug.Visible := False;
+{$ENDIF}
+
   // Initialize the Text Corrector Database
   PreviousLoadedGameVersion := gvUndef;
   TextDatabaseCorrector := TTextDatabaseCorrector.Create;
+  EnableOriginalSubtitlesView := False;
   
 //  WorkFilesList := TFilesList.Create;
 
@@ -1037,7 +1041,7 @@ begin
   //----------------------------------------------------------------------------
   // DEBUG
   //----------------------------------------------------------------------------
-  InitApplicationReleaseType;
+  InitApplicationReleaseType;  
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -1191,13 +1195,11 @@ begin
   // enable or not some menus
   miFileProperties.Enabled := (lbFilesList.ItemIndex <> -1);
   miFileProperties2.Enabled := miFileProperties.Enabled;
-  miReloadDir.Enabled := DirectoryExists(SelectedDirectory);
-  miReloadDir2.Enabled := miReloadDir.Enabled;
-  miBrowseDirectory.Enabled := miReloadDir.Enabled;
-  miBrowseDirectory2.Enabled := miBrowseDirectory.Enabled;
   miExportFilesList.Enabled := lbFilesList.Items.Count > 0;
   miCloseFile2.Enabled := (lbFilesList.ItemIndex <> -1);
   miCloseFile.Enabled := miCloseFile2.Enabled;
+
+  UpdateDirectoryControlsState;
 end;
 
 procedure TfrmMain.lbFilesListDblClick(Sender: TObject);
@@ -2162,6 +2164,14 @@ procedure TfrmMain.tvMultiSubsKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   tvMultiSubsClick(Sender);
+end;
+
+procedure TfrmMain.UpdateDirectoryControlsState;
+begin
+  miReloadDir.Enabled := DirectoryExists(SelectedDirectory);
+  miReloadDir2.Enabled := miReloadDir.Enabled;
+  miBrowseDirectory.Enabled := miReloadDir.Enabled;
+  miBrowseDirectory2.Enabled := miBrowseDirectory.Enabled;
 end;
 
 procedure TfrmMain.UpdateOldSubtitleField;
