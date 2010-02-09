@@ -14,10 +14,13 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
+    fDatasDirectory: TFileName;
     { Déclarations privées }
     procedure PreviewerClosedEvent(Sender: TObject);
   public
     { Déclarations publiques }
+    property DatasDirectory: TFileName
+      read fDatasDirectory write fDatasDirectory;
   end;
 
 var
@@ -40,7 +43,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  Previewer := TSubtitlesPreviewWindow.Create;
+  DatasDirectory :=
+    IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + 'data';
+  Previewer := TSubtitlesPreviewWindow.Create(DatasDirectory);
   Previewer.OnWindowClosed := PreviewerClosedEvent;
 
   // ä Ä â Â á À à Á ï Ï î Î í Í ë Ë ê Ê

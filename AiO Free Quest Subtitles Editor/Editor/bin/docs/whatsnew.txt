@@ -35,6 +35,8 @@ FIXED:
      doesn't contains valid editable SCNF section.
    + Some little tweaks and optimizations.
 - Application configuration manager was optimized and updated.
+- The Subtitles Previewer has been updated. Each charsmap datas can be 
+  modified in the "data/bmpfont" directory.
 - About box was reviewed (new credits, and more).
 - Some code clean-up.
 ___                           _________________________________________________
