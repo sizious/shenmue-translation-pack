@@ -1,6 +1,6 @@
 program scinsube;
 
-{$R '..\..\Shenmue Subtitles Preview\src\font.res' '..\..\Shenmue Subtitles Preview\src\font.rc'}
+
 
 uses
   Forms,

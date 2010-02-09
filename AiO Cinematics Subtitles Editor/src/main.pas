@@ -23,7 +23,7 @@ uses
   JvBrowseFolder, Viewer_Intf, ShellApi;
 
 const
-  COMPIL_DATE_TIME = 'April 8, 2009 @11:49PM';
+  COMPIL_DATE_TIME = 'February 9, 2010 @11:52AM';
 
 type
   TfrmMain = class(TForm)
@@ -619,7 +619,7 @@ begin
   Caption := Application.Title + ' v' + GetShortStringVersion;
 //  Application.Title := Caption;
 
-  Previewer := TSubtitlesPreviewWindow.Create;
+  Previewer := TSubtitlesPreviewWindow.Create(DataDir + 'bmpfont\');
   Previewer.OnWindowClosed := PreviewerWindowCloseEvent;
 
   Constraints.MinHeight := Height;

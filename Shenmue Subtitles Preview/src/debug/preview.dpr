@@ -1,6 +1,6 @@
 program preview;
 
-{$R '..\font.res' '..\font.rc'}
+
 
 uses
   Windows,
