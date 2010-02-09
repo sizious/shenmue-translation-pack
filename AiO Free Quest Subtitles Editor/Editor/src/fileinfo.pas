@@ -268,7 +268,7 @@ begin
       gvShenmue2: AddHeaderEntry('Game version', 'Shenmue II (PAL) (DC)');
       gvShenmue2X: AddHeaderEntry('Game version', 'Shenmue II (PAL) (XBOX)');
     end;*)
-    AddHeaderEntry('Game version', GameVersionToStr(GameVersion));
+    AddHeaderEntry('Game version', GameVersionToFriendlyString(GameVersion));
     AddHeaderEntry('Main CharID', CharacterID);
     AddHeaderEntry('SCNF / CharID header size', ScnfCharIDHeaderSize);
     AddHeaderEntry('String table header offset', StrTableHeaderOffset);

@@ -35,7 +35,8 @@ type
     bExtract: TButton;
     bCancel: TButton;
     JvBrowseForFolderDialog: TJvBrowseForFolderDialog;
-    Label1: TLabel;
+    lHelp: TLabel;
+    lShenmueUS: TLabel;
     procedure bExtractClick(Sender: TObject);
     procedure bCancelClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -92,7 +93,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Math, NPCsID;
+  Math, NPCList;
   
 { TfrmFacesExtractor }
 
@@ -148,25 +149,23 @@ var
 begin
   if not ProcessCanceled then begin
 
+    FacesCount := GetNPCAutoExtractedCount(SelectedGameVersion);
+    
     // Display the missing faces count
-    FacesCount := 0;
     TotalFacesExtracted := 0;
     case SelectedGameVersion of
       gvShenmue: // Shenmue
         begin
-          FacesCount := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
           TotalFacesExtracted_SM1 := TotalFacesExtracted_SM1 + SuccessFiles;
           TotalFacesExtracted := TotalFacesExtracted_SM1;          
         end;
       gvShenmue2: // Shenmue II
         begin
-          FacesCount := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
           TotalFacesExtracted_SM2 := TotalFacesExtracted_SM2 + SuccessFiles;
           TotalFacesExtracted := TotalFacesExtracted_SM2;
         end;
       gvWhatsShenmue: // What's Shenmue
         begin
-          FacesCount := VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT;
           TotalFacesExtracted_WSM := TotalFacesExtracted_WSM + SuccessFiles;
           TotalFacesExtracted := TotalFacesExtracted_WSM;
         end;
@@ -278,8 +277,9 @@ end;
 
 function TfrmFacesExtractor.GetSelectedGameVersion: TGameVersion;
 begin
-  Result := gvShenmue;
+  Result := gvUndef;
   case rgGameVersion.ItemIndex of
+    0: Result := gvShenmue;
     1: Result := gvShenmue2;
     2: Result := gvWhatsShenmue;
   end;

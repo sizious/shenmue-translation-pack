@@ -31,14 +31,16 @@ type
 
 const
   // Default text when not translated...
-  MT_NOT_TRANSLATED_YET       = '# Not translated yet... #';
-  FACE_WIDTH                  = 96; // used in pakfutil
-  FACE_HEIGHT                 = 96;
-  ORIGINAL_TEXT_NOT_AVAILABLE = '~~ Not available... ~~';
+  MT_NOT_TRANSLATED_YET         = '# Not translated yet... #';
+  FACE_WIDTH                    = 96; // used in pakfutil
+  FACE_HEIGHT                   = 96;
+  ORIGINAL_TEXT_NOT_AVAILABLE   = '~~ Not available... ~~';
 
+function GetBitmapFontDatasDirectory: TFileName;
 function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
 function GetDatasDirectory: TFileName;
-function GetFacesDirectory(GameVersion: TGameVersion): TFileName;
+function GetFacesImagesDirectory(GameVersion: TGameVersion): TFileName;
+function GetFacesSystemDirectory: TFileName;
 function GetNPCInfoFile: TFileName;
 function GetTextCorrectorDatabasesDirectory: TFileName;
 function IsCharsModAvailable(GameVersion: TGameVersion): Boolean;
@@ -49,25 +51,36 @@ implementation
 //------------------------------------------------------------------------------
 
 const
-  DATA_BASE_DIR           = 'data';
+  DATA_BASE_DIR               = 'data';
 
-  NPC_INFO_FILE           = 'npc_info.csv';
-  CHR_LIST_1              = 'chrlist1.csv'; // for Shenmue, US Shenmue, What's Shenmue
-  CHR_LIST_2              = 'chrlist2.csv'; // for Shenmue II
+  NPC_INFO_FILE               = 'npc_info.csv';
+  CHR_LIST_1                  = 'chrlist1.csv'; // for Shenmue, US Shenmue, What's Shenmue
+  CHR_LIST_2                  = 'chrlist2.csv'; // for Shenmue II
 
-  FACES_BASE_DIR          = 'faces';
-  FACES_WHATS_DIR         = 'whats';
-  FACES_SHENMUE_DIR       = 'shenmue';
-  FACES_SHENMUE2_DIR      = 'shenmue2';
+  FACES_ROOT_DIR              = 'faces';
+  FACES_SYSTEM_ROOT_DIR       = 'system';
+  FACES_IMAGES_ROOT_DIR       = 'images';
+  FACES_IMAGES_WHATS_DIR      = 'whats';
+  FACES_IMAGES_SHENMUE_DIR    = 'shenmue';
+  FACES_IMAGES_SHENMUE2_DIR   = 'shenmue2';
 
-  TEXT_DATABASE_ROOT_DIR  = 'textdb';       // directory where are stored subtitles correction DB
+  TEXT_DATABASE_ROOT_DIR      = 'textdb';       // directory where are stored subtitles correction DB
+
+  BITMAP_FONT_ROOT_DIR        = 'bmpfont';
 
 {$IFDEF DEBUG}{$IFDEF DEBUG_FACES_DIR}
-  FACES_DEBUG_DIR         = 'G:\Shenmue\~pakf\';
+  FACES_DEBUG_DIR             = 'G:\Shenmue\~pakf\';
 {$ENDIF}{$ENDIF}
   
 var
   DatasDirectory: TFileName;
+
+//------------------------------------------------------------------------------
+
+function GetBitmapFontDatasDirectory: TFileName;
+begin
+  Result := GetDatasDirectory + BITMAP_FONT_ROOT_DIR + '\';
+end;
 
 //------------------------------------------------------------------------------
 
@@ -78,20 +91,35 @@ end;
 
 //------------------------------------------------------------------------------
 
-function GetFacesDirectory(GameVersion: TGameVersion): TFileName;
+function GetFacesImagesDirectory(GameVersion: TGameVersion): TFileName;
 begin
 {$IFDEF DEBUG}{$IFDEF DEBUG_FACES_DIR}
-  Result := FACES_DEBUG_DIR + FACES_BASE_DIR + '\';
+  Result := FACES_DEBUG_DIR;
 {$ENDIF}{$ELSE}
-  Result := GetDatasDirectory + FACES_BASE_DIR + '\';
+  Result := GetDatasDirectory;
 {$ENDIF}
+
+  // Building the path string
+  Result := Result + FACES_ROOT_DIR + '\' + FACES_IMAGES_ROOT_DIR + '\';
   case GameVersion of
-    gvWhatsShenmue  : Result := Result + FACES_WHATS_DIR    + '\';
-    gvShenmue       : Result := Result + FACES_SHENMUE_DIR  + '\';
-    gvShenmue2J     : Result := Result + FACES_SHENMUE2_DIR + '\';
-    gvShenmue2      : Result := Result + FACES_SHENMUE2_DIR + '\';
-    gvShenmue2X     : Result := Result + FACES_SHENMUE2_DIR + '\';
+    gvWhatsShenmue  : Result := Result + FACES_IMAGES_WHATS_DIR    + '\';
+    gvShenmue       : Result := Result + FACES_IMAGES_SHENMUE_DIR  + '\';
+    gvShenmue2J     : Result := Result + FACES_IMAGES_SHENMUE2_DIR + '\';
+    gvShenmue2      : Result := Result + FACES_IMAGES_SHENMUE2_DIR + '\';
+    gvShenmue2X     : Result := Result + FACES_IMAGES_SHENMUE2_DIR + '\';
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetFacesSystemDirectory: TFileName;
+begin
+{$IFDEF DEBUG}{$IFDEF DEBUG_FACES_DIR}
+  Result := FACES_DEBUG_DIR;
+{$ENDIF}{$ELSE}
+  Result := GetDatasDirectory;
+{$ENDIF}
+  Result := Result + FACES_ROOT_DIR + '\' + FACES_SYSTEM_ROOT_DIR + '\';
 end;
 
 //------------------------------------------------------------------------------

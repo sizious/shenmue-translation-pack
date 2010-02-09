@@ -16,9 +16,10 @@ type
   private
 {$IFDEF DEBUG}
     DebugStringResult: string;
-{$ENDIF}  
+{$ENDIF}
     fTargetFileListEntry: TFileName;
     fErrornousFilesCount: Integer;
+    fExtractedCharID: string;
     fGameVersion: TGameVersion;
     fFilesList: TStringList;
     fSourceDirectory: TFileName;
@@ -99,7 +100,7 @@ begin
   fSourceDirectory := IncludeTrailingPathDelimiter(fSourceDirectory);
 //  GetFullPathName(
   fFilesList := TStringList.Create;
-  OutputDir := GetFacesDirectory(GameVersion);
+  OutputDir := GetFacesImagesDirectory(GameVersion);
   
   try
     if FindFirst(SourceDirectory + '*.*', faAnyFile, SR) = 0 then
@@ -166,7 +167,7 @@ end;
 procedure TPAKFExtractorThread.ExtractCurrentEntry;
 begin
   fExtractionResult := ExtractFaceFromPAKF(fTargetFileListEntry,
-    OutputDir, GameVersion {$IFDEF DEBUG}, DebugStringResult{$ENDIF});
+    OutputDir, GameVersion, fExtractedCharID {$IFDEF DEBUG}, DebugStringResult{$ENDIF});
   AddEntry(ExtractFileName(fTargetFileListEntry), fExtractionResult);
 end;
 

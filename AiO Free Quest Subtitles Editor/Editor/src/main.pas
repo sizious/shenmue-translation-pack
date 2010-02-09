@@ -560,6 +560,7 @@ end;
 
 procedure TfrmMain.ApplicationEventsException(Sender: TObject; E: Exception);
 begin
+  miSubsPreview.Enabled := not (E is ESubtitlesPreviewInterface);
   RunBugsHandler(Sender, E);
 end;
 
@@ -961,7 +962,7 @@ begin
   MultiTranslation := TMultiTranslationModule.Create;
 
   // Create the Subtitles Previewer
-  Previewer := TSubtitlesPreviewWindow.Create;
+  Previewer := TSubtitlesPreviewWindow.Create(GetBitmapFontDatasDirectory);
   Previewer.OnWindowClosed := PreviewWindowClosedEvent;
 
   // Create the main object: SCNF Editor (Subtitles Editor)
@@ -1348,10 +1349,10 @@ begin
   if PreviousLoadedGameVersion <> SCNFEditor.GameVersion then begin
     if not TextDatabaseCorrector.LoadDatabase(SCNFEditor.GameVersion) then
       AddDebug('WARNING: Unable to load the original subtitles information database for the "'
-        + GameVersionToStr(SCNFEditor.GameVersion) + '" game version !')
+        + GameVersionToFriendlyString(SCNFEditor.GameVersion) + '" game version !')
     else
       AddDebug('Original subtitles information database for the "'
-        + GameVersionToStr(SCNFEditor.GameVersion) + '" game version successfully loaded.');
+        + GameVersionToFriendlyString(SCNFEditor.GameVersion) + '" game version successfully loaded.');
     PreviousLoadedGameVersion := SCNFEditor.GameVersion;
   end;
 
@@ -1364,7 +1365,7 @@ begin
   // ---- UPDATING VIEW --------------------------------------------------------
 
   // Show game info
-  eGame.Text := GameVersionToStr(SCNFEditor.GameVersion);
+  eGame.Text := GameVersionToFriendlyString(SCNFEditor.GameVersion);
   eCharID.Text := SCNFEditor.CharacterID;
   eVoiceID.Text := SCNFEditor.VoiceShortID;
 
@@ -1410,7 +1411,7 @@ begin
   (*PictFile := GetDatasDirectory + 'faces\'
     + GameVersionFolder + '\' + SCNFEditor.CharacterID + GenderChar + '_'
     + AgeChar + '.JPG';*)
-  PictFile := GetFacesDirectory(SCNFEditor.GameVersion) +
+  PictFile := GetFacesImagesDirectory(SCNFEditor.GameVersion) +
 //    SCNFEditor.CharacterID + GenderChar + '_' + AgeChar + '.JPG';
     SCNFEditor.CharacterID + '.JPG';
 
@@ -1901,7 +1902,7 @@ begin
         Add('Input File   : ' + SCNFEditor.SourceFileName);
         Add('Character ID : ' + SCNFEditor.CharacterID);
         Add('Voice ID     : ' + SCNFEditor.VoiceShortID);
-        Add('Game Version : ' + GameVersionToStr(SCNFEditor.GameVersion));
+        Add('Game Version : ' + GameVersionToFriendlyString(SCNFEditor.GameVersion));
         Add('');
         Add('Subtitles    :');
       end;

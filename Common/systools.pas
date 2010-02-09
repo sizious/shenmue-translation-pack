@@ -5,7 +5,7 @@ unit systools;
 interface
 
 uses
-  Windows, SysUtils, Classes, PNGImage;
+  Windows, SysUtils, Classes; //, PNGImage; // why pngimage is used here??
 
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
@@ -15,6 +15,10 @@ function GetFileSize(const FileName: TFileName): Int64;
 function GetTempDir: TFileName;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
+function StringArrayBinarySearch(SortedSource: array of string;
+  SearchValue: string): Integer;
+function StringArraySequentialSearch(Source: array of string;
+  SearchValue: string): Integer;
 function Left(SubStr: string; S: string): string;
 function Right(SubStr: string; S: string): string;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
@@ -25,6 +29,44 @@ implementation
 
 const
   HexValues = '0123456789ABCDEF';
+
+//------------------------------------------------------------------------------
+
+// Thanks Marc Collin
+// http://www.laboiteaprog.com/article-30-1-delphi_recherche_binaire
+// This function is here to search in an array. ONLY IF THE ARRAY IS SORTED!!!
+function StringArrayBinarySearch(SortedSource: array of string;
+  SearchValue: string): Integer;
+var
+  Middle, Top, Bottom: Integer;
+  Found: Boolean;
+
+begin
+  SearchValue := UpperCase(SearchValue);
+  
+  Bottom := Low(SortedSource);
+  Top := High(SortedSource);
+  Found := False;
+  Result := 1;
+
+  while(Bottom <= Top) and (not Found) do
+  begin
+    Middle := (Bottom + Top) div 2;
+    if SortedSource[Middle] = SearchValue then begin
+      Found := True;
+      Result := Middle;
+    end else
+      if SortedSource[Middle] < SearchValue then
+        Bottom := Middle + 1
+      else
+        Top := Middle - 1;
+  end; // while
+
+  if not Found then
+    Result := Low(SortedSource) - 1;
+end;
+
+//------------------------------------------------------------------------------
 
 // By CodePedia
 // http://www.codepedia.com/1/HexToInt
@@ -227,6 +269,28 @@ begin
     Result := Stream.Size;
   finally
     Stream.Free;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function StringArraySequentialSearch(Source: array of string;
+  SearchValue: string): Integer;
+var
+  i: Integer;
+  Found: Boolean;
+
+begin
+  Result := Low(Source) - 1;
+  Found := False;
+  
+  i := Low(Source);
+  while (not Found) and (i <= High(Source)) do begin
+    if Pos(Source[i], SearchValue) > 0 then begin
+      Result := i;
+      Found := True;
+    end;
+    Inc(i);
   end;
 end;
 

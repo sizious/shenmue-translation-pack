@@ -1,7 +1,7 @@
 program sfqsubed;
 
-{$R '..\..\..\Shenmue Subtitles Preview\src\font.res' '..\..\..\Shenmue Subtitles Preview\src\font.rc'}
 {$R 'engine\lzmabin.res' 'engine\lzmabin.rc'}
+{$R 'engine\npc\pakf\pakfbin.res' 'engine\npc\pakf\pakfbin.rc'}
 
 uses
   Windows,
@@ -48,7 +48,9 @@ uses
   pakfexec in 'engine\npc\pakf\pakfexec.pas',
   pakfextr in 'engine\npc\pakf\pakfextr.pas',
   pakfutil in 'engine\npc\pakf\pakfutil.pas',
-  npcsid in 'engine\npc\npcsid.pas';
+  npclist in 'engine\npc\npclist.pas',
+  imgtools in '..\..\..\Common\imgtools.pas',
+  pakfmgr in 'engine\npc\pakf\pakfmgr.pas';
 
 {$R *.res}
 
