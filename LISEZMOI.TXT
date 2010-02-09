@@ -29,6 +29,12 @@
  
  Actuellement ce pack contient un panel d'outils divers et variés:
  
+ * ADPCM Streaming Toolkit
+   Cette boîte à outil est un bonus non nécessaire à la traduction du jeu,
+   cependant, sa fonction peut être d'une grande aide. Elle permet de convertir
+   le format audio Yamaha AICA ADPCM (.STR) vers le format RIFF WAVE (.WAV), 
+   ceci pour écouter les dialogues du jeu.
+   
  * AFS Utils
    Cet outil permet l'ouverture, la création et l'édition des archives AFS.
    
@@ -39,6 +45,10 @@
  * AiO Free Quest Subtitles Editor
    Cet éditeur est un éditeur de sous-titres dédié aux fichiers PAKS présent
    dans l'archive HUMANS.AFS.
+   
+ * Dreamcast Test Environment
+   Cet outil permet de créer une image Nero Burning Rom de test prête à être 
+   lancée dans nullDC, via un lecteur virtuel.
    
  * IDX Creator
    IDX Creator permet de recréer les fichiers IDX qui vont de paire avec les
