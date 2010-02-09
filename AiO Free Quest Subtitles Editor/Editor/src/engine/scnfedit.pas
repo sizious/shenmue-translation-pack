@@ -18,16 +18,17 @@
 (*
   Short history:
 
-  3.3.7
+  3.3.7 (February 9, 2010 @01:33PM)
     - TSection updated. The "UnknowValue" field is in fact the "CharID" field in
       8 bytes (not 4 as I set before). This include TSectionRawBinaryEntry type
       too.
     - Correction in the SCNF detect function. Some PAKS contains the "BIN " entry
       in the footer but DOESN'T contains valid SCNF section (then not editable
       subtitles).
+    - Fix in the game version detection for some What's Shenmue / Shenmue I (NTSC-J).
     - Some little tweaks
 
-  3.3.6
+  3.3.6 (?)
     - Adding the TSubEntry.IsEquals method
     - Adding some tweaks
 
@@ -71,7 +72,7 @@ uses
 
 const
   SCNF_EDITOR_ENGINE_VERSION = '3.3.7';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'February 3, 2010 @05:39PM';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'February 9, 2010 @01:34PM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -939,11 +940,22 @@ end;
 //------------------------------------------------------------------------------
 
 function TSCNFEditor.GetGameVersionFromVoiceID(const FullVoiceID: string): TGameVersion;
+const
+  WSM_VOICE1 = 'T';
+  WSM_VOICE2 = 'XT';
+  
+var
+  VoiceID: string;
+
 begin
+  VoiceID := ExtremeRight('/', FullVoiceID);
   Result := gvUndef;
-  if Pos(VOICE_STR_WHATS_SHENMUE, FullVoiceID) > 0 then
-    Result := gvWhatsShenmue
-  else if Pos(VOICE_STR_SHENMUEJ, FullVoiceID) > 0 then
+
+  if Pos(VOICE_STR_WHATS_SHENMUE, FullVoiceID) > 0 then begin
+    Result := gvWhatsShenmue;
+    if (Copy(VoiceID, 1, 1) <> WSM_VOICE1) and (Copy(VoiceID, 1, 2) <> WSM_VOICE2) then
+      Result := gvShenmueJ; // fix for some Shenmue 1 (JAP) PKS    
+  end else if Pos(VOICE_STR_SHENMUEJ, FullVoiceID) > 0 then
     Result := gvShenmueJ
   else if Pos(VOICE_STR_SHENMUE, FullVoiceID) > 0 then
     Result := gvShenmue

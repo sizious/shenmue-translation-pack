@@ -33,6 +33,9 @@ FIXED:
       8 bytes length (not 4 bytes as I thought before).
    + Some PAKS (from Shenmue 1) contains "BIN " entries in the footer but 
      doesn't contains valid editable SCNF section.
+   + Fix in the game version detection for some PAKS files. Every PAKS version
+     are correctly detected now.
+     The bug fix was for some What's Shenmue / Shenmue I (NTSC-J) PAKS.
    + Some little tweaks and optimizations.
 - Application configuration manager was optimized and updated.
 - The Subtitles Previewer has been updated. Each charsmap datas can be 
