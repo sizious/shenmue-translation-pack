@@ -37,9 +37,6 @@
     <DelphiCompile Include="preview.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <RcCompile Include="..\font.rc">
-      <Form>..\font.res</Form>
-    </RcCompile>
     <DCCReference Include="..\oldskool_font_mapper.pas" />
     <DCCReference Include="..\oldskool_font_vcl.pas" />
     <DCCReference Include="..\viewer.pas">

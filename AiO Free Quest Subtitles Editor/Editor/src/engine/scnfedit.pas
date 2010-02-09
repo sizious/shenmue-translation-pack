@@ -291,7 +291,7 @@ type
     property CharacterID: string read GetCharacterID;
     property GameVersion: TGameVersion read GetGameVersion;
     property VoiceFullID: string read fVoiceFullID;
-    property VoiceShortID: string read fVoiceShortID;
+    property VoiceShortID: string read fVoiceShortID;          
     property FooterOffset: Integer read fFooterOffset;
     property ScnfCharIDHeaderSize: Integer read fScnfCharIdHeaderSize;
     property StrTableHeaderOffset: Integer read fScnfStrTableHeaderOffset;
