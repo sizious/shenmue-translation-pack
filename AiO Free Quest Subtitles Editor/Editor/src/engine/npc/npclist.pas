@@ -5,6 +5,14 @@ interface
 uses
   ScnfUtil;
 
+function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;
+function GetNPCAutoExtractedCount(const GameVersion: TGameVersion): Integer;
+
+implementation
+
+uses
+  SysUtils, PakfUtil, SysTools;
+
 const
   VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT     = 68;
   VALID_NPC_WHATS_SHENMUE: array[0..67] of string = (
@@ -123,14 +131,6 @@ const
     'YRY_', 'YUR_', 'ZKN_', 'ZKS_', 'ZNC_', 'ZOH_', 'ZYC_'
   );
   
-function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;
-function GetNPCAutoExtractedCount(const GameVersion: TGameVersion): Integer;
-
-implementation
-
-uses
-  SysUtils, PakfUtil, SysTools;
-
 //==============================================================================
 
 function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;

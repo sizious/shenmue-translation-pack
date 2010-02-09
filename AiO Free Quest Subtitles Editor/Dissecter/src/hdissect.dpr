@@ -7,15 +7,16 @@ uses
   config in 'config.pas',
   scnfedit in '..\..\Editor\src\engine\scnfedit.pas',
   common in '..\..\Editor\src\engine\common.pas',
-  scnfutil in '..\..\Editor\src\engine\scnfutil.pas',
   charslst in '..\..\Editor\src\engine\charslst.pas',
   charscnt in '..\..\Editor\src\engine\charscnt.pas',
   npcinfo in '..\..\Editor\src\engine\npc\npcinfo.pas',
-  npcsid in '..\..\Editor\src\engine\npc\npcsid.pas',
   pakfutil in '..\..\Editor\src\engine\npc\pakf\pakfutil.pas',
   img2png in '..\..\..\Common\img2png.pas',
   systools in '..\..\..\Common\systools.pas',
-  lzmadec in '..\..\..\Common\lzmadec.pas';
+  lzmadec in '..\..\..\Common\lzmadec.pas',
+  npclist in '..\..\Editor\src\engine\npc\npclist.pas',
+  imgtools in '..\..\..\Common\imgtools.pas',
+  scnfutil in '..\..\Editor\src\engine\scnfutil.pas';
 
 {$R *.res}
 

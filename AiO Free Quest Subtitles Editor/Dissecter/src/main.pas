@@ -7,7 +7,7 @@ uses
   Dialogs, StdCtrls, FileCtrl, ExtCtrls, ComCtrls, cStreams, XPMan, SCNFEdit;
 
 const
-  APP_VERSION = '1.3';
+  APP_VERSION = '1.4';
   
 type
   TForm1 = class(TForm)
@@ -51,7 +51,7 @@ var
 implementation
 
 uses
-  config;
+  config, ScnfUtil;
   
 {$R *.dfm}
 
@@ -350,7 +350,7 @@ begin
   WriteLn(ResumeFileHandle, 'Output dir: ', out_dir, #13#10);
 
   if OnlySCNF then
-    Write(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Real CharID;Subtitles Count')
+    Write(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Real CharID;Subtitles Count;Game Version')
   else
     Write(ResumeCsvHandle, 'FileName;Char ID #1;Char ID #2;Subtitles Count');
 
@@ -372,7 +372,7 @@ begin
             WriteLn(ResumeFileHandle, ExtractFileName(filename), ': ',
               'CharID #1: ', SCNFEditor.Sections[0].CharID, ', CharID #2: ',
                 SCNFEditor.Sections[1].CharID, ', Real CharID: ', SCNFEditor.CharacterID,
-                ', Subs Count: ', SCNFEditor.Subtitles.Count);
+                ', Subs Count: ', SCNFEditor.Subtitles.Count, ', Game Version: ', GameVersionToFriendlyString(SCNFEditor.GameVersion));
 
             Write(ResumeCsvHandle,
               sLineBreak,
@@ -380,7 +380,8 @@ begin
               SCNFEditor.Sections[0].CharID, ';',
               SCNFEditor.Sections[1].CharID, ';',
               SCNFEditor.CharacterID, ';',
-              SCNFEditor.Subtitles.Count);
+              SCNFEditor.Subtitles.Count, ';',
+              GameVersionToFriendlyString(SCNFEditor.GameVersion));
           end;
         end;          
 
