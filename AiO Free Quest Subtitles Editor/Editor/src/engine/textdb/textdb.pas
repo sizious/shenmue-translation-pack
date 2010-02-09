@@ -29,7 +29,7 @@ type
 
     function LoadDatabase(GameVersion: TGameVersion): Boolean;
     function LoadTableForNPC(const ShortVoiceID, CharID: string): Boolean;
-    
+
     property IndexFileName: TFileName read fIndexFileName;
     property GameVersion: TGameVersion read fGameVersion;
     property Loaded: Boolean read fLoaded;
@@ -81,8 +81,7 @@ begin
     fLoaded := True;
     fGameVersion := GameVersion;
     fIndexFileName := fnIndexFileName;
-    fSubtitles.CharsList.Active :=
-      fSubtitles.CharsList.LoadFromFile(GetCorrectCharsList(GameVersion));
+    fSubtitles.CharsList.LoadFromFile(GetCorrectCharsList(GameVersion));
     Result := fDatabaseIndex.LoadDatabaseIndex(fnIndexFileName);
   end;
 end;

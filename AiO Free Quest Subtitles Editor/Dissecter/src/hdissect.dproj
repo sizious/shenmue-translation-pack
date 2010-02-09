@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ProjectGuid>{3abb1e6d-e0be-452f-b768-f161516ebf7d}</ProjectGuid>
     <MainSource>hdissect.dpr</MainSource>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
     <DCC_DependencyCheckOutputName>..\bin\hdissect.exe</DCC_DependencyCheckOutputName>
@@ -13,7 +13,7 @@
     <DCC_DebugInformation>False</DCC_DebugInformation>
     <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-    <DCC_Define>DEBUG</DCC_Define>
+    <DCC_Define>RELEASE</DCC_Define>
     <DCC_ExeOutput>..\bin</DCC_ExeOutput>
     <DCC_DcuOutput>..\obj</DCC_DcuOutput>
     <DCC_ObjOutput>..\obj</DCC_ObjOutput>
@@ -32,6 +32,22 @@
     <Borland.ProjectType>VCLApplication</Borland.ProjectType>
     <BorlandProject>
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">4</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">4105</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Manic Corp.</VersionInfoKeys><VersionInfoKeys Name="FileDescription">HUMANS Dissecter</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.4.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName">humans_dissecter_v1.exe</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2002, 2010</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Created by Manic</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">hdissect.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">HUMANS Dissecter</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.4.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">Modified by SiZiOUS</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">hdissect.dpr</Source></Source><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       
       
       

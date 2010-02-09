@@ -42,7 +42,7 @@ const
   APP_VERSION =
     '2.4' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'January 29, 2010 @10:45AM';
+  COMPIL_DATE_TIME = 'February 9, 2010 @05:20PM';
 
 type
   TGlobalTranslationModule = class;
@@ -271,7 +271,6 @@ type
     fCanEnableCharsMod2: Boolean;
     fMultiTranslation: TMultiTranslationModule;
     fReloadDirectoryAtStartup: Boolean;
-    fTextDatabaseCorrector: TTextDatabaseCorrector;
     fPreviousLoadedGameVersion: TGameVersion;
     fOldSelectedSubtitleText: string;
     fOriginalSelectedSubtitleText: string;
@@ -352,8 +351,6 @@ type
     // Properties for Text Correction DataBase (Original text from the game)
     property PreviousLoadedGameVersion: TGameVersion
       read fPreviousLoadedGameVersion write fPreviousLoadedGameVersion;
-    property TextDatabaseCorrector: TTextDatabaseCorrector
-      read fTextDatabaseCorrector;
     property OriginalSelectedSubtitleText: string
       read fOriginalSelectedSubtitleText write fOriginalSelectedSubtitleText; // ORIGINAL text from AM2 developers
     property OldSelectedSubtitleText: string
@@ -513,6 +510,8 @@ var
   BatchSubsExporter: TSubsMassExporterThread;         // enable to batch export subtitles
 
   Previewer: TSubtitlesPreviewWindow;                 // Implements the Subtitles Previewer
+
+  TextDatabaseCorrector: TTextDatabaseCorrector;      // Implements the TextCorrectionDatabase
 
 implementation
 
@@ -951,7 +950,7 @@ begin
 
   // Initialize the Text Corrector Database
   PreviousLoadedGameVersion := gvUndef;
-  fTextDatabaseCorrector := TTextDatabaseCorrector.Create;
+  TextDatabaseCorrector := TTextDatabaseCorrector.Create;
   
 //  WorkFilesList := TFilesList.Create;
 
@@ -1335,13 +1334,19 @@ begin
   // Setting the correct chars list file depending of the game version
   LoadRes :=
     SCNFEditor.CharsList.LoadFromFile(GetCorrectCharsList(SCNFEditor.GameVersion));
-  if LoadRes then
-    SCNFEditor.CharsList.Active := EnableCharsMod
-  else
-    if pcSubs.TabIndex = 0 then begin // Only if we have the "Editor" tab shown
-      SCNFEditor.CharsList.Active := False;
+  if LoadRes then begin
+    SCNFEditor.CharsList.Active := EnableCharsMod;
+    miEnableCharsMod.Enabled := True;
+  end else begin
+    AddDebug('WARNING: Unable to load the characters list for "'
+      + GameVersionToFriendlyString(SCNFEditor.GameVersion)
+      + '" from "' + GetCorrectCharsList(SCNFEditor.GameVersion) + '".'
+    );
+    if pcSubs.TabIndex = 0 then begin // Only if we have the "Editor" tab shown...
+      SCNFEditor.CharsList.Active := False; // because in Global mode, we can enable it
       miEnableCharsMod.Enabled := False;
     end;
+  end;
 
   // ---- TEXT DB --------------------------------------------------------------
 
@@ -1350,9 +1355,11 @@ begin
     if not TextDatabaseCorrector.LoadDatabase(SCNFEditor.GameVersion) then
       AddDebug('WARNING: Unable to load the original subtitles information database for the "'
         + GameVersionToFriendlyString(SCNFEditor.GameVersion) + '" game version !')
-    else
+    else begin
       AddDebug('Original subtitles information database for the "'
         + GameVersionToFriendlyString(SCNFEditor.GameVersion) + '" game version successfully loaded.');
+      TextDatabaseCorrector.Subtitles.CharsList.Active := EnableCharsMod;
+    end;
     PreviousLoadedGameVersion := SCNFEditor.GameVersion;
   end;
 

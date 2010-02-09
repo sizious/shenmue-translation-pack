@@ -36,7 +36,9 @@ type
     bCancel: TButton;
     JvBrowseForFolderDialog: TJvBrowseForFolderDialog;
     lHelp: TLabel;
-    lShenmueUS: TLabel;
+    lrg0: TLabel;
+    lrg1: TLabel;
+    lrg2: TLabel;
     procedure bExtractClick(Sender: TObject);
     procedure bCancelClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -51,11 +53,9 @@ type
     fProcessCanceled: Boolean;
     fCanceledByButton: Boolean;
     fSelectedGameVersion: TGameVersion;
-    fTotalFacesExtracted_SM1: Integer;
-    fTotalFacesExtracted_SM2: Integer;    
-    fTotalFacesExtracted_WSM: Integer;
     procedure ExtractionFinished(Sender: TObject; ProcessCanceled: Boolean;
-      ExistsFiles, SuccessFiles, ErrornousFiles, TotalFiles: Integer);
+      SuccessExtractCount, ErrorExtractCount, TotalExtractedCount,
+      TotalExtractedMaxCount: Integer);
   protected
     procedure ExtractFaces;
     function GetSelectedGameVersion: TGameVersion;
@@ -71,12 +71,6 @@ type
       read fSelectedGameVersion write fSelectedGameVersion;
     property ProcessBusy: Boolean read fProcessBusy write fProcessBusy;
     property ProcessCanceled: Boolean read fProcessCanceled write fProcessCanceled;
-    property TotalFacesExtracted_SM1: Integer
-      read fTotalFacesExtracted_SM1 write fTotalFacesExtracted_SM1;
-    property TotalFacesExtracted_SM2: Integer
-      read fTotalFacesExtracted_SM2 write fTotalFacesExtracted_SM2;
-    property TotalFacesExtracted_WSM: Integer
-      read fTotalFacesExtracted_WSM write fTotalFacesExtracted_WSM;
   public
     { Déclarations publiques }
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
@@ -93,7 +87,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Math, NPCList;
+  Math, PakfMgr;
   
 { TfrmFacesExtractor }
 
@@ -137,76 +131,46 @@ begin
 end;
 
 procedure TfrmFacesExtractor.ExtractionFinished(Sender: TObject;
-  ProcessCanceled: Boolean; ExistsFiles, SuccessFiles, ErrornousFiles,
-  TotalFiles: Integer);
+  ProcessCanceled: Boolean; SuccessExtractCount, ErrorExtractCount,
+  TotalExtractedCount, TotalExtractedMaxCount: Integer);
 var
-  Errors, MsgTitle,
+  Errors, MsgTitle, SuccessText,
   MissingFaceText: string;
-  Icon, FacesCount,
-  MissingFacesCount,
-  TotalFacesExtracted: Integer;
+  Icon,
+  MissingFacesCount: Integer;
 
 begin
   if not ProcessCanceled then begin
 
-    FacesCount := GetNPCAutoExtractedCount(SelectedGameVersion);
-    
-    // Display the missing faces count
-    TotalFacesExtracted := 0;
-    case SelectedGameVersion of
-      gvShenmue: // Shenmue
-        begin
-          TotalFacesExtracted_SM1 := TotalFacesExtracted_SM1 + SuccessFiles;
-          TotalFacesExtracted := TotalFacesExtracted_SM1;          
-        end;
-      gvShenmue2: // Shenmue II
-        begin
-          TotalFacesExtracted_SM2 := TotalFacesExtracted_SM2 + SuccessFiles;
-          TotalFacesExtracted := TotalFacesExtracted_SM2;
-        end;
-      gvWhatsShenmue: // What's Shenmue
-        begin
-          TotalFacesExtracted_WSM := TotalFacesExtracted_WSM + SuccessFiles;
-          TotalFacesExtracted := TotalFacesExtracted_WSM;
-        end;
-    end;
-    MissingFacesCount := FacesCount - TotalFacesExtracted;
+    MissingFacesCount := TotalExtractedMaxCount - TotalExtractedCount;
+    Icon := MB_ICONINFORMATION;
+    MsgTitle := 'Extraction finished';
+    Errors := ' no errors.';
 
-    if MissingFacesCount > 0 then
+    if MissingFacesCount > 0 then begin
       MissingFaceText := 'You are missing ' + IntToStr(MissingFacesCount) +
-        ' of ' + IntToStr(FacesCount) + ' face(s) files.' + sLineBreak
-        + 'Extract the missing faces from the others discs set!'
-    else
+        ' of ' + IntToStr(TotalExtractedMaxCount) + ' face(s) files.' + sLineBreak
+        + 'Extract the missing faces from the others discs!';
+
+      // The rest of the message box: displaying errornous files count
+      if ErrorExtractCount > 0 then begin
+        Errors := ' ' + IntToStr(ErrorExtractCount) + ' error(s).';
+        MsgTitle := ' with errors';
+        Icon := MB_ICONWARNING;
+      end;
+
+    end else
       MissingFaceText := 'You have every NPC faces files for '
         + GetSelectedGameTitle + ' !';
 
-    // The rest of the message box: displaying errornous files count
-    MsgTitle := 'Extraction finished';
-    if (SuccessFiles > 0) and (ErrornousFiles > 0) then begin
-      Errors := ' ' + IntToStr(ErrornousFiles) + ' error(s).';
-      Icon := MB_ICONWARNING;
-      MsgTitle := ' with errors';
-    end else begin
-      Errors := ' no errors.';
-      Icon := MB_ICONINFORMATION;
+    // Displaying the message box
+    if SuccessExtractCount > 0 then begin
+      SuccessText := IntToStr(SuccessExtractCount) + ' file(s) successfully '
+        + 'extracted with' + Errors + sLineBreak;
     end;
 
-    // Displaying the message box
-    if MissingFacesCount = 0 then
-      MsgBox(MissingFaceText, 'Faces extraction complete!', MB_ICONINFORMATION + MB_OK)
-    else
-      if SuccessFiles > 0 then
-        MsgBox(IntToStr(SuccessFiles) + ' file(s) successfully extracted with' + Errors
-          + sLineBreak + MissingFaceText,
-          MsgTitle,
-          Icon + MB_OK)
-      else
-        MsgBox('Every NPC for '
-          + GetSelectedGameTitle + ' were already extracted '
-          + 'from the selected folder.',
-          MsgTitle,
-          Icon + MB_OK
-        );
+    MsgBox(SuccessText + MissingFaceText, MsgTitle, Icon + MB_OK);
+        
   end; // ProcessCanceled
 end;
 
@@ -265,14 +229,16 @@ end;
 procedure TfrmFacesExtractor.FormShow(Sender: TObject);
 begin
   Reset(0);
-  TotalFacesExtracted_SM1 := 0;
-  TotalFacesExtracted_SM2 := 0;
-  TotalFacesExtracted_WSM := 0;      
 end;
 
 function TfrmFacesExtractor.GetSelectedGameTitle: string;
+const
+  SPACE_SLASH = '      ';
+
 begin
-  Result := rgGameVersion.Items[rgGameVersion.ItemIndex];
+  Result :=
+    (FindComponent('lrg' + IntToStr(rgGameVersion.ItemIndex)) as TLabel).Caption;
+  Result := StringReplace(Result, SPACE_SLASH, ' / ', [rfReplaceAll]);
 end;
 
 function TfrmFacesExtractor.GetSelectedGameVersion: TGameVersion;
@@ -328,7 +294,12 @@ begin
 end;
 
 procedure TfrmFacesExtractor.SetFormControlsState(State: Boolean);
+var
+  i: Integer;
+
 begin
+  for i := 0 to rgGameVersion.Items.Count - 1 do
+    (FindComponent('lrg' + IntToStr(i)) as TLabel).Enabled := State;    
   bBrowse.Enabled := State;
   eDirectory.Enabled := State;
   rgGameVersion.Enabled := State;

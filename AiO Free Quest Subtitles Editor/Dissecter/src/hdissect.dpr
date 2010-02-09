@@ -27,15 +27,15 @@ var
 {$ENDIF}
 
 begin
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
   ConsoleCreated := AllocConsole;
   ReportMemoryLeaksOnShutdown := True;
-  {$ENDIF}
+{$ENDIF}
   
   Application.Initialize;
   Application.Title := 'HUMANS Dissecter';
   Application.CreateForm(TForm1, Form1);
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
 {$ENDIF}

@@ -2,13 +2,18 @@ unit pakfmgr;
 
 interface
 
+uses
+  ScnfUtil;
+  
+function GetExtractedNPCMaxCount(const GameVersion: TGameVersion): Integer;
+function GetExtractedNPCCount(const GameVersion: TGameVersion): Integer;
 function GetTextureIndexForSpecialCharID(const CharID: string): Integer;
 function IsFaceTexture(TextureName: string): Boolean;
 
 implementation
 
 uses
-  SysUtils, SysTools;
+  SysUtils, Common, SysTools, NPCList;
 
 type
   TSpecialNPC = record
@@ -38,6 +43,10 @@ const
     (CharID: 'RNP_'; TextureIndex: 6), (CharID: 'SYM_'; TextureIndex: 5),
     (CharID: 'TSK_'; TextureIndex: 6)
   );
+
+  VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT          = 592;
+  VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT           = 249;
+  VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT     = 68;
 
 //------------------------------------------------------------------------------
 
@@ -104,6 +113,52 @@ begin
 {$IFDEF DEBUG}
     WriteLn('  Special CharID: "', CharID, '", TextureNumber: ', Result);
 {$ENDIF}
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetExtractedNPCMaxCount(const GameVersion: TGameVersion): Integer;
+begin
+  Result := 0;
+  
+  case GameVersion of
+    gvWhatsShenmue:
+      Result := VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT;
+    gvShenmueJ:
+      Result := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
+    gvShenmue:
+      Result := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
+    gvShenmue2J:
+      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
+    gvShenmue2:
+      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
+    gvShenmue2X:
+      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
+  end;
+
+end;
+
+//------------------------------------------------------------------------------
+
+function GetExtractedNPCCount(const GameVersion: TGameVersion): Integer;
+var
+  SR: TSearchRec;
+  SourceDirectory: TFileName;
+
+begin
+  SourceDirectory := GetFacesImagesDirectory(GameVersion);
+  Result := 0;
+  
+  if FindFirst(SourceDirectory + '*.JPG', faAnyFile, SR) = 0 then
+  begin
+    // Scanning the whole directory
+    repeat
+      if (SR.Name[1] <> '.') and (SR.Attr and faDirectory = 0) then
+        if IsValidCharID(GameVersion, ChangeFileExt(SR.Name, '')) then
+          Inc(Result);        
+    until FindNext(SR) <> 0;
+    FindClose(SR);
   end;
 end;
 

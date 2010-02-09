@@ -38,7 +38,7 @@ object frmFacesExtractor: TfrmFacesExtractor
       'and help the translation.'
     WordWrap = True
   end
-  object lShenmueUS: TLabel
+  object lrg0: TLabel
     Left = 30
     Top = 96
     Width = 62
@@ -46,6 +46,38 @@ object frmFacesExtractor: TfrmFacesExtractor
     Caption = 'Shenmue      US Shenmue'
     Transparent = False
     WordWrap = True
+  end
+  object lrg1: TLabel
+    Left = 153
+    Top = 104
+    Width = 55
+    Height = 13
+    Caption = 'Shenmue II'
+    Transparent = False
+    WordWrap = True
+  end
+  object lrg2: TLabel
+    Left = 278
+    Top = 104
+    Width = 80
+    Height = 13
+    Caption = 'What'#39's Shenmue'
+    Transparent = False
+    WordWrap = True
+  end
+  object rgGameVersion: TRadioGroup
+    Left = 4
+    Top = 79
+    Width = 385
+    Height = 53
+    Caption = ' Game version : '
+    Columns = 3
+    ItemIndex = 0
+    Items.Strings = (
+      ''
+      ''
+      '')
+    TabOrder = 1
   end
   object GroupBox1: TGroupBox
     Left = 4
@@ -70,20 +102,6 @@ object frmFacesExtractor: TfrmFacesExtractor
       TabOrder = 1
       OnClick = bBrowseClick
     end
-  end
-  object rgGameVersion: TRadioGroup
-    Left = 4
-    Top = 79
-    Width = 385
-    Height = 53
-    Caption = ' Game version : '
-    Columns = 3
-    ItemIndex = 0
-    Items.Strings = (
-      ''
-      'Shenmue II'
-      'What'#39's Shenmue')
-    TabOrder = 1
   end
   object GroupBox2: TGroupBox
     Left = 4

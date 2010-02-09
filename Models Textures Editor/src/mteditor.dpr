@@ -1,7 +1,7 @@
 program mteditor;
 
 {$R 'rsrc.res' 'rsrc.rc'}
-{$R '..\..\Common\binaries.res' '..\..\Common\binaries.rc'}
+{$R 'engine\imgbins.res' 'engine\imgbins.rc'}
 
 uses
   Windows,
