@@ -1,4 +1,4 @@
-unit npcsid;
+unit npclist;
 
 interface
 
@@ -6,26 +6,7 @@ uses
   ScnfUtil;
 
 const
-  VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT   = 68;
-  VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT         = 249;
-  VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT        = 592;
-  
-function GetTextureIndexForSpecialCharID(const CharID: string): Integer;
-function IsFaceTexture(TextureName: string): Boolean;
-function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;
-
-implementation
-
-uses
-  SysUtils, PakfUtil;
-
-type
-  TSpecialNPC = record
-    CharID        : string;
-    TextureIndex  : Integer;
-  end;
-
-const
+  VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT     = 68;
   VALID_NPC_WHATS_SHENMUE: array[0..67] of string = (
     'AKSK', 'AOKI', 'ASOU', 'BOB_', 'FKSM', 'FLD1', 'GJBF', 'GJHF', 'HANA',
     'HDEI', 'HIRA', 'HISA', 'HRNO', 'HRSK', 'ITOI', 'KAOR', 'KAYO', 'KENI',
@@ -37,7 +18,8 @@ const
     'YMGC', 'YOHI', 'YOSE', 'YSKT', 'YUKK'
   );
 
-  VALID_NPC_SHENMUE: array[0..254] of string = (
+  VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT           = 249;
+  VALID_NPC_SHENMUE: array[0..254] of string      = (
     'AKMI', 'AKSK', 'AKTG', 'AOKI', 'ASDA', 'ASNO', 'ASOU', 'ATSI', 'BOB_',
     'CMAL', 'DJUN', 'DOOR', 'DORG', 'ECHO', 'EDST', 'EIKK', 'ENDO', 'ENKI',
     'ETKO', 'FKSM', 'FLD1', 'FLD2', 'FLD3', 'FLD4', 'FLD5', 'FLD6', 'FLD7',
@@ -71,7 +53,8 @@ const
 
   // Valid for every Shenmue 2 version
   // Tested on Shenmue 2 (JAP/PAL) (DC) and Shenmue 2X (PAL UK) (Xbox)
-  VALID_NPC_SHENMUE2: array[0..591] of string = (
+  VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT          = 592;
+  VALID_NPC_SHENMUE2: array[0..591] of string     = (
     '00A_', '00B_', '00C_', '00D_', '00E_', '00F_', '00G_', '00H_', '01A_',
     '01B_', '01C_', '01D_', '01E_', '01F_', '01G_', '01H_', '02A_', '02B_',
     '02C_', '02D_', '02E_', '02F_', '02G_', '02H_', '03A_', '03B_', '03C_',
@@ -139,89 +122,16 @@ const
     'XHK_', 'XHO_', 'XNO_', 'YAN_', 'YHG_', 'YKM_', 'YOG_', 'YOK_', 'YRU_',
     'YRY_', 'YUR_', 'ZKN_', 'ZKS_', 'ZNC_', 'ZOH_', 'ZYC_'
   );
-
-  (*
-      These CharIDs are errornous extracted if we don't set properly the right texture
-      to extract. Check the SPECIAL_CHARIDS_PAKF_TEXTURE_INDEX array to know the
-      texture index to extract from the PAKF.
-
-      Example: In the HDEI PKF package, the Face texture is the N°4. The TextureNumber
-      starts at 1 (not 0), so the first texture in the PKF package is 1.
-  *)
-
-
-const
-  SPECIAL_NPCS: array [0..20] of TSpecialNPC = (
-    (CharID: 'HDEI'; TextureIndex: 4), (CharID: 'KOGA'; TextureIndex: 4),
-    (CharID: 'MORN'; TextureIndex: 4), (CharID: 'YMGC'; TextureIndex: 4),
-    (CharID: '04B_'; TextureIndex: 7), (CharID: '05B_'; TextureIndex: 5),
-    (CharID: '06B_'; TextureIndex: 5), (CharID: '07B_'; TextureIndex: 5),
-    (CharID: '08B_'; TextureIndex: 5), (CharID: '09B_'; TextureIndex: 5),
-    (CharID: 'C07_'; TextureIndex: 6), (CharID: 'EDL_'; TextureIndex: 7),
-    (CharID: 'KJN_'; TextureIndex: 7), (CharID: 'KUD_'; TextureIndex: 4),
-    (CharID: 'KUN_'; TextureIndex: 7), (CharID: 'KYG_'; TextureIndex: 4),
-    (CharID: 'MEY_'; TextureIndex: 7), (CharID: 'MM5_'; TextureIndex: 2),
-    (CharID: 'RNP_'; TextureIndex: 6), (CharID: 'SYM_'; TextureIndex: 5),
-    (CharID: 'TSK_'; TextureIndex: 6)
-  );
-
-//=============================================================================
-
-// Thanks Marc Collin
-// http://www.laboiteaprog.com/article-30-1-delphi_recherche_binaire
-// This function is here to search in an array. ONLY IF THE ARRAY IS SORTED!!!
-function BinarySearch(A: array of string; ValueToSearch: string): Integer;
-var
-  Middle, Top, Bottom: Integer;
-  Found: Boolean;
-
-begin
-  ValueToSearch := UpperCase(ValueToSearch);
   
-  Bottom := Low(A);
-  Top := High(A);
-  Found := False;
-  BinarySearch := 1;
+function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;
+function GetNPCAutoExtractedCount(const GameVersion: TGameVersion): Integer;
 
-  while(Bottom <= Top) and (not Found) do
-  begin
-    Middle := (Bottom + Top) div 2;
-    if A[Middle] = ValueToSearch then begin
-      Found := True;
-      BinarySearch := Middle;
-    end else
-      if A[Middle] < ValueToSearch then
-        Bottom := Middle + 1
-      else
-        Top := Middle - 1;
-  end; // while
+implementation
 
-  if not Found then
-    Result := -1;
-end;
+uses
+  SysUtils, PakfUtil, SysTools;
 
-//------------------------------------------------------------------------------
-
-function IsSpecialNPC(SourceArray: array of TSpecialNPC;
-  CharID: string; var IndexResult: Integer): Boolean;
-var
-  i: Integer;
-
-begin
-  Result := False;
-  i := Low(SourceArray);
-  while (not Result) and (i <= High(SourceArray)) do begin
-    Result := (Pos(SourceArray[i].CharID, CharID) > 0);
-    if not Result then
-      Inc(i);
-  end;
-  if Result then
-    IndexResult := i
-  else
-    IndexResult := -1;
-end;
-
-//=============================================================================
+//==============================================================================
 
 function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;
 begin
@@ -229,71 +139,44 @@ begin
 
   case GameVersion of
     gvWhatsShenmue:
-      Result := BinarySearch(VALID_NPC_WHATS_SHENMUE, CharID) <> -1;
+      Result := StringArrayBinarySearch(VALID_NPC_WHATS_SHENMUE, CharID) <> -1;
     gvShenmueJ:
-      Result := BinarySearch(VALID_NPC_SHENMUE, CharID) <> -1;
+      Result := StringArrayBinarySearch(VALID_NPC_SHENMUE, CharID) <> -1;
     gvShenmue:
-      Result := BinarySearch(VALID_NPC_SHENMUE, CharID) <> -1;
+      Result := StringArrayBinarySearch(VALID_NPC_SHENMUE, CharID) <> -1;
     gvShenmue2J:
-      Result := BinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;
+      Result := StringArrayBinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;
     gvShenmue2:
-      Result := BinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;
+      Result := StringArrayBinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;
     gvShenmue2X:
-      Result := BinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;    
+      Result := StringArrayBinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;    
   end;
   
 end;
 
 //------------------------------------------------------------------------------
 
-function IsFaceTexture(TextureName: string): Boolean;
-const
-  SM1_FACE_TEXNAME_SIGN: array[0..12] of string = (
-    'KAO', 'HED', 'KAA', 'FAC', 'KAF',
-    'KAJ', 'MET', 'HIR', 'FCF', 'KAK',
-    'RKA', 'NFA', 'KAC'); // 'MUF', 'ALL', 'AAA', 'L'
-    
-  SM2_FACE_TEXNAME_SIGN: array[0..1] of string = (
-    '}Y_1', '}Y¾‡'
-  );
-
-var
-  i: Integer;
-    
+function GetNPCAutoExtractedCount(const GameVersion: TGameVersion): Integer;
 begin
-  TextureName := UpperCase(TextureName);
-
-  // Shenmue I
-  Result := IsValueInArray(SM1_FACE_TEXNAME_SIGN, TextureName, i);
-
-  // Shenmue II
-  if not Result then begin
-    TextureName[6] := 'Y'; // fix for some Shenmue II PAKF...
-    Result := IsValueInArray(SM2_FACE_TEXNAME_SIGN, TextureName, i);
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-// Sucks function but who cares???
-function GetTextureIndexForSpecialCharID(const CharID: string): Integer;
-var
-  i: Integer;
+  Result := 0;
   
-begin
-  // Setting default texture number (By Default, it will search for the texture name)
-  Result := -1;
-
-  // Handling special CharID (sucks too much... I know)
-  if IsSpecialNPC(SPECIAL_NPCS, CharID, i) then begin
-    Result := SPECIAL_NPCS[i].TextureIndex;
-
-{$IFDEF DEBUG}
-    WriteLn('  Special CharID: "', CharID, '", TextureNumber: ', Result);
-{$ENDIF}
+  case GameVersion of
+    gvWhatsShenmue:
+      Result := VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT;
+    gvShenmueJ:
+      Result := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
+    gvShenmue:
+      Result := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
+    gvShenmue2J:
+      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
+    gvShenmue2:
+      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
+    gvShenmue2X:
+      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
   end;
+
 end;
 
-//=============================================================================
+//==============================================================================
 
 end.

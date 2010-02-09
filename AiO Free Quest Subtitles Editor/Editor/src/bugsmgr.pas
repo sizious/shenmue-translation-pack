@@ -81,7 +81,12 @@ begin
   if CanDo = IDNO then Exit;
 
   ExitCode := 255;
-  frmMain.miQuit.Click;
+  if frmMain.Visible then  
+    frmMain.miQuit.Click
+  else begin
+    Application.ShowMainForm := False;
+    Application.Terminate;
+  end;
 end;
 
 //------------------------------------------------------------------------------

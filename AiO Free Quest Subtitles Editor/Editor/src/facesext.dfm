@@ -26,7 +26,7 @@ object frmFacesExtractor: TfrmFacesExtractor
     Width = 385
     Height = 2
   end
-  object Label1: TLabel
+  object lHelp: TLabel
     Left = 4
     Top = 5
     Width = 385
@@ -36,6 +36,15 @@ object frmFacesExtractor: TfrmFacesExtractor
       'This tool was made to retrieve all NPC faces from Shenmue PAKF f' +
       'iles. This can help you to reconingize a NPC character in-game, ' +
       'and help the translation.'
+    WordWrap = True
+  end
+  object lShenmueUS: TLabel
+    Left = 30
+    Top = 96
+    Width = 62
+    Height = 26
+    Caption = 'Shenmue      US Shenmue'
+    Transparent = False
     WordWrap = True
   end
   object GroupBox1: TGroupBox
@@ -64,30 +73,30 @@ object frmFacesExtractor: TfrmFacesExtractor
   end
   object rgGameVersion: TRadioGroup
     Left = 4
-    Top = 82
+    Top = 79
     Width = 385
-    Height = 39
+    Height = 53
     Caption = ' Game version : '
     Columns = 3
     ItemIndex = 0
     Items.Strings = (
-      'Shenmue'
+      ''
       'Shenmue II'
       'What'#39's Shenmue')
     TabOrder = 1
   end
   object GroupBox2: TGroupBox
     Left = 4
-    Top = 124
+    Top = 134
     Width = 385
-    Height = 145
+    Height = 136
     Caption = ' Result : '
     TabOrder = 2
     object lvFiles: TListView
       Left = 7
       Top = 14
       Width = 372
-      Height = 101
+      Height = 95
       Columns = <
         item
           Caption = 'File'
@@ -105,14 +114,14 @@ object frmFacesExtractor: TfrmFacesExtractor
     end
     object pBar: TProgressBar
       Left = 7
-      Top = 119
+      Top = 115
       Width = 311
       Height = 17
       TabOrder = 1
     end
     object lProgBar: TPanel
       Left = 324
-      Top = 118
+      Top = 114
       Width = 55
       Height = 18
       BevelOuter = bvLowered
@@ -140,7 +149,7 @@ object frmFacesExtractor: TfrmFacesExtractor
   end
   object JvBrowseForFolderDialog: TJvBrowseForFolderDialog
     Title = 'Please select the input directory:'
-    Left = 260
-    Top = 98
+    Left = 252
+    Top = 44
   end
 end

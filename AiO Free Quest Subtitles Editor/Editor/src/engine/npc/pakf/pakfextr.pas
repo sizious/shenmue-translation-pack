@@ -10,15 +10,15 @@ type
     perConversionFailed, perSuccess);
   
 function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName;
-  const GameVersion: TGameVersion
-  {$IFDEF DEBUG};var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
+  const GameVersion: TGameVersion; var CharID: string
+  {$IFDEF DEBUG}; var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
   
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  PakfUtil, NPCsID;
+  PakfUtil, NPCList, PakfMgr;
 
 const
   PAKF_SIGN = 'PAKF';
@@ -196,8 +196,8 @@ end;
 //------------------------------------------------------------------------------
 
 function ExtractFaceFromPAKF(PAKFInFile, OutDir: TFileName;
-  const GameVersion: TGameVersion
-  {$IFDEF DEBUG};var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
+  const GameVersion: TGameVersion; var CharID: string
+  {$IFDEF DEBUG}; var DebugStringResult: string{$ENDIF}): TPAKFExtractionResult;
 var
   PAKFStream: TFileStream;
   Header: TFileHeader;
@@ -206,7 +206,6 @@ var
   CurrentOffset, SpecialCharID_TextureIndex: Integer;
   FaceFound, ValidCharID: Boolean;
   OutFile, JPEGOutFile: TFileName;
-  CharID: string;
   
 begin
 {$IFDEF DEBUG}

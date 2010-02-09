@@ -15,7 +15,7 @@ type
     gvUndef,          // (Undefined)
     gvWhatsShenmue,   // What's Shenmue [Demo] (NTSC-J) (DC)
     gvShenmueJ,       // Shenmue I (NTSC-J) (DC)
-    gvShenmue,        // Shenmue I (PAL) (DC) / US Shenmue (NTSC-J) (DC)
+    gvShenmue,        // Shenmue I (PAL) (NTSC-U) (DC) / US Shenmue (NTSC-J) (DC)
     gvShenmue2J,      // Shenmue II (NTSC-J) (DC)
     gvShenmue2,       // Shenmue II (PAL) (DC)
     gvShenmue2X       // Shenmue II (PAL) (XBOX)
@@ -35,7 +35,7 @@ const
   // Game detection strings
   VOICE_STR_WHATS_SHENMUE       = '/prj16sc/MSG/voice/';                                  // What's Shenmue (DC) (NTSC-J)
   VOICE_STR_SHENMUEJ            = '/prj16sc2/MSG/voice/';                                 // Shenmue I (DC) (NTSC-J)
-  VOICE_STR_SHENMUE             = '/p38/prj38sc/Msg/voice/';                              // Shenmue I (DC) (PAL) / US Shenmue (DC) (NTSC-J)
+  VOICE_STR_SHENMUE             = '/p38/prj38sc/Msg/voice/';                              // Shenmue I (DC) (PAL) (NTSC-U) / US Shenmue (DC) (NTSC-J)
   VOICE_STR_SHENMUE2J           = '/p39/prj39sc/Msg/voice/';                              // Shenmue II (DC)  (NTSC-J)
   VOICE_STR_SHENMUE2            = '/p48/prj48sc/Voice/';                                  // Shenmue II (DC) (PAL)
   VOICE_STR_SHENMUE2X           = '/usr1/people/muramatsu/yoshizawa/humans/data/voice/';  // Shenmue II (XBOX) (PAL)
@@ -48,8 +48,8 @@ function IsFileValidScnf(const FileName: TFileName): Boolean;
 // Misc Utilities
 function Right(SubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
-function GameVersionToStr(GameVersion: TGameVersion): string;
 function GameVersionToCodeStr(GameVersion: TGameVersion): string;
+function GameVersionToFriendlyString(GameVersion: TGameVersion): string;
 function StrToGameVersion(S: string): TGameVersion;
 
 //------------------------------------------------------------------------------
@@ -96,13 +96,13 @@ end;
 
 //------------------------------------------------------------------------------
 
-function GameVersionToStr(GameVersion: TGameVersion): string;
+function GameVersionToFriendlyString(GameVersion: TGameVersion): string;
 begin
   Result := '(Undefined)';
   case GameVersion of
     gvWhatsShenmue  : Result := 'What''s Shenmue (NTSC-J) (DC)';
     gvShenmueJ      : Result := 'Shenmue I (NTSC-J) (DC)';
-    gvShenmue       : Result := 'Shenmue I (PAL) (DC)';
+    gvShenmue       : Result := 'Shenmue I (PAL/NTSC-U) (DC)';
     gvShenmue2J     : Result := 'Shenmue II (NTSC-J) (DC)';
     gvShenmue2      : Result := 'Shenmue II (PAL) (DC)';
     gvShenmue2X     : Result := 'Shenmue II (PAL) (XBOX)';

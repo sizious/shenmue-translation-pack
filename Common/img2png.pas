@@ -1,7 +1,9 @@
 (*
   Pvr2Png Unit Implementation by [big_fury]SiZiOUS
 
-  Powered by Pvr2Png 1.01 by Gzav
+  Powered by:
+  - Pvr2Png 1.01 by Gzav
+  - PvrX2Png 0.1 by SiZiOUS
 *)
 unit img2png;
 
