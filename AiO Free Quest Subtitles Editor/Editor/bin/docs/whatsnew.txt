@@ -38,8 +38,8 @@ FIXED:
      The bug fix was for some What's Shenmue / Shenmue I (NTSC-J) PAKS.
    + Some little tweaks and optimizations.
 - Application configuration manager was optimized and updated.
-- The Subtitles Previewer has been updated. Each charsmap datas can be 
-  modified in the "data/bmpfont" directory.
+- The Subtitles Previewer has been updated. Characters map can be modified in 
+  the "data/bmpfont" directory.
 - About box was reviewed (new credits, and more).
 - Some code clean-up.
 ___                           _________________________________________________
