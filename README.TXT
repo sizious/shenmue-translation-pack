@@ -28,7 +28,12 @@
  __| PACKAGiNG CONTENTS |______________________________________________________
  
  Currently this pack contains a bunch of various tools :       
- 
+
+ * ADPCM Streaming Toolkit
+   This toolkit was made to decode the Yamaha AICA ADPCM (.STR) to the RIFF 
+   WAVE (.WAV) audio format. It isn't a required tool, but it can be useful to 
+   help the translation process.
+   
  * AFS Utils
    This tool allows opening, creating and editing AFS packages.
    
@@ -39,6 +44,11 @@
  * AiO Free Quest Subtitles Editor
    This tool is the subtitles editor for PAKS files inside the HUMANS.AFS
    package.
+
+ * Dreamcast Test Environment
+   This tool was made to generate a Nero Burning Rom test image in order to 
+   test your work in real-time with nullDC. You must mount the generated image
+   in a Virtual Drive, otherwise, it doesn't work.
    
  * IDX Creator
    This stuff allows to re-create correct IDX files corresponding to each AFS.
