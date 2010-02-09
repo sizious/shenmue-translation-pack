@@ -9,8 +9,13 @@ uses
   Windows, SysUtils, Classes, ScnfUtil, PakfExtr;
 
 type
-  TExtractionFinishedEvent = procedure(Sender: TObject; ProcessCanceled: Boolean;
-    ExistsFile, SuccessFiles, ErrornousFiles, TotalFiles: Integer) of object;
+  TExtractionFinishedEvent = procedure(
+    Sender: TObject; ProcessCanceled: Boolean;
+    SuccessExtractCount,
+    ErrorExtractCount,
+    TotalExtractedCount,
+    TotalExtractedMaxCount: Integer
+  ) of object;
 
   TPAKFExtractorThread = class(TThread)
   private
@@ -56,7 +61,7 @@ implementation
 
 uses
   {$IFDEF DEBUG}TypInfo, {$ENDIF}
-  Common, FacesExt, Img2Png, Utils, PakfUtil;
+  Common, FacesExt, Img2Png, Utils, PakfUtil, PakfMgr;
 
 { TPAKFExtractorThread }
 
@@ -153,8 +158,10 @@ begin
 
     // Finished Event
     if Assigned(fExtractionFinished) then
-      fExtractionFinished(Self, ProcessCanceled, fExistsFilesCount,
-        fSuccessFilesCount, fErrornousFilesCount, fFilesList.Count);
+      fExtractionFinished(Self, ProcessCanceled,
+        fSuccessFilesCount, fErrornousFilesCount,
+        GetExtractedNPCCount(GameVersion),
+        GetExtractedNPCMaxCount(GameVersion));
 
   finally
     fFilesList.Free;

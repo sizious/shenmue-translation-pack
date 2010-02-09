@@ -5,6 +5,7 @@
 
 unit common;
 
+// Define this variable to change the faces output dir (check below to set the path).
 {$DEFINE DEBUG_FACES_DIR}
 
 interface
@@ -103,6 +104,7 @@ begin
   Result := Result + FACES_ROOT_DIR + '\' + FACES_IMAGES_ROOT_DIR + '\';
   case GameVersion of
     gvWhatsShenmue  : Result := Result + FACES_IMAGES_WHATS_DIR    + '\';
+    gvShenmueJ      : Result := Result + FACES_IMAGES_SHENMUE_DIR  + '\';
     gvShenmue       : Result := Result + FACES_IMAGES_SHENMUE_DIR  + '\';
     gvShenmue2J     : Result := Result + FACES_IMAGES_SHENMUE2_DIR + '\';
     gvShenmue2      : Result := Result + FACES_IMAGES_SHENMUE2_DIR + '\';
@@ -133,10 +135,22 @@ end;
 
 function IsTheSameCharsList(GameVersion1, GameVersion2: TGameVersion): Boolean;
 begin
+  // GameVersion1 for Shenmue II
   if (GameVersion1 = gvShenmue2J) or (GameVersion1 = gvShenmue2X) then
     GameVersion1 := gvShenmue2;
+
+  // GameVersion2 for Shenmue II
   if (GameVersion2 = gvShenmue2J) or (GameVersion2 = gvShenmue2X) then
     GameVersion2 := gvShenmue2;
+
+  // GameVersion1 for Shenmue I
+  if (GameVersion1 = gvShenmueJ) then
+    GameVersion1 := gvShenmue;
+
+  // GameVersion2 for Shenmue I
+  if (GameVersion2 = gvShenmueJ) then
+    GameVersion2 := gvShenmue;
+
   Result := GameVersion1 = GameVersion2;
 end;
 
@@ -155,6 +169,7 @@ begin
   case GameVersion of
     gvUndef:        Result := '';
     gvWhatsShenmue: Result := Result + CHR_LIST_1;
+    gvShenmueJ:     Result := Result + CHR_LIST_1;
     gvShenmue:      Result := Result + CHR_LIST_1;
     gvShenmue2J:    Result := Result + CHR_LIST_2;
     gvShenmue2:     Result := Result + CHR_LIST_2;

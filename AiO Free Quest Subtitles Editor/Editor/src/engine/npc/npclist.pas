@@ -6,15 +6,15 @@ uses
   ScnfUtil;
 
 function IsValidCharID(const GameVersion: TGameVersion; const CharID: string): Boolean;
-function GetNPCAutoExtractedCount(const GameVersion: TGameVersion): Integer;
 
+//------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
 
 uses
   SysUtils, PakfUtil, SysTools;
 
 const
-  VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT     = 68;
   VALID_NPC_WHATS_SHENMUE: array[0..67] of string = (
     'AKSK', 'AOKI', 'ASOU', 'BOB_', 'FKSM', 'FLD1', 'GJBF', 'GJHF', 'HANA',
     'HDEI', 'HIRA', 'HISA', 'HRNO', 'HRSK', 'ITOI', 'KAOR', 'KAYO', 'KENI',
@@ -26,7 +26,6 @@ const
     'YMGC', 'YOHI', 'YOSE', 'YSKT', 'YUKK'
   );
 
-  VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT           = 249;
   VALID_NPC_SHENMUE: array[0..254] of string      = (
     'AKMI', 'AKSK', 'AKTG', 'AOKI', 'ASDA', 'ASNO', 'ASOU', 'ATSI', 'BOB_',
     'CMAL', 'DJUN', 'DOOR', 'DORG', 'ECHO', 'EDST', 'EIKK', 'ENDO', 'ENKI',
@@ -61,7 +60,6 @@ const
 
   // Valid for every Shenmue 2 version
   // Tested on Shenmue 2 (JAP/PAL) (DC) and Shenmue 2X (PAL UK) (Xbox)
-  VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT          = 592;
   VALID_NPC_SHENMUE2: array[0..591] of string     = (
     '00A_', '00B_', '00C_', '00D_', '00E_', '00F_', '00G_', '00H_', '01A_',
     '01B_', '01C_', '01D_', '01E_', '01F_', '01G_', '01H_', '02A_', '02B_',
@@ -152,29 +150,6 @@ begin
       Result := StringArrayBinarySearch(VALID_NPC_SHENMUE2, CharID) <> -1;    
   end;
   
-end;
-
-//------------------------------------------------------------------------------
-
-function GetNPCAutoExtractedCount(const GameVersion: TGameVersion): Integer;
-begin
-  Result := 0;
-  
-  case GameVersion of
-    gvWhatsShenmue:
-      Result := VALID_NPC_WHATS_SHENMUE_AUTOEXTRACTED_COUNT;
-    gvShenmueJ:
-      Result := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
-    gvShenmue:
-      Result := VALID_NPC_SHENMUE_AUTOEXTRACTED_COUNT;
-    gvShenmue2J:
-      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
-    gvShenmue2:
-      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
-    gvShenmue2X:
-      Result := VALID_NPC_SHENMUE2_AUTOEXTRACTED_COUNT;
-  end;
-
 end;
 
 //==============================================================================

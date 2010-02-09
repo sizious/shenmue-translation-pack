@@ -196,12 +196,12 @@ object frmMultiTranslation: TfrmMultiTranslation
           Height = 13
           Caption = 'New text:'
         end
-        object Label3: TLabel
+        object lOriginalSub: TLabel
           Left = 11
           Top = 32
-          Width = 43
+          Width = 67
           Height = 13
-          Caption = 'Old text:'
+          Caption = '<Generated>'
         end
         object eNewFirstLineLength: TEdit
           Left = 102

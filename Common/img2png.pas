@@ -10,7 +10,7 @@ unit img2png;
 interface
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, PNGImage;
 
 type
   EPVRConverterEngineNotExists = class(Exception);

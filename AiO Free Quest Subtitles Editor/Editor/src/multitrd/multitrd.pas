@@ -27,7 +27,7 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    Label3: TLabel;
+    lOriginalSub: TLabel;
     eNewFirstLineLength: TEdit;
     eNewSecondLineLength: TEdit;
     mNewSub: TMemo;
@@ -52,11 +52,14 @@ type
     fSelectedIndex: Integer;
     fAborted: Boolean;
     fTerminated: Boolean;
+    fOldSelectedSubtitleText: string;
+    fOriginalSelectedSubtitleText: string;
     procedure LoadSubsListView(const FileName: TFileName);
     procedure MultiTranslate;
     function GetSelectedSubtitle: TSubEntry;
 //    function GetSelectedSubtitleUI: string;
 //    procedure SetSelectedSubtitleUI(const Value: string);
+    procedure UpdateOldSubtitleField;
   protected
     procedure AddDebug(m: string);
     procedure InitMultiView(const FileName: TFileName);
@@ -73,6 +76,10 @@ type
     property MultiExec: TMultiTranslationExecute read fMultiExec write fMultiExec;
     property Aborted: Boolean read fAborted write fAborted;
     property Terminated: Boolean read fTerminated write fTerminated;
+    property OriginalSelectedSubtitleText: string
+      read fOriginalSelectedSubtitleText write fOriginalSelectedSubtitleText; // ORIGINAL text from AM2 developers
+    property OldSelectedSubtitleText: string
+      read fOldSelectedSubtitleText write fOldSelectedSubtitleText; // PREVIOUS text from the user (the translator)...    
   public
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
   end;
@@ -139,7 +146,8 @@ begin
   for i := 0 to SCNFEditor.Subtitles.Count - 1 do
     lvSubsSelect.Items[i].SubItems[1] := SCNFEditor.Subtitles[i].Text;
 
-  mOldSub.Text := mNewSub.Text;
+  OldSelectedSubtitleText := mNewSub.Text;
+  UpdateOldSubtitleField;
 
   Delay(1000);
   pbPAKS.Position := 0;
@@ -232,10 +240,19 @@ begin
 end;
 
 function TfrmMultiTranslation.GetSelectedSubtitle: TSubEntry;
+var
+  Index: Integer;
+
 begin
   Result := nil;
   if not Assigned(lvSubsSelect.Selected) then Exit;
-  Result := SCNFEditor.Subtitles[lvSubsSelect.Selected.Index];
+  Index := lvSubsSelect.Selected.Index;
+  Result := SCNFEditor.Subtitles[Index];
+
+  // Loading subtitle from database
+  OriginalSelectedSubtitleText :=
+    TextDatabaseCorrector.Subtitles[Index].Text;
+  OldSelectedSubtitleText := Result.Text;
 end;
 
 (*function TfrmMultiTranslation.GetSelectedSubtitleUI: string;
@@ -247,6 +264,11 @@ end; *)
 
 procedure TfrmMultiTranslation.InitMultiView(const FileName: TFileName);
 begin
+  if frmMain.EnableOriginalSubtitlesView then
+    lOriginalSub.Caption := 'Original text:'
+  else
+    lOriginalSub.Caption := 'Old text:';
+
   mNewSub.Clear;
   mOldSub.Clear;
   lblProgress.Caption := 'Idle...';
@@ -291,8 +313,8 @@ begin
     SelectedIndex := Item.Index;
 
   if Assigned(SelectedSubtitle) then begin
-    mOldSub.Text := SelectedSubtitle.Text;
-    mNewSub.Text := mOldSub.Text;
+    UpdateOldSubtitleField;
+    mNewSub.Text := SelectedSubtitle.Text;
   end;
 end;
 
@@ -317,12 +339,20 @@ procedure TfrmMultiTranslation.MultiTranslate;
 begin
   Terminated := False;
   bGo.Enabled := False;
-  MultiExec := TMultiTranslationExecute.Create(FilesList, mOldSub.Text,
+  MultiExec := TMultiTranslationExecute.Create(FilesList, OldSelectedSubtitleText,
     mNewSub.Text, cbSameSex.Checked);
   MultiExec.OnCompleted := EndEventCompleted;
   MultiExec.OnFileTranslated := EventFileTranslated;
   MultiExec.OnTranslatingSubtitle := EventTranslatingSubtitle;
   MultiExec.Resume;
+end;
+
+procedure TfrmMultiTranslation.UpdateOldSubtitleField;
+begin
+  if frmMain.EnableOriginalSubtitlesView then
+    mOldSub.Text := OriginalSelectedSubtitleText
+  else
+    mOldSub.Text := OldSelectedSubtitleText;
 end;
 
 (*procedure TfrmMultiTranslation.SetSelectedSubtitleUI(const Value: string);
