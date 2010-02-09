@@ -95,7 +95,8 @@ begin
 
   frmMain.SetStatusReady;
   frmMain.AddDebug('Selected directory: "' + frmMain.SelectedDirectory + '"');
-
+  frmMain.UpdateDirectoryControlsState;
+  
   // Multi-Translate if needed
   if frmMain.MultiTranslation.Active then begin
 
