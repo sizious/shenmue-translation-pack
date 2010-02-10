@@ -7,12 +7,14 @@ interface
 uses
   Windows, SysUtils, Classes; //, PNGImage; // why pngimage is used here??
 
+function CopyFile(SourceFileName, DestFileName: TFileName; Overwrite: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetTempDir: TFileName;
+function GetTempFileName: TFileName;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 function StringArrayBinarySearch(SortedSource: array of string;
@@ -104,6 +106,16 @@ end;
 
 //------------------------------------------------------------------------------
 
+function CopyFile(SourceFileName, DestFileName: TFileName; Overwrite: Boolean): Boolean;
+var
+  RadicalFileName: TFileName;
+
+begin
+  Result := Windows.CopyFile(PChar(SourceFileName), PChar(DestFileName), not Overwrite);
+end;
+
+//------------------------------------------------------------------------------
+
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 const
   MAX_BUF_SIZE = 512;
@@ -139,6 +151,13 @@ begin
   Result := '';
   if GetTempPath(SizeOf(Dir), Dir) <> 0 then
     Result := IncludeTrailingPathDelimiter(StrPas(Dir));
+end;
+
+//------------------------------------------------------------------------------
+
+function GetTempFileName: TFileName;
+begin
+  Result := GetTempDir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
 end;
 
 //------------------------------------------------------------------------------
