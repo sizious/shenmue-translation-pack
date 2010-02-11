@@ -7,7 +7,7 @@ interface
 uses
   Windows, SysUtils, Classes; //, PNGImage; // why pngimage is used here??
 
-function CopyFile(SourceFileName, DestFileName: TFileName; Overwrite: Boolean): Boolean;
+function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
@@ -106,12 +106,9 @@ end;
 
 //------------------------------------------------------------------------------
 
-function CopyFile(SourceFileName, DestFileName: TFileName; Overwrite: Boolean): Boolean;
-var
-  RadicalFileName: TFileName;
-
+function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
 begin
-  Result := Windows.CopyFile(PChar(SourceFileName), PChar(DestFileName), not Overwrite);
+  Result := Windows.CopyFile(PChar(SourceFileName), PChar(DestFileName), FailIfExists);
 end;
 
 //------------------------------------------------------------------------------
@@ -312,6 +309,11 @@ begin
     Inc(i);
   end;
 end;
+
+//------------------------------------------------------------------------------
+
+initialization
+  Randomize;
 
 //------------------------------------------------------------------------------
 

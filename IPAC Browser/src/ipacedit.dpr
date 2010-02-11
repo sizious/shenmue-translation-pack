@@ -5,7 +5,8 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   ipacmgr in 'engine\ipacmgr.pas',
-  systools in '..\..\Common\systools.pas';
+  systools in '..\..\Common\systools.pas',
+  ipacutil in 'engine\ipacutil.pas';
 
 {$R *.res}
 
