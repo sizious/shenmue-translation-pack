@@ -26,7 +26,6 @@ type
     GroupBox1: TGroupBox;
     eDirectory: TEdit;
     bBrowse: TButton;
-    rgGameVersion: TRadioGroup;
     GroupBox2: TGroupBox;
     lvFiles: TListView;
     pBar: TProgressBar;
@@ -36,9 +35,10 @@ type
     bCancel: TButton;
     JvBrowseForFolderDialog: TJvBrowseForFolderDialog;
     lHelp: TLabel;
-    lrg0: TLabel;
-    lrg1: TLabel;
-    lrg2: TLabel;
+    GroupBox3: TGroupBox;
+    rbVersion1: TRadioButton;
+    rbVersion0: TRadioButton;
+    rbVersion2: TRadioButton;
     procedure bExtractClick(Sender: TObject);
     procedure bCancelClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -46,16 +46,18 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
+    procedure rbVersion0Click(Sender: TObject);
   private
     { Déclarations privées }
     fProcessBusy: Boolean;
     fPAKFExtractorThread: TPAKFExtractorThread;
     fProcessCanceled: Boolean;
     fCanceledByButton: Boolean;
-    fSelectedGameVersion: TGameVersion;
+    fSelectedGameVersionIndex: Integer;
     procedure ExtractionFinished(Sender: TObject; ProcessCanceled: Boolean;
       SuccessExtractCount, ErrorExtractCount, TotalExtractedCount,
       TotalExtractedMaxCount: Integer);
+    procedure SetSelectedGameVersionIndex(const Value: Integer);
   protected
     procedure ExtractFaces;
     function GetSelectedGameVersion: TGameVersion;
@@ -67,8 +69,9 @@ type
       write fCanceledByButton;
     property ExtractorThread: TPAKFExtractorThread read fPAKFExtractorThread
       write fPAKFExtractorThread;
-    property SelectedGameVersion: TGameVersion
-      read fSelectedGameVersion write fSelectedGameVersion;
+    property SelectedGameVersionIndex: Integer read fSelectedGameVersionIndex
+      write SetSelectedGameVersionIndex;
+    property SelectedGameVersion: TGameVersion read GetSelectedGameVersion;
     property ProcessBusy: Boolean read fProcessBusy write fProcessBusy;
     property ProcessCanceled: Boolean read fProcessCanceled write fProcessCanceled;
   public
@@ -88,7 +91,11 @@ implementation
 
 uses
   Math, PakfMgr;
-  
+
+const
+  GAME_VERSION_COUNT = 3;
+  GAME_VERSION_RADIOBUTTON_NAME = 'rbVersion';
+
 { TfrmFacesExtractor }
 
 procedure TfrmFacesExtractor.bBrowseClick(Sender: TObject);
@@ -121,7 +128,6 @@ begin
   SetFormControlsState(False);
   ProcessBusy := True;
   ProcessCanceled := False;
-  SelectedGameVersion := GetSelectedGameVersion;
 
   // Create and execute the thread
   ExtractorThread := TPAKFExtractorThread.Create(eDirectory.Text, SelectedGameVersion);
@@ -201,19 +207,19 @@ begin
 {$IFDEF DEBUG}
 {$IFDEF DEBUG_PAKF_SHENMUE1}
   eDirectory.Text := 'G:\Shenmue\Humans\04-Shenmue (PAL)\DISC1\PKF\';
-  rgGameVersion.ItemIndex := 0;
+  SelectedGameVersionIndex := 0;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_SHENMUE2}
   eDirectory.Text := 'G:\Shenmue\Humans\06-Shenmue II (PAL)\DISC1\PKF\';
-  rgGameVersion.ItemIndex := 1;
+  SelectedGameVersionIndex := 1;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_SHENMUE2_XB}
   eDirectory.Text := 'G:\Shenmue\Humans\08-Shenmue 2x (PAL) (UK)\DISC1\PKF\';
-  rgGameVersion.ItemIndex := 1;
+  SelectedGameVersionIndex := 1;
 {$ENDIF}
 {$IFDEF DEBUG_PAKF_WHATS_SHENMUE}
   eDirectory.Text := 'G:\Shenmue\Humans\01-What''s Shenmue (JAP)\PKF\';
-  rgGameVersion.ItemIndex := 2;
+  SelectedGameVersionIndex := 2;
 {$ENDIF}
 {$ENDIF}
 end;
@@ -237,14 +243,15 @@ const
 
 begin
   Result :=
-    (FindComponent('lrg' + IntToStr(rgGameVersion.ItemIndex)) as TLabel).Caption;
+    (FindComponent(GAME_VERSION_RADIOBUTTON_NAME
+      + IntToStr(SelectedGameVersionIndex)) as TRadioButton).Caption;
   Result := StringReplace(Result, SPACE_SLASH, ' / ', [rfReplaceAll]);
 end;
 
 function TfrmFacesExtractor.GetSelectedGameVersion: TGameVersion;
 begin
   Result := gvUndef;
-  case rgGameVersion.ItemIndex of
+  case SelectedGameVersionIndex of
     0: Result := gvShenmue;
     1: Result := gvShenmue2;
     2: Result := gvWhatsShenmue;
@@ -268,6 +275,16 @@ begin
   SetFormControlsState(True);
   // Reset the flag if it was canceled by button
   CanceledByButton := False;  
+end;
+
+procedure TfrmFacesExtractor.rbVersion0Click(Sender: TObject);
+var
+  IndexStr: string;
+
+begin
+  IndexStr := StringReplace((Sender as TRadioButton).Name,
+    GAME_VERSION_RADIOBUTTON_NAME, '', [rfReplaceAll]);
+  SelectedGameVersionIndex := StrToInt(IndexStr);
 end;
 
 procedure TfrmFacesExtractor.Reset(SetMaxValue: Integer);
@@ -298,16 +315,26 @@ var
   i: Integer;
 
 begin
-  for i := 0 to rgGameVersion.Items.Count - 1 do
-    (FindComponent('lrg' + IntToStr(i)) as TLabel).Enabled := State;    
+  for i := 0 to GAME_VERSION_COUNT - 1 do
+    (FindComponent(GAME_VERSION_RADIOBUTTON_NAME + IntToStr(i)) as TRadioButton)
+      .Enabled := State;
   bBrowse.Enabled := State;
   eDirectory.Enabled := State;
-  rgGameVersion.Enabled := State;
   bExtract.Enabled := State;
   if State then begin
     lProgBar.Caption := '...';
     pBar.Position := 0;
   end;
+end;
+
+procedure TfrmFacesExtractor.SetSelectedGameVersionIndex(const Value: Integer);
+var
+  RB: TRadioButton;
+begin
+  fSelectedGameVersionIndex := Value;
+  RB := FindComponent(GAME_VERSION_RADIOBUTTON_NAME + IntToStr(Value)) as TRadioButton;
+  if Assigned(RB) then
+    RB.Checked := True;
 end;
 
 procedure TfrmFacesExtractor.UpdateProgressBar;

@@ -38,47 +38,6 @@ object frmFacesExtractor: TfrmFacesExtractor
       'and help the translation.'
     WordWrap = True
   end
-  object lrg0: TLabel
-    Left = 30
-    Top = 96
-    Width = 62
-    Height = 26
-    Caption = 'Shenmue      US Shenmue'
-    Transparent = False
-    WordWrap = True
-  end
-  object lrg1: TLabel
-    Left = 153
-    Top = 104
-    Width = 55
-    Height = 13
-    Caption = 'Shenmue II'
-    Transparent = False
-    WordWrap = True
-  end
-  object lrg2: TLabel
-    Left = 278
-    Top = 104
-    Width = 80
-    Height = 13
-    Caption = 'What'#39's Shenmue'
-    Transparent = False
-    WordWrap = True
-  end
-  object rgGameVersion: TRadioGroup
-    Left = 4
-    Top = 79
-    Width = 385
-    Height = 53
-    Caption = ' Game version : '
-    Columns = 3
-    ItemIndex = 0
-    Items.Strings = (
-      ''
-      ''
-      '')
-    TabOrder = 1
-  end
   object GroupBox1: TGroupBox
     Left = 4
     Top = 34
@@ -109,7 +68,7 @@ object frmFacesExtractor: TfrmFacesExtractor
     Width = 385
     Height = 136
     Caption = ' Result : '
-    TabOrder = 2
+    TabOrder = 1
     object lvFiles: TListView
       Left = 7
       Top = 14
@@ -153,7 +112,7 @@ object frmFacesExtractor: TfrmFacesExtractor
     Width = 90
     Height = 25
     Caption = '&Extract'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = bExtractClick
   end
   object bCancel: TButton
@@ -162,8 +121,46 @@ object frmFacesExtractor: TfrmFacesExtractor
     Width = 90
     Height = 25
     Caption = '&Cancel'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = bCancelClick
+  end
+  object GroupBox3: TGroupBox
+    Left = 4
+    Top = 79
+    Width = 385
+    Height = 53
+    Caption = ' Game version: '
+    TabOrder = 4
+    object rbVersion1: TRadioButton
+      Left = 133
+      Top = 22
+      Width = 113
+      Height = 17
+      Caption = 'Shenmue II'
+      TabOrder = 0
+      OnClick = rbVersion0Click
+    end
+    object rbVersion0: TRadioButton
+      Left = 11
+      Top = 14
+      Width = 82
+      Height = 31
+      Caption = 'Shenmue      US Shenmue'
+      Checked = True
+      TabOrder = 1
+      TabStop = True
+      WordWrap = True
+      OnClick = rbVersion0Click
+    end
+    object rbVersion2: TRadioButton
+      Left = 258
+      Top = 24
+      Width = 113
+      Height = 17
+      Caption = 'What'#39's Shenmue'
+      TabOrder = 2
+      OnClick = rbVersion0Click
+    end
   end
   object JvBrowseForFolderDialog: TJvBrowseForFolderDialog
     Title = 'Please select the input directory:'

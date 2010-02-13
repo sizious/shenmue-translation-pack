@@ -1605,7 +1605,7 @@ object frmAbout: TfrmAbout
       'Gustavo Huffenbacher Daud, '
       'The Project JEDI Team, Marc '
       'Collin, Michel Bardou, Jean-Yves '
-      'Qu'#233'inec, Zarko Gajic'
+      'Qu'#233'inec, Zarko Gajic, Nono40'
       ''
       '-- The End --'
       ''

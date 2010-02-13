@@ -50,7 +50,7 @@ DelphiForFun, David Butler,
 Gustavo Huffenbacher Daud, 
 The Project JEDI Team, Marc 
 Collin, Michel Bardou, Jean-Yves 
-Quéinec, Zarko Gajic
+Quéinec, Zarko Gajic, Nono40
 
 -- The End --
 
@@ -64,3 +64,4 @@ Cheers !
 
 The SHENTRAD Team, here to 
 breake the language barrier!
+
