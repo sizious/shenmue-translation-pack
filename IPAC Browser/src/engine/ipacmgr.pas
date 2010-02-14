@@ -119,7 +119,9 @@ type
     fMakeBackup: Boolean;
     fFileSectionsList: TFileSectionsList;
     fSourceFileName: TFileName;
+    fCompressed: Boolean;
   protected
+    function GetWorkingSelectedFile(InputFileName: TFileName): TFileName;
     procedure ParseIpacSections(var FS: TFileStream; IpacOffset, IpacSize: LongWord);
   public
     constructor Create;
@@ -131,6 +133,8 @@ type
 
     // This stores every IPAC sections
     property Content: TIpacSectionsList read fSections;
+
+    property Compressed: Boolean read fCompressed;
 
     // This flag is here to make backup if needed
     property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
@@ -330,6 +334,31 @@ begin
   inherited;
 end;
 
+function TIpacEditor.GetWorkingSelectedFile(InputFileName: TFileName): TFileName;
+var
+  InputStream, OutputStream: TFileStream;
+  DeCompressionStream: TZDecompressionStream;
+  OutputFileName: TFileName;
+  
+begin
+  OutputFileName := GetTempFileName;
+
+  InputStream := TFileStream.Create(InputFileName, fmOpenRead);
+  OutputStream := TFileStream.Create(OutputFileName, fmCreate);
+  DecompressionStream := TZDecompressionStream.Create(InputStream);
+  try
+    OutputStream.CopyFrom(DecompressionStream, 0);
+    if FileExists(OutputFileName) then
+      Result := OutputFileName
+    else
+      Result := SourceFileName;
+  finally
+    DecompressionStream.Free;
+    OutputStream.Free;
+    InputStream.Free;
+  end;
+end;
+
 function TIpacEditor.LoadFromFile(const FileName: TFileName): Boolean;
 var
   FS: TFileStream;
@@ -345,6 +374,11 @@ begin
   fSourceFileName := FileName;
   Clear;
 
+{$IFDEF DEBUG}
+  WriteLn(GetWorkingSelectedFile(SourceFileName));
+{$ENDIF}
+
+  // Loading the decompressed IPAC file
   FS := TFileStream.Create(FileName, fmOpenRead);
   try
 
