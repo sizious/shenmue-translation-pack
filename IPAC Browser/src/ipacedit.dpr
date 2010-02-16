@@ -1,5 +1,7 @@
 program ipacedit;
 
+{$R 'engine\gzipbin.res' 'engine\gzipbin.rc'}
+
 uses
   Windows,
   Forms,
@@ -7,7 +9,8 @@ uses
   ipacmgr in 'engine\ipacmgr.pas',
   systools in '..\..\Common\systools.pas',
   ipacutil in 'engine\ipacutil.pas',
-  gzipmgr in '..\..\Common\gzipmgr.pas';
+  gzipmgr in '..\..\Common\gzipmgr.pas',
+  utils in 'utils.pas';
 
 {$R *.res}
 

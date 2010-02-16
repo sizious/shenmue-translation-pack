@@ -33,6 +33,9 @@ begin
   if strBuf = 'TEXN' then begin
     Result := True;
   end;
+
+  // Closing file (Fix by SiZiOUS)
+  CloseFile(F);
 end;
 
 end.
