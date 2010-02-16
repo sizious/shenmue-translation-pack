@@ -34,8 +34,8 @@ object frmFacesExtractor: TfrmFacesExtractor
     AutoSize = False
     Caption = 
       'This tool was made to retrieve all NPC faces from Shenmue PAKF f' +
-      'iles. This can help you to reconingize a NPC character in-game, ' +
-      'and help the translation.'
+      'iles. This can help you to recognize a NPC character in-game, an' +
+      'd help the translation.'
     WordWrap = True
   end
   object GroupBox1: TGroupBox

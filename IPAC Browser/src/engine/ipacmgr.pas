@@ -3,7 +3,7 @@ unit ipacmgr;
 interface
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, IpacUtil;
 
 type
   TIpacEditor = class;
@@ -57,12 +57,13 @@ type
     fImportedFileName: TFileName;
     fUpdated: Boolean;
     fIndex: Integer;
+    fFileSectionDetails: TIpacSectionKind;
+    fExpandedFileSectionDetails: Boolean;
     function GetSourceFileName: TFileName;
-    function GetFileExtension: string;
   protected
+    procedure AnalyzeSection(var SourceFileStream: TFileStream);
     function GetSectionPaddingSize: LongWord;
     procedure WriteIpacSection(var InStream, OutStream: TFileStream);
-    function KindToExtension(Kind: string): string;
     property SourceFileName: TFileName read GetSourceFileName;
   public
     constructor Create(Owner: TIpacSectionsList);
@@ -74,8 +75,9 @@ type
     function ImportFromFile(const FileName: TFileName): Boolean;
 
     property AbsoluteOffset: LongWord read fAbsoluteOffset;
-    property FileExtension: string read GetFileExtension;
-    property Index: Integer read fIndex;    
+    property ExpandedFileSectionDetails: Boolean read fExpandedFileSectionDetails;
+    property FileSectionDetails: TIpacSectionKind read fFileSectionDetails;
+    property Index: Integer read fIndex;
     property ImportedFileName: TFileName read fImportedFileName;
     property Name: string read fName;
     property Kind: string read fKind;
@@ -98,8 +100,8 @@ type
     function GetItem(Index: Integer): TIpacSectionsListItem;
     function GetIpacFileSection: TFileSectionsListItem;
   protected
-    function Add(Name, Kind: string; AbsoluteOffset, RelativeOffset,
-      Size: LongWord): Integer;
+    function Add(var SourceFileStream: TFileStream; Name, Kind: string;
+      AbsoluteOffset, RelativeOffset, Size: LongWord): Integer;
     procedure Clear;
     procedure WriteIpacHeader(var FS: TFileStream);
     procedure WriteIpacFooter(var FS: TFileStream);
@@ -120,9 +122,12 @@ type
     fFileSectionsList: TFileSectionsList;
     fSourceFileName: TFileName;
     fCompressed: Boolean;
+    fInternalWorkingSourceFile: TFileName;
   protected
-    function GetWorkingSelectedFile(InputFileName: TFileName): TFileName;
+    procedure InitWorkingSelectedFile(InputFileName: TFileName);
     procedure ParseIpacSections(var FS: TFileStream; IpacOffset, IpacSize: LongWord);
+    property InternalWorkingSourceFile: TFileName read fInternalWorkingSourceFile
+      write fInternalWorkingSourceFile;
   public
     constructor Create;
     destructor Destroy; override;
@@ -148,7 +153,7 @@ type
 implementation
 
 uses
-  SysTools, IpacUtil;
+  SysTools, Utils, GZipMgr;
   
 type
   TSectionEntry = record
@@ -163,17 +168,8 @@ type
     Size: LongWord;
   end;
 
-  TIpacSectionKind = record
-    Name: string;
-    Extension: string;
-  end;
-
 const
   IPAC_SIGN = 'IPAC';
-  IPAC_SECTION_KINDS: array[0..1] of TIpacSectionKind = (
-    (Name: IPAC_BIN ; Extension: 'BIN'),
-    (Name: IPAC_CHRM; Extension: 'CHR')
-  );
 
 { TIpacSectionsListItem }
 
@@ -210,9 +206,10 @@ begin
   ExportToFile(Result);
 end;
 
-function TIpacSectionsListItem.GetFileExtension: string;
+procedure TIpacSectionsListItem.AnalyzeSection(var SourceFileStream: TFileStream);
 begin
-  Result := '.' + KindToExtension(Kind);
+  fFileSectionDetails := AnalyzeIpacSection(Kind, SourceFileStream,
+    AbsoluteOffset, Size, fExpandedFileSectionDetails);
 end;
 
 function TIpacSectionsListItem.GetOutputFileName: TFileName;
@@ -223,7 +220,7 @@ begin
   RadicalName := ChangeFileExt(ExtractFileName(Owner.Owner.SourceFileName));
   Result := RadicalName + '_' + Name + '_#' + IntToStr(Index) + '.BIN';*)
 begin
-  Result := Name + '.' + KindToExtension(Kind);
+  Result := Name + '.' + FileSectionDetails.Extension;
 end;
 
 function TIpacSectionsListItem.ImportFromFile(
@@ -234,17 +231,6 @@ begin
 
   fImportedFileName := FileName;
   fUpdated := True;
-end;
-
-function TIpacSectionsListItem.KindToExtension(Kind: string): string;
-var
-  i: Integer;
-
-begin
-  for i := Low(IPAC_SECTION_KINDS) to High(IPAC_SECTION_KINDS) do
-    if IPAC_SECTION_KINDS[i].Name = Kind then begin
-      Result := IPAC_SECTION_KINDS[i].Extension;
-    end;
 end;
 
 procedure TIpacSectionsListItem.WriteIpacSection(var InStream, OutStream: TFileStream);
@@ -310,7 +296,7 @@ end;
 
 function TIpacSectionsListItem.GetSourceFileName: TFileName;
 begin
-  Result := Owner.Owner.SourceFileName;
+  Result := Owner.Owner.InternalWorkingSourceFile;
 end;
 
 { TIPACEditor }
@@ -325,6 +311,7 @@ constructor TIpacEditor.Create;
 begin
   fSections := TIpacSectionsList.Create(Self);
   fFileSectionsList := TFileSectionsList.Create(Self);
+  GZipInitEngine(GetWorkingTempDirectory);
 end;
 
 destructor TIpacEditor.Destroy;
@@ -334,29 +321,11 @@ begin
   inherited;
 end;
 
-function TIpacEditor.GetWorkingSelectedFile(InputFileName: TFileName): TFileName;
-var
-  InputStream, OutputStream: TFileStream;
-  DeCompressionStream: TZDecompressionStream;
-  OutputFileName: TFileName;
-  
+procedure TIpacEditor.InitWorkingSelectedFile(InputFileName: TFileName);
 begin
-  OutputFileName := GetTempFileName;
-
-  InputStream := TFileStream.Create(InputFileName, fmOpenRead);
-  OutputStream := TFileStream.Create(OutputFileName, fmCreate);
-  DecompressionStream := TZDecompressionStream.Create(InputStream);
-  try
-    OutputStream.CopyFrom(DecompressionStream, 0);
-    if FileExists(OutputFileName) then
-      Result := OutputFileName
-    else
-      Result := SourceFileName;
-  finally
-    DecompressionStream.Free;
-    OutputStream.Free;
-    InputStream.Free;
-  end;
+  fCompressed := GZipDecompress(InputFileName, GetWorkingTempDirectory, fInternalWorkingSourceFile);
+  if not Compressed then
+    InternalWorkingSourceFile := InputFileName;
 end;
 
 function TIpacEditor.LoadFromFile(const FileName: TFileName): Boolean;
@@ -374,12 +343,11 @@ begin
   fSourceFileName := FileName;
   Clear;
 
-{$IFDEF DEBUG}
-  WriteLn(GetWorkingSelectedFile(SourceFileName));
-{$ENDIF}
+  // Ungzip if needed
+  InitWorkingSelectedFile(SourceFileName);
 
   // Loading the decompressed IPAC file
-  FS := TFileStream.Create(FileName, fmOpenRead);
+  FS := TFileStream.Create(InternalWorkingSourceFile, fmOpenRead);
   try
 
 {$IFDEF DEBUG}
@@ -448,10 +416,12 @@ begin
   WriteLn(sLineBreak, 'Reading IPAC sections:');
 {$ENDIF}
 
+  // Scanning every IPAC footer entry
   for i := 0 to IpacSectionsCount - 1 do begin
     FS.Read(IpacSection, SizeOf(TIpacSectionEntry));
     with IpacSection do
-      Content.Add(Name, Kind, (IpacOffset + Offset), Offset, Size);
+      Content.Add(FS, Name, Kind, (IpacOffset + Offset), Offset, Size);
+      // We are passing the FS parameter to the AnalyzeSection for determinate what's the section content...
   end;
 
 {$IFDEF DEBUG}
@@ -471,11 +441,14 @@ var
   i, j: Integer;
   
 begin
+  Result := False;
+  if not FileExists(InternalWorkingSourceFile) then Exit;
+
   OutTempFile := GetTempFileName;
 
   // Opening the file
   OutStream := TFileStream.Create(OutTempFile, fmCreate);
-  InStream := TFileStream.Create(SourceFileName, fmOpenRead);
+  InStream := TFileStream.Create(InternalWorkingSourceFile, fmOpenRead);
   try
 
 {$IFDEF DEBUG}
@@ -505,7 +478,7 @@ begin
     end;
 
   finally
-    // Destroying FileStream
+    // Destroying FileStream. The save is finished!
     OutStream.Free;
     InStream.Free;
 
@@ -515,6 +488,14 @@ begin
         RenameFile(FileName, FileName + '.BAK')
       else
         DeleteFile(FileName);
+
+    // Compress the file if needed
+    if Compressed then begin
+      DeleteFile(InternalWorkingSourceFile); // the uncompressed original temp file
+      RenameFile(OutTempFile, InternalWorkingSourceFile); // OutTempFile is the new file
+      OutTempFile := InternalWorkingSourceFile; // The new temp saved file is renamed as the original temp file
+      GZipCompress(OutTempFile); // compressing the new temp file
+    end;
 
     // Copying the right file
     Result := CopyFile(OutTempFile, FileName, False);
@@ -536,8 +517,8 @@ end;
 
 { TIpacSectionsList }
 
-function TIpacSectionsList.Add(Name, Kind: string; AbsoluteOffset, RelativeOffset,
-  Size: LongWord): Integer;
+function TIpacSectionsList.Add(var SourceFileStream: TFileStream; Name,
+  Kind: string; AbsoluteOffset, RelativeOffset, Size: LongWord): Integer;
 var
   NewItem: TIpacSectionsListItem;
 
@@ -550,6 +531,9 @@ begin
   NewItem.fSize := Size;
   Result := fList.Add(NewItem);
   NewItem.fIndex := Result;
+
+  // Searching the section extended type
+  NewItem.AnalyzeSection(SourceFileStream);
 
 {$IFDEF DEBUG}
   WriteLn('  #', Result, ': Name: ', Name, ', Kind: ', Kind,
