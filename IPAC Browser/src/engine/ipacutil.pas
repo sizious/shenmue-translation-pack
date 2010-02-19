@@ -15,12 +15,14 @@ type
 const
   IPAC_BIN  = 'BIN ';
   IPAC_CHRM = 'CHRM';
+  IPAC_CHRT = 'CHRT';
 
   (*  IPAC footer section type
       Raw read in the footer to determine section type. *)
-  IPAC_SECTION_KINDS: array[0..1] of TIpacSectionKind = (
+  IPAC_SECTION_KINDS: array[0..2] of TIpacSectionKind = (
     (Name: IPAC_BIN ; Extension: 'BIN'; Description: 'Generic Binary'),
-    (Name: IPAC_CHRM; Extension: 'CHR'; Description: 'Character Model')
+    (Name: IPAC_CHRM; Extension: 'CHR'; Description: 'Character Model'),
+    (Name: IPAC_CHRT; Extension: 'CHT'; Description: 'Character PAKF')
   );
 
   (*  Extended IPAC section entries.
