@@ -6,10 +6,6 @@ uses
   Windows, SysUtils;
   
 type
-  TNodeInfo = class
-  public
-    function ReadString(): Boolean;
-  end;
 
   TXmlConfigurationFile = class
   private
@@ -19,9 +15,27 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GetNode(const Name: string): TNodeInfo;
+    function GetNode(const Name: string): string;
   end;
   
 implementation
+
+{ TXmlConfigurationFile }
+
+constructor TXmlConfigurationFile.Create;
+begin
+  raise exception.create('todo');
+end;
+
+destructor TXmlConfigurationFile.Destroy;
+begin
+
+  inherited;
+end;
+
+function TXmlConfigurationFile.GetNode(const Name: string): string;
+begin
+
+end;
 
 end.

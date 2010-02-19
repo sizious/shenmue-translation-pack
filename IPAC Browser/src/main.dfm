@@ -385,8 +385,9 @@ object frmMain: TfrmMain
   object odOpen: TOpenDialog
     DefaultExt = 'PKS'
     Filter = 
-      'All Supported Formats (*.PKS;*.BIN)|*.PKS;*.BIN|PAKS Packages (*' +
-      '.PKS)|*.PKS|All Files (*.*)|*.*'
+      'All Supported Formats (*.PKS;*.PKF;*.BIN)|*.PKS;*.PKF;*.BIN|PAKS' +
+      ' Packages (*.PKS)|*.PKS|PAKF Packages (*.PKF)|*.PKF|All Files (*' +
+      '.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 8
@@ -1800,8 +1801,9 @@ object frmMain: TfrmMain
   object sdSave: TSaveDialog
     DefaultExt = '# Generated #'
     Filter = 
-      'All Supported Formats (*.PKS;*.BIN)|*.PKS;*.BIN|PAKS Packages (*' +
-      '.PKS)|*.PKS|All Files (*.*)|*.*'
+      'All Supported Formats (*.PKS;*.PKF;*.BIN)|*.PKS;*.PKF;*.BIN|PAKS' +
+      ' Packages (*.PKS)|*.PKS|PAKF Packages (*.PKF)|*.PKF|All Files (*' +
+      '.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Export the current entry to...'
     Left = 8
