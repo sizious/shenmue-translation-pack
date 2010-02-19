@@ -5,6 +5,7 @@ interface
 uses
   Windows, SysUtils;
 
+function GetAppVersion: string;
 function GetWorkingTempDirectory: TFileName;
 
 implementation
@@ -17,6 +18,13 @@ const
     
 var
   sWorkingTempDirectory: TFileName;
+
+//------------------------------------------------------------------------------
+
+function GetAppVersion: string;
+begin
+  Result := GetApplicationVersion(LANG_FRENCH, SUBLANG_FRENCH);
+end;
 
 //------------------------------------------------------------------------------
 

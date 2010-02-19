@@ -59,10 +59,17 @@ type
     fIndex: Integer;
     fFileSectionDetails: TIpacSectionKind;
     fExpandedFileSectionDetails: Boolean;
+
+    // Updated value (for the SaveToFile function)
+    fNewAbsoluteOffset: LongWord;
+    fNewRelativeOffset: LongWord;
+    fNewSize: LongWord;
+    fNewPaddingSize: LongWord;
+    
     function GetSourceFileName: TFileName;
   protected
     procedure AnalyzeSection(var SourceFileStream: TFileStream);
-    function GetSectionPaddingSize: LongWord;
+    function GetSectionPaddingSize(DataSize: LongWord): LongWord;
     procedure WriteIpacSection(var InStream, OutStream: TFileStream);
     property SourceFileName: TFileName read GetSourceFileName;
   public
@@ -81,7 +88,6 @@ type
     property ImportedFileName: TFileName read fImportedFileName;
     property Name: string read fName;
     property Kind: string read fKind;
-    property PaddingSize: LongWord read GetSectionPaddingSize;
     property RelativeOffset: LongWord read fRelativeOffset;
     property Size: LongWord read fSize;
     property Owner: TIpacSectionsList read fOwner;
@@ -236,7 +242,7 @@ end;
 procedure TIpacSectionsListItem.WriteIpacSection(var InStream, OutStream: TFileStream);
 var
   Offset, IpacAbsoluteOffset,
-  NewSectionSize: LongWord;
+  NewSectionSize, NewPaddingSize: LongWord;
   ImportedFileStream: TFileStream;
   Buffer: array[0..31] of Char;
 
@@ -262,17 +268,21 @@ begin
     OutStream.CopyFrom(InStream, NewSectionSize);
   end;
 
-  // Updating footer infos
-  Owner.Items[Index].fAbsoluteOffset := Offset;
-  Owner.Items[Index].fRelativeOffset := Offset - IpacAbsoluteOffset;
-  Owner.Items[Index].fSize := NewSectionSize; // important because PaddingSize is set after!
-
   // Writing section padding
-  ZeroMemory(@Buffer, PaddingSize);
-  OutStream.Write(Buffer, PaddingSize);
+  NewPaddingSize := GetSectionPaddingSize(NewSectionSize);
+  ZeroMemory(@Buffer, NewPaddingSize);
+  OutStream.Write(Buffer, NewPaddingSize);
+
+  // Updating footer infos
+  with Owner.Items[Index] do begin
+    fNewAbsoluteOffset := Offset;
+    fNewRelativeOffset := Offset - IpacAbsoluteOffset;
+    fNewSize := NewSectionSize;
+    fNewPaddingSize := NewPaddingSize;
+  end;
 end;
 
-function TIpacSectionsListItem.GetSectionPaddingSize: LongWord;
+function TIpacSectionsListItem.GetSectionPaddingSize(DataSize: LongWord): LongWord;
 var
   current_num, total_null_bytes: LongWord;
 
@@ -281,12 +291,11 @@ begin
   // Based on the original function by Manic
   current_num := 0;
   total_null_bytes := 0;
-  while current_num <> Size do
+  while current_num <> DataSize do
   begin
     if total_null_bytes = 0 then begin
       total_null_bytes := 31;
-    end
-    else begin
+    end else begin
       Dec(total_null_bytes);
     end;
     Inc(current_num);
@@ -303,6 +312,11 @@ end;
 
 procedure TIpacEditor.Clear;
 begin
+  (*  If the source file is compressed, the InternalWorkingSourceFile contains
+      the uncompressed temp file. if the source if is already uncompressed,
+      InternalWorkingSourceFile contains the source file [NOT TO BE DELETED]. *)
+  if Compressed and FileExists(InternalWorkingSourceFile) then
+    DeleteFile(InternalWorkingSourceFile);
   Sections.Clear;
   Content.Clear;
 end;
@@ -339,9 +353,9 @@ var
 begin
   Result := False;
   if not FileExists(FileName) then Exit;
+  Clear; // the previous temp file is cleaned here (if needed)
 
   fSourceFileName := FileName;
-  Clear;
 
   // Ungzip if needed
   InitWorkingSelectedFile(SourceFileName);
@@ -437,7 +451,7 @@ end;
 function TIpacEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
   InStream, OutStream: TFileStream;
-  OutTempFile: TFileName;
+  OutTempFile, FinalEmbeddedFileName: TFileName;
   i, j: Integer;
   
 begin
@@ -490,10 +504,12 @@ begin
         DeleteFile(FileName);
 
     // Compress the file if needed
-    if Compressed then begin
-      DeleteFile(InternalWorkingSourceFile); // the uncompressed original temp file
-      RenameFile(OutTempFile, InternalWorkingSourceFile); // OutTempFile is the new file
-      OutTempFile := InternalWorkingSourceFile; // The new temp saved file is renamed as the original temp file
+    if Compressed then begin                    
+      FinalEmbeddedFileName :=
+        IncludeTrailingPathDelimiter(ExtractFilePath(OutTempFile))
+        + ExtractFileName(InternalWorkingSourceFile);
+      RenameFile(OutTempFile, FinalEmbeddedFileName); // OutTempFile is the new file
+      OutTempFile := FinalEmbeddedFileName;
       GZipCompress(OutTempFile); // compressing the new temp file
     end;
 
@@ -504,10 +520,13 @@ begin
     if Result then
       DeleteFile(OutTempFile);
 
-    (*  Reloading the file from the disk because every structure must be reloaded
-        cleared datas. Every infos has been modified in order to build the output
-        file. It's crap, but doing so uses less variables, so less source code. *)
-    Result := Result and LoadFromFile(SourceFileName);
+    // Updating the information if we Save the current loaded file to the same file
+    if FileName = SourceFileName then begin
+      Result := Result and LoadFromFile(SourceFileName);
+{$IFDEF DEBUG}
+      WriteLn('File was reloaded from disk.');
+{$ENDIF}
+    end;
 
 {$IFDEF DEBUG}
     WriteLn('Saved to "', ExtractFileName(FileName), '", Result: ', Result);
@@ -601,20 +620,20 @@ begin
     // Initializing members
     StrCopy(Entry.Name, PChar(Items[i].Name));
     StrCopy(Entry.Kind, PChar(Items[i].Kind));
-    Entry.Offset := Items[i].RelativeOffset;
-    Entry.Size := Items[i].Size;
+    Entry.Offset := Items[i].fNewRelativeOffset;
+    Entry.Size := Items[i].fNewSize;
 
     // Writing to the file
     FS.Write(Entry, SizeOf(TIpacSectionEntry));
 
     // Calculating Ipac Section size
-    Inc(IpacSection.fSize, Items[i].Size);
-    Inc(IpacSection.fSize, Items[i].PaddingSize);
+    Inc(IpacSection.fSize, Items[i].fNewSize);
+    Inc(IpacSection.fSize, Items[i].fNewPaddingSize);
 
 {$IFDEF DEBUG}
     with Items[i] do
       WriteLn('  #', i, ': Name: ', Name, ', Kind: ', Kind, ', ROffset: ',
-        RelativeOffset, ', AOffset: ', AbsoluteOffset, ', Size: ', Size);
+        fNewRelativeOffset, ', AOffset: ', fNewAbsoluteOffset, ', Size: ', fNewSize);
 {$ENDIF}
   end;
 

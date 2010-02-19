@@ -37,7 +37,7 @@ var
 //
 function GetApplicationFileVersion: TApplicationFileVersion;
 const
-  FRENCH_LANG_CODE = '100904E4';
+  CANADA_LANG_CODE = '100904E4';
   
 Var
   Chaine:String;
@@ -73,7 +73,7 @@ Var
   end;
 
 begin
-  Chaine := _FileVersion(FRENCH_LANG_CODE);
+  Chaine := _FileVersion(CANADA_LANG_CODE);
 
   Result.Major := -1;
   Result.Minor := -1;

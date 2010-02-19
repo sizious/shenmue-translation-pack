@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'frmMain'
-  ClientHeight = 386
+  Caption = '## DYNAMIC TITLE ## // IPAC Browser // (C)reated by SiZiOUS'
+  ClientHeight = 346
   ClientWidth = 492
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,6 +14,8 @@ object frmMain: TfrmMain
   OldCreateOrder = False
   Position = poScreenCenter
   ShowHint = True
+  OnActivate = FormActivate
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -21,15 +23,14 @@ object frmMain: TfrmMain
   object lvIpacContent: TJvListView
     AlignWithMargins = True
     Left = 3
-    Top = 26
+    Top = 29
     Width = 486
-    Height = 338
-    Margins.Top = 0
+    Height = 295
     Align = alClient
     Columns = <
       item
         Caption = 'Name'
-        Width = 180
+        Width = 160
       end
       item
         Caption = 'Type'
@@ -37,11 +38,15 @@ object frmMain: TfrmMain
       end
       item
         Caption = 'Offset'
-        Width = 100
+        Width = 65
       end
       item
         Caption = 'Size'
-        Width = 100
+        Width = 65
+      end
+      item
+        Caption = 'Updated'
+        Width = 70
       end>
     ColumnClick = False
     GridLines = True
@@ -52,11 +57,16 @@ object frmMain: TfrmMain
     TabOrder = 0
     ViewStyle = vsReport
     OnColumnClick = lvIpacContentColumnClick
-    ColumnsOrder = '0=180,1=100,2=100,3=100'
+    OnSelectItem = lvIpacContentSelectItem
+    ColumnsOrder = '0=160,1=100,2=65,3=65,4=70'
     HeaderImagePosition = hipRight
     HeaderImages = ilHeader
     Groups = <>
     ExtendedColumns = <
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
       item
         HeaderImagePosition = hipRight
         UseParentHeaderImagePosition = False
@@ -78,7 +88,7 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 367
+    Top = 327
     Width = 492
     Height = 19
     Panels = <
@@ -94,7 +104,6 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
-    ExplicitTop = 357
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -243,11 +252,13 @@ object frmMain: TfrmMain
       Caption = '&File'
       object miOpen: TMenuItem
         Caption = '&Open...'
+        Hint = 'Open a Shenmue IPAC-based data file.'
         ShortCut = 16463
         OnClick = miOpenClick
       end
       object miReload: TMenuItem
         Caption = '&Reload...'
+        Hint = 'Reload the selected file from the disk.'
         OnClick = miReloadClick
       end
       object N2: TMenuItem
@@ -255,10 +266,13 @@ object frmMain: TfrmMain
       end
       object miSave: TMenuItem
         Caption = '&Save...'
+        Hint = 'Save the current file.'
         ShortCut = 16467
+        OnClick = miSaveClick
       end
       object miSaveAs: TMenuItem
         Caption = '&Save as...'
+        Hint = 'Save the current file as another file.'
         ShortCut = 49235
         OnClick = miSaveAsClick
       end
@@ -267,6 +281,7 @@ object frmMain: TfrmMain
       end
       object miClose: TMenuItem
         Caption = '&Close'
+        Hint = 'Close the current file.'
         OnClick = miCloseClick
       end
       object N1: TMenuItem
@@ -274,6 +289,7 @@ object frmMain: TfrmMain
       end
       object miQuit: TMenuItem
         Caption = 'Quit'
+        Hint = 'Exit the application.'
         ShortCut = 16465
         OnClick = miQuitClick
       end
@@ -282,18 +298,22 @@ object frmMain: TfrmMain
       Caption = '&Edit'
       object miUndo: TMenuItem
         Caption = '&Undo...'
+        Hint = 'Cancel the IPAC entry importation.'
         ShortCut = 16474
+        OnClick = miUndoClick
       end
       object N4: TMenuItem
         Caption = '-'
       end
       object miImport: TMenuItem
         Caption = '&Import...'
+        Hint = 'Replace the current selected entry with the content from a file.'
         ShortCut = 16457
         OnClick = miImportClick
       end
       object miExport: TMenuItem
         Caption = '&Export...'
+        Hint = 'Extract the current selected entry to a file.'
         ShortCut = 16453
         OnClick = miExportClick
       end
@@ -302,49 +322,63 @@ object frmMain: TfrmMain
       end
       object miExportAll: TMenuItem
         Caption = '&Export all...'
+        Hint = 'Extract all IPAC entries to a directory.'
         ShortCut = 16449
+        OnClick = miExportAllClick
       end
     end
     object miView: TMenuItem
       Caption = '&View'
       object miDebugLog: TMenuItem
         Caption = '&Debug log...'
+        Hint = 'Show or hide the Debug log window.'
+        ShortCut = 16452
+        OnClick = miDebugLogClick
       end
       object N6: TMenuItem
         Caption = '-'
       end
       object miProperties: TMenuItem
         Caption = '&Properties...'
+        Hint = 'Show or hide the Properties window for the current file.'
+        ShortCut = 115
       end
     end
     object miOptions: TMenuItem
       Caption = '&Options'
       object miAutoSave: TMenuItem
         Caption = '&Auto-save'
+        Hint = 'Auto-save each opened file if needed.'
+        ShortCut = 118
+        OnClick = miAutoSaveClick
       end
       object miMakeBackup: TMenuItem
         Caption = '&Make backup'
+        Hint = 'Auto-create a copy of the current file before overwriting it.'
+        ShortCut = 119
+        OnClick = miMakeBackupClick
       end
     end
     object miHelp: TMenuItem
       Caption = '&Help'
       object miAbout: TMenuItem
         Caption = '&About...'
+        Hint = 'I don'#39't know what'#39's it. Maybe you shouldn'#39't select this!'
         ShortCut = 123
       end
     end
-    object miDebugMenu: TMenuItem
+    object miDEBUG: TMenuItem
       Caption = 'DEBUG'
-      object miDebugTest1: TMenuItem
+      object miDEBUG_TEST1: TMenuItem
         Caption = 'Test IPACEditor'
-        OnClick = miDebugTest1Click
+        OnClick = miDEBUG_TEST1Click
       end
       object N7: TMenuItem
         Caption = '-'
       end
-      object GZipDecompress1: TMenuItem
+      object miDEBUG_TEST2: TMenuItem
         Caption = 'Test GZip Interface'
-        OnClick = GZipDecompress1Click
+        OnClick = miDEBUG_TEST2Click
       end
     end
   end
@@ -1186,6 +1220,7 @@ object frmMain: TfrmMain
     object miUndo2: TMenuItem
       Caption = '&Undo...'
       ShortCut = 16474
+      OnClick = miUndoClick
     end
     object N8: TMenuItem
       Caption = '-'
@@ -1206,6 +1241,7 @@ object frmMain: TfrmMain
     object miExportAll2: TMenuItem
       Caption = 'Export &all...'
       ShortCut = 16449
+      OnClick = miExportAllClick
     end
   end
   object sdExport: TSaveDialog
@@ -1770,5 +1806,17 @@ object frmMain: TfrmMain
     Title = 'Export the current entry to...'
     Left = 8
     Top = 180
+  end
+  object aeMain: TApplicationEvents
+    OnHint = aeMainHint
+    Left = 10
+    Top = 284
+  end
+  object bfdExportAll: TJvBrowseForFolderDialog
+    Title = 
+      'Please select the output directory to store the exported IPAC co' +
+      'ntent...'
+    Left = 296
+    Top = 192
   end
 end

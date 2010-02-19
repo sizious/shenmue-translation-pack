@@ -13,7 +13,8 @@ uses
   oldskool_font_vcl in '..\..\Shenmue Subtitles Preview\src\oldskool_font_vcl.pas',
   viewer in '..\..\Shenmue Subtitles Preview\src\viewer.pas' {frmSubsPreview},
   about in 'about.pas' {frmAbout},
-  tools in 'tools.pas';
+  tools in 'tools.pas',
+  systools in '..\..\Common\systools.pas';
 
 {$R *.res}
 
