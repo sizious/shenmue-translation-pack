@@ -21,7 +21,7 @@ BEGIN
             VALUE "LegalCopyright", "© Copyleft 2002-2009\0"
             VALUE "LegalTrademarks", "Shenmue is copyrighted SEGA © 1999, 2001\0"
             VALUE "OriginalFilename", "convert.exe\0"
-            VALUE "ProductName", "Shenmue II Free Quest Subtitles Editor v1.xx to v1.02+ Exporter\0"
+            VALUE "ProductName", "Shenmue Translation Pack\0"
             VALUE "ProductVersion", "2.0.2.0\0"
             VALUE "Comments", "http://shenmuesubs.sourceforge.net/\0"
         END

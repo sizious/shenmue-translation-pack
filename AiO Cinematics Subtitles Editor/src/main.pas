@@ -597,6 +597,8 @@ var
   DataDir: TFileName;
 
 begin
+//  ShowMessage(GetApplicationVersion(LANG_ENGLISH, SUBLANG_ENGLISH_CAN));
+
   SrfList := TStringList.Create;
   SrfStruct := TSrfStruct.Create;
   DataDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)+'\data');
