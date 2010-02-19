@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '## DYNAMIC TITLE ## // IPAC Browser // (C)reated by SiZiOUS'
-  ClientHeight = 346
+  ClientHeight = 366
   ClientWidth = 492
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -25,7 +25,7 @@ object frmMain: TfrmMain
     Left = 3
     Top = 29
     Width = 486
-    Height = 295
+    Height = 315
     Align = alClient
     Columns = <
       item
@@ -88,7 +88,7 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 327
+    Top = 347
     Width = 492
     Height = 19
     Panels = <

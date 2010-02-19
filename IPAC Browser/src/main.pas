@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, IpacMgr, Menus, ComCtrls, JvExComCtrls, JvListView, ImgList, ToolWin,
-  JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder;
+  JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder, IpacUtil;
 
 type
   TfrmMain = class(TForm)
@@ -122,14 +122,13 @@ type
     procedure Clear; overload;
     procedure Clear(const OnlyUI: Boolean); overload;
     procedure ClearColumnsImages;
-    procedure InitFileOperationDialogFilter(TargetDialog: TOpenDialog;
-      const SpecificFilter: string);
+    function ExtendedKindToFilterString(
+      SectionKind: TIpacSectionKind): string;
+    function GetFileOperationDialogFilterIndex(
+      TargetDialog: TOpenDialog): Integer;
     procedure InitToolbarControl;
     procedure InitContentPopupMenuControl;
-    function GetFileOperationDialogFilterIndex(TargetDialog: TOpenDialog;
-      SelectedContentEntry: TIpacSectionsListItem): Integer;
     function KindToImageIndex(Kind: string): Integer;
-    procedure LoadFile(const FileName: TFileName);
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
@@ -142,6 +141,7 @@ type
     { Déclarations publiques }
     function MsgBox(Text: string): Integer; overload;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer; overload;
+    procedure LoadFile(const FileName: TFileName);    
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property DebugLogVisible: Boolean read fDebugLogVisible write SetDebugLogVisible;
@@ -166,7 +166,7 @@ implementation
 {$R *.dfm}
 
 uses
-  IpacUtil, GZipMgr, Utils, DebugLog;
+  GZipMgr, Utils, DebugLog;
 
 procedure TfrmMain.Clear(const OnlyUI: Boolean);
 begin
@@ -199,6 +199,13 @@ var
 begin
   for i := 0 to lvIpacContent.Columns.Count - 1 do
     lvIpacContent.Column[i].ImageIndex := -1;
+end;
+
+function TfrmMain.ExtendedKindToFilterString(
+  SectionKind: TIpacSectionKind): string;
+begin
+  Result := SectionKind.Description + ' (*.' + SectionKind.Extension + ')|*.'
+    + SectionKind.Extension + '|';
 end;
 
 procedure TfrmMain.miAutoSaveClick(Sender: TObject);
@@ -255,7 +262,7 @@ begin
 
     // Select the right filter
     DefaultExt := SelectedContentEntry.FileSectionDetails.Extension;
-    FilterIndex := GetFileOperationDialogFilterIndex(sdExport, SelectedContentEntry);
+    FilterIndex := GetFileOperationDialogFilterIndex(sdExport);
 
     // Saving IPAC content section
     if Execute then
@@ -270,7 +277,7 @@ begin
 
     // Select the right filter
     DefaultExt := SelectedContentEntry.FileSectionDetails.Extension;
-    FilterIndex := GetFileOperationDialogFilterIndex(odImport, SelectedContentEntry);
+    FilterIndex := GetFileOperationDialogFilterIndex(odImport);
 
     // Loading IPAC content section
     if Execute then
@@ -312,10 +319,6 @@ begin
   IPACEditor := TIpacEditor.Create;
   Clear;
 
-  // Init the ExportDialog Filter
-  InitFileOperationDialogFilter(sdExport, '');
-  InitFileOperationDialogFilter(odImport, '');
-
   // Initialize some UI controls
   InitToolbarControl;
   InitContentPopupMenuControl;
@@ -325,35 +328,6 @@ procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   // Destroying the IPAC Object
   IPACEditor.Free;
-end;
-
-function TfrmMain.GetFileOperationDialogFilterIndex(TargetDialog: TOpenDialog;
-  SelectedContentEntry: TIpacSectionsListItem): Integer;
-var
-  i: Integer;
-  SpecificFilter: string;
-
-begin
-  SpecificFilter := '';
-  
-  with SelectedContentEntry do begin
-    // If we know more that is an 'CHRM' or 'BIN ' entry... we'll add the entry
-    // in the first filter index
-    if ExpandedFileSectionDetails then begin
-      SpecificFilter := FileSectionDetails.Description + ' (*.' +
-        FileSectionDetails.Extension + ')|*.' + FileSectionDetails.Extension + '|';
-      Result := 0;
-    end else begin
-      // Selecting the right filter in the combo
-      Result := High(IPAC_SECTION_KINDS) + 2; // select the "all files"
-      for i := Low(IPAC_SECTION_KINDS) to High(IPAC_SECTION_KINDS) do
-        if (IPAC_SECTION_KINDS[i].Extension) = FileSectionDetails.Extension then
-          Result := i + 1;
-    end;
-  end;
-
-  // Filling the dialog with the filters...
-  InitFileOperationDialogFilter(TargetDialog, SpecificFilter);
 end;
 
 function TfrmMain.GetSelectedContentEntry: TIpacSectionsListItem;
@@ -394,17 +368,46 @@ begin
   miExportAll2.Hint := miExportAll.Hint;
 end;
 
-procedure TfrmMain.InitFileOperationDialogFilter(TargetDialog: TOpenDialog;
-  const SpecificFilter: string);
+function TfrmMain.GetFileOperationDialogFilterIndex(
+  TargetDialog: TOpenDialog): Integer;
 var
   i: Integer;
+  StandardKind: TIpacSectionKind;
   
 begin
-  TargetDialog.Filter := SpecificFilter;
-  for i := Low(IPAC_SECTION_KINDS) to High(IPAC_SECTION_KINDS) do
-    TargetDialog.Filter := TargetDialog.Filter +
-      IPAC_SECTION_KINDS[i].Description + ' File (*.' +
-      IPAC_SECTION_KINDS[i].Extension + ')|*.' + IPAC_SECTION_KINDS[i].Extension + '|';
+  TargetDialog.Filter := '';
+  Result := -1;
+  
+  // Filling with extended filter for the current entry
+  with SelectedContentEntry do begin
+    // If we know more that is an 'CHRM' or 'BIN ' entry... we'll add the entry
+    // in the first filter index
+    if FileSectionDetailsAvailable then begin
+      TargetDialog.Filter := ExtendedKindToFilterString(FileSectionDetails);
+      Result := 0;
+    end;
+  end;
+
+  // Filling with all standard kinds
+  for i := 0 to GetStandardKindCount - 1 do begin
+    StandardKind := GetStandardKind(i);
+
+    // Setting the FilterIndex
+    if StandardKind.Name = SelectedContentEntry.Kind then begin
+      // Select the Standard Kind if we don't have an Extended kind for this entry
+      if Result = -1 then
+        Result := i;
+
+      // Adding the Filter to the Dialog
+      TargetDialog.Filter := TargetDialog.Filter +
+        ExtendedKindToFilterString(StandardKind);
+    end;
+  end;
+
+  // If we don't have found the entry... select the all files filter
+  Result := 0;
+  
+  // Adding the *.* filter
   TargetDialog.Filter := TargetDialog.Filter + 'All Files (*.*)|*.*';
 end;
 
@@ -483,10 +486,10 @@ end;
 function TfrmMain.KindToImageIndex(Kind: string): Integer;
 begin
   Result := -1;
-  if Kind = IPAC_BIN then
+(*  if Kind = IPAC_BIN then
     Result := 0
   else if Kind = IPAC_CHRM then
-    Result := 1;
+    Result := 1;*)
 end;
 
 procedure TfrmMain.LoadFile(const FileName: TFileName);
@@ -494,31 +497,49 @@ var
   i: Integer;
 
 begin
+  // Updating UI
+  StatusText := 'Loading file...';
+
+  // Checking the file
+  if not FileExists(FileName) then begin
+    MsgBox('The file "' + FileName + '" doesn''t exists.', 'Warning', MB_ICONWARNING);
+    Exit;
+  end;
+
+  // Loading the file
   if IPACEditor.LoadFromFile(FileName) then begin
     // Clearing UI
     Clear(True);
-    StatusText := 'Loading file...';
 
-    // Adding entries
-    for i := 0 to IPACEditor.Content.Count - 1 do
-      with lvIpacContent.Items.Add do
-        with IPACEditor.Content[i] do begin
-          Data := Pointer(i);
-          Caption := GetOutputFileName;
-          SubItems.Add(FileSectionDetails.Description);
-          SubItems.Add(IntToStr(AbsoluteOffset));
-          SubItems.Add(IntToStr(Size));
-          SubItems.Add(''); // for updated
-          ImageIndex := KindToImageIndex(Kind);
-        end;
+    // Filling the UI with the IPAC Content
+    if IPACEditor.Content.Count > 0 then begin
 
-    // Updating UI
-    SetWindowTitleCaption(IPACEditor.SourceFileName);
-    SetControlsStateFileOperations(True);
-    StatusText := '';
+      // Adding entries
+      for i := 0 to IPACEditor.Content.Count - 1 do
+        with lvIpacContent.Items.Add do
+          with IPACEditor.Content[i] do begin
+            Data := Pointer(i);
+            Caption := GetOutputFileName;
+            SubItems.Add(FileSectionDetails.Description);
+            SubItems.Add(IntToStr(AbsoluteOffset));
+            SubItems.Add(IntToStr(Size));
+            SubItems.Add(''); // for updated
+            ImageIndex := KindToImageIndex(Kind);
+          end;
+
+      // Updating UI
+      SetWindowTitleCaption(IPACEditor.SourceFileName);
+      SetControlsStateFileOperations(True);
+    end else begin
+      StatusText := 'IPAC section empty ! Loading aborted...';
+      MsgBox('This file contains a valid IPAC section, but the section itself is empty.',
+        'Nothing to edit in this file', MB_ICONINFORMATION);
+    end;
 
   end else
     MsgBox('This file doesn''t contain a valid IPAC section.', 'Warning', MB_ICONWARNING);
+
+  StatusText := '';
 end;
 
 procedure TfrmMain.lvIpacContentColumnClick(Sender: TObject;
@@ -550,9 +571,8 @@ procedure TfrmMain.miOpenClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;   
   with odOpen do
-    if Execute then begin
+    if Execute then
       LoadFile(FileName);
-    end;
 end;
 
 procedure TfrmMain.miQuitClick(Sender: TObject);

@@ -82,7 +82,7 @@ type
     function ImportFromFile(const FileName: TFileName): Boolean;
 
     property AbsoluteOffset: LongWord read fAbsoluteOffset;
-    property ExpandedFileSectionDetails: Boolean read fExpandedFileSectionDetails;
+    property FileSectionDetailsAvailable: Boolean read fExpandedFileSectionDetails;
     property FileSectionDetails: TIpacSectionKind read fFileSectionDetails;
     property Index: Integer read fIndex;
     property ImportedFileName: TFileName read fImportedFileName;
@@ -219,14 +219,14 @@ begin
 end;
 
 function TIpacSectionsListItem.GetOutputFileName: TFileName;
-(*var
-  RadicalName: TFileName;
+var
+  Ext: string;
 
 begin
-  RadicalName := ChangeFileExt(ExtractFileName(Owner.Owner.SourceFileName));
-  Result := RadicalName + '_' + Name + '_#' + IntToStr(Index) + '.BIN';*)
-begin
-  Result := Name + '.' + FileSectionDetails.Extension;
+  Ext := FileSectionDetails.Extension;
+  if Ext <> '' then
+    Ext := '.' + Ext;  
+  Result := Name + Ext;
 end;
 
 function TIpacSectionsListItem.ImportFromFile(
