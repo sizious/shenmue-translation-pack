@@ -12,17 +12,35 @@ type
     Description: string;
   end;
 
+// Analyze IPAC section to know if the section type is "Extended" (used by IpacMgr)
+function AnalyzeIpacSection(const KindName: string;
+  var SourceFileStream: TFileStream; Offset, Size: LongWord;
+  var ExpandedKindFound: Boolean): TIpacSectionKind;
+
+// Standard Kind for UI
+function GetStandardKind(Index: Integer): TIpacSectionKind;
+function GetStandardKindCount: Integer;
+
+implementation
+
+uses
+ SysTools, Forms;
+
 const
-  IPAC_BIN  = 'BIN ';
-  IPAC_CHRM = 'CHRM';
-  IPAC_CHRT = 'CHRT';
+  UNKNOW_DESCRIPTION_KIND = '(Unknow)';
 
   (*  IPAC footer section type
       Raw read in the footer to determine section type. *)
-  IPAC_SECTION_KINDS: array[0..2] of TIpacSectionKind = (
-    (Name: IPAC_BIN ; Extension: 'BIN'; Description: 'Generic Binary'),
-    (Name: IPAC_CHRM; Extension: 'CHR'; Description: 'Character Model'),
-    (Name: IPAC_CHRT; Extension: 'CHT'; Description: 'Character PAKF')
+  STANDARD_COUNT = 7;
+  IPAC_SECTION_STANDARD_KINDS: array[0..STANDARD_COUNT] of TIpacSectionKind = (
+    (Name: 'BIN '; Extension: 'BIN'; Description: 'Generic Binary'),
+    (Name: 'CHRM'; Extension: 'CRM'; Description: 'Character Model'),
+    (Name: 'CHRT'; Extension: 'CHT'; Description: 'Character Info'),
+    (Name: 'MAPM'; Extension: 'MAP'; Description: 'Map Info'),
+    (Name: 'MOTN'; Extension: 'MOT'; Description: 'Motion Data'),
+    (Name: 'AUTH'; Extension: 'ATH'; Description: 'Sequence Data'),
+    (Name: 'DYNM'; Extension: 'DYM'; Description: 'Dynamics Data'),
+    (Name: 'SCR0'; Extension: 'SRL'; Description: 'Scroll Data')
   );
 
   (*  Extended IPAC section entries.
@@ -30,7 +48,8 @@ const
       can be identified by a more specific type. In fact, in the footer,
       we have (at least for now) only two types: 'BIN ' and 'CHRM'. But a 'BIN '
       section can be a PVR, SPR... or anything else. *)
-  IPAC_SECTION_PARSE_RESULTS: array[0..6] of TIpacSectionKind = (
+  EXTENDED_COUNT = 6;
+  IPAC_SECTION_EXTENDED_KINDS: array[0..EXTENDED_COUNT] of TIpacSectionKind = (
     (Name: 'TEXN'; Extension: 'SPR'; Description: 'Sprite Package'),
     (Name: 'GBIX'; Extension: 'PVR'; Description: 'PowerVR Texture'),
     (Name: 'PVRT'; Extension: 'PVR'; Description: 'PowerVR Texture'),
@@ -39,15 +58,25 @@ const
     (Name: 'WDAT'; Extension: 'WDT'; Description: 'Weather Data'),
     (Name: 'MVSD'; Extension: 'MVS'; Description: 'MVS Data')
   );
+  
+//------------------------------------------------------------------------------
 
-function AnalyzeIpacSection(const KindName: string;
-  var SourceFileStream: TFileStream; Offset, Size: LongWord;
-  var ExpandedKindFound: Boolean): TIpacSectionKind;
+function GetStandardKind(Index: Integer): TIpacSectionKind;
+begin
+  Result.Name := '';
+  Result.Extension := '';
+  Result.Description := UNKNOW_DESCRIPTION_KIND;
+  if (Index < 0) or (Index > STANDARD_COUNT) then Exit;
 
-implementation
+  Result := IPAC_SECTION_STANDARD_KINDS[Index];
+end;
 
-uses
- SysTools, Forms;
+//------------------------------------------------------------------------------
+
+function GetStandardKindCount: Integer;
+begin
+  Result := STANDARD_COUNT + 1; // it's 0 based!
+end;
 
 //------------------------------------------------------------------------------
 
@@ -70,18 +99,18 @@ end;
 
 //------------------------------------------------------------------------------
 
-function GetKindDetails(const KindName: string;
+function GetStandardKindDetails(const KindName: string;
   var ResultItem: TIpacSectionKind): Boolean;
 begin
-  Result := SectionKindSequentialSearch(IPAC_SECTION_KINDS, KindName, ResultItem);
+  Result := SectionKindSequentialSearch(IPAC_SECTION_STANDARD_KINDS, KindName, ResultItem);
 end;
 
 //------------------------------------------------------------------------------
 
-function GetParseResultDetails(const SectionName: string;
+function GetExtendedKindDetails(const SectionName: string;
   var ResultItem: TIpacSectionKind): Boolean;
 begin
-  Result := SectionKindSequentialSearch(IPAC_SECTION_PARSE_RESULTS, SectionName, ResultItem);
+  Result := SectionKindSequentialSearch(IPAC_SECTION_EXTENDED_KINDS, SectionName, ResultItem);
 end;
 
 //------------------------------------------------------------------------------
@@ -99,13 +128,17 @@ var
   SavedOffset, MaxPos: LongWord;
   Done: Boolean;
   SectionHeader: TSectionHeader;
-  
+  StandardKindFound: Boolean;
+
 begin
-  (*  Saving the offset, because this Stream is coming from the LoadFromFile function,
-      and currently scanning the source file! *)
+  (*  Saving the offset, because this Stream is coming from the LoadFromFile
+      function, and currently scanning the source file! *)
   SavedOffset := SourceFileStream.Position;
 
-  // Trying to get the section details (is the section SPR, PVR or anything else?)...
+  //  EXPANDED KIND INFO -------------------------------------------------------
+  (*  Trying to get the section details (is the section SPR, PVR or anything
+      else?)... In fact, the IPAC footer may indicate only if the file is "BIN "
+      type, but it can be more specific. *)
   SourceFileStream.Seek(Offset, soFromBeginning);
   MaxPos := SourceFileStream.Position + Size;
 
@@ -113,7 +146,7 @@ begin
   repeat
     // Parsing header
     SourceFileStream.Read(SectionHeader, SizeOf(SectionHeader));
-    ExpandedKindFound := GetParseResultDetails(SectionHeader.Name, Result);
+    ExpandedKindFound := GetExtendedKindDetails(SectionHeader.Name, Result);
 
     // Checking if we found an expanded kind and/or if the next section is invalid
     Done := ExpandedKindFound or (SectionHeader.Size = 0)
@@ -126,9 +159,19 @@ begin
 
   SourceFileStream.Seek(SavedOffset, soFromBeginning);
 
+  // STANDARD KIND INFO --------------------------------------------------------
   // By default, it's the kind from the IPAC footer
-  if not ExpandedKindFound then
-    GetKindDetails(KindName, Result);
+  if not ExpandedKindFound then begin
+    StandardKindFound := GetStandardKindDetails(KindName, Result);
+
+    // UNKNOW STANDARD KIND INFO -----------------------------------------------
+    // The worst case, we don't know anything on this IPAC entry!
+    if not StandardKindFound then begin
+      Result.Extension := '';
+      Result.Description := UNKNOW_DESCRIPTION_KIND;
+    end;
+    
+  end;
 end;
 
 //------------------------------------------------------------------------------
