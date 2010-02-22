@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, IpacMgr, Menus, ComCtrls, JvExComCtrls, JvListView, ImgList, ToolWin,
-  JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder, IpacUtil;
+  JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder, IpacUtil, DebugLog;
 
 type
   TfrmMain = class(TForm)
@@ -47,7 +47,6 @@ type
     tbSave: TToolButton;
     tbReload: TToolButton;
     ToolButton4: TToolButton;
-    N7: TMenuItem;
     miDEBUG_TEST2: TMenuItem;
     miOptions: TMenuItem;
     miAutoSave: TMenuItem;
@@ -74,11 +73,12 @@ type
     N9: TMenuItem;
     miExportAll2: TMenuItem;
     sdExport: TSaveDialog;
-    ilToolbarDisabled: TImageList;
+    ilToolBarDisabled: TImageList;
     odImport: TOpenDialog;
     sdSave: TSaveDialog;
     aeMain: TApplicationEvents;
     bfdExportAll: TJvBrowseForFolderDialog;
+    miDEBUG_TEST3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
@@ -104,6 +104,7 @@ type
     procedure miSaveClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure miExportAllClick(Sender: TObject);
+    procedure miDEBUG_TEST3Click(Sender: TObject);
   private
     { Déclarations privées }
     fStoredCaption: string;
@@ -128,7 +129,6 @@ type
       TargetDialog: TOpenDialog): Integer;
     procedure InitToolbarControl;
     procedure InitContentPopupMenuControl;
-    function KindToImageIndex(Kind: string): Integer;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
@@ -139,6 +139,7 @@ type
     property StoredCaption: string read fStoredCaption write fStoredCaption;
   public
     { Déclarations publiques }
+    procedure AddDebug(LineType: TLineType; Text: string);
     function MsgBox(Text: string): Integer; overload;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer; overload;
     procedure LoadFile(const FileName: TFileName);    
@@ -166,7 +167,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GZipMgr, Utils, DebugLog;
+  GZipMgr, Utils;
 
 procedure TfrmMain.Clear(const OnlyUI: Boolean);
 begin
@@ -179,6 +180,11 @@ begin
   SetControlsStateUndoImporting(False);
   SetControlsStateFileOperations(False);
   SetControlsStateSaveOperation(False);
+end;
+
+procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
+begin
+  frmDebugLog.AddLine(LineType, Text);
 end;
 
 procedure TfrmMain.aeMainHint(Sender: TObject);
@@ -366,6 +372,17 @@ begin
 {$ENDIF}
 end;
 
+procedure TfrmMain.miDEBUG_TEST3Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  frmDebugLog.addline(ltinformation, 'information');
+  frmDebugLog.AddLine(ltWarning, 'test warning');
+  frmDebugLOG.addline(ltCritical, 'CRITICAL!!!');
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
 procedure TfrmMain.InitContentPopupMenuControl;
 begin
   miUndo2.Hint := miUndo.Hint;
@@ -489,33 +506,23 @@ begin
     end; // Style = tbsButton
 end;
 
-function TfrmMain.KindToImageIndex(Kind: string): Integer;
-begin
-  Result := -1;
-(*  if Kind = IPAC_BIN then
-    Result := 0
-  else if Kind = IPAC_CHRM then
-    Result := 1;*)
-end;
-
 procedure TfrmMain.LoadFile(const FileName: TFileName);
 var
   i: Integer;
 
 begin
-  // Updating UI
-  StatusText := 'Loading file...';
-
   // Checking the file
   if not FileExists(FileName) then begin
     MsgBox('The file "' + FileName + '" doesn''t exists.', 'Warning', MB_ICONWARNING);
     Exit;
   end;
 
+  // Updating UI
+  StatusText := 'Loading file...';
+  Clear(True);  
+
   // Loading the file
   if IPACEditor.LoadFromFile(FileName) then begin
-    // Clearing UI
-    Clear(True);
 
     // Filling the UI with the IPAC Content
     if IPACEditor.Content.Count > 0 then begin
@@ -530,12 +537,13 @@ begin
             SubItems.Add(IntToStr(AbsoluteOffset));
             SubItems.Add(IntToStr(Size));
             SubItems.Add(''); // for updated
-            ImageIndex := KindToImageIndex(Kind);
+            ImageIndex := GetKindIndex(FileSectionDetails.Name);
           end;
 
       // Updating UI
       SetWindowTitleCaption(IPACEditor.SourceFileName);
       SetControlsStateFileOperations(True);
+      AddDebug(ltInformation, 'The file "' + IPACEditor.SourceFileName + '" was successfully opened.');
     end else begin
       StatusText := 'IPAC section empty ! Loading aborted...';
       MsgBox('This file contains a valid IPAC section, but the section itself is empty.',

@@ -18,6 +18,7 @@ function AnalyzeIpacSection(const KindName: string;
   var ExpandedKindFound: Boolean): TIpacSectionKind;
 
 // Standard Kind for UI
+function GetKindIndex(const KindName: string): Integer;
 function GetStandardKind(Index: Integer): TIpacSectionKind;
 function GetStandardKindCount: Integer;
 
@@ -35,11 +36,11 @@ const
   IPAC_SECTION_STANDARD_KINDS: array[0..STANDARD_COUNT] of TIpacSectionKind = (
     (Name: 'BIN '; Extension: 'BIN'; Description: 'Generic Binary'),
     (Name: 'CHRM'; Extension: 'CRM'; Description: 'Character Model'),
-    (Name: 'CHRT'; Extension: 'CHT'; Description: 'Character Info'),
-    (Name: 'MAPM'; Extension: 'MAP'; Description: 'Map Info'),
+    (Name: 'CHRT'; Extension: 'CHT'; Description: 'Character Properties'),
+    (Name: 'MAPM'; Extension: 'MAP'; Description: 'Map Information'),
     (Name: 'MOTN'; Extension: 'MOT'; Description: 'Motion Data'),
     (Name: 'AUTH'; Extension: 'ATH'; Description: 'Sequence Data'),
-    (Name: 'DYNM'; Extension: 'DYM'; Description: 'Dynamics Data'),
+    (Name: 'DYNM'; Extension: 'DYM'; Description: 'Dynamics Info'),
     (Name: 'SCR0'; Extension: 'SRL'; Description: 'Scroll Data')
   );
 
@@ -81,16 +82,19 @@ end;
 //------------------------------------------------------------------------------
 
 function SectionKindSequentialSearch(SourceArray: array of TIpacSectionKind;
-  const Value: string; var ResultItem: TIpacSectionKind): Boolean;
+  const Value: string; var ResultItem: TIpacSectionKind;
+  var ResultIndex: Integer): Boolean;
 var
   i: Integer;
-  
+
 begin
   i := Low(SourceArray);
+  ResultIndex := i - 1;
   Result := False;
   repeat
     if SourceArray[i].Name = Value then begin
       ResultItem := SourceArray[i];
+      ResultIndex := i;
       Result := True;
     end;
     Inc(i);
@@ -101,16 +105,24 @@ end;
 
 function GetStandardKindDetails(const KindName: string;
   var ResultItem: TIpacSectionKind): Boolean;
+var
+  NotUsedCrap: Integer;
+
 begin
-  Result := SectionKindSequentialSearch(IPAC_SECTION_STANDARD_KINDS, KindName, ResultItem);
+  Result := SectionKindSequentialSearch(IPAC_SECTION_STANDARD_KINDS, KindName,
+    ResultItem, NotUsedCrap);
 end;
 
 //------------------------------------------------------------------------------
 
 function GetExtendedKindDetails(const SectionName: string;
   var ResultItem: TIpacSectionKind): Boolean;
+var
+  NotUsedCrap: Integer;
+
 begin
-  Result := SectionKindSequentialSearch(IPAC_SECTION_EXTENDED_KINDS, SectionName, ResultItem);
+  Result := SectionKindSequentialSearch(IPAC_SECTION_EXTENDED_KINDS, SectionName,
+    ResultItem, NotUsedCrap);
 end;
 
 //------------------------------------------------------------------------------
@@ -172,6 +184,32 @@ begin
     end;
     
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetKindIndex(const KindName: string): Integer;
+var
+  Crap: TIpacSectionKind;
+  Found: Boolean;
+
+begin
+  Result := 0;
+
+  // Seaching Extended first   
+  Found := SectionKindSequentialSearch(IPAC_SECTION_EXTENDED_KINDS,
+    KindName, Crap, Result);
+
+  // Searching Standard kinds after
+  if not Found then begin
+    Found := SectionKindSequentialSearch(IPAC_SECTION_STANDARD_KINDS, KindName,
+      Crap, Result);
+    Inc(Result, EXTENDED_COUNT + 1); // Standard Images are after the Extended ones
+  end;
+
+ // Result + 1: The "0" is for the "Unknow" ImageIndex.
+  if Found then
+    Inc(Result);
 end;
 
 //------------------------------------------------------------------------------

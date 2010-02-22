@@ -25,10 +25,6 @@ uses
   common in 'engine\common.pas',
   warning in 'warning.pas' {frmWarning},
   vistaui in 'vistaui.pas',
-  viewer_intf in '..\..\..\Shenmue Subtitles Preview\src\viewer_intf.pas',
-  oldskool_font_mapper in '..\..\..\Shenmue Subtitles Preview\src\oldskool_font_mapper.pas',
-  oldskool_font_vcl in '..\..\..\Shenmue Subtitles Preview\src\oldskool_font_vcl.pas',
-  viewer in '..\..\..\Shenmue Subtitles Preview\src\viewer.pas' {frmSubsPreview},
   textdata in 'engine\multitrd\textdata.pas',
   about in 'about.pas' {frmAbout},
   viewupd in 'engine\multitrd\ui\viewupd.pas',
@@ -50,7 +46,11 @@ uses
   pakfutil in 'engine\npc\pakf\pakfutil.pas',
   npclist in 'engine\npc\npclist.pas',
   imgtools in '..\..\..\Common\imgtools.pas',
-  pakfmgr in 'engine\npc\pakf\pakfmgr.pas';
+  pakfmgr in 'engine\npc\pakf\pakfmgr.pas',
+  viewer_intf in '..\..\..\Common\Preview\src\viewer_intf.pas',
+  oldskool_font_mapper in '..\..\..\Common\Preview\src\oldskool_font_mapper.pas',
+  oldskool_font_vcl in '..\..\..\Common\Preview\src\oldskool_font_vcl.pas',
+  viewer in '..\..\..\Common\Preview\src\viewer.pas' {frmSubsPreview};
 
 {$R *.res}
 
@@ -73,6 +73,7 @@ begin
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmFileInfo, frmFileInfo);
+  Application.CreateForm(TfrmSubsPreview, frmSubsPreview);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

@@ -100,7 +100,7 @@ object frmDebugLog: TfrmDebugLog
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object eDebug: TJvRichEdit
+  object mDebug: TJvRichEdit
     AlignWithMargins = True
     Left = 3
     Top = 3
@@ -108,6 +108,12 @@ object frmDebugLog: TfrmDebugLog
     Height = 221
     Align = alClient
     AutoSize = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     ReadOnly = True
     TabOrder = 0
     WordWrap = False
