@@ -322,12 +322,18 @@ begin
   // Initialize some UI controls
   InitToolbarControl;
   InitContentPopupMenuControl;
+
+  // Load configuration
+  LoadConfigMain;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   // Destroying the IPAC Object
   IPACEditor.Free;
+
+  // Saving configuration
+  SaveConfigMain;
 end;
 
 function TfrmMain.GetSelectedContentEntry: TIpacSectionsListItem;

@@ -12,7 +12,7 @@ type
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     Options1: TMenuItem;
-    Alwaysontop1: TMenuItem;
+    miOnTop: TMenuItem;
     Save1: TMenuItem;
     Copy1: TMenuItem;
     Clearall1: TMenuItem;
@@ -28,10 +28,15 @@ type
     procedure FormCreate(Sender: TObject);
     procedure aeDebugHint(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure miOnTopClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    fOnTop: Boolean;
+    procedure SetOnTop(const Value: Boolean);
     { Déclarations privées }
   public
     { Déclarations publiques }
+    property OnTop: Boolean read fOnTop write SetOnTop;
   end;
 
 var
@@ -39,7 +44,8 @@ var
 
 implementation
 
-uses main;
+uses
+  Main, Utils;
 
 {$R *.dfm}
 
@@ -64,6 +70,29 @@ begin
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
   sbDebug.SimplePanel := True;
+
+  // Load config
+  LoadConfigDebug;
+end;
+
+procedure TfrmDebugLog.FormDestroy(Sender: TObject);
+begin
+  SaveConfigDebug;
+end;
+
+procedure TfrmDebugLog.miOnTopClick(Sender: TObject);
+begin
+  OnTop := not OnTop;
+end;
+
+procedure TfrmDebugLog.SetOnTop(const Value: Boolean);
+begin
+  fOnTop := Value;
+  miOnTop.Checked := Value;
+  if Value then
+    FormStyle := fsStayOnTop
+  else
+    FormStyle := fsNormal;
 end;
 
 end.
