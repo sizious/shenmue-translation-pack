@@ -7,6 +7,16 @@ uses
   Dialogs, ExtCtrls, StdCtrls, Buttons;
 
 type
+  TExceptionCallBackEvent =
+    procedure(Sender: TObject; ExceptionMessage: string) of object;
+
+  TBugsHandlerInterface = class
+  private
+
+  public
+    constructor Create
+  end;
+
   TfrmBugsHandler = class(TForm)
     iError: TImage;
     Label1: TLabel;
@@ -28,26 +38,33 @@ type
     fErrorMsg : string;
     fErrorType : string;
     fErrorSender : string;
+    fExceptionCallBack: TExceptionCallBackEvent;
+    fQuitRequest: TNotifyEvent;
+    fSaveLogRequest: TNotifyEvent;
   public
     { Déclarations publiques }
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    property OnExceptionCallBack: TExceptionCallBackEvent read
+      fExceptionCallBack write fExceptionCallBack;
+    property OnSaveLogRequest: TNotifyEvent read fSaveLogRequest
+      write fSaveLogRequest;
+    property OnQuitRequest: TNotifyEvent read fQuitRequest write fQuitRequest;
   end;
 
 var
   frmBugsHandler: TfrmBugsHandler;
 
-procedure RunBugsHandler(Sender: TObject; E: Exception);
+procedure RunBugsHandler(Sender: TObject; E: Exception;
+  BugsHandlerCallBack: TBugsHandlerCallBack);
 
 implementation
-
-uses
-  main, utils;
 
 {$R *.dfm}
 
 //------------------------------------------------------------------------------
 
-procedure RunBugsHandler(Sender: TObject; E: Exception);
+procedure RunBugsHandler(Sender: TObject; E: Exception;
+  BugsHandlerCallBack: TBugsHandlerCallBack);
 begin
   frmBugsHandler := TfrmBugsHandler.Create(Application);
   try
@@ -64,13 +81,6 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure AddException(Msg : string);
-begin
-  frmMain.AddDebug('FATAL ERROR: ' + Msg);
-end;
-
-//------------------------------------------------------------------------------
-
 procedure TfrmBugsHandler.bQuitClick(Sender: TObject);
 var
   CanDo : integer;
@@ -81,12 +91,14 @@ begin
   if CanDo = IDNO then Exit;
 
   ExitCode := 255;
-  if frmMain.Visible then  
+  if Assigned(fQuitRequest) then
+    fQuitRequest(Self);
+(*  if frmMain.Visible then
     frmMain.miQuit.Click
   else begin
     Application.ShowMainForm := False;
     Application.Terminate;
-  end;
+  end; *)
 end;
 
 //------------------------------------------------------------------------------
@@ -100,7 +112,8 @@ end;
 
 procedure TfrmBugsHandler.bSaveDebugLogClick(Sender: TObject);
 begin
-  frmMain.miSaveDebugLog.Click;
+  if Assigned(fSaveLogRequest) then
+    fSaveLogRequest(Self);
 end;
 
 //------------------------------------------------------------------------------
@@ -115,7 +128,9 @@ begin
     + fErrorSender + ').';
   MessageBeep(MB_ICONERROR);
   mExceptionMessage.Text := fErrorMsg;
-  AddException(err);
+
+  if Assigned(fExceptionCallBack) then
+    fExceptionCallBack(Self, Err);
 end;
 
 //------------------------------------------------------------------------------
