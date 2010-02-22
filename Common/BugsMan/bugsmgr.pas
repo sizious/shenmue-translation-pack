@@ -14,7 +14,7 @@ type
   private
 
   public
-    constructor Create
+
   end;
 
   TfrmBugsHandler = class(TForm)
@@ -54,8 +54,7 @@ type
 var
   frmBugsHandler: TfrmBugsHandler;
 
-procedure RunBugsHandler(Sender: TObject; E: Exception;
-  BugsHandlerCallBack: TBugsHandlerCallBack);
+procedure RunBugsHandler(Sender: TObject; E: Exception);
 
 implementation
 
@@ -63,8 +62,7 @@ implementation
 
 //------------------------------------------------------------------------------
 
-procedure RunBugsHandler(Sender: TObject; E: Exception;
-  BugsHandlerCallBack: TBugsHandlerCallBack);
+procedure RunBugsHandler(Sender: TObject; E: Exception);
 begin
   frmBugsHandler := TfrmBugsHandler.Create(Application);
   try
