@@ -43,16 +43,46 @@ end;
 
 //------------------------------------------------------------------------------
 
+procedure SaveFormConfig(Section: string; Form: TForm);
+begin
+  with Configuration do begin
+    WriteInteger(Section, 'state', Integer(Form.WindowState));
+
+    if Form.WindowState = wsMaximized then begin
+      WriteInteger(Section, 'width', ReadInteger(Section, 'width', Form.Width));
+      WriteInteger(Section, 'height', ReadInteger(Section, 'height', Form.Height));
+      WriteInteger(Section, 'left', ReadInteger(Section, 'left', Form.Left));
+      WriteInteger(Section, 'top', ReadInteger(Section, 'top', Form.Top));
+    end else begin
+      WriteInteger(Section, 'width', Form.Width);
+      WriteInteger(Section, 'height', Form.Height);
+      WriteInteger(Section, 'left', Form.Left);
+      WriteInteger(Section, 'top', Form.Top);
+    end;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure LoadFormConfig(Section: string; Form: TForm);
+begin
+  with Configuration do begin
+    Form.Left := ReadInteger(Section, 'left', Form.Left);
+    Form.Top := ReadInteger(Section, 'top', Form.Top);
+    Form.Width := ReadInteger(Section, 'width', Form.Width);
+    Form.Height := ReadInteger(Section, 'height', Form.Height);
+    Form.WindowState := TWindowState(ReadInteger(Section, 'state',
+      Integer(Form.WindowState)));
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
 procedure LoadConfigDebug;
 begin
   with Configuration do begin
     frmDebugLog.OnTop := ReadBool('debug', 'ontop', False);
-    frmDebugLog.Left := ReadInteger('debug', 'left', 100);
-    frmDebugLog.Top := ReadInteger('debug', 'top', 100);
-    frmDebugLog.Width := ReadInteger('debug', 'width', frmDebugLog.Width);
-    frmDebugLog.Height := ReadInteger('debug', 'height', frmDebugLog.Height);
-    frmDebugLog.WindowState := TWindowState(ReadInteger('debug', 'state',
-      Integer(frmDebugLog.WindowState)));
+    LoadFormConfig('debug', frmDebugLog);
     frmMain.DebugLogVisible := ReadBool('debug', 'visible', False);    
   end;
 end;
@@ -72,13 +102,9 @@ end;
 procedure SaveConfigDebug;
 begin
   with Configuration do begin
-    WriteBool('debug', 'ontop', frmDebugLog.OnTop);
-    WriteInteger('debug', 'left', frmDebugLog.Left);
-    WriteInteger('debug', 'top', frmDebugLog.Top);
-    WriteInteger('debug', 'width', frmDebugLog.Width);
-    WriteInteger('debug', 'height', frmDebugLog.Height);
-    WriteInteger('debug', 'state', Integer(frmDebugLog.WindowState));   
     WriteBool('debug', 'visible', frmMain.DebugLogVisible);
+    WriteBool('debug', 'ontop', frmDebugLog.OnTop);
+    SaveFormConfig('debug', frmDebugLog);
   end;
 end;
 

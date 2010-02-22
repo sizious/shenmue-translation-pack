@@ -1,0 +1,20 @@
+# Please check the IpacUtil source file to check the ImageIndex order
+# The function using this is in IpacUtil.GetKindIndex().
+
+ImageIndex;Extension
+0;(Unknow)
+1;SPR
+2;PVR
+3;PVR
+4;SNF
+5;IWD
+6;WDT
+7;MVS
+8;BIN
+9;CRM
+10;CHT
+11;MAP
+12;MOT
+13;ATH
+14;DYM
+15;SRL

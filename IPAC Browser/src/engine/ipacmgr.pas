@@ -339,7 +339,7 @@ procedure TIpacEditor.InitWorkingSelectedFile(InputFileName: TFileName);
 begin
   fCompressed := GZipDecompress(InputFileName, GetWorkingTempDirectory, fInternalWorkingSourceFile);
   if not Compressed then
-    InternalWorkingSourceFile := InputFileName;
+    InternalWorkingSourceFile := ExpandFileName(InputFileName);
 end;
 
 function TIpacEditor.LoadFromFile(const FileName: TFileName): Boolean;

@@ -8,6 +8,13 @@ uses
   JvStatusBar, AppEvnts;
 
 type
+  TLineType = (ltInformation, ltWarning, ltCritical);
+
+  TDebugAttributes = record
+    Color: TColor;
+    Style: TFontStyles;
+  end;
+
   TfrmDebugLog = class(TForm)
     MainMenu1: TMainMenu;
     File1: TMenuItem;
@@ -21,7 +28,7 @@ type
     Selectall1: TMenuItem;
     N2: TMenuItem;
     Close1: TMenuItem;
-    eDebug: TJvRichEdit;
+    mDebug: TJvRichEdit;
     sbDebug: TJvStatusBar;
     aeDebug: TApplicationEvents;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -31,11 +38,15 @@ type
     procedure miOnTopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
+    { Déclarations privées }
     fOnTop: Boolean;
     procedure SetOnTop(const Value: Boolean);
-    { Déclarations privées }
+  protected
+    function LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
+    function LineTypeToTextLabel(LineType: TLineType): string;
   public
     { Déclarations publiques }
+    procedure AddLine(LineType: TLineType; const Text: string);
     property OnTop: Boolean read fOnTop write SetOnTop;
   end;
 
@@ -48,6 +59,35 @@ uses
   Main, Utils;
 
 {$R *.dfm}
+
+procedure TfrmDebugLog.AddLine(LineType: TLineType; const Text: string);
+var
+  Attr: TDebugAttributes;
+  Timestamp: TDateTime;
+//  SelLength, SelStart: Integer;
+
+begin
+  Timestamp := Now;
+  Attr := LineTypeToAttributes(LineType);
+
+//  SelLength := mDebug.SelLength;
+//  SelStart := mDebug.SelStart;
+//  mDebug.SelLength := 0;
+//  mDebug.SelStart := Length(mDebug.Lines.Text) - 1;
+{$IFDEF DEBUG}
+  WriteLn('Debug: SelStart: ', mDebug.SelStart, ', SelLength: ', mDebug.SelLength,
+    ', TextLength: ', Length(mDebug.Lines.Text));
+{$ENDIF}
+
+  mDebug.SelAttributes.Color := Attr.Color;
+  mDebug.SelAttributes.Style := Attr.Style;
+
+  mDebug.Lines.Add('[' + DateToStr(Timestamp) + ' ' + TimeToStr(Timestamp) + '] '
+    + LineTypeToTextLabel(LineType) + Text);
+
+//  mDebug.SelLength := SelLength;
+//  mDebug.SelStart := SelStart;
+end;
 
 procedure TfrmDebugLog.aeDebugHint(Sender: TObject);
 begin
@@ -78,6 +118,31 @@ end;
 procedure TfrmDebugLog.FormDestroy(Sender: TObject);
 begin
   SaveConfigDebug;
+end;
+
+function TfrmDebugLog.LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
+begin
+  Result.Color := clGray;
+  Result.Style := [];
+  case LineType of
+    ltInformation:
+      Result.Color := clGray;
+    ltWarning:
+      Result.Color := $000080FF; // orange
+    ltCritical: begin
+      Result.Color := clRed;
+      Result.Style := [fsBold];
+    end;
+  end;
+end;
+
+function TfrmDebugLog.LineTypeToTextLabel(LineType: TLineType): string;
+begin
+  Result := '';
+  case LineType of
+    ltWarning: Result := 'WARNING: ';
+    ltCritical: Result := 'CRITICAL: ';
+  end;
 end;
 
 procedure TfrmDebugLog.miOnTopClick(Sender: TObject);
