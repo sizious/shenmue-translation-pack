@@ -97,6 +97,7 @@ object frmDebugLog: TfrmDebugLog
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object eDebug: TJvRichEdit
@@ -117,9 +118,6 @@ object frmDebugLog: TfrmDebugLog
     Width = 492
     Height = 19
     Panels = <>
-    ExplicitLeft = 200
-    ExplicitTop = 198
-    ExplicitWidth = 0
   end
   object MainMenu1: TMainMenu
     Left = 10
@@ -157,8 +155,9 @@ object frmDebugLog: TfrmDebugLog
     end
     object Options1: TMenuItem
       Caption = '&Options'
-      object Alwaysontop1: TMenuItem
+      object miOnTop: TMenuItem
         Caption = '&Always on top'
+        OnClick = miOnTopClick
       end
     end
   end
