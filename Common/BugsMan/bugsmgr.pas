@@ -10,11 +10,23 @@ type
   TExceptionCallBackEvent =
     procedure(Sender: TObject; ExceptionMessage: string) of object;
 
-  TBugsHandlerInterface = class
+  TBugsHandlerInterface = class(TObject)
   private
-
+    fSaveLogRequest: TNotifyEvent;
+    fExceptionCallBack: TExceptionCallBackEvent;
+    fQuitRequest: TNotifyEvent;
+    procedure SetExceptionCallBack(const Value: TExceptionCallBackEvent);
+    procedure SetQuitRequest(const Value: TNotifyEvent);
+    procedure SetSaveLogRequest(const Value: TNotifyEvent);
   public
-
+    constructor Create;
+    destructor Destroy; override;
+    procedure Execute(Sender: TObject; E: Exception);
+    property OnExceptionCallBack: TExceptionCallBackEvent read
+      fExceptionCallBack write SetExceptionCallBack;
+    property OnSaveLogRequest: TNotifyEvent read fSaveLogRequest
+      write SetSaveLogRequest;
+    property OnQuitRequest: TNotifyEvent read fQuitRequest write SetQuitRequest;
   end;
 
   TfrmBugsHandler = class(TForm)
@@ -33,6 +45,7 @@ type
     procedure bQuitClick(Sender: TObject);
     procedure bReturnClick(Sender: TObject);
     procedure bSaveDebugLogClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Déclarations privées }
     fErrorMsg : string;
@@ -41,6 +54,9 @@ type
     fExceptionCallBack: TExceptionCallBackEvent;
     fQuitRequest: TNotifyEvent;
     fSaveLogRequest: TNotifyEvent;
+    fQuitAction: Boolean;
+  protected
+    property QuitAction: Boolean read fQuitAction write fQuitAction;
   public
     { Déclarations publiques }
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
@@ -54,28 +70,9 @@ type
 var
   frmBugsHandler: TfrmBugsHandler;
 
-procedure RunBugsHandler(Sender: TObject; E: Exception);
-
 implementation
 
 {$R *.dfm}
-
-//------------------------------------------------------------------------------
-
-procedure RunBugsHandler(Sender: TObject; E: Exception);
-begin
-  frmBugsHandler := TfrmBugsHandler.Create(Application);
-  try
-    with frmBugsHandler do begin
-      fErrorMsg := E.Message;
-      fErrorSender := Sender.ClassName;
-      fErrorType := E.ClassType.ClassName;
-    end;
-    frmBugsHandler.ShowModal;
-  finally
-    frmBugsHandler.Free;
-  end;  
-end;
 
 //------------------------------------------------------------------------------
 
@@ -88,15 +85,8 @@ begin
     'Exit application ?', MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
   if CanDo = IDNO then Exit;
 
-  ExitCode := 255;
-  if Assigned(fQuitRequest) then
-    fQuitRequest(Self);
-(*  if frmMain.Visible then
-    frmMain.miQuit.Click
-  else begin
-    Application.ShowMainForm := False;
-    Application.Terminate;
-  end; *)
+  QuitAction := True;
+  Close;
 end;
 
 //------------------------------------------------------------------------------
@@ -116,11 +106,23 @@ end;
 
 //------------------------------------------------------------------------------
 
+procedure TfrmBugsHandler.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if QuitAction and Assigned(fQuitRequest) then begin
+    ExitCode := 255;  
+    fQuitRequest(Self); // Don't destroy the BugsHandler object in this procedure!!
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
 procedure TfrmBugsHandler.FormShow(Sender: TObject);
 var
   err, s : string;
 
 begin
+  QuitAction := False;
+  
   s := StringReplace(fErrorMsg, sLineBreak, ' ', [rfReplaceAll]);
   err := s + ' (exception class type: ' + fErrorType + ', sender : '
     + fErrorSender + ').';
@@ -139,5 +141,63 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+
+{ TBugsHandlerInterface }
+
+constructor TBugsHandlerInterface.Create;
+begin
+  frmBugsHandler := TfrmBugsHandler.Create(nil);
+end;
+
+destructor TBugsHandlerInterface.Destroy;
+begin
+  if frmBugsHandler.Visible then
+    frmBugsHandler.Close;
+  frmBugsHandler.Free;
+  inherited;
+end;
+
+procedure TBugsHandlerInterface.Execute(Sender: TObject; E: Exception);
+begin
+  try
+    with frmBugsHandler do begin
+      fErrorMsg := E.Message;
+      fErrorSender := Sender.ClassName;
+      fErrorType := E.ClassType.ClassName;
+      ShowModal;
+    end;
+  except
+    on E:Exception do begin
+      MessageBoxA(Application.Handle,
+        PChar('TBugsHandlerInterface.Create: Unable to use the Bugs Handler !' + sLineBreak +
+        'Abnormal Program Termination.' + sLineBreak + sLineBreak +
+        'Reason: "' + E.Message + '".'),
+        'Critical Exception', MB_ICONERROR);
+      Application.Terminate;
+    end;
+  end;
+end;
+
+procedure TBugsHandlerInterface.SetExceptionCallBack(
+  const Value: TExceptionCallBackEvent);
+begin
+  fExceptionCallBack := Value;
+  if Assigned(OnExceptionCallBack) then
+    frmBugsHandler.OnExceptionCallBack := OnExceptionCallBack;
+end;
+
+procedure TBugsHandlerInterface.SetQuitRequest(const Value: TNotifyEvent);
+begin
+  fQuitRequest := Value;
+  if Assigned(OnQuitRequest) then
+    frmBugsHandler.OnQuitRequest := OnQuitRequest;
+end;
+
+procedure TBugsHandlerInterface.SetSaveLogRequest(const Value: TNotifyEvent);
+begin
+  fSaveLogRequest := Value;
+  if Assigned(OnSaveLogRequest) then
+    frmBugsHandler.OnSaveLogRequest := OnSaveLogRequest;
+end;
 
 end.

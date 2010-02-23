@@ -31,22 +31,27 @@ type
     mDebug: TJvRichEdit;
     sbDebug: TJvStatusBar;
     aeDebug: TApplicationEvents;
+    sdDebug: TSaveDialog;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure aeDebugHint(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure miOnTopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure aeDebugException(Sender: TObject; E: Exception);
+    procedure Save1Click(Sender: TObject);
   private
     { Déclarations privées }
     fOnTop: Boolean;
     procedure SetOnTop(const Value: Boolean);
   protected
+    function GenerateDebugLogFileName: TFileName;
     function LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
     function LineTypeToTextLabel(LineType: TLineType): string;
   public
     { Déclarations publiques }
     procedure AddLine(LineType: TLineType; const Text: string);
+    procedure SaveLogFile;
     property OnTop: Boolean read fOnTop write SetOnTop;
   end;
 
@@ -56,7 +61,7 @@ var
 implementation
 
 uses
-  Main, Utils;
+  DateUtils, Main, Utils;
 
 {$R *.dfm}
 
@@ -87,6 +92,12 @@ begin
 
 //  mDebug.SelLength := SelLength;
 //  mDebug.SelStart := SelStart;
+end;
+
+procedure TfrmDebugLog.aeDebugException(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);
+  aeDebug.CancelDispatch;
 end;
 
 procedure TfrmDebugLog.aeDebugHint(Sender: TObject);
@@ -120,6 +131,21 @@ begin
   SaveConfigDebug;
 end;
 
+function TfrmDebugLog.GenerateDebugLogFileName: TFileName;
+var
+  PrgName: TFileName;
+  TimeStamp: string;
+  Year, Month, Day,
+  Hour, Minute, Second,
+  MilliSecond: Word;
+  
+begin
+  DecodeDateTime(Now, Year, Month, Day, Hour, Minute, Second, MilliSecond);
+  TimeStamp := Format('%2.4d%2.2d%2.2d_%2.2d%2.2d%2.2d', [Year, Month, Day, Hour, Minute, Second]);
+  PrgName := ExtractFileName(ChangeFileExt(Application.ExeName, ''));
+  Result := PrgName + '_' + TimeStamp;
+end;
+
 function TfrmDebugLog.LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
 begin
   Result.Color := clGray;
@@ -148,6 +174,22 @@ end;
 procedure TfrmDebugLog.miOnTopClick(Sender: TObject);
 begin
   OnTop := not OnTop;
+end;
+
+procedure TfrmDebugLog.Save1Click(Sender: TObject);
+begin
+  SaveLogFile;
+end;
+
+procedure TfrmDebugLog.SaveLogFile;
+begin
+  with sdDebug do begin
+    FileName := GenerateDebugLogFileName;
+    if Execute then begin
+      mDebug.PlainText := (FilterIndex = 2) or (FilterIndex = 3);
+      mDebug.Lines.SaveToFile(FileName); // RTF format
+    end;
+  end;
 end;
 
 procedure TfrmDebugLog.SetOnTop(const Value: Boolean);

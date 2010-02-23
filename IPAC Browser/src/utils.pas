@@ -25,7 +25,7 @@ const
 var
   sWorkingTempDirectory: TFileName;
   Configuration: TXmlConfigurationFile;
-  
+
 //------------------------------------------------------------------------------
 
 function GetApplicationDirectory: TFileName;
