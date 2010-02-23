@@ -32,8 +32,8 @@ const
 
   (*  IPAC footer section type
       Raw read in the footer to determine section type. *)
-  STANDARD_COUNT = 7;
-  IPAC_SECTION_STANDARD_KINDS: array[0..STANDARD_COUNT] of TIpacSectionKind = (
+  STANDARD_COUNT = 8;
+  IPAC_SECTION_STANDARD_KINDS: array[0..STANDARD_COUNT - 1] of TIpacSectionKind = (
     (Name: 'BIN '; Extension: 'BIN'; Description: 'Generic Binary'),
     (Name: 'CHRM'; Extension: 'CRM'; Description: 'Character Model'),
     (Name: 'CHRT'; Extension: 'CHT'; Description: 'Character Properties'),
@@ -49,15 +49,22 @@ const
       can be identified by a more specific type. In fact, in the footer,
       we have (at least for now) only two types: 'BIN ' and 'CHRM'. But a 'BIN '
       section can be a PVR, SPR... or anything else. *)
-  EXTENDED_COUNT = 6;
-  IPAC_SECTION_EXTENDED_KINDS: array[0..EXTENDED_COUNT] of TIpacSectionKind = (
+  EXTENDED_COUNT = 14;
+  IPAC_SECTION_EXTENDED_KINDS: array[0..EXTENDED_COUNT - 1] of TIpacSectionKind = (
     (Name: 'TEXN'; Extension: 'SPR'; Description: 'Sprite Package'),
     (Name: 'GBIX'; Extension: 'PVR'; Description: 'PowerVR Texture'),
     (Name: 'PVRT'; Extension: 'PVR'; Description: 'PowerVR Texture'),
     (Name: 'SCNF'; Extension: 'SNF'; Description: 'Subtitles Table'),
     (Name: 'IWAD'; Extension: 'IWD'; Description: 'LCD Table'),
     (Name: 'WDAT'; Extension: 'WDT'; Description: 'Weather Data'),
-    (Name: 'MVSD'; Extension: 'MVS'; Description: 'MVS Data')
+    (Name: 'MVSD'; Extension: 'MVS'; Description: 'MVS Data'),
+    (Name: 'MDP7'; Extension: 'MP7'; Description: 'MP7 Model'),
+    (Name: 'MDC7'; Extension: 'MC7'; Description: 'MC7 Model'),
+    (Name: 'MDPX'; Extension: 'MPX'; Description: 'MPX Model'),
+    (Name: 'MDCX'; Extension: 'MCX'; Description: 'MCX Model'),
+    (Name: 'HRCM'; Extension: 'HCM'; Description: 'HCM Model'),
+    (Name: 'MDL7'; Extension: 'ML7'; Description: 'ML7 Model'),
+    (Name: 'MDLX'; Extension: 'MLX'; Description: 'MLX Model')
   );
   
 //------------------------------------------------------------------------------
@@ -67,7 +74,7 @@ begin
   Result.Name := '';
   Result.Extension := '';
   Result.Description := UNKNOW_DESCRIPTION_KIND;
-  if (Index < 0) or (Index > STANDARD_COUNT) then Exit;
+  if (Index < 0) or (Index > (STANDARD_COUNT - 1)) then Exit;
 
   Result := IPAC_SECTION_STANDARD_KINDS[Index];
 end;
@@ -76,7 +83,7 @@ end;
 
 function GetStandardKindCount: Integer;
 begin
-  Result := STANDARD_COUNT + 1; // it's 0 based!
+  Result := STANDARD_COUNT;
 end;
 
 //------------------------------------------------------------------------------
@@ -194,8 +201,6 @@ var
   Found: Boolean;
 
 begin
-  Result := 0;
-
   // Seaching Extended first   
   Found := SectionKindSequentialSearch(IPAC_SECTION_EXTENDED_KINDS,
     KindName, Crap, Result);
@@ -204,12 +209,14 @@ begin
   if not Found then begin
     Found := SectionKindSequentialSearch(IPAC_SECTION_STANDARD_KINDS, KindName,
       Crap, Result);
-    Inc(Result, EXTENDED_COUNT + 1); // Standard Images are after the Extended ones
+    Inc(Result, EXTENDED_COUNT); // Standard Images are after the Extended ones
   end;
 
  // Result + 1: The "0" is for the "Unknow" ImageIndex.
   if Found then
-    Inc(Result);
+    Inc(Result)
+  else
+    Result := 0;
 end;
 
 //------------------------------------------------------------------------------

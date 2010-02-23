@@ -134,6 +134,7 @@ object frmDebugLog: TfrmDebugLog
         Caption = '&Save...'
         Hint = 'Save'
         ShortCut = 16467
+        OnClick = Save1Click
       end
       object N2: TMenuItem
         Caption = '-'
@@ -168,8 +169,19 @@ object frmDebugLog: TfrmDebugLog
     end
   end
   object aeDebug: TApplicationEvents
+    OnException = aeDebugException
     OnHint = aeDebugHint
     Left = 10
     Top = 38
+  end
+  object sdDebug: TSaveDialog
+    DefaultExt = 'rtf'
+    Filter = 
+      'RTF Documents (*.rtf)|*.rtf|Debug Logs (*.log)|*.log|Text Files ' +
+      '(*.txt)|*.txt|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Save the Debug Log to...'
+    Left = 10
+    Top = 68
   end
 end

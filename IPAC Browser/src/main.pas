@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, IpacMgr, Menus, ComCtrls, JvExComCtrls, JvListView, ImgList, ToolWin,
-  JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder, IpacUtil, DebugLog;
+  JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder, IpacUtil, DebugLog,
+  BugsMgr;
 
 type
   TfrmMain = class(TForm)
@@ -79,6 +80,7 @@ type
     aeMain: TApplicationEvents;
     bfdExportAll: TJvBrowseForFolderDialog;
     miDEBUG_TEST3: TMenuItem;
+    miDEBUG_TEST4: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
@@ -105,6 +107,8 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure miExportAllClick(Sender: TObject);
     procedure miDEBUG_TEST3Click(Sender: TObject);
+    procedure miDEBUG_TEST4Click(Sender: TObject);
+    procedure aeMainException(Sender: TObject; E: Exception);
   private
     { Déclarations privées }
     fStoredCaption: string;
@@ -113,6 +117,12 @@ type
     fDebugLogVisible: Boolean;
     fAutoSave: Boolean;
     fMakeBackup: Boolean;
+    fQuitOnFailure: Boolean;
+    procedure BugsHandlerExceptionCallBack(Sender: TObject;
+      ExceptionMessage: string);
+    procedure BugsHandlerSaveLogRequest(Sender: TObject);
+    procedure BugsHandlerQuitRequest(Sender: TObject);
+    procedure FreeApplication;
     function GetSelectedContentEntry: TIpacSectionsListItem;
     procedure SetDebugLogVisible(const Value: Boolean);
     function GetStatusText: string;
@@ -121,13 +131,14 @@ type
     procedure SetMakeBackup(const Value: Boolean);
   protected
     procedure Clear; overload;
-    procedure Clear(const OnlyUI: Boolean); overload;
+    procedure Clear(const UpdateOnlyUI: Boolean); overload;
     procedure ClearColumnsImages;
     function ExtendedKindToFilterString(
       SectionKind: TIpacSectionKind): string;
     function GetFileOperationDialogFilterIndex(
       TargetDialog: TOpenDialog): Integer;
     procedure InitToolbarControl;
+    procedure InitBugsHandler;
     procedure InitContentPopupMenuControl;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
@@ -137,12 +148,13 @@ type
     procedure SetWindowTitleCaption(const FileName: TFileName);
     procedure UpdateFileModifiedState;
     property StoredCaption: string read fStoredCaption write fStoredCaption;
+    property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
     procedure AddDebug(LineType: TLineType; Text: string);
     function MsgBox(Text: string): Integer; overload;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer; overload;
-    procedure LoadFile(const FileName: TFileName);    
+    procedure LoadFile(FileName: TFileName);
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property DebugLogVisible: Boolean read fDebugLogVisible write SetDebugLogVisible;
@@ -161,6 +173,7 @@ type
 var
   frmMain: TfrmMain;
   IPACEditor: TIpacEditor;
+  BugsHandler: TBugsHandlerInterface;
 
 implementation
 
@@ -169,13 +182,15 @@ implementation
 uses
   GZipMgr, Utils;
 
-procedure TfrmMain.Clear(const OnlyUI: Boolean);
+procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
-  if not OnlyUI then
-    IPACEditor.Clear;
-  ClearColumnsImages;
-  lvIpacContent.Clear;
-  SetWindowTitleCaption('');
+  if not UpdateOnlyUI then begin
+    IPACEditor.Clear;  
+    ClearColumnsImages;
+    lvIpacContent.Clear;
+    SetWindowTitleCaption('');
+  end;
+
   UpdateFileModifiedState;
   SetControlsStateUndoImporting(False);
   SetControlsStateFileOperations(False);
@@ -187,10 +202,33 @@ begin
   frmDebugLog.AddLine(LineType, Text);
 end;
 
+procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);
+  aeMain.CancelDispatch;
+end;
+
 procedure TfrmMain.aeMainHint(Sender: TObject);
 begin
   StatusText := Application.Hint;
   aeMain.CancelDispatch;
+end;
+
+procedure TfrmMain.BugsHandlerExceptionCallBack(Sender: TObject;
+  ExceptionMessage: string);
+begin
+  AddDebug(ltCritical, ExceptionMessage);
+end;
+
+procedure TfrmMain.BugsHandlerQuitRequest(Sender: TObject);
+begin
+  QuitOnFailure := True;
+  Close;
+end;
+
+procedure TfrmMain.BugsHandlerSaveLogRequest(Sender: TObject);
+begin
+  frmDebugLog.SaveLogFile;  
 end;
 
 procedure TfrmMain.Clear;
@@ -307,7 +345,7 @@ end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if not SaveFileOnDemand(True) then begin
+  if (not SaveFileOnDemand(not QuitOnFailure)) then begin
     Action := caNone;
     Exit;
   end;
@@ -321,6 +359,9 @@ begin
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
 
+  // Initialize the Bugs Handler
+  InitBugsHandler;
+  
   // Creating the main IPAC Editor object
   IPACEditor := TIpacEditor.Create;
   Clear;
@@ -335,9 +376,25 @@ end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  FreeApplication;
+end;
+
+procedure TfrmMain.FreeApplication;
+var
+  HandleMenu: THandle;
+
+begin
+  // Disabling the Quit control
+  miQuit.Enabled := False;
+  HandleMenu := GetSystemMenu(Handle, False);
+  EnableMenuItem(HandleMenu, SC_CLOSE, MF_DISABLED);
+
   // Destroying the IPAC Object
   IPACEditor.Free;
 
+  // Destroying BugsHandler
+  BugsHandler.Free;
+  
   // Saving configuration
   SaveConfigMain;
 end;
@@ -381,6 +438,32 @@ begin
 {$ELSE}
 begin
 {$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST4Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  raise Exception.Create('TEST EXCEPTION');
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.InitBugsHandler;
+begin
+  QuitOnFailure := False;
+  BugsHandler := TBugsHandlerInterface.Create;
+  try
+    BugsHandler.OnExceptionCallBack := BugsHandlerExceptionCallBack;
+    BugsHandler.OnSaveLogRequest := BugsHandlerSaveLogRequest;
+    BugsHandler.OnQuitRequest := BugsHandlerQuitRequest;
+  except
+    on E: Exception do begin
+      AddDebug(ltCritical, 'Error when initializing Bugs Handler! [Exception: '
+        + E.Message + ']');
+      MsgBox('Error when initializing Bugs Handler!');
+    end;
+  end;
 end;
 
 procedure TfrmMain.InitContentPopupMenuControl;
@@ -506,11 +589,17 @@ begin
     end; // Style = tbsButton
 end;
 
-procedure TfrmMain.LoadFile(const FileName: TFileName);
+procedure TfrmMain.LoadFile(FileName: TFileName);
 var
-  i: Integer;
+  i, j: Integer;
+  UpdateUI: Boolean;
+  ListItem: TListItem;
 
 begin
+  // Extending filenames
+  FileName := ExpandFileName(FileName);
+  UpdateUI := (FileName = IPACEditor.SourceFileName);
+
   // Checking the file
   if not FileExists(FileName) then begin
     MsgBox('The file "' + FileName + '" doesn''t exists.', 'Warning', MB_ICONWARNING);
@@ -519,7 +608,7 @@ begin
 
   // Updating UI
   StatusText := 'Loading file...';
-  Clear(True);  
+  Clear(UpdateUI);  
 
   // Loading the file
   if IPACEditor.LoadFromFile(FileName) then begin
@@ -527,23 +616,47 @@ begin
     // Filling the UI with the IPAC Content
     if IPACEditor.Content.Count > 0 then begin
 
-      // Adding entries
-      for i := 0 to IPACEditor.Content.Count - 1 do
-        with lvIpacContent.Items.Add do
+      // Adding IPAC entries
+      for i := 0 to IPACEditor.Content.Count - 1 do begin
+        ListItem := nil;
+
+        // Checking if we must update the current view...
+        if UpdateUI then
+          ListItem := lvIpacContent.FindData(0, Pointer(i), True, False); // finding the correct index
+
+        (*  If we ListItem = nil, it says that we don't have found the correct
+            Item index, or we opened a new file. So we'll create a new item
+            and prepare it to be updated. *)
+        if not Assigned(ListItem) then begin
+          ListItem := lvIpacContent.Items.Add;
+          ListItem.Caption := '';
+          j := 0;
+          repeat
+            ListItem.SubItems.Add('');
+            Inc(j);
+          until j = 4;
+        end;
+
+        // Updating the current item with the new values
+        with ListItem do
           with IPACEditor.Content[i] do begin
             Data := Pointer(i);
             Caption := GetOutputFileName;
-            SubItems.Add(FileSectionDetails.Description);
-            SubItems.Add(IntToStr(AbsoluteOffset));
-            SubItems.Add(IntToStr(Size));
-            SubItems.Add(''); // for updated
+            SubItems[0] := FileSectionDetails.Description;
+            SubItems[1] := IntToStr(AbsoluteOffset);
+            SubItems[2] := IntToStr(Size);
+            SubItems[3] := ''; // for updated
             ImageIndex := GetKindIndex(FileSectionDetails.Name);
           end;
+      end;
 
       // Updating UI
-      SetWindowTitleCaption(IPACEditor.SourceFileName);
+      if not UpdateUI then begin
+        SetWindowTitleCaption(IPACEditor.SourceFileName);
+        AddDebug(ltInformation, 'The file "' + IPACEditor.SourceFileName
+          + '" was successfully opened.');
+      end;
       SetControlsStateFileOperations(True);
-      AddDebug(ltInformation, 'The file "' + IPACEditor.SourceFileName + '" was successfully opened.');
     end else begin
       StatusText := 'IPAC section empty ! Loading aborted...';
       MsgBox('This file contains a valid IPAC section, but the section itself is empty.',

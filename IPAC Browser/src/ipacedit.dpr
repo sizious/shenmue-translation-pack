@@ -34,8 +34,7 @@ begin
   Application.Title := 'Shenmue IPAC Browser';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmDebugLog, frmDebugLog);
-  Application.CreateForm(TfrmBugsHandler, frmBugsHandler);
-  {$IFDEF DEBUG}
+{$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
