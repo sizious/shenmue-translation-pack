@@ -494,7 +494,7 @@ begin
     end;
   end;
 
-  // Filling with all standard kinds
+  // Filling with the standard kind corresponding to the extended (if any)
   for i := 0 to GetStandardKindCount - 1 do begin
     StandardKind := GetStandardKind(i);
 
@@ -883,7 +883,7 @@ begin
   if FileName = '' then
     Caption := StoredCaption
   else
-    Caption := StoredCaption + ' - [' + ExtractFileName(FileName) + ']';
+    Caption := ExtractFileName(FileName) + ' - ' + StoredCaption;
   Application.Title := Caption;
 end;
 
