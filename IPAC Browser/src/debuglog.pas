@@ -16,22 +16,23 @@ type
   end;
 
   TfrmDebugLog = class(TForm)
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
-    Options1: TMenuItem;
+    mmDebug: TMainMenu;
+    miFile: TMenuItem;
+    miView: TMenuItem;
     miOnTop: TMenuItem;
-    Save1: TMenuItem;
-    Copy1: TMenuItem;
-    Clearall1: TMenuItem;
+    miSave: TMenuItem;
+    miEdit: TMenuItem;
+    miClearAll: TMenuItem;
     N1: TMenuItem;
-    Copy2: TMenuItem;
-    Selectall1: TMenuItem;
+    miCopy: TMenuItem;
+    miSelectAll: TMenuItem;
     N2: TMenuItem;
-    Close1: TMenuItem;
+    miClose: TMenuItem;
     mDebug: TJvRichEdit;
     sbDebug: TJvStatusBar;
     aeDebug: TApplicationEvents;
     sdDebug: TSaveDialog;
+    miShowMainWindow: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure aeDebugHint(Sender: TObject);
@@ -39,7 +40,12 @@ type
     procedure miOnTopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure aeDebugException(Sender: TObject; E: Exception);
-    procedure Save1Click(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
+    procedure miShowMainWindowClick(Sender: TObject);
+    procedure miCloseClick(Sender: TObject);
+    procedure miClearAllClick(Sender: TObject);
+    procedure miSelectAllClick(Sender: TObject);
+    procedure miCopyClick(Sender: TObject);
   private
     { Déclarations privées }
     fOnTop: Boolean;
@@ -51,6 +57,7 @@ type
   public
     { Déclarations publiques }
     procedure AddLine(LineType: TLineType; const Text: string);
+    function MsgBox(Text, Caption: string; Flags: Integer): Integer;
     procedure SaveLogFile;
     property OnTop: Boolean read fOnTop write SetOnTop;
   end;
@@ -171,14 +178,40 @@ begin
   end;
 end;
 
+procedure TfrmDebugLog.miClearAllClick(Sender: TObject);
+var
+  CanDo: Integer;
+
+begin
+  CanDo := MsgBox('Are you sure to clear the Debug Log?', 'Question',
+    MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
+  if CanDo = IDNO then Exit;
+  mDebug.Clear;
+end;
+
+procedure TfrmDebugLog.miCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmDebugLog.miCopyClick(Sender: TObject);
+begin
+  mDebug.CopyToClipboard;
+end;
+
 procedure TfrmDebugLog.miOnTopClick(Sender: TObject);
 begin
   OnTop := not OnTop;
 end;
 
-procedure TfrmDebugLog.Save1Click(Sender: TObject);
+procedure TfrmDebugLog.miSaveClick(Sender: TObject);
 begin
   SaveLogFile;
+end;
+
+procedure TfrmDebugLog.miSelectAllClick(Sender: TObject);
+begin
+  mDebug.SelectAll;
 end;
 
 procedure TfrmDebugLog.SaveLogFile;
@@ -196,10 +229,21 @@ procedure TfrmDebugLog.SetOnTop(const Value: Boolean);
 begin
   fOnTop := Value;
   miOnTop.Checked := Value;
+  miShowMainWindow.Enabled := not Value;
   if Value then
     FormStyle := fsStayOnTop
   else
     FormStyle := fsNormal;
+end;
+
+procedure TfrmDebugLog.miShowMainWindowClick(Sender: TObject);
+begin
+  frmMain.BringToFront;
+end;
+
+function TfrmDebugLog.MsgBox(Text, Caption: string; Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
 end;
 
 end.

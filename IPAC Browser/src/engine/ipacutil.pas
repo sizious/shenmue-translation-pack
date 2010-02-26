@@ -27,9 +27,16 @@ implementation
 uses
  SysTools, Forms;
 
+type
+  TSearchExtended = record
+    Name: string;
+    ExtendedAvailable: Boolean;
+  end;
+
 const
   UNKNOW_DESCRIPTION_KIND = '(Unknow)';
-
+  GZIP = #$1F#$8B#$08#$08;
+  
   (*  IPAC footer section type
       Raw read in the footer to determine section type. *)
   STANDARD_COUNT = 8;
@@ -43,13 +50,24 @@ const
     (Name: 'DYNM'; Extension: 'DYM'; Description: 'Dynamics Info'),
     (Name: 'SCR0'; Extension: 'SRL'; Description: 'Scroll Data')
   );
+  // Search for Extended only if the value is true.
+  IPAC_SECTION_STANDARD_SEARCH_EXTENDED: array[0..STANDARD_COUNT - 1] of TSearchExtended = (
+    (Name: 'BIN '; ExtendedAvailable: True),
+    (Name: 'CHRM'; ExtendedAvailable: True),
+    (Name: 'CHRT'; ExtendedAvailable: False),
+    (Name: 'MAPM'; ExtendedAvailable: False),
+    (Name: 'MOTN'; ExtendedAvailable: False),
+    (Name: 'AUTH'; ExtendedAvailable: False),
+    (Name: 'DYNM'; ExtendedAvailable: False),
+    (Name: 'SCR0'; ExtendedAvailable: False)
+  );
 
   (*  Extended IPAC section entries.
       When we read the Ipac section signature we can determinate if the section
       can be identified by a more specific type. In fact, in the footer,
       we have (at least for now) only two types: 'BIN ' and 'CHRM'. But a 'BIN '
       section can be a PVR, SPR... or anything else. *)
-  EXTENDED_COUNT = 14;
+  EXTENDED_COUNT = 15;
   IPAC_SECTION_EXTENDED_KINDS: array[0..EXTENDED_COUNT - 1] of TIpacSectionKind = (
     (Name: 'TEXN'; Extension: 'SPR'; Description: 'Sprite Package'),
     (Name: 'GBIX'; Extension: 'PVR'; Description: 'PowerVR Texture'),
@@ -64,7 +82,8 @@ const
     (Name: 'MDCX'; Extension: 'MCX'; Description: 'MCX Model'),
     (Name: 'HRCM'; Extension: 'HCM'; Description: 'HCM Model'),
     (Name: 'MDL7'; Extension: 'ML7'; Description: 'ML7 Model'),
-    (Name: 'MDLX'; Extension: 'MLX'; Description: 'MLX Model')
+    (Name: 'MDLX'; Extension: 'MLX'; Description: 'MLX Model'),
+    (Name:  GZIP ; Extension: 'GZ' ; Description: 'GZip Archive')
   );
   
 //------------------------------------------------------------------------------
@@ -106,6 +125,25 @@ begin
     end;
     Inc(i);
   until Result or (i > High(SourceArray));
+end;
+
+//------------------------------------------------------------------------------
+
+function HasExtendedKind(const StandardKindName: string): Boolean;
+var
+  i, Max: Integer;
+  Current: TSearchExtended;
+
+begin
+  Result := False;
+  i := Low(IPAC_SECTION_STANDARD_SEARCH_EXTENDED);
+  Max := High(IPAC_SECTION_STANDARD_SEARCH_EXTENDED);
+  repeat
+    Current := IPAC_SECTION_STANDARD_SEARCH_EXTENDED[i];
+    if (Current.Name = StandardKindName) then
+      Result := Current.ExtendedAvailable;
+    Inc(i);
+  until Result or (i > Max);
 end;
 
 //------------------------------------------------------------------------------
@@ -158,25 +196,28 @@ begin
   (*  Trying to get the section details (is the section SPR, PVR or anything
       else?)... In fact, the IPAC footer may indicate only if the file is "BIN "
       type, but it can be more specific. *)
-  SourceFileStream.Seek(Offset, soFromBeginning);
-  MaxPos := SourceFileStream.Position + Size;
+  ExpandedKindFound := False;
+  if HasExtendedKind(KindName) then begin
+    SourceFileStream.Seek(Offset, soFromBeginning);
+    MaxPos := SourceFileStream.Position + Size;
 
-  // scanning section
-  repeat
-    // Parsing header
-    SourceFileStream.Read(SectionHeader, SizeOf(SectionHeader));
-    ExpandedKindFound := GetExtendedKindDetails(SectionHeader.Name, Result);
+    // scanning section
+    repeat
+      // Parsing header
+      SourceFileStream.Read(SectionHeader, SizeOf(SectionHeader));
+      ExpandedKindFound := GetExtendedKindDetails(SectionHeader.Name, Result);
 
-    // Checking if we found an expanded kind and/or if the next section is invalid
-    Done := ExpandedKindFound or (SectionHeader.Size = 0)
-      or (SectionHeader.Size >= MaxPos);
-    if not Done then
-      SourceFileStream.Seek(SectionHeader.Size, soFromBeginning);
+      // Checking if we found an expanded kind and/or if the next section is invalid
+      Done := ExpandedKindFound or (SectionHeader.Size = 0)
+        or (SectionHeader.Size >= MaxPos);
+      if not Done then
+        SourceFileStream.Seek(SectionHeader.Size, soFromBeginning);
 
-    Application.ProcessMessages;
-  until (Done) or (SourceFileStream.Position >= MaxPos);
+      Application.ProcessMessages;
+    until (Done) or (SourceFileStream.Position >= MaxPos);
 
-  SourceFileStream.Seek(SavedOffset, soFromBeginning);
+    SourceFileStream.Seek(SavedOffset, soFromBeginning);
+  end; // HasExtendedKind
 
   // STANDARD KIND INFO --------------------------------------------------------
   // By default, it's the kind from the IPAC footer

@@ -91,7 +91,7 @@ object frmDebugLog: TfrmDebugLog
     00000000000000000000000000000000000000000000F8030000000300000003
     0000000300000003000000030000000300000003000000030000000300000003
     0000001F0000001F0000003F0000007F0000FFFF0000}
-  Menu = MainMenu1
+  Menu = mmDebug
   OldCreateOrder = False
   ShowHint = True
   OnActivate = FormActivate
@@ -108,6 +108,7 @@ object frmDebugLog: TfrmDebugLog
     Height = 221
     Align = alClient
     AutoSize = False
+    Color = clWhite
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -125,46 +126,62 @@ object frmDebugLog: TfrmDebugLog
     Height = 19
     Panels = <>
   end
-  object MainMenu1: TMainMenu
+  object mmDebug: TMainMenu
     Left = 10
     Top = 10
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
-      object Save1: TMenuItem
-        Caption = '&Save...'
-        Hint = 'Save'
+      object miSave: TMenuItem
+        Caption = 'Sa&ve...'
+        Hint = 'Save the current Debug log to a file.'
         ShortCut = 16467
-        OnClick = Save1Click
+        OnClick = miSaveClick
       end
       object N2: TMenuItem
         Caption = '-'
       end
-      object Close1: TMenuItem
+      object miClose: TMenuItem
         Caption = '&Close'
+        Hint = 'Close this window.'
+        OnClick = miCloseClick
       end
     end
-    object Copy1: TMenuItem
-      Caption = '&Edit'
-      object Clearall1: TMenuItem
+    object miEdit: TMenuItem
+      Caption = 'E&dit'
+      object miClearAll: TMenuItem
         Caption = 'Cl&ear all...'
+        Hint = 'Reset and clear the Debug log.'
+        OnClick = miClearAllClick
       end
       object N1: TMenuItem
         Caption = '-'
       end
-      object Copy2: TMenuItem
+      object miCopy: TMenuItem
         Caption = 'C&opy'
+        Hint = 'Copy the selected text.'
         ShortCut = 16451
+        OnClick = miCopyClick
       end
-      object Selectall1: TMenuItem
-        Caption = '&Select all...'
+      object miSelectAll: TMenuItem
+        Caption = 'Selec&t all...'
+        Hint = 'Select all text.'
         ShortCut = 16449
+        OnClick = miSelectAllClick
       end
     end
-    object Options1: TMenuItem
-      Caption = '&Options'
+    object miView: TMenuItem
+      Caption = 'Vie&w'
       object miOnTop: TMenuItem
         Caption = '&Always on top'
+        Hint = 'Show this window in front of every window.'
         OnClick = miOnTopClick
+      end
+      object miShowMainWindow: TMenuItem
+        Caption = '&Show main window'
+        Hint = 
+          'Bring the main window in front (not available if the Debug log w' +
+          'indow is always on top)'
+        OnClick = miShowMainWindowClick
       end
     end
   end
