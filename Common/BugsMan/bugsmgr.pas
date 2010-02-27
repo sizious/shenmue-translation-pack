@@ -124,8 +124,8 @@ begin
   QuitAction := False;
   
   s := StringReplace(fErrorMsg, sLineBreak, ' ', [rfReplaceAll]);
-  err := s + ' (exception class type: ' + fErrorType + ', sender : '
-    + fErrorSender + ').';
+  err := s + ' / [Exception Class Type: ' + fErrorType + ', Sender : '
+    + fErrorSender + '].';
   MessageBeep(MB_ICONERROR);
   mExceptionMessage.Text := fErrorMsg;
 
@@ -164,7 +164,7 @@ begin
       fErrorMsg := E.Message;
       fErrorSender := Sender.ClassName;
       fErrorType := E.ClassType.ClassName;
-      ShowModal;
+      if not Visible then ShowModal;
     end;
   except
     on E:Exception do begin
@@ -174,6 +174,7 @@ begin
         'Reason: "' + E.Message + '".'),
         'Critical Exception', MB_ICONERROR);
       Application.Terminate;
+//      Halt(255);
     end;
   end;
 end;

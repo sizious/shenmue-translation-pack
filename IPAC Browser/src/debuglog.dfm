@@ -176,6 +176,10 @@ object frmDebugLog: TfrmDebugLog
         Hint = 'Show this window in front of every window.'
         OnClick = miOnTopClick
       end
+      object miAutoScroll: TMenuItem
+        Caption = 'Auto-scro&ll'
+        OnClick = miAutoScrollClick
+      end
       object miShowMainWindow: TMenuItem
         Caption = '&Show main window'
         Hint = 

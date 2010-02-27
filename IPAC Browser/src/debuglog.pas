@@ -33,6 +33,7 @@ type
     aeDebug: TApplicationEvents;
     sdDebug: TSaveDialog;
     miShowMainWindow: TMenuItem;
+    miAutoScroll: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure aeDebugHint(Sender: TObject);
@@ -46,10 +47,13 @@ type
     procedure miClearAllClick(Sender: TObject);
     procedure miSelectAllClick(Sender: TObject);
     procedure miCopyClick(Sender: TObject);
+    procedure miAutoScrollClick(Sender: TObject);
   private
     { Déclarations privées }
     fOnTop: Boolean;
+    fAutoScroll: Boolean;
     procedure SetOnTop(const Value: Boolean);
+    procedure SetAutoScroll(const Value: Boolean);
   protected
     function GenerateDebugLogFileName: TFileName;
     function LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
@@ -58,7 +62,9 @@ type
     { Déclarations publiques }
     procedure AddLine(LineType: TLineType; const Text: string);
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    procedure ResetStatus;
     procedure SaveLogFile;
+    property AutoScroll: Boolean read fAutoScroll write SetAutoScroll;
     property OnTop: Boolean read fOnTop write SetOnTop;
   end;
 
@@ -99,6 +105,10 @@ begin
 
 //  mDebug.SelLength := SelLength;
 //  mDebug.SelStart := SelStart;
+
+  // Selecting last line
+  if AutoScroll then
+    SendMessage(mDebug.Handle, WM_VSCROLL, SB_BOTTOM, 0);
 end;
 
 procedure TfrmDebugLog.aeDebugException(Sender: TObject; E: Exception);
@@ -115,6 +125,8 @@ end;
 
 procedure TfrmDebugLog.FormActivate(Sender: TObject);
 begin
+  frmMain.StatusText := '';
+  aeDebug.OnException := aeDebugException;
   aeDebug.Activate;
 end;
 
@@ -125,6 +137,8 @@ end;
 
 procedure TfrmDebugLog.FormCreate(Sender: TObject);
 begin
+  aeDebug.OnException := nil;
+
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
   sbDebug.SimplePanel := True;
@@ -178,6 +192,11 @@ begin
   end;
 end;
 
+procedure TfrmDebugLog.miAutoScrollClick(Sender: TObject);
+begin
+  AutoScroll := not AutoScroll;
+end;
+
 procedure TfrmDebugLog.miClearAllClick(Sender: TObject);
 var
   CanDo: Integer;
@@ -225,6 +244,12 @@ begin
   end;
 end;
 
+procedure TfrmDebugLog.SetAutoScroll(const Value: Boolean);
+begin
+  fAutoScroll := Value;
+  miAutoScroll.Checked := Value;
+end;
+
 procedure TfrmDebugLog.SetOnTop(const Value: Boolean);
 begin
   fOnTop := Value;
@@ -244,6 +269,11 @@ end;
 function TfrmDebugLog.MsgBox(Text, Caption: string; Flags: Integer): Integer;
 begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
+end;
+
+procedure TfrmDebugLog.ResetStatus;
+begin
+  sbDebug.SimpleText := '';
 end;
 
 end.

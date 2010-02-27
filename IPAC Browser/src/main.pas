@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, IpacMgr, Menus, ComCtrls, JvExComCtrls, JvListView, ImgList, ToolWin,
   JvToolBar, Themes, AppEvnts, JvBaseDlg, JvBrowseFolder, IpacUtil, DebugLog,
-  BugsMgr;
+  BugsMgr, JvComponentBase, JvDragDrop;
 
 type
   TfrmMain = class(TForm)
@@ -81,6 +81,7 @@ type
     bfdExportAll: TJvBrowseForFolderDialog;
     miDEBUG_TEST3: TMenuItem;
     miDEBUG_TEST4: TMenuItem;
+    JvDragDrop: TJvDragDrop;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
@@ -109,6 +110,8 @@ type
     procedure miDEBUG_TEST3Click(Sender: TObject);
     procedure miDEBUG_TEST4Click(Sender: TObject);
     procedure aeMainException(Sender: TObject; E: Exception);
+    procedure JvDragDropDrop(Sender: TObject; Pos: TPoint; Value: TStrings);
+    procedure miPropertiesClick(Sender: TObject);
   private
     { Déclarations privées }
     fStoredCaption: string;
@@ -118,6 +121,7 @@ type
     fAutoSave: Boolean;
     fMakeBackup: Boolean;
     fQuitOnFailure: Boolean;
+    fFilePropertiesVisible: Boolean;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -129,6 +133,7 @@ type
     procedure SetStatusText(const Value: string);
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
+    procedure SetFilePropertiesVisible(const Value: Boolean);
   protected
     procedure Clear; overload;
     procedure Clear(const UpdateOnlyUI: Boolean); overload;
@@ -154,11 +159,15 @@ type
     procedure AddDebug(LineType: TLineType; Text: string);
     function MsgBox(Text: string): Integer; overload;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer; overload;
+    procedure ReportFailure(Text, AdditionalDebugText, Caption: string;
+      FailureType: TLineType);
     procedure LoadFile(FileName: TFileName);
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property DebugLogVisible: Boolean read fDebugLogVisible write SetDebugLogVisible;
     property FileModified: Boolean read fFileModified;
+    property FilePropertiesVisible: Boolean read fFilePropertiesVisible
+      write SetFilePropertiesVisible;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
     property StatusText: string read GetStatusText write SetStatusText;
     property SelectedContentUI: TListItem read fSelectedContentUI;
@@ -180,7 +189,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GZipMgr, Utils;
+  GZipMgr, Utils, fileprop;
 
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
@@ -199,7 +208,8 @@ end;
 
 procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
 begin
-  frmDebugLog.AddLine(LineType, Text);
+  if Assigned(frmDebugLog) then
+    frmDebugLog.AddLine(LineType, Text);
 end;
 
 procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
@@ -210,6 +220,7 @@ end;
 
 procedure TfrmMain.aeMainHint(Sender: TObject);
 begin
+  frmDebugLog.ResetStatus;
   StatusText := Application.Hint;
   aeMain.CancelDispatch;
 end;
@@ -261,6 +272,8 @@ procedure TfrmMain.miCloseClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   Clear;
+  AddDebug(ltInformation, 'Close successfully done for "' +
+    IpacEditor.SourceFileName + '".');
 end;
 
 procedure TfrmMain.miDebugLogClick(Sender: TObject);
@@ -296,6 +309,8 @@ begin
       for i := 0 to IPACEditor.Content.Count - 1 do
         IpacEditor.Content[i].ExportToFolder(Directory);
       StatusText := '';
+      AddDebug(ltInformation, 'All the IPAC content was succesfully exported to the "'
+        + Directory + '" directory.');
     end;
 end;
 
@@ -309,12 +324,23 @@ begin
     FilterIndex := GetFileOperationDialogFilterIndex(sdExport);
 
     // Saving IPAC content section
-    if Execute then
+    if Execute then begin
+      StatusText := 'Exporting...';
       SelectedContentEntry.ExportToFile(FileName);
+      StatusText := '';
+      AddDebug(ltInformation, Format(
+        'The current entry #%d [%s] was successfully saved to the "%s" file.',
+        [SelectedContentEntry.Index, SelectedContentEntry.GetOutputFileName,
+        FileName])
+      );
+    end;
   end;
 end;
 
 procedure TfrmMain.miImportClick(Sender: TObject);
+var
+  Buf: string;
+
 begin
   with odImport do begin
     FileName := SelectedContentEntry.Name;
@@ -322,13 +348,20 @@ begin
     // Select the right filter
     DefaultExt := SelectedContentEntry.FileSectionDetails.Extension;
     FilterIndex := GetFileOperationDialogFilterIndex(odImport);
+    Buf := Format('#%d [%s]', [SelectedContentEntry.Index,
+      SelectedContentEntry.GetOutputFileName]);
 
     // Loading IPAC content section
-    if Execute then
+    if Execute then begin
+      StatusText := 'Importing...';
       if SelectedContentEntry.ImportFromFile(FileName) then begin
         SetControlsStateSelectedContentModified(True);
         SetControlsStateUndoImporting(True);
-      end;
+        AddDebug(ltInformation, 'Entry import for ' + Buf + ' done from "' + FileName + '".');
+      end else
+        AddDebug(ltWarning, 'Unable to import for ' + Buf + ' from "' + FileName + '".');
+      StatusText := '';
+    end;
 
   end; // with
 end;
@@ -340,12 +373,13 @@ end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
 begin
+  aeMain.OnException := aeMainException;
   aeMain.Activate;
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if (not SaveFileOnDemand(not QuitOnFailure)) then begin
+  if (not QuitOnFailure) and (not SaveFileOnDemand(True)) then begin
     Action := caNone;
     Exit;
   end;
@@ -353,6 +387,8 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  aeMain.OnException := nil;
+  
   // Init the Main Form
   Caption := Application.Title + ' v' + GetAppVersion;
   StoredCaption := Caption;
@@ -458,11 +494,9 @@ begin
     BugsHandler.OnSaveLogRequest := BugsHandlerSaveLogRequest;
     BugsHandler.OnQuitRequest := BugsHandlerQuitRequest;
   except
-    on E: Exception do begin
-      AddDebug(ltCritical, 'Error when initializing Bugs Handler! [Exception: '
-        + E.Message + ']');
-      MsgBox('Error when initializing Bugs Handler!');
-    end;
+    on E: Exception do
+      ReportFailure('Unable to initialize the Bugs Handler!',
+        'Reason: "' + E.Message + '"', 'Critical', ltWarning);
   end;
 end;
 
@@ -589,6 +623,18 @@ begin
     end; // Style = tbsButton
 end;
 
+procedure TfrmMain.JvDragDropDrop(Sender: TObject; Pos: TPoint;
+  Value: TStrings);
+begin
+  if not SaveFileOnDemand(False) then Exit;
+  if Value.Count > 0 then begin
+    if Value.Count > 1 then
+      ReportFailure('Only one file can be dropped at the same time on the application.',
+        Format('FilesDroppedCount: %d', [Value.Count]), 'Warning', ltWarning);
+    LoadFile(Value[0]);
+  end;
+end;
+
 procedure TfrmMain.LoadFile(FileName: TFileName);
 var
   i, j: Integer;
@@ -602,7 +648,8 @@ begin
 
   // Checking the file
   if not FileExists(FileName) then begin
-    MsgBox('The file "' + FileName + '" doesn''t exists.', 'Warning', MB_ICONWARNING);
+    ReportFailure('The file "' + FileName + '" doesn''t exists.',
+      'FullFileName: ' + FileName, 'Warning', ltWarning);
     Exit;
   end;
 
@@ -653,18 +700,19 @@ begin
       // Updating UI
       if not UpdateUI then begin
         SetWindowTitleCaption(IPACEditor.SourceFileName);
-        AddDebug(ltInformation, 'The file "' + IPACEditor.SourceFileName
-          + '" was successfully opened.');
+        AddDebug(ltInformation, 'Load successfully done for "' + IPACEditor.SourceFileName
+          + '".');
       end;
       SetControlsStateFileOperations(True);
     end else begin
       StatusText := 'IPAC section empty ! Loading aborted...';
-      MsgBox('This file contains a valid IPAC section, but the section itself is empty.',
-        'Nothing to edit in this file', MB_ICONINFORMATION);
+      ReportFailure('This file contains a valid IPAC section, but the section itself is empty.',
+        'FileName: ' + FileName, 'Nothing to edit in this file', ltInformation);
     end;
 
   end else
-    MsgBox('This file doesn''t contain a valid IPAC section.', 'Warning', MB_ICONWARNING);
+    ReportFailure('This file doesn''t contain a valid IPAC section.',
+      'FileName: ' + FileName, 'Warning', ltWarning);
 
   StatusText := '';
 end;
@@ -702,6 +750,11 @@ begin
       LoadFile(FileName);
 end;
 
+procedure TfrmMain.miPropertiesClick(Sender: TObject);
+begin
+  FilePropertiesVisible := not FilePropertiesVisible;
+end;
+
 procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
@@ -711,6 +764,8 @@ procedure TfrmMain.miReloadClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   LoadFile(IPACEditor.SourceFileName);
+  AddDebug(ltInformation, 'Successfully reloaded the file "'
+    + IPACEditor.SourceFileName + '".');
 end;
 
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
@@ -723,10 +778,20 @@ begin
     FileName := ExtractFileName(IPACEditor.SourceFileName);
     Buf := ExtractFileExt(IPACEditor.SourceFileName);
     DefaultExt := Copy(Buf, 2, Length(Buf) - 1);
+
+    // Executing dialog
     if Execute then begin
       StatusText := 'Saving file...';
       ReloadFromDisk := FileName = IPACEditor.SourceFileName;
-      IPACEditor.SaveToFile(FileName);
+
+      // Saving on the disk
+      Buf := ' for "' + IPACEditor.SourceFileName + '" to "' + FileName + '".';
+      if IPACEditor.SaveToFile(FileName) then
+        AddDebug(ltInformation, 'Save successfully done' + Buf)
+      else
+        AddDebug(ltWarning, 'Unable to do the save' + Buf);
+
+      // Reloading the view if needed
       if ReloadFromDisk then
         LoadFile(IPACEditor.SourceFileName);
       StatusText := '';
@@ -737,7 +802,16 @@ end;
 procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
   StatusText := 'Saving file...';
-  IPACEditor.Save;
+  if IPACEditor.Save then
+    AddDebug(ltInformation,
+      Format('Save successfully done on the disk for "%s".',
+      [IpacEditor.SourceFileName])
+    )
+  else
+    AddDebug(ltWarning,
+      Format('Unable to save on disk for "%s".',
+      [IPACEditor.SourceFileName])
+    );
   LoadFile(IPACEditor.SourceFileName);
 end;
 
@@ -752,6 +826,10 @@ begin
   
   SelectedContentEntry.CancelImport;
   SetControlsStateSelectedContentModified(False);
+  AddDebug(ltInformation,
+    Format('The import for the entry #%d [%s] of the file "%s" was canceled.', [
+      SelectedContentEntry.Index, SelectedContentEntry.GetOutputFileName,
+        IPACEditor.SourceFileName]));
 end;
 
 function TfrmMain.MsgBox(Text: string): Integer;
@@ -808,6 +886,21 @@ begin
     else
       if frmDebugLog.Visible then
         frmDebugLog.Close;
+  end;
+end;
+
+procedure TfrmMain.SetFilePropertiesVisible(const Value: Boolean);
+begin
+  if fFilePropertiesVisible <> Value then begin
+    fFilePropertiesVisible := Value;
+    miProperties.Checked := Value;
+    tbProperties.Down := Value;
+    
+    if Value then
+      frmProperties.Show
+    else
+      if frmProperties.Visible then
+        frmProperties.Close;
   end;
 end;
 
@@ -885,6 +978,25 @@ begin
   else
     Caption := ExtractFileName(FileName) + ' - ' + StoredCaption;
   Application.Title := Caption;
+end;
+
+procedure TfrmMain.ReportFailure(Text, AdditionalDebugText, Caption: string;
+  FailureType: TLineType);
+var
+  MsgIcon: Integer;
+  
+begin
+  MsgIcon := 0;
+  case FailureType of
+    ltInformation: MsgIcon := MB_ICONINFORMATION;
+    ltWarning: MsgIcon := MB_ICONWARNING;
+    ltCritical: MsgIcon := MB_ICONERROR;
+  end;
+
+  if AdditionalDebugText <> '' then
+    AdditionalDebugText := ' [' + AdditionalDebugText + '].';
+  AddDebug(FailureType, Text + AdditionalDebugText);
+  MsgBox(Text, Caption, MsgIcon + MB_OK);
 end;
 
 end.
