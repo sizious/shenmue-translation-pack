@@ -176,6 +176,7 @@ type
 
 const
   IPAC_SIGN = 'IPAC';
+  UNIT_NAME = 'ipacmgr'; // For Exception handling
 
 { TIpacSectionsListItem }
 
@@ -198,8 +199,17 @@ begin
   OutStream := TFileStream.Create(FileName, fmCreate);
   InStream := TFileStream.Create(GetSourceFileName, fmOpenRead);
   try
-    InStream.Seek(AbsoluteOffset, soFromBeginning);
-    OutStream.CopyFrom(InStream, Size);
+    try
+      InStream.Seek(AbsoluteOffset, soFromBeginning);
+      OutStream.CopyFrom(InStream, Size);
+    except
+      on E:Exception do begin
+        E.Message := Format('%s.ExportToFile: %s [AbsoluteOffset: %d, '
+          + 'SourceFileName: "%s", TargetFileName: "%s"]', [UNIT_NAME,
+          E.Message, AbsoluteOffset, GetSourceFileName, FileName]);
+        raise;
+      end;
+    end;
   finally
     OutStream.Free;
     InStream.Free;
@@ -214,8 +224,18 @@ end;
 
 procedure TIpacSectionsListItem.AnalyzeSection(var SourceFileStream: TFileStream);
 begin
-  fFileSectionDetails := AnalyzeIpacSection(Kind, SourceFileStream,
-    AbsoluteOffset, Size, fExpandedFileSectionDetails);
+  try
+    fFileSectionDetails := AnalyzeIpacSection(Kind, SourceFileStream,
+      AbsoluteOffset, Size, fExpandedFileSectionDetails);
+  except
+    on E:Exception do begin
+      E.Message := Format('%s.AnalyzeSection: %s [Kind: %s, ' +
+        'SourceFileName: "%s", AbsoluteOffset: %d, Size: %d]',
+        [UNIT_NAME, E.Message, Kind, SourceFileStream.FileName, AbsoluteOffset,
+        Size]);
+      raise;
+    end;
+  end;
 end;
 
 function TIpacSectionsListItem.GetOutputFileName: TFileName;
@@ -247,38 +267,55 @@ var
   Buffer: array[0..31] of Char;
 
 begin
+  NewPaddingSize := $FFFFFFFF;
   Offset := OutStream.Position;
   IpacAbsoluteOffset := Owner.IpacSection.Offset;
   
-  if Updated then begin
+  try
 
-    // Importing the new section
-    ImportedFileStream := TFileStream.Create(ImportedFileName, fmOpenRead);
-    try
-      NewSectionSize := ImportedFileStream.Size;
-      OutStream.CopyFrom(ImportedFileStream, NewSectionSize);
-    finally
-      ImportedFileStream.Free;
-    end;  
+    if Updated then begin
 
-  end else begin
-    // Raw Copy of the section
-    NewSectionSize := Size;
-    InStream.Seek(AbsoluteOffset, soFromBeginning);
-    OutStream.CopyFrom(InStream, NewSectionSize);
-  end;
+      // Importing the new section
+      ImportedFileStream := TFileStream.Create(ImportedFileName, fmOpenRead);
+      try
+        NewSectionSize := ImportedFileStream.Size;
+        OutStream.CopyFrom(ImportedFileStream, NewSectionSize);
+      finally
+        ImportedFileStream.Free;
+      end;  
 
-  // Writing section padding
-  NewPaddingSize := GetSectionPaddingSize(NewSectionSize);
-  ZeroMemory(@Buffer, NewPaddingSize);
-  OutStream.Write(Buffer, NewPaddingSize);
+    end else begin
+      // Raw Copy of the section
+      NewSectionSize := Size;
+      InStream.Seek(AbsoluteOffset, soFromBeginning);
+      OutStream.CopyFrom(InStream, NewSectionSize);
+    end;
 
-  // Updating footer infos
-  with Owner.Items[Index] do begin
-    fNewAbsoluteOffset := Offset;
-    fNewRelativeOffset := Offset - IpacAbsoluteOffset;
-    fNewSize := NewSectionSize;
-    fNewPaddingSize := NewPaddingSize;
+    // Writing section padding
+    NewPaddingSize := GetSectionPaddingSize(NewSectionSize);
+    ZeroMemory(@Buffer, NewPaddingSize);
+    OutStream.Write(Buffer, NewPaddingSize);
+
+    // Updating footer infos
+    with Owner.Items[Index] do begin
+      fNewAbsoluteOffset := Offset;
+      fNewRelativeOffset := Offset - IpacAbsoluteOffset;
+      fNewSize := NewSectionSize;
+      fNewPaddingSize := NewPaddingSize;
+    end;
+
+  except
+    on E:Exception do begin
+      E.Message := Format('%s.WriteIpacSection: %s [InStream: "%s", ' +
+        'OutStream: "%s", Section Info = {"%s" "%s" A:%d R:%d S:%d}, Updated: %s ' +
+        '= {A:%d R:%d S:%d}, IpacAbsoluteOffset: %d, NewPaddingSize: %d]',
+        [UNIT_NAME, E.Message, InStream.FileName, OutStream.FileName,
+        Name, Kind, AbsoluteOffset, RelativeOffset, Size,
+        BoolToStr(Updated, True), fNewAbsoluteOffset, fNewRelativeOffset,
+        fNewSize, IpacAbsoluteOffset, NewPaddingSize]
+      );
+      raise;
+    end;
   end;
 end;
 
@@ -355,55 +392,65 @@ begin
   if not FileExists(FileName) then Exit;
   Clear; // the previous temp file is cleaned here (if needed)
 
-  fSourceFileName := FileName;
-
-  // Ungzip if needed
-  InitWorkingSelectedFile(SourceFileName);
-
-  // Loading the decompressed IPAC file
-  FS := TFileStream.Create(InternalWorkingSourceFile, fmOpenRead);
   try
+    fSourceFileName := FileName;
+
+    // Ungzip if needed
+    InitWorkingSelectedFile(SourceFileName);
+
+    // Loading the decompressed IPAC file
+    FS := TFileStream.Create(InternalWorkingSourceFile, fmOpenRead);
+    try
 
 {$IFDEF DEBUG}
-    WriteLn(sLineBreak, '*** PARSING FILE ***');
+      WriteLn(sLineBreak, '*** PARSING FILE ***');
 {$ENDIF}
 
-    // Parsing the file...
-    repeat
-      Offset := FS.Position;
+      // Parsing the file...
+      repeat
+        Offset := FS.Position;
 
-      // Reading the header
-      FS.Read(SectionEntry, SizeOf(TSectionEntry));
-      IpacSectionIndex := Sections.Add(SectionEntry.Name, Offset, SectionEntry.Size);
-      NextSectionOffset := Offset + SectionEntry.Size;
+        // Reading the header
+        FS.Read(SectionEntry, SizeOf(TSectionEntry));
+        IpacSectionIndex := Sections.Add(SectionEntry.Name, Offset, SectionEntry.Size);
+        NextSectionOffset := Offset + SectionEntry.Size;
 
-      // We found the IPAC section
-      if SectionEntry.Name = IPAC_SIGN then begin
-        Result := True;
-        Content.fIpacFileSectionIndex := IpacSectionIndex;
+        // We found the IPAC section
+        if SectionEntry.Name = IPAC_SIGN then begin
+          Result := True;
+          Content.fIpacFileSectionIndex := IpacSectionIndex;
 
-        // Parse the IPAC section
-        with Content.IpacSection do
-          ParseIpacSections(FS, Offset, Size);
+          // Parse the IPAC section
+          with Content.IpacSection do
+            ParseIpacSections(FS, Offset, Size);
 
-        // Skip IPAC footer
-        Inc(NextSectionOffset, Content.Count * SizeOf(TIpacSectionEntry));
-      end;
+          // Skip IPAC footer
+          Inc(NextSectionOffset, Content.Count * SizeOf(TIpacSectionEntry));
+        end;
 
-      // Skipping section
-      Done := (NextSectionOffset >= FS.Size) or (SectionEntry.Size = 0);
+        // Skipping section
+        Done := (NextSectionOffset >= FS.Size) or (SectionEntry.Size = 0);
+        if not Result then
+          FS.Seek(NextSectionOffset, soFromBeginning);
+
+      until Done or (FS.Position >= FS.Size);
+
+      // Not a valid file...
       if not Result then
-        FS.Seek(NextSectionOffset, soFromBeginning);
-      
-    until Done or (FS.Position >= FS.Size);
-
-    // Not a valid file...
-    if not Result then
-      Clear;
+        Clear;
 
 {$IFDEF DEBUG}
-    WriteLn(sLineBreak, 'LoadFromFile "', ExtractFileName(FileName), '" result: ', Result);
+      WriteLn(sLineBreak, 'LoadFromFile "', ExtractFileName(FileName), '" result: ', Result);
 {$ENDIF}
+
+    except
+      on E:Exception do begin
+        E.Message := Format('%s.LoadFromFile: %s [InputFile: "%s"]',
+          [UNIT_NAME, E.Message, FileName]
+        );
+        raise;
+      end;
+    end;
 
   finally
     FS.Free;

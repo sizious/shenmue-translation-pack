@@ -82,6 +82,7 @@ procedure LoadConfigDebug;
 begin
   with Configuration do begin
     frmDebugLog.OnTop := ReadBool('debug', 'ontop', False);
+    frmDebugLog.AutoScroll := ReadBool('debug', 'autoscroll', True);
     LoadFormConfig('debug', frmDebugLog);
     frmMain.DebugLogVisible := ReadBool('debug', 'visible', False);    
   end;
@@ -104,6 +105,7 @@ begin
   with Configuration do begin
     WriteBool('debug', 'visible', frmMain.DebugLogVisible);
     WriteBool('debug', 'ontop', frmDebugLog.OnTop);
+    WriteBool('debug', 'autoscroll', frmDebugLog.AutoScroll);
     SaveFormConfig('debug', frmDebugLog);
   end;
 end;

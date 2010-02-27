@@ -342,6 +342,7 @@ object frmMain: TfrmMain
         Caption = '&Properties...'
         Hint = 'Show or hide the Properties window for the current file.'
         ShortCut = 115
+        OnClick = miPropertiesClick
       end
     end
     object miOptions: TMenuItem
@@ -3775,5 +3776,11 @@ object frmMain: TfrmMain
       'ntent...'
     Left = 296
     Top = 192
+  end
+  object JvDragDrop: TJvDragDrop
+    DropTarget = Owner
+    OnDrop = JvDragDropDrop
+    Left = 42
+    Top = 284
   end
 end
