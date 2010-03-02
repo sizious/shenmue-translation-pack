@@ -10,13 +10,15 @@ function GetApplicationDirectory: TFileName;
 function GetWorkingTempDirectory: TFileName;
 procedure LoadConfigDebug;
 procedure LoadConfigMain;
+procedure LoadConfigProperties;
 procedure SaveConfigDebug;
 procedure SaveConfigMain;
+procedure SaveConfigProperties;
 
 implementation
 
 uses
-  Forms, SysTools, XmlConf, Main, DebugLog;
+  Forms, SysTools, UITools, XmlConf, Main, DebugLog, FileProp;
 
 const
   WORKING_TEMP_DIR = 'IPACTemp';
@@ -93,8 +95,37 @@ end;
 procedure LoadConfigMain;
 begin
   with Configuration do begin
+    if FirstConfiguration then
+      frmMain.Position := poScreenCenter
+    else begin
+      frmMain.Position := poDesigned;
+      LoadFormConfig('main', frmMain);
+      frmMain.lvIpacContent.ColumnsOrder :=
+        ReadString('main', 'columnsorder', frmMain.lvIpacContent.ColumnsOrder);
+    end;
     frmMain.AutoSave := ReadBool('options', 'autosave', False);
     frmMain.MakeBackup := ReadBool('options', 'makebackup', True);
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure LoadConfigProperties;
+begin
+  with Configuration do begin
+    LoadFormConfig('properties', frmProperties);
+
+    with frmProperties do begin
+      pcProp.TabIndex := ReadInteger('properties', 'tabindex', 0);
+      lvGeneral.ColumnsOrder :=
+        ReadString('properties', 'generalview', lvGeneral.ColumnsOrder);
+      lvSections.ColumnsOrder :=
+        ReadString('properties', 'sectionsorder', lvSections.ColumnsOrder);
+      lvContent.ColumnsOrder :=
+        ReadString('properties', 'contentorder', lvContent.ColumnsOrder);
+    end;
+
+    frmMain.FilePropertiesVisible := ReadBool('properties', 'visible', False);
   end;
 end;
 
@@ -115,8 +146,28 @@ end;
 procedure SaveConfigMain;
 begin
   with Configuration do begin
+    SaveFormConfig('main', frmMain);
+    WriteString('main', 'columnsorder', frmMain.lvIpacContent.ColumnsOrder);
     WriteBool('options', 'autosave', frmMain.AutoSave);
     WriteBool('options', 'makebackup', frmMain.MakeBackup);
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure SaveConfigProperties;
+begin
+  with Configuration do begin
+    SaveFormConfig('properties', frmProperties);
+
+    with frmProperties do begin
+      WriteInteger('properties', 'tabindex', pcProp.TabIndex);
+      WriteString('properties', 'generalview', lvGeneral.ColumnsOrder);
+      WriteString('properties', 'sectionsorder', lvSections.ColumnsOrder);
+      WriteString('properties', 'contentorder', lvContent.ColumnsOrder);
+    end;
+
+    WriteBool('properties', 'visible', frmMain.FilePropertiesVisible);
   end;
 end;
 

@@ -52,16 +52,14 @@
    
  * IDX Creator
    This stuff allows to re-create correct IDX files corresponding to each AFS.
-   
+ 
+ * IPAC Browser
+   This utility was done to explore and edit PKS/PKF/BIN files.
+  
  * Models Textures Editor
    This tool is a texture editor for MT5/MT6/MT7 files, in case of some sprites
    must be translated.
-   
- * Shenmue Subtitles Preview
-   This isn't a tool but a library used by some projects inside this package.
-   This library is the implementation of a subtitle previewer, in order to
-   help the translation.
-   
+      
  * SPR Utils
    This's an editor for SPR files.
  __                  __________________________________________________________

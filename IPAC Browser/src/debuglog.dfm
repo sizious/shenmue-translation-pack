@@ -178,6 +178,7 @@ object frmDebugLog: TfrmDebugLog
       end
       object miAutoScroll: TMenuItem
         Caption = 'Auto-scro&ll'
+        Hint = 'Auto-scroll the view when a new line is added in the Debug log.'
         OnClick = miAutoScrollClick
       end
       object miShowMainWindow: TMenuItem

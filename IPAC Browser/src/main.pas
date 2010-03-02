@@ -82,6 +82,8 @@ type
     miDEBUG_TEST3: TMenuItem;
     miDEBUG_TEST4: TMenuItem;
     JvDragDrop: TJvDragDrop;
+    N7: TMenuItem;
+    miAssociate: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
@@ -112,6 +114,8 @@ type
     procedure aeMainException(Sender: TObject; E: Exception);
     procedure JvDragDropDrop(Sender: TObject; Pos: TPoint; Value: TStrings);
     procedure miPropertiesClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure miAssociateClick(Sender: TObject);
   private
     { Déclarations privées }
     fStoredCaption: string;
@@ -122,18 +126,20 @@ type
     fMakeBackup: Boolean;
     fQuitOnFailure: Boolean;
     fFilePropertiesVisible: Boolean;
+    fFileAssociated: Boolean;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
     procedure BugsHandlerQuitRequest(Sender: TObject);
     procedure FreeApplication;
-    function GetSelectedContentEntry: TIpacSectionsListItem;
+    function GetSelectedContentEntry: TIpacSectionListItem;
     procedure SetDebugLogVisible(const Value: Boolean);
     function GetStatusText: string;
     procedure SetStatusText(const Value: string);
     procedure SetAutoSave(const Value: Boolean);
     procedure SetMakeBackup(const Value: Boolean);
     procedure SetFilePropertiesVisible(const Value: Boolean);
+    procedure SetFileAssociated(const Value: Boolean);
   protected
     procedure Clear; overload;
     procedure Clear(const UpdateOnlyUI: Boolean); overload;
@@ -165,13 +171,14 @@ type
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property DebugLogVisible: Boolean read fDebugLogVisible write SetDebugLogVisible;
+    property FileAssociated: Boolean read fFileAssociated write SetFileAssociated;
     property FileModified: Boolean read fFileModified;
     property FilePropertiesVisible: Boolean read fFilePropertiesVisible
       write SetFilePropertiesVisible;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
     property StatusText: string read GetStatusText write SetStatusText;
     property SelectedContentUI: TListItem read fSelectedContentUI;
-    property SelectedContentEntry: TIpacSectionsListItem
+    property SelectedContentEntry: TIpacSectionListItem
       read GetSelectedContentEntry;
   end;
 
@@ -189,7 +196,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GZipMgr, Utils, fileprop;
+  GZipMgr, Utils, FileProp, About, Shell;
 
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
@@ -223,6 +230,27 @@ begin
   frmDebugLog.ResetStatus;
   StatusText := Application.Hint;
   aeMain.CancelDispatch;
+end;
+
+procedure TfrmMain.miAssociateClick(Sender: TObject);
+var
+  CanDo: Integer;
+  Msg: string;
+
+begin
+  // Better to do for the next version: retriving the managed extensions!!!
+  // Go to the Shell unit to see what I mean
+  
+  if not FileAssociated then begin
+    Msg := 'Are you sure to associate the Shenmue data files (*.PKS, *.PKF and '
+       + '*.BIN) with this tool ?';
+  end else
+    Msg := 'Do you want to dissociate the Shenmue data files ?';
+
+  CanDo := MsgBox(Msg, 'Question', MB_ICONQUESTION + MB_YESNO);
+  if CanDo = IDNO then Exit;
+
+  FileAssociated := not FileAssociated;
 end;
 
 procedure TfrmMain.BugsHandlerExceptionCallBack(Sender: TObject;
@@ -263,6 +291,11 @@ begin
     + SectionKind.Extension + '|';
 end;
 
+procedure TfrmMain.miAboutClick(Sender: TObject);
+begin
+  RunAboutBox;
+end;
+
 procedure TfrmMain.miAutoSaveClick(Sender: TObject);
 begin
   AutoSave := not AutoSave;
@@ -282,8 +315,8 @@ begin
 end;
 
 procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
-begin
 {$IFDEF DEBUG}
+begin
   IPACEditor.LoadFromFile('AKMI.PKS');
   IPACEditor.Content[0].ExportToFile('0_before.bin');
   IPACEditor.Content[0].ImportFromFile('TEST.BIN');
@@ -320,7 +353,7 @@ begin
     FileName := SelectedContentEntry.Name;
 
     // Select the right filter
-    DefaultExt := SelectedContentEntry.FileSectionDetails.Extension;
+    DefaultExt := SelectedContentEntry.ExpandedKind.Extension;
     FilterIndex := GetFileOperationDialogFilterIndex(sdExport);
 
     // Saving IPAC content section
@@ -346,7 +379,7 @@ begin
     FileName := SelectedContentEntry.Name;
 
     // Select the right filter
-    DefaultExt := SelectedContentEntry.FileSectionDetails.Extension;
+    DefaultExt := SelectedContentEntry.ExpandedKind.Extension;
     FilterIndex := GetFileOperationDialogFilterIndex(odImport);
     Buf := Format('#%d [%s]', [SelectedContentEntry.Index,
       SelectedContentEntry.GetOutputFileName]);
@@ -388,7 +421,17 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   aeMain.OnException := nil;
-  
+
+  // Init the About Box
+  InitAboutBox(
+    Application.Title,
+    GetAppVersion
+  );
+
+{$IFNDEF DEBUG}
+  miDEBUG.Visible := False;
+{$ENDIF}
+
   // Init the Main Form
   Caption := Application.Title + ' v' + GetAppVersion;
   StoredCaption := Caption;
@@ -405,6 +448,10 @@ begin
   // Initialize some UI controls
   InitToolbarControl;
   InitContentPopupMenuControl;
+
+  // Init the file Association menu
+  fFileAssociated := ShellExtension.IsFilesAssociated;
+  miAssociate.Checked := fFileAssociated;
 
   // Load configuration
   LoadConfigMain;
@@ -435,7 +482,7 @@ begin
   SaveConfigMain;
 end;
 
-function TfrmMain.GetSelectedContentEntry: TIpacSectionsListItem;
+function TfrmMain.GetSelectedContentEntry: TIpacSectionListItem;
 begin
   try
     Result := IPACEditor.Content[Integer(SelectedContentUI.Data)];
@@ -522,8 +569,8 @@ begin
   with SelectedContentEntry do begin
     // If we know more that is an 'CHRM' or 'BIN ' entry... we'll add the entry
     // in the first filter index
-    if FileSectionDetailsAvailable then begin
-      TargetDialog.Filter := ExtendedKindToFilterString(FileSectionDetails);
+    if ExpandedKindAvailable then begin
+      TargetDialog.Filter := ExtendedKindToFilterString(ExpandedKind);
       Result := 0;
     end;
   end;
@@ -689,11 +736,11 @@ begin
           with IPACEditor.Content[i] do begin
             Data := Pointer(i);
             Caption := GetOutputFileName;
-            SubItems[0] := FileSectionDetails.Description;
+            SubItems[0] := ExpandedKind.Description;
             SubItems[1] := IntToStr(AbsoluteOffset);
             SubItems[2] := IntToStr(Size);
             SubItems[3] := ''; // for updated
-            ImageIndex := GetKindIndex(FileSectionDetails.Name);
+            ImageIndex := GetKindIndex(ExpandedKind.Name);
           end;
       end;
 
@@ -704,6 +751,9 @@ begin
           + '".');
       end;
       SetControlsStateFileOperations(True);
+
+      // Updating File Properties
+      frmProperties.RefreshInfos;
     end else begin
       StatusText := 'IPAC section empty ! Loading aborted...';
       ReportFailure('This file contains a valid IPAC section, but the section itself is empty.',
@@ -887,6 +937,13 @@ begin
       if frmDebugLog.Visible then
         frmDebugLog.Close;
   end;
+end;
+
+procedure TfrmMain.SetFileAssociated(const Value: Boolean);
+begin
+  fFileAssociated := Value;
+  miAssociate.Checked := Value;
+  ShellExtension.RegisterShellFilesAssociation(Value);
 end;
 
 procedure TfrmMain.SetFilePropertiesVisible(const Value: Boolean);

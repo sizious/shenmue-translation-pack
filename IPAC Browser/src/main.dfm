@@ -12,7 +12,7 @@ object frmMain: TfrmMain
   Font.Style = []
   Menu = mmMain
   OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poDesigned
   ShowHint = True
   OnActivate = FormActivate
   OnClose = FormClose
@@ -359,6 +359,16 @@ object frmMain: TfrmMain
         ShortCut = 119
         OnClick = miMakeBackupClick
       end
+      object N7: TMenuItem
+        Caption = '-'
+      end
+      object miAssociate: TMenuItem
+        Caption = 'Associate...'
+        Hint = 
+          'Associate this tool with editables Shenmue data files in the Exp' +
+          'lorer'
+        OnClick = miAssociateClick
+      end
     end
     object miHelp: TMenuItem
       Caption = '&Help'
@@ -366,6 +376,7 @@ object frmMain: TfrmMain
         Caption = '&About...'
         Hint = 'I don'#39't know what'#39's it. Maybe you shouldn'#39't select this!'
         ShortCut = 123
+        OnClick = miAboutClick
       end
     end
     object miDEBUG: TMenuItem

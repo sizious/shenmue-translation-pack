@@ -1,6 +1,8 @@
 program ipacedit;
 
 {$R 'engine\gzipbin.res' 'engine\gzipbin.rc'}
+{$R 'about\credits.res' 'about\credits.rc'}
+{$R 'shicons.res' 'shicons.rc'}
 
 uses
   Windows,
@@ -14,7 +16,12 @@ uses
   debuglog in 'debuglog.pas' {frmDebugLog},
   xmlconf in '..\..\Common\xmlconf.pas',
   bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
-  fileprop in 'fileprop.pas' {frmProperties};
+  fileprop in 'fileprop.pas' {frmProperties},
+  about in '..\..\Common\About\about.pas' {frmAbout},
+  uitools in '..\..\Common\uitools.pas',
+  shell in 'shell.pas',
+  shellext in '..\..\Common\ShellExt\shellext.pas',
+  regshell in '..\..\Common\ShellExt\regshell.pas';
 
 {$R *.res}
 
@@ -33,6 +40,8 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
   Application.Title := 'Shenmue IPAC Browser';
+  InitializeShellExtension;
+
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmDebugLog, frmDebugLog);
   Application.CreateForm(TfrmProperties, frmProperties);
