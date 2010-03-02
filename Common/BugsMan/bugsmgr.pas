@@ -124,7 +124,7 @@ begin
   QuitAction := False;
   
   s := StringReplace(fErrorMsg, sLineBreak, ' ', [rfReplaceAll]);
-  err := s + ' / [Exception Class Type: ' + fErrorType + ', Sender : '
+  err := s + ' [Exception Class Type: ' + fErrorType + ', Sender : '
     + fErrorSender + '].';
   MessageBeep(MB_ICONERROR);
   mExceptionMessage.Text := fErrorMsg;

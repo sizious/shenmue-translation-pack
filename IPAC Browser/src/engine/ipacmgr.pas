@@ -7,7 +7,7 @@ uses
 
 type
   TIpacEditor = class;
-  TIpacSectionsList = class;
+  TIpacSectionList = class;
   TFileSectionsList = class;
 
   // Item of TFileSectionsList
@@ -46,9 +46,9 @@ type
   end;
 
   // IPAC section entry
-  TIpacSectionsListItem = class
+  TIpacSectionListItem = class
   private
-    fOwner: TIpacSectionsList;
+    fOwner: TIpacSectionList;
     fName: string;
     fKind: string;
     fSize: LongWord;
@@ -57,8 +57,8 @@ type
     fImportedFileName: TFileName;
     fUpdated: Boolean;
     fIndex: Integer;
-    fFileSectionDetails: TIpacSectionKind;
-    fExpandedFileSectionDetails: Boolean;
+    fExpandedKind: TIpacSectionKind;
+    fExpandedKindAvailable: Boolean;
 
     // Updated value (for the SaveToFile function)
     fNewAbsoluteOffset: LongWord;
@@ -73,7 +73,7 @@ type
     procedure WriteIpacSection(var InStream, OutStream: TFileStream);
     property SourceFileName: TFileName read GetSourceFileName;
   public
-    constructor Create(Owner: TIpacSectionsList);
+    constructor Create(Owner: TIpacSectionList);
 
     procedure CancelImport;
     procedure ExportToFile(const FileName: TFileName);
@@ -82,20 +82,20 @@ type
     function ImportFromFile(const FileName: TFileName): Boolean;
 
     property AbsoluteOffset: LongWord read fAbsoluteOffset;
-    property FileSectionDetailsAvailable: Boolean read fExpandedFileSectionDetails;
-    property FileSectionDetails: TIpacSectionKind read fFileSectionDetails;
+    property ExpandedKind: TIpacSectionKind read fExpandedKind;    
+    property ExpandedKindAvailable: Boolean read fExpandedKindAvailable;
     property Index: Integer read fIndex;
     property ImportedFileName: TFileName read fImportedFileName;
     property Name: string read fName;
     property Kind: string read fKind;
     property RelativeOffset: LongWord read fRelativeOffset;
     property Size: LongWord read fSize;
-    property Owner: TIpacSectionsList read fOwner;
+    property Owner: TIpacSectionList read fOwner;
     property Updated: Boolean read fUpdated;    
   end;
 
   // IPAC sections manager
-  TIpacSectionsList = class
+  TIpacSectionList = class
   private
     fIpacSectionSizeAbsoluteOffset1: LongWord;
     fIpacSectionSizeAbsoluteOffset2: LongWord;
@@ -103,7 +103,7 @@ type
     fList: TList;
     fIpacFileSectionIndex: Integer;
     function GetCount: Integer;
-    function GetItem(Index: Integer): TIpacSectionsListItem;
+    function GetItem(Index: Integer): TIpacSectionListItem;
     function GetIpacFileSection: TFileSectionsListItem;
   protected
     function Add(var SourceFileStream: TFileStream; Name, Kind: string;
@@ -115,7 +115,7 @@ type
     constructor Create(Owner: TIpacEditor);
     destructor Destroy; override;
     property Count: Integer read GetCount;
-    property Items[Index: Integer]: TIpacSectionsListItem read GetItem; default;
+    property Items[Index: Integer]: TIpacSectionListItem read GetItem; default;
     property IpacSection: TFileSectionsListItem read GetIpacFileSection;
     property Owner: TIpacEditor read fOwner;
   end;
@@ -123,7 +123,7 @@ type
   // Main class
   TIpacEditor = class
   private
-    fSections: TIpacSectionsList;
+    fSections: TIpacSectionList;
     fMakeBackup: Boolean;
     fFileSectionsList: TFileSectionsList;
     fSourceFileName: TFileName;
@@ -143,7 +143,7 @@ type
     function Save: Boolean;
 
     // This stores every IPAC sections
-    property Content: TIpacSectionsList read fSections;
+    property Content: TIpacSectionList read fSections;
 
     property Compressed: Boolean read fCompressed;
 
@@ -180,18 +180,18 @@ const
 
 { TIpacSectionsListItem }
 
-procedure TIpacSectionsListItem.CancelImport;
+procedure TIpacSectionListItem.CancelImport;
 begin
   fImportedFileName := '';
   fUpdated := False;
 end;
 
-constructor TIpacSectionsListItem.Create(Owner: TIpacSectionsList);
+constructor TIpacSectionListItem.Create(Owner: TIpacSectionList);
 begin
   fOwner := Owner;
 end;
 
-procedure TIpacSectionsListItem.ExportToFile(const FileName: TFileName);
+procedure TIpacSectionListItem.ExportToFile(const FileName: TFileName);
 var
   InStream, OutStream: TFileStream;
 
@@ -216,17 +216,17 @@ begin
   end;
 end;
 
-function TIpacSectionsListItem.ExportToFolder(const Folder: TFileName): TFileName;
+function TIpacSectionListItem.ExportToFolder(const Folder: TFileName): TFileName;
 begin
   Result := IncludeTrailingPathDelimiter(Folder) + GetOutputFileName;
   ExportToFile(Result);
 end;
 
-procedure TIpacSectionsListItem.AnalyzeSection(var SourceFileStream: TFileStream);
+procedure TIpacSectionListItem.AnalyzeSection(var SourceFileStream: TFileStream);
 begin
   try
-    fFileSectionDetails := AnalyzeIpacSection(Kind, SourceFileStream,
-      AbsoluteOffset, Size, fExpandedFileSectionDetails);
+    fExpandedKind := AnalyzeIpacSection(Kind, SourceFileStream,
+      AbsoluteOffset, Size, fExpandedKindAvailable);
   except
     on E:Exception do begin
       E.Message := Format('%s.AnalyzeSection: %s [Kind: %s, ' +
@@ -238,18 +238,18 @@ begin
   end;
 end;
 
-function TIpacSectionsListItem.GetOutputFileName: TFileName;
+function TIpacSectionListItem.GetOutputFileName: TFileName;
 var
   Ext: string;
 
 begin
-  Ext := FileSectionDetails.Extension;
+  Ext := ExpandedKind.Extension;
   if Ext <> '' then
     Ext := '.' + Ext;  
   Result := Name + Ext;
 end;
 
-function TIpacSectionsListItem.ImportFromFile(
+function TIpacSectionListItem.ImportFromFile(
   const FileName: TFileName): Boolean;
 begin
   Result := FileExists(FileName);
@@ -259,7 +259,7 @@ begin
   fUpdated := True;
 end;
 
-procedure TIpacSectionsListItem.WriteIpacSection(var InStream, OutStream: TFileStream);
+procedure TIpacSectionListItem.WriteIpacSection(var InStream, OutStream: TFileStream);
 var
   Offset, IpacAbsoluteOffset,
   NewSectionSize, NewPaddingSize: LongWord;
@@ -319,7 +319,7 @@ begin
   end;
 end;
 
-function TIpacSectionsListItem.GetSectionPaddingSize(DataSize: LongWord): LongWord;
+function TIpacSectionListItem.GetSectionPaddingSize(DataSize: LongWord): LongWord;
 var
   current_num, total_null_bytes: LongWord;
 
@@ -340,7 +340,7 @@ begin
   Result := total_null_bytes;
 end;
 
-function TIpacSectionsListItem.GetSourceFileName: TFileName;
+function TIpacSectionListItem.GetSourceFileName: TFileName;
 begin
   Result := Owner.Owner.InternalWorkingSourceFile;
 end;
@@ -360,7 +360,7 @@ end;
 
 constructor TIpacEditor.Create;
 begin
-  fSections := TIpacSectionsList.Create(Self);
+  fSections := TIpacSectionList.Create(Self);
   fFileSectionsList := TFileSectionsList.Create(Self);
   GZipInitEngine(GetWorkingTempDirectory);
 end;
@@ -583,13 +583,13 @@ end;
 
 { TIpacSectionsList }
 
-function TIpacSectionsList.Add(var SourceFileStream: TFileStream; Name,
+function TIpacSectionList.Add(var SourceFileStream: TFileStream; Name,
   Kind: string; AbsoluteOffset, RelativeOffset, Size: LongWord): Integer;
 var
-  NewItem: TIpacSectionsListItem;
+  NewItem: TIpacSectionListItem;
 
 begin
-  NewItem := TIpacSectionsListItem.Create(Self);
+  NewItem := TIpacSectionListItem.Create(Self);
   NewItem.fAbsoluteOffset := AbsoluteOffset;
   NewItem.fName := Name;
   NewItem.fKind := Kind;
@@ -608,45 +608,45 @@ begin
 {$ENDIF}
 end;
 
-procedure TIpacSectionsList.Clear;
+procedure TIpacSectionList.Clear;
 var
   i: Integer;
 
 begin
   for i := 0 to Count - 1 do
-    TIpacSectionsListItem(fList.Items[i]).Free;
+    TIpacSectionListItem(fList.Items[i]).Free;
   fList.Clear;
 end;
 
-constructor TIpacSectionsList.Create(Owner: TIpacEditor);
+constructor TIpacSectionList.Create(Owner: TIpacEditor);
 begin
   fOwner := Owner;
   fList := TList.Create;
 end;
 
-destructor TIpacSectionsList.Destroy;
+destructor TIpacSectionList.Destroy;
 begin
   Clear;
   fList.Free;
   inherited;
 end;
 
-function TIpacSectionsList.GetCount: Integer;
+function TIpacSectionList.GetCount: Integer;
 begin
   Result := fList.Count;
 end;
 
-function TIpacSectionsList.GetIpacFileSection: TFileSectionsListItem;
+function TIpacSectionList.GetIpacFileSection: TFileSectionsListItem;
 begin
   Result := Owner.Sections[fIpacFileSectionIndex];
 end;
 
-function TIpacSectionsList.GetItem(Index: Integer): TIpacSectionsListItem;
+function TIpacSectionList.GetItem(Index: Integer): TIpacSectionListItem;
 begin
-  Result := TIpacSectionsListItem(fList.Items[Index]);
+  Result := TIpacSectionListItem(fList.Items[Index]);
 end;
 
-procedure TIpacSectionsList.WriteIpacFooter(var FS: TFileStream);
+procedure TIpacSectionList.WriteIpacFooter(var FS: TFileStream);
 const
   IPAC_HEADER_SIZE = 16;
 
@@ -701,7 +701,7 @@ begin
   FS.Seek(Offset, soFromBeginning);
 end;
 
-procedure TIpacSectionsList.WriteIpacHeader(var FS: TFileStream);
+procedure TIpacSectionList.WriteIpacHeader(var FS: TFileStream);
 const
   IPAC_FAKE_SIZE: LongWord = $FFFFFFFF;
 

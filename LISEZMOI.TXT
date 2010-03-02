@@ -53,16 +53,15 @@
  * IDX Creator
    IDX Creator permet de recréer les fichiers IDX qui vont de paire avec les
    fichiers AFS contenant les SRF traduits.
-   
+ 
+ * IPAC Browser
+   Il s'agit d'un explorateur de fichiers PKS/PKF/BIN, permettant de visualiser
+   et/ou d'éditer le contenu de ces fichiers.
+
  * Models Textures Editor
    Cet outil permet d'éditer les textures MT5/MT6/MT7, dans le but de traduire
    certains sprites.
-   
- * Shenmue Subtitles Preview
-   Il ne s'agit pas d'un outil mais d'une bibliothèque utilisée dans les 
-   éditeurs de sous-titres. Cette bibliothèque permet la visualisation en temps
-   réel des sous-titres traduits afin d'apréhender le rendu.
-   
+      
  * SPR Utils
    Cet outil est un éditeur de sprites au format SPR.
  __                    ________________________________________________________

@@ -12,7 +12,6 @@ procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
-function GetApplicationVersion(LangID, SubLangID: Byte): string;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetTempDir: TFileName;
 function GetTempFileName: TFileName;
@@ -309,58 +308,6 @@ begin
     end;
     Inc(i);
   end;
-end;
-
-//------------------------------------------------------------------------------
-// Based on the original function published by Nono40 (nono40.developpez.com)
-// Thanks to Olivier Lance (http://delphi.developpez.com/faq/?page=systemedivers#langidcquoi)
-function GetApplicationVersionAPI(const wLanguage: LANGID): string;
-const
-  VERSION_INFO_VALUE = '04E4';
-
-var
-  InfoSize,
-  InfoLength: LongWord;
-  Buffer,
-  VersionPC: PChar;
-  LangCode: string;
-
-begin
-  Result := '';
-  Buffer := nil;
-
-  LangCode := IntToHex(wLanguage, 4) + VERSION_INFO_VALUE;
-
-  // Asking file version information size
-  InfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), InfoSize);
-
-  // We have file version information on the file.
-  if InfoSize > 0 then
-    try
-      // Allocating memory for reading file info
-      Buffer := AllocMem(InfoSize);
-
-      // Copying file info in the buffer
-      GetFileVersionInfo(PChar(ParamStr(0)), 0, InfoSize, Buffer);
-
-      // Reading the ProductVersion value
-      if VerQueryValue(Buffer, PChar('\StringFileInfo\' + LangCode
-        + '\ProductVersion'), Pointer(VersionPC), InfoLength
-      ) then
-        Result := VersionPC;
-    finally
-      FreeMem(Buffer, InfoSize);
-    end;
-end;
-
-function MakeLangID(LangID, SubLangID: Byte): Word;
-begin
-  Result := (SubLangID shl 10) or LangID;
-end;
-
-function GetApplicationVersion(LangID, SubLangID: Byte): string;
-begin
-  Result := GetApplicationVersionAPI(MakeLangID(LangID, SubLangID));
 end;
 
 //------------------------------------------------------------------------------

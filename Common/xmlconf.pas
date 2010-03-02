@@ -14,6 +14,7 @@ type
     fXMLDocument: IXMLDocument;
     fLoadedFileName: TFileName;
     fConfigID: string;
+    fFirstConfiguration: Boolean;
   protected
     function GetSectionNode(Section: string; var ResultNode: IXMLNode;
       AllowCreate: Boolean): Boolean;
@@ -29,6 +30,7 @@ type
     procedure WriteInteger(const Section, Key: string; Value: Integer); overload;
     procedure WriteString(const Section, Key, Value: string); overload;
     property ConfigID: string read fConfigID;
+    property FirstConfiguration: Boolean read fFirstConfiguration;
     property LoadedFileName: TFileName read fLoadedFileName;
   end;
   
@@ -44,6 +46,7 @@ constructor TXmlConfigurationFile.Create(const FileName: TFileName;
 begin
   CoInitialize(nil);
   fLoadedFileName := FileName;
+  fFirstConfiguration := not FileExists(LoadedFileName);
   fConfigID := ConfigID;
   InitDocument;
 end;
@@ -95,7 +98,7 @@ begin
   end;
 
   // Loading the current file
-  if FileExists(LoadedFileName) then begin
+  if not FirstConfiguration then begin
     XMLDocument.LoadFromFile(LoadedFileName);
 
     // Checking the root

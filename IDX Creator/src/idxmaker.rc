@@ -3,7 +3,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
 
 1 VERSIONINFO
  FILEVERSION 1,1,0,0
- PRODUCTVERSION 2,2,0,47
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS 0x4L
@@ -21,8 +21,8 @@ BEGIN
             VALUE "LegalCopyright", "© Copyleft 2002-2009\0"
             VALUE "LegalTrademarks", "Shenmue is copyrighted SEGA © 1999, 2001\0"
             VALUE "OriginalFilename", "idxmaker.exe\0"
-            VALUE "ProductName", "Shenmue Translation Pack\0"
-            VALUE "ProductVersion", "2.2.0.47\0"
+            VALUE "ProductName", "IDX Creator\0"
+            VALUE "ProductVersion", "1.1\0"
             VALUE "Comments", "http://sbibuilder.shorturl.com/\0"
         END
     END
