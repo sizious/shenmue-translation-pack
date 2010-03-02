@@ -43,7 +43,6 @@ type
     Massextraction1: TMenuItem;
     N3: TMenuItem;
     SPRCreator1: TMenuItem;
-    N4: TMenuItem;
     Savexmllist1: TMenuItem;
     Help1: TMenuItem;
     About1: TMenuItem;
@@ -72,6 +71,7 @@ type
     Closeselectedfile2: TMenuItem;
     Extractselectedfiles2: TMenuItem;
     Extractallfiles2: TMenuItem;
+    N5: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Openfiles1Click(Sender: TObject);
