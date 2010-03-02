@@ -1,0 +1,68 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                        _____________________________________________________
+ __| Shenmue IPAC Browser |_____________________________________________________
+
+  Shenmue IPAC Browser est un logiciel libre qui permet d'explorer et de 
+  modifier les données contenues dans les fichiers PKS/PKF/BIN de Shenmue. La
+  section IPAC est une section spéciale permettant de stocker des données, un
+  peu comme le format d'archive ZIP.
+ 
+  Les jeux supportés sont:
+    - What's Shenmue (DC)
+    - Shenmue I (DC)
+    - Shenmue II (DC / XBOX)
+
+  Cet éditeur peut être utile pour remplacer certaines entrées contenues dans 
+  la section IPAC des fichiers de données de Shenmue.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+ 
+  Les fichiers PKS/PKF/BIN peuvent être localisés dans divers dossiers.
+  Seulement les fichiers contenant une section IPAC non vide peuvent être 
+  édités dans ce logiciel. L'outil supporte le glisser-déposer, l'association
+  avec l'Explorateur Windows ou le passage de paramètres via la ligne de
+  commande.  
+  
+  Vous pouvez importer/exporter des données depuis/vers le fichier de données
+  du jeu, voir les informations sur ces fichiers et bien plus.
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône "Package" a été créée par Umut Pulatk.
+  
+  Cet outil contient une version embarquée de GZip écrit par Jean-loup Gailly
+  et Mark Adler.
+  
+  Pour les crédits complets, rendez-vous dans la boîte de dialogue "A propos".
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+ _____________________________________________________________________[ FIN ]___
