@@ -9,12 +9,12 @@ uses
   charsutils in 'engine\charsutils.pas',
   subutils in 'engine\subutils.pas',
   about in 'about.pas' {frmAbout},
-  tools in 'tools.pas',
   systools in '..\..\Common\systools.pas',
   oldskool_font_mapper in '..\..\Common\Preview\src\oldskool_font_mapper.pas',
   oldskool_font_vcl in '..\..\Common\Preview\src\oldskool_font_vcl.pas',
   viewer in '..\..\Common\Preview\src\viewer.pas' {frmSubsPreview},
-  viewer_intf in '..\..\Common\Preview\src\viewer_intf.pas';
+  viewer_intf in '..\..\Common\Preview\src\viewer_intf.pas',
+  uitools in '..\..\Common\uitools.pas';
 
 {$R *.res}
 

@@ -698,13 +698,17 @@ begin
     end;
 
     //Writing subtitle text (no accentuated characters support)
-    if SrfEntry.Editable then begin
+(*    if SrfEntry.Editable then begin
       WriteSubtitle(F, SrfEntry);
     end
     else begin
       intBuf := 4;
       BlockWrite(F, intBuf, _SizeOf_Integer);
-    end;
+    end;*)
+
+(* PATCHED BY SiZiOUS --- TEST MUST BE DONE TO KNOW IF IT FAILS THE PROGRAM! *)
+    WriteSubtitle(F, SrfEntry);
+
 
     //Writing data
     CopyMemToFile(SrfEntry.sData, F);
@@ -769,9 +773,12 @@ begin
     BlockWrite(F, Pointer(SrfEntry.sName)^, Length(SrfEntry.sName));
 
     //Writing subtitle (no accentuated characters support)
-    if SrfEntry.Editable then begin
+(*    if SrfEntry.Editable then begin
       WriteSubtitle(F, SrfEntry);
-    end;
+    end; *)
+
+(* PATCHED BY SiZiOUS --- TEST MUST BE DONE TO KNOW IF IT FAILS THE PROGRAM! *)
+    WriteSubtitle(F, SrfEntry);
 
     //Writing data
     CopyMemToFile(SrfEntry.sData, F);
