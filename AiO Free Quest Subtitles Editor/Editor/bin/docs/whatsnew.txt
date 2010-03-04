@@ -4,14 +4,28 @@
              |   ---|     |  _  |     |  _  |  -__|__ --|
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
-___                             _______________________________________________
-___| Version 2.4.1: 2010-02-13 |_______________________________________________
+___                           __________________________________________________
+___| Version 2.5: 2010-03-04 |__________________________________________________
+
+ADDED:
+- Added a column containing the original subtitles (Thanks Shendream)
+
+FIXED:
+- Small bug in the Batch Import Subtitles, the XML source directory
+  wasn't set correctly (Thanks Shendream)
+- Little UI bug in the NPC Faces Extractor (Thanks Hiei-)
+- Little bug in the SCNF Editor (v3.3.8) when importing subtitles.
+- Really little bug in the Shenmue Subtitles Previewer.
+- The View menu was re-organized.
+- Code cleanup.
+___                             ________________________________________________
+___| Version 2.4.1: 2010-02-13 |________________________________________________
 
 FIXED:
 - Fixed a small bug in the NPC Faces Extractor: The radiobuttons labels were 
   empty (Thanks kogami-san).
-___                           _________________________________________________
-___| Version 2.4: 2010-02-09 |_________________________________________________
+___                           __________________________________________________
+___| Version 2.4: 2010-02-09 |__________________________________________________
 
 ADDED:
 - New powerful function: The Subtitles Corrector.
@@ -51,15 +65,15 @@ FIXED:
 - Fixed a small bug disabling the "Decode subtitles" option in rare cases.
 - About box was reviewed (new credits, and more).
 - Some code clean-up.
-___                           _________________________________________________
-___| Version 2.3: 2010-01-14 |_________________________________________________
+___                           __________________________________________________
+___| Version 2.3: 2010-01-14 |__________________________________________________
 
 FIXED:
 - Shenmue Subtitles Viewer: "-", "Ó", "ó", "Ú", "ú" characters added (Thanks 
   IlDucci)
 - The "Browse directory" context menu enabled/disabled bug was fixed.
-___                           _________________________________________________
-___| Version 2.2: 2009-09-14 |_________________________________________________
+___                           __________________________________________________
+___| Version 2.2: 2009-09-14 |__________________________________________________
     
 ADDED:
 - New feature added: "Multi-Translation". This is based on the old 
@@ -73,8 +87,8 @@ FIXED:
   Multi-Translation / Global-Translation.
 - Global-Translation must be fixed... it doesn't sort items now.
 
-___                           _________________________________________________
-___| Version 2.1: 2009-08-29 |_________________________________________________
+___                           __________________________________________________
+___| Version 2.1: 2009-08-29 |__________________________________________________
 
 ADDED:
 - Powerful and optimized Multi-Translation feature. Entierly rewritten from 
@@ -102,8 +116,8 @@ FIXED:
 - Too many things fixed to be listed here. The application is ready to become 
   the FINAL one!
 
-___                           _________________________________________________
-___| Version 2.0: 2009-04-01 |_________________________________________________
+___                           __________________________________________________
+___| Version 2.0: 2009-04-01 |__________________________________________________
 
 ADDED:
 - Added the support for Shenmue I and What's Shenmue.
@@ -120,3 +134,9 @@ FIXED:
 - Properly hacking method implemented (all save bugs are fixed).
 - Fixed a problem when reading config.xml for retrieving previous 
   "scan directory" selected.
+___                            _________________________________________________
+___| Version 1.02: 2008-??-?? |_________________________________________________
+
+DON'T USE THESE VERSIONS.
+
+ 

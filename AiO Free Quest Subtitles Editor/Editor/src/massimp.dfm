@@ -41,7 +41,7 @@ object frmMassImport: TfrmMassImport
     object Label1: TLabel
       Left = 7
       Top = 15
-      Width = 346
+      Width = 329
       Height = 26
       Caption = 
         'XML subtitles files must be the same name as PAKS files but with' +

@@ -16,7 +16,6 @@ uses
   charscnt in 'engine\charscnt.pas',
   charslst in 'engine\charslst.pas',
   multiscan in 'engine\multitrd\multiscan.pas',
-  multitrad in 'engine\multitrd\multitrad.pas',
   fileinfo in 'fileinfo.pas' {frmFileInfo},
   fileslst in 'engine\fileslst.pas',
   massimp in 'massimp.pas' {frmMassImport},
@@ -50,7 +49,8 @@ uses
   viewer_intf in '..\..\..\Common\Preview\src\viewer_intf.pas',
   oldskool_font_mapper in '..\..\..\Common\Preview\src\oldskool_font_mapper.pas',
   oldskool_font_vcl in '..\..\..\Common\Preview\src\oldskool_font_vcl.pas',
-  viewer in '..\..\..\Common\Preview\src\viewer.pas' {frmSubsPreview};
+  viewer in '..\..\..\Common\Preview\src\viewer.pas' {frmSubsPreview},
+  uitools in '..\..\..\Common\uitools.pas';
 
 {$R *.res}
 
@@ -73,7 +73,6 @@ begin
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmFileInfo, frmFileInfo);
-  Application.CreateForm(TfrmSubsPreview, frmSubsPreview);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

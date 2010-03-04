@@ -6,25 +6,23 @@ unit utils;
 interface
 
 uses
-  Windows, SysUtils, Variants, ShellApi, ComCtrls;
+  Windows, SysUtils;
 
+function GetConfigFileName: TFileName;
+function GetPreviousSelectedPathFileName: TFileName;
+function GetWorkingTempDirectory: TFileName;
 procedure SaveConfig;
 function LoadConfig: Boolean;
 
-procedure ShellOpenPropertiesDialog(FileName: TFileName);
-function GetConfigFileName: TFileName;
-function GetPreviousSelectedPathFileName: TFileName;
-function FindNode(Node: TTreeNode; Text: string): TTreeNode;
-procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 function WrapStr: string;
-function GetWorkingTempDirectory: TFileName;
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Main, Warning, VistaUI, SysTools;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main, Warning, VistaUI,
+  SysTools;
 
 const
   WORKING_TEMP_DIR = 'FQEditor';
@@ -122,10 +120,11 @@ begin
     WriteXMLNode(XMLDoc, 'directory', frmMain.SelectedDirectory);
     WriteXMLNode(XMLDoc, 'decodesubs', frmMain.EnableCharsMod);
     WriteXMLNode(XMLDoc, 'makebackup', frmMain.MakeBackup);
-    WriteXMLNode(XMLDoc, 'multitranslate', frmMain.MultiTranslation.Active);
+(*    WriteXMLNode(XMLDoc, 'multitranslate', frmMain.MultiTranslation.Active);*)
     WriteXMLNode(XMLDoc, 'rescandirstartup', frmMain.ReloadDirectoryAtStartup);
-    WriteXMLNode(XMLDoc, 'originalsubs', frmMain.EnableOriginalSubtitlesView);
-    WriteXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);    
+    WriteXMLNode(XMLDoc, 'originalsubs', frmMain.EnableOriginalSubtitlesFieldView);
+    WriteXMLNode(XMLDoc, 'warningdisplayed', IsWarningUnderstood);
+    WriteXMLNode(XMLDoc, 'originalsubscol', frmMain.EnableOriginalSubtitlesColumnView);
 
     XMLDoc.SaveToFile(ConfigFileName);
   finally
@@ -183,70 +182,21 @@ begin
       (XMLDoc.DocumentElement.NodeName <> 's2freequestcfg') then Exit;
 
     // Reading config values
-    frmMain.AutoSave := ReadXMLNodeBoolean(XMLDoc, 'autosave');
-    frmMain.MakeBackup := ReadXMLNodeBoolean(XMLDoc, 'makebackup');
-    frmMain.EnableCharsMod := ReadXMLNodeBoolean(XMLDoc, 'decodesubs');
-    frmMain.SelectedDirectory := ReadXMLNodeString(XMLDoc, 'directory');
-    frmMain.MultiTranslation.Active := ReadXMLNodeBoolean(XMLDoc, 'multitranslate');
-    frmMain.ReloadDirectoryAtStartup := ReadXMLNodeBoolean(XMLDoc, 'rescandirstartup');
-    frmMain.EnableOriginalSubtitlesView :=
-      ReadXMLNodeBoolean(XMLDoc, 'originalsubs');
+    with frmMain do begin
+      AutoSave := ReadXMLNodeBoolean(XMLDoc, 'autosave');
+      MakeBackup := ReadXMLNodeBoolean(XMLDoc, 'makebackup');
+      EnableCharsMod := ReadXMLNodeBoolean(XMLDoc, 'decodesubs');
+      SelectedDirectory := ReadXMLNodeString(XMLDoc, 'directory');
+  (*    MultiTranslation.Active := ReadXMLNodeBoolean(XMLDoc, 'multitranslate');*)
+      ReloadDirectoryAtStartup := ReadXMLNodeBoolean(XMLDoc, 'rescandirstartup');
+      EnableOriginalSubtitlesFieldView := ReadXMLNodeBoolean(XMLDoc, 'originalsubs');
+      EnableOriginalSubtitlesColumnView := ReadXMLNodeBoolean(XMLDoc, 'originalsubscol');
+    end;
 
     Result := True;
   finally
     XMLDoc.Active := False;
     XMLDoc := nil;
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-procedure ShellOpenPropertiesDialog(FileName: TFileName);
-var
-  ShellExecuteInfo: TShellExecuteInfo;
-
-begin
-  FillChar(ShellExecuteInfo, SizeOf(ShellExecuteInfo), 0);
-  ShellExecuteInfo.cbSize := SizeOf(ShellExecuteInfo);
-  ShellExecuteInfo.fMask := SEE_MASK_INVOKEIDLIST;
-  ShellExecuteInfo.lpVerb := 'properties';
-  ShellExecuteInfo.lpFile := PChar(FileName);
-  ShellExecuteEx(@ShellExecuteInfo);
-end;
-
-//------------------------------------------------------------------------------
-
-function FindNode(Node: TTreeNode; Text: string): TTreeNode;
-var
-  i: Integer;
-
-begin
-  Result := nil;
-  if not Node.HasChildren then Exit;
-
-  for i := 0 to Node.Count - 1 do
-    if Node.Item[i].Text = Text then begin
-      Result := Node.Item[i];
-      Break;
-    end;
-
-end;
-
-//------------------------------------------------------------------------------
-
-procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
-var
-  P: TPoint;
-
-begin
-  if Index = 0 then begin
-//    ListView.Scroll(0, - MaxInt);
-    ListView.ItemIndex := 0;
-  end else begin
-    ListView.ItemIndex := Index - 1;
-    P := ListView.Selected.Position;
-    ListView.Scroll(0, P.Y);
-    ListView.ItemIndex := Index;
   end;
 end;
 

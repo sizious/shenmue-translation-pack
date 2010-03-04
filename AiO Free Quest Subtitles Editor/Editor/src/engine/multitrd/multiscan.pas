@@ -67,7 +67,7 @@ implementation
 // -----------------------------------------------------------------------------
 
 uses
-  Main, Progress, ScnfEdit, Utils, Common, IconsUI;
+  Main, Progress, ScnfEdit, Common, IconsUI, UITools;
 
 // -----------------------------------------------------------------------------
 // TMultiTranslationSubtitlesRetriever

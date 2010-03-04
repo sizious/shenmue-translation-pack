@@ -18,6 +18,10 @@
 (*
   Short history:
 
+  3.3.8 (March 4, 2010 @02:15PM)
+    - Fixed a little bug in the ImportFromFile causing a silent exception
+      (little tweak).
+
   3.3.7 (February 9, 2010 @01:33PM)
     - TSection updated. The "UnknowValue" field is in fact the "CharID" field in
       8 bytes (not 4 as I set before). This include TSectionRawBinaryEntry type
@@ -71,8 +75,8 @@ uses
   ;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.3.7';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'February 9, 2010 @01:34PM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.3.8';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'March 4, 2010 @02:15PM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -325,7 +329,7 @@ implementation
 
 uses
   {$IFDEF DEBUG}TypInfo, {$ENDIF}
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants;
 
 {$IFDEF USE_DCL}
 
@@ -656,7 +660,9 @@ begin
           xmlSubCode := '';
         end;
         try
-          xmlSubtitle := LoopNode.NodeValue;
+          xmlSubtitle := '';
+          if not VarIsNull(LoopNode.NodeValue) then
+            xmlSubtitle := LoopNode.NodeValue;
         except
           xmlSubtitle := '';
         end;
