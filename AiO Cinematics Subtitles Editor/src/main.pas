@@ -23,7 +23,7 @@ uses
   JvBrowseFolder, Viewer_Intf, ShellApi;
 
 const
-  COMPIL_DATE_TIME = 'February 9, 2010 @11:52AM';
+  COMPIL_DATE_TIME = 'March 4, 2010 @06:45PM';
 
 type
   TfrmMain = class(TForm)
@@ -144,7 +144,7 @@ var
   Previewer: TSubtitlesPreviewWindow;
   
 implementation
-uses charsutils, subutils, tools, about;
+uses charsutils, subutils, about, UITools;
 {$R *.dfm}
 
 function TfrmMain.MsgBox(const Text: string; const Caption: string; Flags: Integer): Integer;
@@ -326,19 +326,21 @@ begin
     editChId.Text := '(no name)';
   end;
 
-  if SrfEntry.Editable then begin
+(* PATCHED BY SiZiOUS --- TEST MUST BE DONE TO KNOW IF IT FAILS THE PROGRAM! *)
+//  if SrfEntry.Editable then begin
+    memoLineCnt.Clear;
     memoText.Text := SpecialDecodeText(SrfEntry.Text, False);
     memoText.Enabled := True;
     mOldSub.Text := memoText.Text;
     fNoEdit := False;
     CountChars(memoText.Text);
     Previewer.Update(memoText.Text);
-  end
+(*  end
   else begin
     memoText.Text := 'No editable subtitle...';
     memoText.Enabled := False;
     memoLineCnt.Clear;
-  end;
+  end;*)
 end;
 
 procedure TfrmMain.PostImport;
@@ -618,7 +620,7 @@ begin
   MenuActivation(False);
   SetModified(False);
   ClearInfos;
-  Caption := Application.Title + ' v' + GetShortStringVersion;
+  Caption := Application.Title + ' v' + GetApplicationVersion(LANG_ENGLISH, SUBLANG_ENGLISH_CAN);
 //  Application.Title := Caption;
 
   Previewer := TSubtitlesPreviewWindow.Create(DataDir + 'bmpfont\');

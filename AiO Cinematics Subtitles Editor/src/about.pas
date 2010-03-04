@@ -36,7 +36,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Main, Tools;
+  Main, UITools;
 
 procedure TfrmAbout.bCloseClick(Sender: TObject);
 begin
@@ -46,7 +46,7 @@ end;
 procedure TfrmAbout.FormCreate(Sender: TObject);
 begin
   Caption := Caption + ' ' + Application.Title + '...';
-  lAppVersion.Caption := GetFullStringVersion;
+  lAppVersion.Caption := GetApplicationVersion(LANG_ENGLISH, SUBLANG_ENGLISH_CAN);
 end;
 
 end.
