@@ -2,14 +2,20 @@ unit uitools;
 
 interface
 
+uses
+  Windows, SysUtils, Forms, ComCtrls;
+
+function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion(LangID, SubLangID: Byte): string;
 function GetShortApplicationTitle: string;
+procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
+procedure ShellOpenPropertiesDialog(FileName: TFileName);
 
 implementation
 
 uses
-  Windows, SysUtils, Forms;
-
+  ShellApi;
+  
 //------------------------------------------------------------------------------
 
 function GetShortApplicationTitle: string;
@@ -75,6 +81,57 @@ end;
 function GetApplicationVersion(LangID, SubLangID: Byte): string;
 begin
   Result := ExtractApplicationVersion(MakeLangID(LangID, SubLangID));
+end;
+
+//------------------------------------------------------------------------------
+
+function FindNode(Node: TTreeNode; Text: string): TTreeNode;
+var
+  i: Integer;
+
+begin
+  Result := nil;
+  if not Node.HasChildren then Exit;
+
+  for i := 0 to Node.Count - 1 do
+    if Node.Item[i].Text = Text then begin
+      Result := Node.Item[i];
+      Break;
+    end;
+
+end;
+
+//------------------------------------------------------------------------------
+
+procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
+var
+  P: TPoint;
+
+begin
+  if Index = 0 then begin
+//    ListView.Scroll(0, - MaxInt);
+    ListView.ItemIndex := 0;
+  end else begin
+    ListView.ItemIndex := Index - 1;
+    P := ListView.Selected.Position;
+    ListView.Scroll(0, P.Y);
+    ListView.ItemIndex := Index;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure ShellOpenPropertiesDialog(FileName: TFileName);
+var
+  ShellExecuteInfo: TShellExecuteInfo;
+
+begin
+  FillChar(ShellExecuteInfo, SizeOf(ShellExecuteInfo), 0);
+  ShellExecuteInfo.cbSize := SizeOf(ShellExecuteInfo);
+  ShellExecuteInfo.fMask := SEE_MASK_INVOKEIDLIST;
+  ShellExecuteInfo.lpVerb := 'properties';
+  ShellExecuteInfo.lpFile := PChar(FileName);
+  ShellExecuteEx(@ShellExecuteInfo);
 end;
 
 //------------------------------------------------------------------------------

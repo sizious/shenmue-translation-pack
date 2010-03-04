@@ -264,7 +264,7 @@ end; *)
 
 procedure TfrmMultiTranslation.InitMultiView(const FileName: TFileName);
 begin
-  if frmMain.EnableOriginalSubtitlesView then
+  if frmMain.EnableOriginalSubtitlesFieldView then
     lOriginalSub.Caption := 'Original text:'
   else
     lOriginalSub.Caption := 'Old text:';
@@ -349,7 +349,7 @@ end;
 
 procedure TfrmMultiTranslation.UpdateOldSubtitleField;
 begin
-  if frmMain.EnableOriginalSubtitlesView then
+  if frmMain.EnableOriginalSubtitlesFieldView then
     mOldSub.Text := OriginalSelectedSubtitleText
   else
     mOldSub.Text := OldSelectedSubtitleText;

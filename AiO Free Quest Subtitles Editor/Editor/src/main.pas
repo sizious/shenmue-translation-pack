@@ -21,16 +21,12 @@ unit main;
 // Uncomment this if you want to release a BETA build
 // {$DEFINE DEBUG_BUILD_RELEASE}
 
-{ Uncomment this to disable the old Multi-Translation and enable the new
-  powerful (and unfinished) Multi-Translation function }
-{$DEFINE OLD_MULTI_TRANSLATION_STYLE}
-
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Menus, SCNFEdit, SCNFUtil, MultiScan, ExtCtrls, ScnfScan,
-  MultiTrad, JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
+  JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
   AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf, TextData,
   ImgList, ViewUpd, Progress, TextDB;
 
@@ -40,13 +36,13 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.4.1' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.5' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'February 13, 2010 @03:04PM';
+  COMPIL_DATE_TIME = 'March 4, 2010 @06:05PM';
 
 type
   TGlobalTranslationModule = class;
-  TMultiTranslationModule = class;
+  (*TMultiTranslationModule = class;*)
   
   TfrmMain = class(TForm)
     MainMenu: TMainMenu;
@@ -175,17 +171,19 @@ type
     miCheckForUpdate: TMenuItem;
     miMultiTranslate: TMenuItem;
     miDEBUG: TMenuItem;
-    miDumpMultiTranslationTextData: TMenuItem;
-    DumpMultiTranslationCacheList1: TMenuItem;
+    miDEBUG_DumpMultiTranslationTextData: TMenuItem;
+    miDEBUG_DumpMultiTranslationCacheList: TMenuItem;
     miOptions: TMenuItem;
     miReloadDirAtStartup: TMenuItem;
-    InitTextDatabase1: TMenuItem;
+    miDEBUG_InitTextDatabase: TMenuItem;
     N17: TMenuItem;
-    TextDatabaseCorrector1: TMenuItem;
+    miDEBUG_TextDatabaseCorrector: TMenuItem;
     miShowOriginalText: TMenuItem;
     miBrowseDirectory2: TMenuItem;
     N18: TMenuItem;
-    GenerateTestException1: TMenuItem;
+    miDEBUG_GenerateTestException: TMenuItem;
+    N19: TMenuItem;
+    miOriginalColumnList: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -245,14 +243,15 @@ type
     procedure miCheckForUpdateClick(Sender: TObject);
     procedure miMultiTranslateClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure miDumpMultiTranslationTextDataClick(Sender: TObject);
-    procedure DumpMultiTranslationCacheList1Click(Sender: TObject);
+    procedure miDEBUG_DumpMultiTranslationTextDataClick(Sender: TObject);
+    procedure miDEBUG_DumpMultiTranslationCacheListClick(Sender: TObject);
     procedure miReloadDirAtStartupClick(Sender: TObject);
-    procedure InitTextDatabase1Click(Sender: TObject);
-    procedure TextDatabaseCorrector1Click(Sender: TObject);
+    procedure miDEBUG_InitTextDatabaseClick(Sender: TObject);
+    procedure miDEBUG_TextDatabaseCorrectorClick(Sender: TObject);
     procedure miShowOriginalTextClick(Sender: TObject);
-    procedure GenerateTestException1Click(Sender: TObject);
+    procedure miDEBUG_GenerateTestExceptionClick(Sender: TObject);
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
+    procedure miOriginalColumnListClick(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -269,12 +268,15 @@ type
     fSubtitleSelected: Integer;
     fCanEnableCharsMod1: Boolean;
     fCanEnableCharsMod2: Boolean;
-    fMultiTranslation: TMultiTranslationModule;
+(*    fMultiTranslation: TMultiTranslationModule;*)
     fReloadDirectoryAtStartup: Boolean;
     fPreviousLoadedGameVersion: TGameVersion;
     fOldSelectedSubtitleText: string;
     fOriginalSelectedSubtitleText: string;
     fEnableOriginalSubtitlesView: Boolean;
+    fOriginalSubtitlesColumn: TListColumn;
+    fEnableOriginalSubtitlesColumnView: Boolean;
+    fOriginalSubtitlesColumnWidth: Integer;
 //    fWrapStr: string;
     procedure SetFileOperationMenusItemEnabledState(const State: Boolean);
     procedure SetAutoSave(const Value: Boolean);
@@ -287,10 +289,12 @@ type
     procedure SetEnableCharsMod(const Value: Boolean);
     procedure SetReloadDirectoryAtStartup(const Value: Boolean);
     procedure SetEnableOriginalSubtitlesView(const Value: Boolean);
+    procedure SetEnableOriginalSubtitlesColumnView(const Value: Boolean);
   protected
     procedure CheckIfSubLengthIsCorrect(const Value: Integer; Field: TEdit);
     procedure FreeApplication;
     procedure InitApplicationReleaseType;
+    procedure InitOriginalSubtitlesColumn;
     procedure PreviewWindowClosedEvent(Sender: TObject);
     procedure SetModifiedIndicator(State: Boolean);
     procedure SetApplicationHint(const HintStr: string);
@@ -345,8 +349,8 @@ type
     // If we must use this feature in the editor or not:
     property EnableCharsMod: Boolean read fEnableCharsMod write SetEnableCharsMod;
 
-    property MultiTranslation: TMultiTranslationModule read fMultiTranslation
-      write fMultiTranslation;
+(*    property MultiTranslation: TMultiTranslationModule read fMultiTranslation
+      write fMultiTranslation;*)
 //    property WorkFilesList: TFilesList read fWorkFilesList write fWorkFilesList;
 
     // Properties for Text Correction DataBase (Original text from the game)
@@ -356,12 +360,20 @@ type
       read fOriginalSelectedSubtitleText write fOriginalSelectedSubtitleText; // ORIGINAL text from AM2 developers
     property OldSelectedSubtitleText: string
       read fOldSelectedSubtitleText write fOldSelectedSubtitleText; // PREVIOUS text from the user (the translator)...
-    property EnableOriginalSubtitlesView: Boolean
-      read fEnableOriginalSubtitlesView write SetEnableOriginalSubtitlesView;      
+
+    // Original Subtitles View
+    property EnableOriginalSubtitlesFieldView: Boolean
+      read fEnableOriginalSubtitlesView write SetEnableOriginalSubtitlesView;
+    property EnableOriginalSubtitlesColumnView: Boolean
+      read fEnableOriginalSubtitlesColumnView write SetEnableOriginalSubtitlesColumnView;
+    property OriginalSubtitlesColumn: TListColumn read
+      fOriginalSubtitlesColumn write fOriginalSubtitlesColumn;
+    property OriginalSubtitlesColumnWidth: Integer read fOriginalSubtitlesColumnWidth
+      write fOriginalSubtitlesColumnWidth;
   end;
 
   // This class implements the Multi-Translation function.
-  TCurrentFileMultiTranslationModule = class(TObject)
+(*  TCurrentFileMultiTranslationModule = class(TObject)
   private
     fCacheIndexList: TList;
     fOwner: TMultiTranslationModule;
@@ -434,7 +446,7 @@ type
     { This object stores every information about the Multi-Translation. }
     property TextDataList: TMultiTranslationTextData read fTextDataList
       write fTextDataList;
-  end;
+  end;*)
 
   // This class implements the Global-Translation view.
   TGlobalTranslationModule = class(TObject)
@@ -505,7 +517,7 @@ var
   SCNFEditor: TSCNFEditor;                            // enable to edit any valid SCNF file: this's the main class of this application
 
   MultiTranslationSubsRetriever: TMultiTranslationSubtitlesRetriever; // enable to retrieve all subtitles from loaded file list
-  MultiTranslationUpdater: TMultiTranslationExecThread;                  // enable to multi-translate subtitles
+//  MultiTranslationUpdater: TMultiTranslationExecThread;                  // enable to multi-translate subtitles
   MultiTranslationViewUpdater: TMTViewUpdater;
 
   BatchSubsExporter: TSubsMassExporterThread;         // enable to batch export subtitles
@@ -524,10 +536,9 @@ implementation
 
 uses
   {$IFDEF DEBUG} TypInfo, DBLzma, {$ENDIF}
-  {$IFDEF OLD_MULTI_TRANSLATION_STYLE} MultiTrd, {$ENDIF}
-  SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
+  MultiTrd, SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,
-  BugsMgr;
+  BugsMgr, UITools;
 
 {$R *.dfm}
 
@@ -612,8 +623,8 @@ begin
   frmMassImport := TfrmMassImport.Create(Application);
   try
     frmMassImport.ShowModal;
-    if frmMassImport.Success and MultiTranslation.Active then
-      MultiTranslation.Prepare(True);
+    (*if frmMassImport.Success and MultiTranslation.Active then
+      MultiTranslation.Prepare(True);*)
   finally
     frmMassImport.Free;
   end;
@@ -629,7 +640,7 @@ var
   CanDo: Integer;
 
 begin
-  if MultiTranslation.Active then begin
+  (*if MultiTranslation.Active then begin
     CanDo := MsgBox(
       'You are currently using the Multi-Translation function and it can be used with' + WrapStr
       + 'the Global-Translation function. Are you sure to continue?' + WrapStr +
@@ -638,7 +649,7 @@ begin
       'Multi-Translation / Global-Translation uncompatiblity',
       MB_ICONWARNING + MB_OKCANCEL + MB_DEFBUTTON2);
     if CanDo = IDCANCEL then Exit;
-  end;
+  end;*)
 
   CanDo := MsgBox(
     'This function will build the Global-Translation list from the actual loaded files. ' + WrapStr +
@@ -648,7 +659,7 @@ begin
     MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
   if CanDo = IDNO then Exit;
 
-  MultiTranslation.Disabled := True;
+  (*MultiTranslation.Disabled := True;*)
   GlobalTranslation.Reset;
   RetrieveSubtitles(GlobalTranslation.TextDataList, pmGlobalScan, False);
 end;
@@ -680,7 +691,7 @@ begin
   GlobalTranslation.Reset;
 
   // Re-enable Multi-Translation if needeed
-  MultiTranslation.Disabled := False;
+  (*MultiTranslation.Disabled := False;*)
 end;
 
 procedure TfrmMain.bMTCollapseAllClick(Sender: TObject);
@@ -743,39 +754,53 @@ end;
 
 procedure TfrmMain.InitApplicationReleaseType;
 begin
-{$IFDEF OLD_MULTI_TRANSLATION_STYLE}
-  MultiTranslation.Active := False;
   miMultiTranslate.Caption := 'Multi-translation...';
   miMultiTranslate.Hint := 'Open the Multi-translation module.';
-{$ENDIF}
 end;
 
-procedure TfrmMain.InitTextDatabase1Click(Sender: TObject);
+procedure TfrmMain.InitOriginalSubtitlesColumn;
+begin
+  // Preparing Original Subtitles Column
+  if EnableOriginalSubtitlesColumnView then begin
+    if not Assigned(OriginalSubtitlesColumn) then begin
+      OriginalSubtitlesColumn := lvSubsSelect.Columns.Add;
+      OriginalSubtitlesColumn.Caption := 'Original';
+      OriginalSubtitlesColumn.Width := OriginalSubtitlesColumnWidth;
+    end;
+  end else
+    if Assigned(OriginalSubtitlesColumn) then begin
+      OriginalSubtitlesColumnWidth := OriginalSubtitlesColumn.Width;
+      lvSubsSelect.Columns.Delete(OriginalSubtitlesColumn.Index);
+      OriginalSubtitlesColumn := nil;
+    end;
+end;
+
+procedure TfrmMain.miDEBUG_InitTextDatabaseClick(Sender: TObject);
 begin
 {$IFDEF DEBUG} ShowMessage(GetTextDatabaseIndexFile(gvShenmue2)); {$ENDIF}
 end;
 
-procedure TfrmMain.DumpMultiTranslationCacheList1Click(Sender: TObject);
+procedure TfrmMain.miDEBUG_DumpMultiTranslationCacheListClick(Sender: TObject);
 {$IFDEF DEBUG}
-var
-  FName: string;
+(*var
+  FName: string;*)
 
 begin
-  FName := ExtractFilePath(application.ExeName) + IntToHex(Random($FFFFFFF), 8) + '.csv';
-  MultiTranslation.CurrentLoadedFile.DumpCacheList(FName);
+  (*FName := ExtractFilePath(application.ExeName) + IntToHex(Random($FFFFFFF), 8) + '.csv';
+  MultiTranslation.CurrentLoadedFile.DumpCacheList(FName);*)
 {$ELSE}
 begin
 {$ENDIF}
 end;
 
-procedure TfrmMain.miDumpMultiTranslationTextDataClick(Sender: TObject);
+procedure TfrmMain.miDEBUG_DumpMultiTranslationTextDataClick(Sender: TObject);
 {$IFDEF DEBUG}
-var
-  FName: string;
+(*var
+  FName: string;*)
 
 begin
-  FName := ExtractFilePath(Application.ExeName) + IntToHex(Random($FFFFFFF), 8) + '.csv';
-  MultiTranslation.TextDataList.SaveDump(FName);
+  (*FName := ExtractFilePath(Application.ExeName) + IntToHex(Random($FFFFFFF), 8) + '.csv';
+  MultiTranslation.TextDataList.SaveDump(FName);*)
 {$ELSE}
 begin
 {$ENDIF}
@@ -954,7 +979,9 @@ begin
   // Initialize the Text Corrector Database
   PreviousLoadedGameVersion := gvUndef;
   TextDatabaseCorrector := TTextDatabaseCorrector.Create;
-  EnableOriginalSubtitlesView := False;
+  EnableOriginalSubtitlesFieldView := False;
+  EnableOriginalSubtitlesColumnView := False;
+  OriginalSubtitlesColumnWidth := lvSubsSelect.Columns[2].Width;
   
 //  WorkFilesList := TFilesList.Create;
 
@@ -962,7 +989,7 @@ begin
   // This module is here to implements the "Global" tab.
   GlobalTranslation := TGlobalTranslationModule.Create;
 
-  MultiTranslation := TMultiTranslationModule.Create;
+  (*MultiTranslation := TMultiTranslationModule.Create;*)
 
   // Create the Subtitles Previewer
   Previewer := TSubtitlesPreviewWindow.Create(GetBitmapFontDatasDirectory);
@@ -1053,7 +1080,7 @@ begin
   GlobalTranslation.Free;
 
   // Destroying Multi-Translation data list
-  MultiTranslation.Free;
+  (*MultiTranslation.Free;*)
 
   SCNFEditor.Free;
 //  WorkFilesList.Free;
@@ -1109,7 +1136,7 @@ begin
   // FreeTreeViewUI;
 end;
 
-procedure TfrmMain.GenerateTestException1Click(Sender: TObject);
+procedure TfrmMain.miDEBUG_GenerateTestExceptionClick(Sender: TObject);
 {$IFDEF DEBUG}
 begin
   raise EDivByZero.Create('TEST EXCEPTION MESSAGE COOL!');
@@ -1220,6 +1247,9 @@ var
   CharsList: TSubsCharsList;
 
 begin
+  InitOriginalSubtitlesColumn;
+
+  // Filling the ListView  
   if UpdateView then begin
 
     // Exits: we have nothing to update
@@ -1265,6 +1295,12 @@ begin
 //        SubText := StringReplace(SCNFEditor.Subtitles[i].Text, #13#10, '<br>', [rfReplaceAll]);
         SubText := SCNFEditor.Subtitles[i].Text;
         SubItems.Add(SubText);
+
+        // adding text correction subs
+        if TextDatabaseCorrector.Loaded then
+          SubItems.Add(TextDatabaseCorrector.Subtitles[i].Text)
+        else
+          SubItems.Add('');
       end;
     end;
 
@@ -1434,8 +1470,8 @@ begin
 
   // Build Multi-Translation cache index list to know where to look when
   // Multi-translating...
-  if MultiTranslation.Active then
-    MultiTranslation.CurrentLoadedFile.BuildCache;
+  (*if MultiTranslation.Active then
+    MultiTranslation.CurrentLoadedFile.BuildCache;*)
 
 //  SetStatus('Ready');
   SetStatusReady;
@@ -1486,7 +1522,9 @@ begin
 end;
 
 procedure TfrmMain.miMultiTranslateClick(Sender: TObject);
-{$IFDEF OLD_MULTI_TRANSLATION_STYLE}
+(*var
+  CanDo: Integer;*)
+
 begin
   frmMultiTranslation := TfrmMultiTranslation.Create(Application);
   try
@@ -1494,13 +1532,8 @@ begin
   finally
     frmMultiTranslation.Free;
   end;
-{$ELSE}
 
-var
-  CanDo: Integer;
-
-begin
-  if FileModified and not MultiTranslation.Active then begin
+  (*if FileModified and not MultiTranslation.Active then begin
     CanDo := MsgBox('You are currently editing the view. Enabling this feature'
       + WrapStr + 'will save the current modifications.' + WrapStr
       + 'Do you agree ?', 'Multi-Translation activation', MB_ICONWARNING
@@ -1511,8 +1544,7 @@ begin
     end;
   end;
 
-  MultiTranslation.Active := not MultiTranslation.Active;
-{$ENDIF}
+  MultiTranslation.Active := not MultiTranslation.Active;*)
 end;
 
 procedure TfrmMain.miSubsPreviewClick(Sender: TObject);
@@ -1574,10 +1606,10 @@ begin
     { Multi-Translation Linked Subtitle Process
       In case if the same file has multiple occurences of the same subtitle.
       This procedure is here to "multi-translate" in the same file, in live. }
-    with MultiTranslation do
+    (*with MultiTranslation do
       if Active then begin
         CurrentLoadedFile.UpdateLinkedSubtitles(SubtitleSelected, NewSubtitle);
-    end;
+    end;*)
   end;
 
   // Update the chars count fields
@@ -1640,6 +1672,11 @@ begin
   end;
 end;
 
+procedure TfrmMain.miOriginalColumnListClick(Sender: TObject);
+begin
+  EnableOriginalSubtitlesColumnView := not EnableOriginalSubtitlesColumnView;
+end;
+
 procedure TfrmMain.pcSubsChange(Sender: TObject);
 var
   OldSubtitleSelected: Integer;
@@ -1699,7 +1736,7 @@ begin
   Clear;
   fFileListSelectedIndex := -1;
   lbFilesList.Clear;
-  MultiTranslation.Clear;
+  (*MultiTranslation.Clear;*)
   miClearFilesList.Enabled := False;
   miClearFilesList2.Enabled := False;
   miBatchImportSubs.Enabled := False;
@@ -1768,8 +1805,8 @@ begin
     frmFileInfo.LoadFileInfo;
 
     // Applying Multi-Translation
-    if MultiTranslation.Active then
-      MultiTranslation.Apply;
+    (*if MultiTranslation.Active then
+      MultiTranslation.Apply;*)
     
     {$IFDEF DEBUG} WriteLn('Saving file : ', ExtractFileName(SCNFEditor.GetLoadedFileName), #13#10); {$ENDIF}
   end;
@@ -2027,6 +2064,13 @@ begin
   TextDatabaseCorrector.Subtitles.CharsList.Active := Value;
 end;
 
+procedure TfrmMain.SetEnableOriginalSubtitlesColumnView(const Value: Boolean);
+begin
+  fEnableOriginalSubtitlesColumnView := Value;
+  miOriginalColumnList.Checked := Value;
+  InitOriginalSubtitlesColumn;
+end;
+
 procedure TfrmMain.SetEnableOriginalSubtitlesView(const Value: Boolean);
 begin
   fEnableOriginalSubtitlesView := Value;
@@ -2112,10 +2156,10 @@ end;
 
 procedure TfrmMain.miShowOriginalTextClick(Sender: TObject);
 begin
-  EnableOriginalSubtitlesView := not EnableOriginalSubtitlesView; 
+  EnableOriginalSubtitlesFieldView := not EnableOriginalSubtitlesFieldView;
 end;
 
-procedure TfrmMain.TextDatabaseCorrector1Click(Sender: TObject);
+procedure TfrmMain.miDEBUG_TextDatabaseCorrectorClick(Sender: TObject);
 {$IFDEF DEBUG}
 var
   DB: TTextDatabaseCorrector;
@@ -2176,7 +2220,7 @@ end;
 
 procedure TfrmMain.UpdateOldSubtitleField;
 begin
-  if EnableOriginalSubtitlesView then
+  if EnableOriginalSubtitlesFieldView then
     mOldSubEd.Text := OriginalSelectedSubtitleText
   else
     mOldSubEd.Text := OldSelectedSubtitleText;
@@ -2568,7 +2612,7 @@ end;
 // TMultiTranslationModule
 //------------------------------------------------------------------------------
 
-procedure TMultiTranslationModule.Apply;
+(*procedure TMultiTranslationModule.Apply;
 begin
   MultiTranslationUpdater := TMultiTranslationExecThread.Create;
   frmProgress.Mode := pmMultiExec;
@@ -2735,5 +2779,6 @@ begin
       frmMain.lvSubsSelect.Items[SubIndex].SubItems[1] := NewSubtitleValue;
     end;
 end;
+*)
 
 end.

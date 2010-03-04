@@ -248,8 +248,8 @@ object frmMain: TfrmMain
             Caption = 'Code'
           end
           item
-            AutoSize = True
             Caption = 'Subtitle'
+            Width = 196
           end>
         ColumnClick = False
         ReadOnly = True
@@ -264,9 +264,9 @@ object frmMain: TfrmMain
           item
           end
           item
+          end
+          item
           end>
-        ExplicitWidth = 292
-        ExplicitHeight = 127
       end
       object mOldSubEd: TMemo
         Left = 104
@@ -710,7 +710,7 @@ object frmMain: TfrmMain
         ShortCut = 114
         OnClick = miSubsPreviewClick
       end
-      object N12: TMenuItem
+      object N19: TMenuItem
         Caption = '-'
       end
       object miClearDebugLog: TMenuItem
@@ -723,7 +723,26 @@ object frmMain: TfrmMain
         Hint = 'Save the debug history.'
         OnClick = miSaveDebugLogClick
       end
-      object N15: TMenuItem
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object miShowOriginalText: TMenuItem
+        Caption = 'Original text in field'
+        Hint = 
+          'Show untouched original subtitles extracted from the game in the' +
+          ' old text field.'
+        ShortCut = 122
+        OnClick = miShowOriginalTextClick
+      end
+      object miOriginalColumnList: TMenuItem
+        Caption = 'Original column in list'
+        Hint = 
+          'Show an additional column with the original subtitle text in the' +
+          ' view.'
+        ShortCut = 16506
+        OnClick = miOriginalColumnListClick
+      end
+      object N12: TMenuItem
         Caption = '-'
       end
       object miEnableCharsMod: TMenuItem
@@ -733,15 +752,7 @@ object frmMain: TfrmMain
         ShortCut = 117
         OnClick = miEnableCharsModClick
       end
-      object miShowOriginalText: TMenuItem
-        Caption = 'Show original text'
-        Hint = 
-          'Show untouched original subtitles extracted from the game in the' +
-          ' old text field'
-        ShortCut = 122
-        OnClick = miShowOriginalTextClick
-      end
-      object N5: TMenuItem
+      object N15: TMenuItem
         Caption = '-'
       end
       object miBrowseDirectory2: TMenuItem
@@ -836,33 +847,33 @@ object frmMain: TfrmMain
     end
     object miDEBUG: TMenuItem
       Caption = 'DEBUG'
-      object InitTextDatabase1: TMenuItem
+      object miDEBUG_InitTextDatabase: TMenuItem
         Caption = 'InitTextDatabase'
-        OnClick = InitTextDatabase1Click
+        OnClick = miDEBUG_InitTextDatabaseClick
       end
-      object TextDatabaseCorrector1: TMenuItem
+      object miDEBUG_TextDatabaseCorrector: TMenuItem
         Caption = 'Test TextDatabaseCorrector'
-        OnClick = TextDatabaseCorrector1Click
+        OnClick = miDEBUG_TextDatabaseCorrectorClick
       end
       object N17: TMenuItem
         Caption = '-'
       end
-      object miDumpMultiTranslationTextData: TMenuItem
+      object miDEBUG_DumpMultiTranslationTextData: TMenuItem
         Caption = 'Dump Multi-Translation Text Data'
         Enabled = False
-        OnClick = miDumpMultiTranslationTextDataClick
+        OnClick = miDEBUG_DumpMultiTranslationTextDataClick
       end
-      object DumpMultiTranslationCacheList1: TMenuItem
+      object miDEBUG_DumpMultiTranslationCacheList: TMenuItem
         Caption = 'Dump Multi-Translation Cache List'
         Enabled = False
-        OnClick = DumpMultiTranslationCacheList1Click
+        OnClick = miDEBUG_DumpMultiTranslationCacheListClick
       end
       object N18: TMenuItem
         Caption = '-'
       end
-      object GenerateTestException1: TMenuItem
+      object miDEBUG_GenerateTestException: TMenuItem
         Caption = 'Generate Test Exception'
-        OnClick = GenerateTestException1Click
+        OnClick = miDEBUG_GenerateTestExceptionClick
       end
     end
   end

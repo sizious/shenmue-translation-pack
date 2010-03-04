@@ -98,6 +98,10 @@ object frmMultiTranslation: TfrmMultiTranslation
     TabOrder = 3
     object TabSheet1: TTabSheet
       Caption = 'T&ranslator'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         498
         320)
@@ -159,7 +163,7 @@ object frmMultiTranslation: TfrmMultiTranslation
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 1
           OnSelect = cbFilesSelect
         end
@@ -268,6 +272,10 @@ object frmMultiTranslation: TfrmMultiTranslation
     object TabSheet2: TTabSheet
       Caption = '&Debug Log'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         498
         320)

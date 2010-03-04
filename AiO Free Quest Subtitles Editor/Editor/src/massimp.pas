@@ -59,7 +59,7 @@ var
 implementation
 
 uses
-  Main, Math, FilesLst, Utils;
+  Main, Math, FilesLst, UITools, Utils;
   
 {$R *.dfm}
 
@@ -139,7 +139,7 @@ end;
 procedure TfrmMassImport.FileImportedEvent(Sender: TObject;
   TargetFileName, SubsFileName: TFileName; ImportResult: TImportResult);
 begin
-  with Self.lvFiles.Items.Add do begin
+  with lvFiles.Items.Add do begin
     Caption := ExtractFileName(TargetFileName);
     case ImportResult of
       irSuccess           : SubItems.Add('OK');
@@ -151,13 +151,23 @@ begin
                             //end;
     end;
   end;
+  ListViewSelectItem(lvFiles, lvFiles.Items.Count - 1);
 end;
 
 //------------------------------------------------------------------------------
 
 procedure TfrmMassImport.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+(*var
+  CanDo: Integer;
+*)  
 begin
   if Importing then begin
+(*    fBatchSubsImporter.Suspend;
+    CanDo := MsgBox('Are you sure to cancel the import?' + WrapStr
+      + 'Files already imported won''t be undo!', 'Please confirm',
+      MB_OKCANCEL + MB_ICONWARNING);
+    fBatchSubsImporter.Resume;
+    if CanDo = IDCANCEL then Exit; *)
     Aborted := True;
     if Assigned(fBatchSubsImporter) then begin
       fBatchSubsImporter.Terminate;
@@ -174,6 +184,10 @@ procedure TfrmMassImport.FormCreate(Sender: TObject);
 begin
   DoubleBuffered := True;
   ResetForm;
+  if DirectoryExists(frmMain.SelectedDirectory) then begin
+    eDirectory.Text := frmMain.SelectedDirectory;
+    JvBrowseForFolderDialog.Directory := eDirectory.Text;
+  end;
 end;
 
 procedure TfrmMassImport.FormKeyPress(Sender: TObject; var Key: Char);
@@ -214,7 +228,7 @@ begin
   if not Aborted then begin
 
     if FilesImported > 0 then begin
-      if FilesFailure = 0 then
+      if (FilesFailure = 0) then
         Icon := MB_ICONINFORMATION
       else
         Icon := MB_ICONWARNING;
@@ -222,7 +236,7 @@ begin
         + IntToStr(FilesFailure) + ' errornous file(s).', 'Batch Import Results', Icon);
       fSuccess := True;
 
-      if FilesFailure = 0 then
+      if (FilesFailure = 0) then
         Close;
     end else
       MsgBox('No files successfully imported. Check your input folder.',
@@ -241,10 +255,6 @@ begin
   lvFiles.Clear;
   ChangeControlsState(True);
   btnCancel.Enabled := True;
-  if DirectoryExists(frmMain.SelectedDirectory) then begin
-    eDirectory.Text := frmMain.SelectedDirectory;
-    JvBrowseForFolderDialog.Directory := eDirectory.Text;
-  end;
 //  HasFilesAmbigous := False;
 end;
   
