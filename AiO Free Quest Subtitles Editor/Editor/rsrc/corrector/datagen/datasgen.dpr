@@ -2,6 +2,8 @@ program datasgen;
 
 {$APPTYPE CONSOLE}
 
+// Don't forget to undef DEBUG_SCNFEDITOR in scnfedit.pas
+
 uses
   Windows,
   SysUtils,
@@ -14,9 +16,9 @@ uses
   charslst in '..\..\..\src\engine\charslst.pas',
   common in '..\..\..\src\engine\common.pas',
   fileslst in '..\..\..\src\engine\fileslst.pas',
-  npcinfo in '..\..\..\src\engine\npcinfo.pas',
   scnfedit in '..\..\..\src\engine\scnfedit.pas',
-  scnfutil in '..\..\..\src\engine\scnfutil.pas';
+  scnfutil in '..\..\..\src\engine\scnfutil.pas',
+  npcinfo in '..\..\..\src\engine\npc\npcinfo.pas';
 
 const
   OUTPUT_FILE_EXT = '.dbi';

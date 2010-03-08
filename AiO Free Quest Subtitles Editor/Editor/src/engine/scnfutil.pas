@@ -153,6 +153,24 @@ end;
 
 function IsFileValidScnf(const FileName: TFileName): Boolean;
 var
+  ScnfEditorTester: TSCNFEditor;
+
+begin
+  ScnfEditorTester := TSCNFEditor.Create;
+  try
+    try
+      Result := ScnfEditorTester.LoadFromFile(FileName);
+    except
+      Result := False;
+    end;
+  finally
+    ScnfEditorTester.Free;
+  end;
+end;
+
+(*
+function IsFileValidScnf(const FileName: TFileName): Boolean;
+var
   F: File;
   Buf: array[0..4] of Char;
   SectionEntry: TSectionRawBinaryEntry;
@@ -208,6 +226,7 @@ begin
     CloseFile(F);
   end;
 end;
+*)
 
 //------------------------------------------------------------------------------
 
