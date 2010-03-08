@@ -5,6 +5,14 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.6: 2010-03-?? |__________________________________________________
+
+FIXED:
+- Small bug in the SCNF Editor (v3.3.9): some Shenmue PAKS weren't properly
+  opened (Thanks Shendream).
+- Fixed the Text Correction Database for Shenmue 1, it missed some subtitles
+  entries.
+___                           __________________________________________________
 ___| Version 2.5: 2010-03-04 |__________________________________________________
 
 ADDED:

@@ -1,78 +1,104 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'frmMain'
-  ClientHeight = 246
-  ClientWidth = 492
+  Caption = '< Generated Title > // VMU Screen Editor'
+  ClientHeight = 386
+  ClientWidth = 542
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = mmMain
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object lvIpacContent: TJvListView
+  object lvIwadContent: TJvListView
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 331
-    Height = 221
+    Width = 381
+    Height = 361
     Align = alClient
     Columns = <
       item
+        Caption = '#'
+        Width = 20
+      end
+      item
         Caption = 'Name'
-        Width = 100
+        Width = 70
       end
       item
         Caption = 'Offset'
-        Width = 65
+        Width = 60
       end
       item
         Caption = 'Size'
-        Width = 65
+        Width = 60
+      end
+      item
+        Caption = 'Height'
+      end
+      item
+        Caption = 'Width'
       end
       item
         Caption = 'Updated'
-        Width = 70
+        Width = 55
       end>
     ColumnClick = False
     GridLines = True
     ReadOnly = True
     RowSelect = True
+    PopupMenu = pmIwadContent
     TabOrder = 0
     ViewStyle = vsReport
-    ColumnsOrder = '0=100,1=65,2=65,3=70'
+    ColumnsOrder = '6=20,0=70,1=60,2=60,3=50,4=50,5=55'
     HeaderImagePosition = hipRight
     Groups = <>
     ExtendedColumns = <
       item
         HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
       end
       item
         HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
       end
       item
         HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
       end
       item
         HeaderImagePosition = hipRight
       end>
   end
-  object Panel1: TPanel
-    Left = 337
+  object pnlRightCommands: TPanel
+    Left = 387
     Top = 0
     Width = 155
-    Height = 227
+    Height = 367
     Margins.Left = 0
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 3
     object pnlScreenPreview: TPanel
       Left = 3
       Top = 3
@@ -100,44 +126,44 @@ object frmMain: TfrmMain
         ExplicitTop = 6
       end
     end
-    object Button1: TButton
+    object btnImport: TButton
       Left = 3
       Top = 109
-      Width = 148
+      Width = 72
       Height = 25
       Caption = '&Import...'
       TabOrder = 1
-      OnClick = Button1Click
+      OnClick = btnImportClick
     end
-    object Button2: TButton
+    object btnExport: TButton
       Left = 3
-      Top = 137
-      Width = 148
+      Top = 135
+      Width = 72
       Height = 25
       Caption = '&Export...'
       TabOrder = 2
     end
-    object Button3: TButton
-      Left = 3
-      Top = 166
-      Width = 148
+    object btnExportAll: TButton
+      Left = 77
+      Top = 135
+      Width = 72
       Height = 25
       Caption = '&Export all...'
       TabOrder = 3
     end
-    object Button4: TButton
-      Left = 3
-      Top = 196
-      Width = 148
+    object btnUndo: TButton
+      Left = 77
+      Top = 109
+      Width = 72
       Height = 25
-      Caption = '&Undo import...'
+      Caption = '&Undo...'
       TabOrder = 4
     end
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 227
-    Width = 492
+    Top = 367
+    Width = 542
     Height = 19
     Panels = <
       item
@@ -152,19 +178,82 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
-    ExplicitTop = 275
   end
-  object MainMenu1: TMainMenu
-    Left = 18
+  object mmMain: TMainMenu
+    Left = 12
     Top = 94
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object miOpen: TMenuItem
         Caption = 'miOpen'
+        ShortCut = 16463
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object miSave: TMenuItem
+        Caption = 'miSave'
+        ShortCut = 16467
+      end
+      object miSaveAs: TMenuItem
+        Caption = 'miSaveAs'
+        ShortCut = 49235
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object miClose: TMenuItem
+        Caption = 'miClose'
+      end
+      object N3: TMenuItem
+        Caption = '-'
       end
       object miQuit: TMenuItem
         Caption = '&Quit'
         ShortCut = 16465
+        OnClick = miQuitClick
+      end
+    end
+    object miEdit: TMenuItem
+      Caption = '&Edit'
+      object miUndo: TMenuItem
+        Caption = 'miUndo'
+        ShortCut = 16474
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object miImport: TMenuItem
+        Caption = 'miImport'
+        ShortCut = 16457
+      end
+      object miExport: TMenuItem
+        Caption = 'miExport'
+        ShortCut = 16453
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object miExportAll: TMenuItem
+        Caption = 'miExportAll'
+        ShortCut = 16449
+      end
+    end
+    object miHelp: TMenuItem
+      Caption = 'miHelp'
+      object miProjectHome: TMenuItem
+        Caption = 'miProjectHome'
+        ShortCut = 112
+      end
+      object miCheckForUpdate: TMenuItem
+        Caption = 'miCheckForUpdate'
+      end
+      object N6: TMenuItem
+        Caption = '-'
+      end
+      object miAbout: TMenuItem
+        Caption = 'miAbout'
+        ShortCut = 123
       end
     end
   end
@@ -175,5 +264,31 @@ object frmMain: TfrmMain
     Title = 'Select the file to open...'
     Left = 8
     Top = 150
+  end
+  object pmIwadContent: TPopupMenu
+    Left = 10
+    Top = 186
+    object miUndo2: TMenuItem
+      Caption = 'miUndo2'
+      ShortCut = 16474
+    end
+    object N7: TMenuItem
+      Caption = '-'
+    end
+    object miImport2: TMenuItem
+      Caption = 'miImport2'
+      ShortCut = 16457
+    end
+    object miExport2: TMenuItem
+      Caption = 'miExport2'
+      ShortCut = 16453
+    end
+    object N8: TMenuItem
+      Caption = '-'
+    end
+    object miExportAll2: TMenuItem
+      Caption = 'miExportAll2'
+      ShortCut = 16449
+    end
   end
 end

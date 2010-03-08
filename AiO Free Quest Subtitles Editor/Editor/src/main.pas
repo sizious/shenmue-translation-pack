@@ -36,7 +36,7 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.5' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.6' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
   COMPIL_DATE_TIME = 'March 4, 2010 @06:05PM';
 
@@ -1297,7 +1297,7 @@ begin
         SubItems.Add(SubText);
 
         // adding text correction subs
-        if TextDatabaseCorrector.Loaded then
+        if (TextDatabaseCorrector.Loaded) and (i < TextDatabaseCorrector.Subtitles.Count) then
           SubItems.Add(TextDatabaseCorrector.Subtitles[i].Text)
         else
           SubItems.Add('');
@@ -1498,7 +1498,8 @@ begin
     OldSelectedSubtitleText := mSubText.Text;
 
     // Loading the original text for this subtitle from the database
-    if TextDatabaseCorrector.Loaded then
+    if TextDatabaseCorrector.Loaded
+      and (SubtitleSelected < TextDatabaseCorrector.Subtitles.Count) then
       OriginalSelectedSubtitleText :=
         StringReplace(TextDatabaseCorrector.Subtitles[SubtitleSelected].Text,
           '<br>', sLineBreak, [rfReplaceAll])
@@ -1656,7 +1657,7 @@ begin
           lbFilesList.Items.Add(ExtractFileName(Files[i]));
         end else begin
           if Files.Count <> 1 then
-            AddDebug('The selected file, "' + Files[i] + '" isn''t a valid Shenmue Free Quest subtitles format.');
+            AddDebug('The file "' + Files[i] + '" isn''t a valid Shenmue Free Quest subtitles format.');
         end;
 
       end; // for
@@ -1665,7 +1666,7 @@ begin
         lbFilesList.ItemIndex := 0;
         lbFilesListClick(Self);
       end else
-        MsgBox('This file isn''t a valid Shenmue Free Quest subtitles format.', 'Not a valid PAKS SCNF file', MB_ICONWARNING);
+        MsgBox('No valid Free Quest subtitles format was found in the selected file(s).', 'Not valid PAKS SCNF file(s)', MB_ICONWARNING);
 
     end; // if Execute
     Options := Options - [ofAllowMultiSelect];

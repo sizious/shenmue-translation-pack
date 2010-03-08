@@ -9,23 +9,49 @@ uses
 
 type
   TfrmMain = class(TForm)
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
+    mmMain: TMainMenu;
+    miFile: TMenuItem;
     miQuit: TMenuItem;
-    lvIpacContent: TJvListView;
+    lvIwadContent: TJvListView;
     miOpen: TMenuItem;
     odOpen: TOpenDialog;
-    Panel1: TPanel;
+    pnlRightCommands: TPanel;
     sbMain: TStatusBar;
     pnlScreenPreview: TPanel;
     imgScreenPreview: TImage;
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
+    btnImport: TButton;
+    btnExport: TButton;
+    btnExportAll: TButton;
+    btnUndo: TButton;
+    N1: TMenuItem;
+    miSave: TMenuItem;
+    miSaveAs: TMenuItem;
+    N2: TMenuItem;
+    miClose: TMenuItem;
+    N3: TMenuItem;
+    miEdit: TMenuItem;
+    miUndo: TMenuItem;
+    N4: TMenuItem;
+    miImport: TMenuItem;
+    miExport: TMenuItem;
+    N5: TMenuItem;
+    miExportAll: TMenuItem;
+    miHelp: TMenuItem;
+    miProjectHome: TMenuItem;
+    miCheckForUpdate: TMenuItem;
+    N6: TMenuItem;
+    miAbout: TMenuItem;
+    pmIwadContent: TPopupMenu;
+    miUndo2: TMenuItem;
+    N7: TMenuItem;
+    miImport2: TMenuItem;
+    miExport2: TMenuItem;
+    N8: TMenuItem;
+    miExportAll2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnImportClick(Sender: TObject);
+    procedure miQuitClick(Sender: TObject);
   private
     { Déclarations privées }
   public
@@ -43,7 +69,7 @@ implementation
 uses
   Themes;
   
-procedure TfrmMain.Button1Click(Sender: TObject);
+procedure TfrmMain.btnImportClick(Sender: TObject);
 begin
   VmuLcdEditor.LoadFromFile('LCD.IWD');
   vmulcdeditor.Items[2].ExportToFile('test.bmp');
@@ -54,11 +80,20 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   pnlScreenPreview.DoubleBuffered := True;
   VmuLcdEditor := TVmuLcdEditor.Create;
+
+  // Setting the Form
+  Constraints.MinHeight := Height;
+  Constraints.MinWidth := Width;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   VmuLcdEditor.Free;
+end;
+
+procedure TfrmMain.miQuitClick(Sender: TObject);
+begin
+  Close;
 end;
 
 end.

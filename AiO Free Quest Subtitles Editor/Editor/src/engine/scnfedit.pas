@@ -18,6 +18,10 @@
 (*
   Short history:
 
+  3.3.9 (March 8, 2010 @06:02PM)
+    - Fixed a little bug when reading some specials PKS from Shenmue 1.
+      The function IsFileValidScnf in the scnfutil.pas was updated.
+    
   3.3.8 (March 4, 2010 @02:15PM)
     - Fixed a little bug in the ImportFromFile causing a silent exception
       (little tweak).
@@ -75,8 +79,8 @@ uses
   ;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.3.8';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'March 4, 2010 @02:15PM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.3.9';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'March 8, 2010 @06:02PM';
 
 type
   // Structure to read IPAC sections info from footer
