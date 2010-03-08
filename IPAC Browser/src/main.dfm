@@ -52,15 +52,12 @@ object frmMain: TfrmMain
     GridLines = True
     ReadOnly = True
     RowSelect = True
-    PopupMenu = pmIpacContent
-    SmallImages = ilIpacContent
     TabOrder = 0
     ViewStyle = vsReport
     OnColumnClick = lvIpacContentColumnClick
     OnSelectItem = lvIpacContentSelectItem
     ColumnsOrder = '0=160,1=100,2=65,3=65,4=70'
     HeaderImagePosition = hipRight
-    HeaderImages = ilHeader
     Groups = <>
     ExtendedColumns = <
       item
@@ -403,8 +400,8 @@ object frmMain: TfrmMain
     DefaultExt = 'PKS'
     Filter = 
       'All Supported Formats (*.PKS;*.PKF;*.BIN)|*.PKS;*.PKF;*.BIN|PAKS' +
-      ' Packages (*.PKS)|*.PKS|PAKF Packages (*.PKF)|*.PKF|All Files (*' +
-      '.*)|*.*'
+      ' Packages (*.PKS)|*.PKS|PAKF Packages (*.PKF)|*.PKF|Generic Bina' +
+      'ry Files (*.BIN)|*.BIN|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 8
