@@ -13,7 +13,6 @@ uses
   ipacutil in 'engine\ipacutil.pas',
   gzipmgr in '..\..\Common\gzipmgr.pas',
   utils in 'utils.pas',
-  debuglog in 'debuglog.pas' {frmDebugLog},
   xmlconf in '..\..\Common\xmlconf.pas',
   bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
   fileprop in 'fileprop.pas' {frmProperties},
@@ -43,7 +42,6 @@ begin
   InitializeShellExtension;
 
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmDebugLog, frmDebugLog);
   Application.CreateForm(TfrmProperties, frmProperties);
   {$IFDEF DEBUG}
   // Debug

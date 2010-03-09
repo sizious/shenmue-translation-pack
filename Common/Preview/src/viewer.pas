@@ -27,12 +27,12 @@ implementation
 
 procedure TfrmSubsPreview.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  MessageBoxA(Handle, PChar(
+{$IFDEF DEBUG}
+  raise Exception.Create(
     'Please remove the frmSubsPreview from the' +
-    ' ''Form created by Delphi'' in the Project option dialog.'),
-    'Exception',
-    MB_ICONERROR
+    ' ''Form created by Delphi'' in the Project option dialog.'
   );
+{$ENDIF}
 end;
 
 end.

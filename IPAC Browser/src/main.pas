@@ -338,10 +338,10 @@ var
 begin
   with bfdExportAll do
     if Execute then begin
-      StatusText := 'Exporting all...';
+      frmMain.StatusText := 'Exporting all...';
       for i := 0 to IPACEditor.Content.Count - 1 do
         IpacEditor.Content[i].ExportToFolder(Directory);
-      StatusText := '';
+      frmMain.StatusText := '';
       AddDebug(ltInformation, 'All the IPAC content was succesfully exported to the "'
         + Directory + '" directory.');
     end;
