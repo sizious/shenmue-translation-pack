@@ -3,7 +3,7 @@ unit xmlconf;
 interface
 
 uses
-  Windows, SysUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
+  Windows, SysUtils, Forms, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
   
 type
   EXMLConfigurationFile = class(Exception);
@@ -23,12 +23,16 @@ type
   public
     constructor Create(const FileName: TFileName; const ConfigID: string);
     destructor Destroy; override;
-    function ReadBool(const Section, Key: string; DefaultValue: Boolean): Boolean; overload;
-    function ReadInteger(const Section, Key: string; DefaultValue: Integer): Integer; overload;
-    function ReadString(const Section, Key: string; DefaultValue: string): string; overload;
-    procedure WriteBool(const Section, Key: string; Value: Boolean); overload;
-    procedure WriteInteger(const Section, Key: string; Value: Integer); overload;
-    procedure WriteString(const Section, Key, Value: string); overload;
+    function ReadBool(const Section, Key: string; DefaultValue: Boolean): Boolean;
+    procedure ReadFormAttributes(Form: TForm); overload;
+    procedure ReadFormAttributes(const Section: string; Form: TForm); overload;
+    function ReadInteger(const Section, Key: string; DefaultValue: Integer): Integer;
+    function ReadString(const Section, Key: string; DefaultValue: string): string;
+    procedure WriteBool(const Section, Key: string; Value: Boolean);
+    procedure WriteFormAttributes(Form: TForm); overload;
+    procedure WriteFormAttributes(const Section: string; Form: TForm); overload;
+    procedure WriteInteger(const Section, Key: string; Value: Integer);
+    procedure WriteString(const Section, Key, Value: string);
     property ConfigID: string read fConfigID;
     property FirstConfiguration: Boolean read fFirstConfiguration;
     property LoadedFileName: TFileName read fLoadedFileName;
@@ -120,6 +124,26 @@ begin
     Key, LowerCase(BoolToStr(DefaultValue, True))));
 end;
 
+procedure TXmlConfigurationFile.ReadFormAttributes(const Section: string;
+  Form: TForm);
+begin
+  Form.Left := ReadInteger(Section, 'left', Form.Left);
+  Form.Top := ReadInteger(Section, 'top', Form.Top);
+  Form.Width := ReadInteger(Section, 'width', Form.Width);
+  Form.Height := ReadInteger(Section, 'height', Form.Height);
+  Form.WindowState := TWindowState(ReadInteger(Section, 'state',
+    Integer(Form.WindowState)));
+end;
+
+procedure TXmlConfigurationFile.ReadFormAttributes(Form: TForm);
+var
+  Section: string;
+
+begin
+  Section := LowerCase(StringReplace(Form.Name, 'frm', '', []));
+  ReadFormAttributes(Section, Form);
+end;
+
 function TXmlConfigurationFile.ReadInteger(const Section, Key: string;
   DefaultValue: Integer): Integer;
 begin
@@ -146,6 +170,33 @@ end;
 procedure TXmlConfigurationFile.WriteBool(const Section, Key: string; Value: Boolean);
 begin
   WriteString(Section, Key, LowerCase(BoolToStr(Value, True)));
+end;
+
+procedure TXmlConfigurationFile.WriteFormAttributes(const Section: string;
+  Form: TForm);
+begin
+  WriteInteger(Section, 'state', Integer(Form.WindowState));
+
+  if Form.WindowState = wsMaximized then begin
+    WriteInteger(Section, 'width', ReadInteger(Section, 'width', Form.Width));
+    WriteInteger(Section, 'height', ReadInteger(Section, 'height', Form.Height));
+    WriteInteger(Section, 'left', ReadInteger(Section, 'left', Form.Left));
+    WriteInteger(Section, 'top', ReadInteger(Section, 'top', Form.Top));
+  end else begin
+    WriteInteger(Section, 'width', Form.Width);
+    WriteInteger(Section, 'height', Form.Height);
+    WriteInteger(Section, 'left', Form.Left);
+    WriteInteger(Section, 'top', Form.Top);
+  end;
+end;
+
+procedure TXmlConfigurationFile.WriteFormAttributes(Form: TForm);
+var
+  Section: string;
+
+begin
+  Section := LowerCase(StringReplace(Form.Name, 'frm', '', []));
+  WriteFormAttributes(Section, Form);
 end;
 
 procedure TXmlConfigurationFile.WriteInteger(const Section, Key: string;

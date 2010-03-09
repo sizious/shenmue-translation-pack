@@ -93,7 +93,8 @@ end;
 
 procedure TSubtitlesPreviewWindow.Hide;
 begin
-  if IsVisible then frmSubsPreview.Close;
+  if IsVisible then
+    frmSubsPreview.Close;
 end;
 
 function TSubtitlesPreviewWindow.IsVisible: Boolean;

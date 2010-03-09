@@ -8,10 +8,8 @@ uses
 function GetAppVersion: string;
 function GetApplicationDirectory: TFileName;
 function GetWorkingTempDirectory: TFileName;
-procedure LoadConfigDebug;
 procedure LoadConfigMain;
 procedure LoadConfigProperties;
-procedure SaveConfigDebug;
 procedure SaveConfigMain;
 procedure SaveConfigProperties;
 
@@ -45,53 +43,6 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure SaveFormConfig(Section: string; Form: TForm);
-begin
-  with Configuration do begin
-    WriteInteger(Section, 'state', Integer(Form.WindowState));
-
-    if Form.WindowState = wsMaximized then begin
-      WriteInteger(Section, 'width', ReadInteger(Section, 'width', Form.Width));
-      WriteInteger(Section, 'height', ReadInteger(Section, 'height', Form.Height));
-      WriteInteger(Section, 'left', ReadInteger(Section, 'left', Form.Left));
-      WriteInteger(Section, 'top', ReadInteger(Section, 'top', Form.Top));
-    end else begin
-      WriteInteger(Section, 'width', Form.Width);
-      WriteInteger(Section, 'height', Form.Height);
-      WriteInteger(Section, 'left', Form.Left);
-      WriteInteger(Section, 'top', Form.Top);
-    end;
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-procedure LoadFormConfig(Section: string; Form: TForm);
-begin
-  with Configuration do begin
-    Form.Left := ReadInteger(Section, 'left', Form.Left);
-    Form.Top := ReadInteger(Section, 'top', Form.Top);
-    Form.Width := ReadInteger(Section, 'width', Form.Width);
-    Form.Height := ReadInteger(Section, 'height', Form.Height);
-    Form.WindowState := TWindowState(ReadInteger(Section, 'state',
-      Integer(Form.WindowState)));
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-procedure LoadConfigDebug;
-begin
-  with Configuration do begin
-    frmDebugLog.OnTop := ReadBool('debug', 'ontop', False);
-    frmDebugLog.AutoScroll := ReadBool('debug', 'autoscroll', True);
-    LoadFormConfig('debug', frmDebugLog);
-    frmMain.DebugLogVisible := ReadBool('debug', 'visible', False);    
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
 procedure LoadConfigMain;
 begin
   with Configuration do begin
@@ -99,7 +50,7 @@ begin
       frmMain.Position := poScreenCenter
     else begin
       frmMain.Position := poDesigned;
-      LoadFormConfig('main', frmMain);
+      ReadFormAttributes(frmMain);
       frmMain.lvIpacContent.ColumnsOrder :=
         ReadString('main', 'columnsorder', frmMain.lvIpacContent.ColumnsOrder);
     end;
@@ -113,7 +64,7 @@ end;
 procedure LoadConfigProperties;
 begin
   with Configuration do begin
-    LoadFormConfig('properties', frmProperties);
+    ReadFormAttributes(frmProperties);
 
     with frmProperties do begin
       pcProp.TabIndex := ReadInteger('properties', 'tabindex', 0);
@@ -131,22 +82,10 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure SaveConfigDebug;
-begin
-  with Configuration do begin
-    WriteBool('debug', 'visible', frmMain.DebugLogVisible);
-    WriteBool('debug', 'ontop', frmDebugLog.OnTop);
-    WriteBool('debug', 'autoscroll', frmDebugLog.AutoScroll);
-    SaveFormConfig('debug', frmDebugLog);
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
 procedure SaveConfigMain;
 begin
   with Configuration do begin
-    SaveFormConfig('main', frmMain);
+    WriteFormAttributes(frmMain);
     WriteString('main', 'columnsorder', frmMain.lvIpacContent.ColumnsOrder);
     WriteBool('options', 'autosave', frmMain.AutoSave);
     WriteBool('options', 'makebackup', frmMain.MakeBackup);
@@ -158,7 +97,7 @@ end;
 procedure SaveConfigProperties;
 begin
   with Configuration do begin
-    SaveFormConfig('properties', frmProperties);
+    WriteFormAttributes(frmProperties);
 
     with frmProperties do begin
       WriteInteger('properties', 'tabindex', pcProp.TabIndex);

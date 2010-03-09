@@ -24,8 +24,10 @@ type
     fNewSize: LongWord;
     fDimension: TImageDimension;
     fNewOffset: LongWord;
+    fNewDimension: TImageDimension;
   protected
     procedure WriteEntry(var InStream, OutStream: TFileStream);
+    property NewDimension: TImageDimension read fNewDimension;
     property NewSize: LongWord read fNewSize;
     property NewOffset: LongWord read fNewOffset;    
   public
@@ -33,7 +35,7 @@ type
     procedure CancelImport;
     procedure Dump(const FileName: TFileName);
     procedure ExportToFile(const FileName: TFileName);
-    procedure ImportFromFile(const FileName: TFileName);
+    function ImportFromFile(const FileName: TFileName): Boolean;
     property Dimension: TImageDimension read fDimension;
     property ImportedFileName: TFileName read fImportedFileName;
     property Name: string read fName;
@@ -51,13 +53,14 @@ type
     function GetCount: Integer;
   protected
     procedure Add(var IwadFile: TFileStream; Offset, Size: LongWord; Name: string);
-    procedure Clear;
     function GetImageSize(var Iwad: TFileStream; Offset: LongWord): TImageDimension;
   public
     constructor Create;
     destructor Destroy; override;
+    procedure Clear;
     function LoadFromFile(const FileName: TFileName): Boolean;
-    procedure SaveToFile(const FileName: TFileName);
+    function Save: Boolean;
+    function SaveToFile(const FileName: TFileName): Boolean;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TVmuLcdEntry read GetItem; default;
     property SourceFileName: TFileName read fSourceFileName;
@@ -198,7 +201,12 @@ begin
   end;
 end;
 
-procedure TVmuLcdEditor.SaveToFile(const FileName: TFileName);
+function TVmuLcdEditor.Save: Boolean;
+begin
+  Result := SaveToFile(SourceFileName);
+end;
+
+function TVmuLcdEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
   Header: TIwadHeader;
   Entry: TIwadTableEntry;
@@ -209,6 +217,9 @@ var
   TempFileName: TFileName;
 
 begin
+  Result := False;
+  if not FileExists(SourceFileName) then Exit;
+
   Overwrite := UpperCase(SourceFileName) = UpperCase(FileName);
   TempFileName := GetTempFileName;
 
@@ -234,8 +245,9 @@ begin
       // Updating entry if needed (the source file was overwrited)
       if Overwrite then
         with Items[i] do begin
-          fSize := fNewSize;
-          fOffset := fNewOffset;
+          fSize := NewSize;
+          fOffset := NewOffset;
+          fDimension := NewDimension;
           CancelImport; // reset import status
         end;
     end;
@@ -258,8 +270,14 @@ begin
     InStream.Free;
     OutStream.Free;
 
+    // Deleting the old source file
+    if Overwrite then
+      DeleteFile(SourceFileName);
+    if FileExists(FileName) then
+      DeleteFile(FileName);
+
     // Copying the new file
-    CopyFile(TempFileName, FileName, False);
+    Result := MoveFile(TempFileName, FileName);
   end;
 end;
 
@@ -297,7 +315,6 @@ var
   Bitmap: TBitmap;
   Buffer: array[0..255] of Byte;
   X, Y, b, i, BitPower: Integer;
-  NewImageSize: TImageDimension;
   Padding: array[0..31] of Byte;
   PaddingSize: LongWord;
   
@@ -323,13 +340,13 @@ begin
       Bitmap.Monochrome := True;
 
       // Writing the new size of the image
-      NewImageSize.Width := Bitmap.Width;
-      NewImageSize.Height := Bitmap.Height;
-      OutStream.Write(NewImageSize, SizeOf(TImageDimension));
+      fNewDimension.Width := Bitmap.Width;
+      fNewDimension.Height := Bitmap.Height;
+      OutStream.Write(NewDimension, SizeOf(TImageDimension));
 
       // Initialize
       i := -1;
-      fNewSize := Bitmap.Height * (Bitmap.Width div 8);
+      fNewSize := Bitmap.Height * (Round(Bitmap.Width / 8));
       ZeroMemory(@Buffer, NewSize);
       
       // Encoding the Bitmap data
@@ -355,6 +372,8 @@ begin
       // Writing the encoded data
       OutStream.Write(Buffer, NewSize);
 
+      // Adding the TImageDimension Size
+      Inc(fNewSize, SizeOf(TImageDimension));
     finally
       Bitmap.Free;
     end;
@@ -372,6 +391,8 @@ begin
   // Writing Padding
   PaddingSize := NewSize mod 4;
   ZeroMemory(@Padding, PaddingSize);
+(*  padding[0] := $de;
+  padding[1] := $ad; *)
   OutStream.Write(Padding, PaddingSize);
 end;
 
@@ -428,8 +449,11 @@ begin
   end;
 end;
 
-procedure TVmuLcdEntry.ImportFromFile(const FileName: TFileName);
+function TVmuLcdEntry.ImportFromFile(const FileName: TFileName): Boolean;
 begin
+  Result := FileExists(FileName);
+  if not Result then Exit;
+  
   fImportedFileName := FileName;
   fUpdated := True;
 end;

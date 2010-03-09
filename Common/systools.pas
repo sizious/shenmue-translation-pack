@@ -17,6 +17,7 @@ function GetTempDir: TFileName;
 function GetTempFileName: TFileName;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
+function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function StringArrayBinarySearch(SortedSource: array of string;
   SearchValue: string): Integer;
 function StringArraySequentialSearch(Source: array of string;
@@ -308,6 +309,13 @@ begin
     end;
     Inc(i);
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
+begin
+  Result := Windows.MoveFile(PChar(ExistingFileName), PChar(NewFileName));
 end;
 
 //------------------------------------------------------------------------------
