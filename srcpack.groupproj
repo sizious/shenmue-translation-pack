@@ -86,15 +86,6 @@
   <Target Name="afsutils:Make">
     <MSBuild Projects="AFS Utils\src\afsutils.dproj" Targets="Make" />
   </Target>
-  <Target Name="sprutils">
-    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="" />
-  </Target>
-  <Target Name="sprutils:Clean">
-    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="sprutils:Make">
-    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Make" />
-  </Target>
   <Target Name="ipacedit">
     <MSBuild Projects="IPAC Browser\src\ipacedit.dproj" Targets="" />
   </Target>
@@ -103,6 +94,15 @@
   </Target>
   <Target Name="ipacedit:Make">
     <MSBuild Projects="IPAC Browser\src\ipacedit.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sprutils">
+    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="" />
+  </Target>
+  <Target Name="sprutils:Clean">
+    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sprutils:Make">
+    <MSBuild Projects="SPR Utils\src\sprutils.dproj" Targets="Make" />
   </Target>
   <Target Name="hdissect">
     <MSBuild Projects="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" Targets="" />
@@ -132,13 +132,13 @@
     <MSBuild Projects="VMU Screen Editor\src\vmulcded.dproj" Targets="Make" />
   </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;sprutils;ipacedit;hdissect;preview;vmulcded" />
+    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;hdissect;preview;vmulcded" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;sprutils:Clean;ipacedit:Clean;hdissect:Clean;preview:Clean;vmulcded:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;hdissect:Clean;preview:Clean;vmulcded:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;sprutils:Make;ipacedit:Make;hdissect:Make;preview:Make;vmulcded:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;hdissect:Make;preview:Make;vmulcded:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

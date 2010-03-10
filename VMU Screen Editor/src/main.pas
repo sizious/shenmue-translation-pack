@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, LCDEdit, ImgList, ComCtrls, ToolWin, JvExComCtrls, JvToolBar,
-  JvListView, ExtCtrls, StdCtrls, JvBaseDlg, JvBrowseFolder, ExtDlgs;
+  JvListView, ExtCtrls, StdCtrls, JvBaseDlg, JvBrowseFolder, ExtDlgs, DebugLog;
 
 type
   TfrmMain = class(TForm)
@@ -15,14 +15,7 @@ type
     lvIwadContent: TJvListView;
     miOpen: TMenuItem;
     odOpen: TOpenDialog;
-    pnlRightCommands: TPanel;
     sbMain: TStatusBar;
-    pnlScreenPreview: TPanel;
-    imgScreenPreview: TImage;
-    btnImport: TButton;
-    btnExport: TButton;
-    btnExportAll: TButton;
-    btnUndo: TButton;
     N1: TMenuItem;
     miSave: TMenuItem;
     miSaveAs: TMenuItem;
@@ -52,6 +45,30 @@ type
     sdExport: TSaveDialog;
     odImport: TOpenPictureDialog;
     sdSave: TSaveDialog;
+    miView: TMenuItem;
+    miDebugLog: TMenuItem;
+    N9: TMenuItem;
+    miPreview: TMenuItem;
+    ilToolBarDisabled: TImageList;
+    ilToolBar: TImageList;
+    tbMain: TJvToolBar;
+    ToolButton1: TToolButton;
+    tbOpen: TToolButton;
+    tbReload: TToolButton;
+    tbSave: TToolButton;
+    ToolButton4: TToolButton;
+    tbUndo: TToolButton;
+    ToolButton8: TToolButton;
+    tbImport: TToolButton;
+    tbExport: TToolButton;
+    ToolButton10: TToolButton;
+    tbExportAll: TToolButton;
+    ToolButton11: TToolButton;
+    tbDebugLog: TToolButton;
+    tbPreview: TToolButton;
+    ToolButton17: TToolButton;
+    tbAbout: TToolButton;
+    miReload: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
@@ -65,28 +82,48 @@ type
     procedure miSaveAsClick(Sender: TObject);
     procedure miCloseClick(Sender: TObject);
     procedure miExportAllClick(Sender: TObject);
+    procedure miDebugLogClick(Sender: TObject);
+    procedure miPreviewClick(Sender: TObject);
+    procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
+      var DefaultDraw: Boolean);
   private
     { Déclarations privées }
     fFileModified: Boolean;
     fSelectedContentUI: TListItem;
+    fDebugLogVisible: Boolean;
+    fScreenPreview: Boolean;
+    fStoredCaption: string;
+    procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
+    procedure DebugLogMainFormToFront(Sender: TObject);
+    procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);
+    procedure DebugLogWindowActivated(Sender: TObject);
     function GetStatusText: string;
     procedure SetStatusText(const Value: string);
     function GetSelectedContentEntry: TVmuLcdEntry;
+    procedure SetDebugLogVisible(const Value: Boolean);
+    procedure SetScreenPreview(const Value: Boolean);
   protected
     procedure Clear; overload;
     procedure Clear(const UpdateOnlyUI: Boolean); overload;
+    procedure InitDebugLog;
     procedure LoadFile(FileName: TFileName);
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
     procedure SetControlsStateSelectedContentModified(State: Boolean);
     procedure SetControlsStateUndoImporting(State: Boolean);
+    procedure SetWindowTitleCaption(const FileName: TFileName);
     procedure UpdateFileModifiedState;
+    property StoredCaption: string read fStoredCaption write fStoredCaption;    
   public
     { Déclarations publiques }
-    function MsgBox(Text, Caption: string; Flags: Integer): Integer;    
+    procedure AddDebug(LineType: TLineType; Text: string);
+    function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    property DebugLogVisible: Boolean read fDebugLogVisible
+      write SetDebugLogVisible;    
     property FileModified: Boolean read fFileModified;
     property SelectedContentUI: TListItem read fSelectedContentUI;
+    property ScreenPreview: Boolean read fScreenPreview write SetScreenPreview;
     property StatusText: string read GetStatusText write SetStatusText;
     property SelectedContentEntry: TVmuLcdEntry read GetSelectedContentEntry;
   end;
@@ -96,21 +133,28 @@ type
 
 var
   frmMain: TfrmMain;
+
   LcdEditor: TVmuLcdEditor;
+  DebugLog: TDebugLogHandlerInterface;
 
 implementation
 
 {$R *.dfm}
 
 uses
-  Themes;
+  Themes, Preview, UITools, Utils;
   
+procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
+begin
+  DebugLog.AddLine(LineType, Text);
+end;
+
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
   if not UpdateOnlyUI then begin
     LcdEditor.Clear;
     lvIwadContent.Clear;
-//    SetWindowTitleCaption('');
+    SetWindowTitleCaption('');
   end;
 
   UpdateFileModifiedState;
@@ -121,6 +165,29 @@ begin
   StatusText := '';
 end;
 
+procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
+begin
+  showmessage('DebugLogExceptionEvent');
+end;
+
+procedure TfrmMain.DebugLogMainFormToFront(Sender: TObject);
+begin
+  BringToFront;
+end;
+
+procedure TfrmMain.DebugLogVisibilityChange(Sender: TObject;
+  const Visible: Boolean);
+begin
+  fDebugLogVisible := Visible;
+  miDebugLog.Checked := Visible;
+  tbDebugLog.Down := Visible;
+end;
+
+procedure TfrmMain.DebugLogWindowActivated(Sender: TObject);
+begin
+//  showmessage('DebugLogWindowActivated');
+end;
+
 procedure TfrmMain.Clear;
 begin
   Clear(False);
@@ -128,20 +195,26 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  pnlScreenPreview.DoubleBuffered := True;
+  // Initialize modules
+  InitDebugLog;
   LcdEditor := TVmuLcdEditor.Create;
 
-  // Setting the Form
+  // Init the Main Form
+  Caption := Application.Title + ' v' + GetAppVersion;
+  StoredCaption := Caption;
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
 
   // Init the UI
+  InitToolBarControl(Self, tbMain);
   Clear(False);
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  // Destroying modules
   LcdEditor.Free;
+  DebugLog.Free;
 end;
 
 function TfrmMain.GetSelectedContentEntry: TVmuLcdEntry;
@@ -159,6 +232,26 @@ begin
   Result := sbMain.Panels[2].Text;
 end;
 
+procedure TfrmMain.InitDebugLog;
+begin
+  DebugLog := TDebugLogHandlerInterface.Create;
+  with DebugLog do begin
+    // Setting up events
+    OnException := DebugLogExceptionEvent;
+    OnMainWindowBringToFront := DebugLogMainFormToFront;
+    OnVisibilityChange := DebugLogVisibilityChange;
+    OnWindowActivated := DebugLogWindowActivated;
+
+    // Setting up the properties
+//    Configuration := GetConfigurationObject; // in this order!
+  end;
+end;
+
+procedure TfrmMain.miPreviewClick(Sender: TObject);
+begin
+  ScreenPreview := not ScreenPreview;
+end;
+
 procedure TfrmMain.LoadFile(FileName: TFileName);
 var
   i, j: Integer;
@@ -168,7 +261,7 @@ var
 begin
   // Extending filenames
   FileName := ExpandFileName(FileName);
-  UpdateUI := (FileName = LcdEditor.SourceFileName);
+  UpdateUI := SameText(FileName, LcdEditor.SourceFileName);
 
   // Checking the file
   if not FileExists(FileName) then begin
@@ -184,10 +277,10 @@ begin
   // Loading the file
   if LcdEditor.LoadFromFile(FileName) then begin
 
-    // Filling the UI with the IPAC Content
+    // Filling the UI with the IWAD content
     if LcdEditor.Count > 0 then begin
 
-      // Adding IPAC entries
+      // Adding entries
       for i := 0 to LcdEditor.Count - 1 do begin
         ListItem := nil;
 
@@ -225,14 +318,16 @@ begin
 
       // Updating UI
       if not UpdateUI then begin
-(*        SetWindowTitleCaption(IPACEditor.SourceFileName);
-        AddDebug(ltInformation, 'Load successfully done for "' + IPACEditor.SourceFileName
-          + '".');
-*)      end;
+        SetWindowTitleCaption(LcdEditor.SourceFileName);
+        AddDebug(ltInformation, 'Load successfully done for "'
+          + LcdEditor.SourceFileName + '".');
+      end;
       SetControlsStateFileOperations(True);
 
-      // Updating File Properties
-//      frmProperties.RefreshInfos;
+      // Refreshing the view
+      if Assigned(SelectedContentUI) then
+        lvIwadContentSelectItem(Self, SelectedContentUI, True);
+
     end else begin
       StatusText := 'IWAD empty ! Loading aborted...';
 (*      ReportFailure('This file contains a valid IPAC section, but the section itself is empty.',
@@ -253,6 +348,7 @@ begin
   if Selected then begin
     fSelectedContentUI := Item;
     SetControlsStateUndoImporting(SelectedContentEntry.Updated);
+    frmPreview.AssignBitmap(SelectedContentEntry.DecodedImage);
   end;
 end;
 
@@ -260,6 +356,11 @@ procedure TfrmMain.miCloseClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   Clear;
+end;
+
+procedure TfrmMain.miDebugLogClick(Sender: TObject);
+begin
+  DebugLogVisible := not DebugLogVisible;
 end;
 
 procedure TfrmMain.miExportAllClick(Sender: TObject);
@@ -273,7 +374,7 @@ begin
       Directory := IncludeTrailingPathDelimiter(Directory);
       for i := 0 to LcdEditor.Count - 1 do begin
         LcdEditor[i].ExportToFile(Directory + Trim(LcdEditor[i].Name) + '.BMP');
-        if i mod 5 = 0 then
+        if (i mod 5) = 0 then
           Application.ProcessMessages;
       end;
       frmMain.StatusText := '';
@@ -292,30 +393,35 @@ begin
       StatusText := 'Exporting...';
       SelectedContentEntry.ExportToFile(FileName);
       StatusText := '';
-(*      AddDebug(ltInformation, Format(
+      AddDebug(ltInformation, Format(
         'The current entry #%d [%s] was successfully saved to the "%s" file.',
-        [SelectedContentEntry.Index, SelectedContentEntry.GetOutputFileName,
+        [SelectedContentEntry.Index, SelectedContentEntry.Name,
         FileName])
-      ); *)
+      );
     end;
   end;
 end;
 
 procedure TfrmMain.miImportClick(Sender: TObject);
+var
+  Buf: string;
+  
 begin
   with odImport do begin
     FileName := SelectedContentEntry.Name;
 
-    // Loading IPAC content section
+    // Do the import
     if Execute then begin
+      Buf := Format(' for #%d [%s] from "%s".',
+        [SelectedContentEntry.Index, SelectedContentEntry.Name, FileName]);
+
       StatusText := 'Importing...';
       if SelectedContentEntry.ImportFromFile(FileName) then begin
         SetControlsStateSelectedContentModified(True);
         SetControlsStateUndoImporting(True);
-//        AddDebug(ltInformation, 'Entry import for ' + Buf + ' done from "' + FileName + '".');
+        AddDebug(ltInformation, 'Import done successfully' + Buf);
       end else
-        msgbox('error', 'error', 0);
-//        AddDebug(ltWarning, 'Unable to import for ' + Buf + ' from "' + FileName + '".');
+        AddDebug(ltWarning, 'Unable to import' + Buf);
       StatusText := '';
     end;
 
@@ -353,9 +459,9 @@ begin
       // Saving on the disk
       Buf := ' for "' + LcdEditor.SourceFileName + '" to "' + FileName + '".';
       if LcdEditor.SaveToFile(FileName) then
-        MsgBox('Save successfully done' + Buf, 'Information', MB_ICONINFORMATION)
+        AddDebug(ltInformation, 'Save successfully done' + Buf)
       else
-        MsgBox('Unable to do the save' + Buf, 'Warning', MB_ICONWARNING);
+        AddDebug(ltWarning, 'Unable to do the save' + Buf);
 
       // Reloading the view if needed
       if ReloadFromDisk then
@@ -369,8 +475,8 @@ procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
   StatusText := 'Saving file...';
   if LcdEditor.Save then
-    MsgBox(Format('Save successfully done on the disk for "%s".',
-      [LcdEditor.SourceFileName]), 'Information', MB_ICONINFORMATION
+    AddDebug(ltInformation, Format('Save successfully done on the disk for "%s".',
+      [LcdEditor.SourceFileName])
     )
   else
     MsgBox(
@@ -393,10 +499,10 @@ begin
   
   SelectedContentEntry.CancelImport;
   SetControlsStateSelectedContentModified(False);
-  (*AddDebug(ltInformation,
+  AddDebug(ltInformation,
     Format('The import for the entry #%d [%s] of the file "%s" was canceled.', [
-      SelectedContentEntry.Index, SelectedContentEntry.GetOutputFileName,
-        IPACEditor.SourceFileName]));*)
+      SelectedContentEntry.Index, SelectedContentEntry.Name,
+        LcdEditor.SourceFileName]));
 end;
 
 function TfrmMain.MsgBox(Text, Caption: string; Flags: Integer): Integer;
@@ -437,17 +543,20 @@ begin
   miClose.Enabled := State;
   miImport.Enabled := State;
   miImport2.Enabled := State;
-  btnImport.Enabled := State;
+  tbImport.Enabled := State;
   miExport.Enabled := State;
   miExport2.Enabled := State;
-  btnExport.Enabled := State;  
+  tbExport.Enabled := State;
   miExportAll.Enabled := State;
   miExportAll2.Enabled := State;
-  btnExportAll.Enabled := State;
+  tbExportAll.Enabled := State;
+  miReload.Enabled := State;
+  tbReload.Enabled := State;
 end;
 
 procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);
 begin
+  tbSave.Enabled := State;
   miSave.Enabled := State;
   miSaveAs.Enabled := State;
 end;
@@ -469,7 +578,28 @@ procedure TfrmMain.SetControlsStateUndoImporting(State: Boolean);
 begin
   miUndo.Enabled := State;
   miUndo2.Enabled := State;
-  btnUndo.Enabled := State;
+  tbUndo.Enabled := State;
+//  btnUndo.Enabled := State;
+end;
+
+procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);
+begin
+  DebugLog.Active := Value;
+end;
+
+procedure TfrmMain.SetScreenPreview(const Value: Boolean);
+begin
+  if fScreenPreview <> Value then begin
+    fScreenPreview := Value;
+    miPreview.Checked := Value;
+    tbPreview.Down := Value;
+
+    with frmPreview do
+      if (Value) and (not Visible) then
+        Show
+      else if (not Value) and (Visible) then
+        Close;
+  end;
 end;
 
 procedure TfrmMain.SetStatusText(const Value: string);
@@ -481,22 +611,48 @@ begin
   Application.ProcessMessages;
 end;
 
+procedure TfrmMain.SetWindowTitleCaption(const FileName: TFileName);
+begin
+  if FileName = '' then
+    Caption := StoredCaption
+  else
+    Caption := ExtractFileName(FileName) + ' - ' + StoredCaption;
+  Application.Title := Caption;
+end;
+
+procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
+  var DefaultDraw: Boolean);
+var
+  ElementDetails: TThemedElementDetails;
+  NewRect : TRect;
+
+begin
+  // Thank you ...
+  // http://www.brandonstaggs.com/2009/06/29/give-a-delphi-ttoolbar-a-proper-themed-background/
+  if ThemeServices.ThemesEnabled then begin
+    NewRect := Sender.ClientRect;
+    NewRect.Top := NewRect.Top - GetSystemMetrics(SM_CYMENU);
+    ElementDetails := ThemeServices.GetElementDetails(trRebarRoot);
+    ThemeServices.DrawElement(Sender.Canvas.Handle, ElementDetails, NewRect);
+  end;
+end;
+
 procedure TfrmMain.UpdateFileModifiedState;
 var
   i: Integer;
-  IpacContentIsModified: Boolean;
+  ContentIsModified: Boolean;
 
 begin
   // Checking if a Iwad content entry is modified
   i := 0;
-  IpacContentIsModified := False;
-  while (i < LcdEditor.Count) and (not IpacContentIsModified) do begin
-    IpacContentIsModified := LcdEditor.Items[i].Updated;
+  ContentIsModified := False;
+  while (i < LcdEditor.Count) and (not ContentIsModified) do begin
+    ContentIsModified := LcdEditor.Items[i].Updated;
     Inc(i);
   end;
 
   // Setting up the result
-  fFileModified := IpacContentIsModified;
+  fFileModified := ContentIsModified;
 
   // Update UI
   SetControlsStateSaveOperation(FileModified);

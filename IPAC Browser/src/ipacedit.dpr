@@ -20,7 +20,8 @@ uses
   uitools in '..\..\Common\uitools.pas',
   shell in 'shell.pas',
   shellext in '..\..\Common\ShellExt\shellext.pas',
-  regshell in '..\..\Common\ShellExt\regshell.pas';
+  regshell in '..\..\Common\ShellExt\regshell.pas',
+  debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog};
 
 {$R *.res}
 
