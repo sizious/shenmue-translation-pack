@@ -313,6 +313,7 @@ var
   SavedPosition: Int64;
 
 begin
+  // For the EncodeImage function, go the WriteEntry function.
   SavedPosition := IwadFileStream.Position;
   
 //  IwadFileStream := TFileStream.Create(Owner.SourceFileName, fmOpenRead);

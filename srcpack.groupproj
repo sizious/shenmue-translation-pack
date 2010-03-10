@@ -10,6 +10,7 @@
     <Projects Include="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
     <Projects Include="Common\Preview\src\debug\preview.dproj" />
+    <Projects Include="Font Utility\src\fontutil.dproj" />
     <Projects Include="IDX Creator\src\idxmaker.dproj" />
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
     <Projects Include="IPAC Browser\src\ipacedit.dproj" />
@@ -131,14 +132,23 @@
   <Target Name="vmulcded:Make">
     <MSBuild Projects="VMU Screen Editor\src\vmulcded.dproj" Targets="Make" />
   </Target>
+  <Target Name="fontutil">
+    <MSBuild Projects="Font Utility\src\fontutil.dproj" Targets="" />
+  </Target>
+  <Target Name="fontutil:Clean">
+    <MSBuild Projects="Font Utility\src\fontutil.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="fontutil:Make">
+    <MSBuild Projects="Font Utility\src\fontutil.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;hdissect;preview;vmulcded" />
+    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;hdissect;preview;vmulcded;fontutil" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;hdissect:Clean;preview:Clean;vmulcded:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;hdissect:Clean;preview:Clean;vmulcded:Clean;fontutil:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;hdissect:Make;preview:Make;vmulcded:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;hdissect:Make;preview:Make;vmulcded:Make;fontutil:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
