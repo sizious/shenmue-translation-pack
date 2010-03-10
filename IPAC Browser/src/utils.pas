@@ -3,10 +3,11 @@ unit utils;
 interface
 
 uses
-  Windows, SysUtils;
+  Windows, SysUtils, XmlConf;
 
 function GetAppVersion: string;
 function GetApplicationDirectory: TFileName;
+function GetConfigurationObject: TXMLConfigurationFile;
 function GetWorkingTempDirectory: TFileName;
 procedure LoadConfigMain;
 procedure LoadConfigProperties;
@@ -16,7 +17,7 @@ procedure SaveConfigProperties;
 implementation
 
 uses
-  Forms, SysTools, UITools, XmlConf, Main, DebugLog, FileProp;
+  Forms, SysTools, UITools, Main, FileProp;
 
 const
   WORKING_TEMP_DIR = 'IPACTemp';
@@ -24,7 +25,14 @@ const
 
 var
   sWorkingTempDirectory: TFileName;
-  Configuration: TXmlConfigurationFile;
+  Configuration: TXMLConfigurationFile;
+
+//------------------------------------------------------------------------------
+
+function GetConfigurationObject: TXMLConfigurationFile;
+begin
+  Result := Configuration;
+end;
 
 //------------------------------------------------------------------------------
 
@@ -145,9 +153,9 @@ end;
 
 //------------------------------------------------------------------------------
 
-function InitConfigurationFile: TXmlConfigurationFile;
+function InitConfigurationFile: TXMLConfigurationFile;
 begin
-  Result := TXmlConfigurationFile.Create(GetConfigFile, CONFIG_ID);
+  Result := TXMLConfigurationFile.Create(GetConfigFile, CONFIG_ID);
 end;
 
 //------------------------------------------------------------------------------

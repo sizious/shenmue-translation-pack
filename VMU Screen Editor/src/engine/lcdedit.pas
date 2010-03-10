@@ -15,6 +15,7 @@ type
 
   TVmuLcdEntry = class
   private
+    fDecodedImage: TBitmap;
     fName: string;
     fSize: LongWord;
     fOffset: LongWord;
@@ -25,22 +26,28 @@ type
     fDimension: TImageDimension;
     fNewOffset: LongWord;
     fNewDimension: TImageDimension;
+    fIndex: Integer;
   protected
+    procedure DecodeImage(var IwadFileStream: TFileStream);
     procedure WriteEntry(var InStream, OutStream: TFileStream);
     property NewDimension: TImageDimension read fNewDimension;
     property NewSize: LongWord read fNewSize;
     property NewOffset: LongWord read fNewOffset;    
   public
     constructor Create(Owner: TVmuLcdEditor);
+    destructor Destroy; override;
     procedure CancelImport;
     procedure Dump(const FileName: TFileName);
     procedure ExportToFile(const FileName: TFileName);
     function ImportFromFile(const FileName: TFileName): Boolean;
+    property DecodedImage: TBitmap read fDecodedImage;    
     property Dimension: TImageDimension read fDimension;
     property ImportedFileName: TFileName read fImportedFileName;
+    property Index: Integer read fIndex;
     property Name: string read fName;
     property Offset: LongWord read fOffset;
     property Owner: TVmuLcdEditor read fOwner;
+    property Picture: TBitmap read fDecodedImage;
     property Size: LongWord read fSize;
     property Updated: Boolean read fUpdated;
   end;
@@ -69,7 +76,7 @@ type
 implementation
 
 uses
-  SysTools;
+  SysTools, Math;
   
 const
   IWAD_SIGN = 'IWAD';
@@ -94,9 +101,6 @@ procedure TVmuLcdEditor.Add(var IwadFile: TFileStream; Offset, Size: LongWord;
 var
   Item: TVmuLcdEntry;
   ImageSize: TImageDimension;
-{$IFDEF DEBUG}
-  Index: Integer;
-{$ENDIF}
 
 begin
   // Retrieving the image size
@@ -108,11 +112,12 @@ begin
   Item.fDimension.Width := ImageSize.Width;
   Item.fOffset := Offset;
   Item.fSize := Size;
-  Item.fName := Name;    
-{$IFDEF DEBUG} Index := {$ENDIF} fVmuLcdEntryList.Add(Item);
+  Item.fName := Name;
+  Item.DecodeImage(IwadFile);
+  Item.fIndex := fVmuLcdEntryList.Add(Item);
 
 {$IFDEF DEBUG}
-  WriteLn('  #', Index, ': Name: "', Name, '", Offset: ', Offset, 
+  WriteLn('  #', Item.Index, ': Name: "', Name, '", Offset: ', Offset,
     ', Size: ', Size, ', Image Size: ', Item.Dimension.Width, 'x',
     Item.Dimension.Height);
 {$ENDIF}
@@ -126,6 +131,7 @@ begin
   for i := 0 to Count - 1 do
     TVmuLcdEntry(fVmuLcdEntryList[i]).Free;
   fVmuLcdEntryList.Clear;
+  fSourceFileName := '';
 end;
 
 constructor TVmuLcdEditor.Create;
@@ -174,6 +180,10 @@ var
   
 begin
   Result := False;
+  if not FileExists(FileName) then Exit;
+
+  Clear;
+  
   IwadFile := TFileStream.Create(FileName, fmOpenRead);
   try
     // Read the header
@@ -294,6 +304,69 @@ begin
   fOwner := Owner;
 end;
 
+procedure TVmuLcdEntry.DecodeImage(var IwadFileStream: TFileStream);
+var
+//  IwadFileStream: TFileStream;
+  Buffer: array[0..255] of Byte;
+  i, b, Factor, X, Y: Integer;
+  PixelOn: Boolean;
+  SavedPosition: Int64;
+
+begin
+  SavedPosition := IwadFileStream.Position;
+  
+//  IwadFileStream := TFileStream.Create(Owner.SourceFileName, fmOpenRead);
+
+  fDecodedImage := TBitmap.Create;
+//  try
+
+  // Init Bitmap properties
+  with DecodedImage do begin
+    Monochrome := True; // 1bpp
+    Width := Dimension.Width;
+    Height := Dimension.Height;
+  end;
+
+  // Skipping Image Size infos
+  IwadFileStream.Seek(Offset + SizeOf(TImageDimension), soFromBeginning);
+
+  // Reading the LCD data entry
+  IwadFileStream.Read(Buffer, Size);
+
+  // Initializing 1bpp decoder
+  Factor := Size div Dimension.Height; // 8 bits in one Byte
+  X := 0;
+
+  // Decoding LCD data
+  for i := 0 to Size - 1 do begin
+
+    // Pre-calculating coordonates
+    Y := i div Factor;
+    if (i mod Factor) = 0 then
+      X := 0;
+
+    // Drawing on the Bitmap
+    for b := 7 downto 0 do begin
+      PixelOn := ((Buffer[i] shr b) and 1) = 1;
+      if PixelOn then
+        DecodedImage.Canvas.Pixels[X, Y] := clBlack;
+      Inc(X);
+    end;
+  end;
+
+  IwadFileStream.Seek(SavedPosition, soFromBeginning);
+  
+(*  finally
+    IwadFileStream.Free;
+  end; *)
+end;
+
+destructor TVmuLcdEntry.Destroy;
+begin
+  fDecodedImage.Free;
+  inherited;
+end;
+
 procedure TVmuLcdEntry.Dump(const FileName: TFileName);
 var
   IwadFile, OutFile: TFileStream;
@@ -328,13 +401,13 @@ var
   end;
 
 begin
+  fNewOffset := OutStream.Position;
+
   if Updated then begin
     // Write the patched LCD data
 
     Bitmap := TBitmap.Create;
     try
-      fNewOffset := OutStream.Position;
-
       // Loading the Bitmap
       Bitmap.LoadFromFile(ImportedFileName);
       Bitmap.Monochrome := True;
@@ -346,7 +419,7 @@ begin
 
       // Initialize
       i := -1;
-      fNewSize := Bitmap.Height * (Round(Bitmap.Width / 8));
+      fNewSize := Bitmap.Height * (Ceil(Bitmap.Width / 8));
       ZeroMemory(@Buffer, NewSize);
       
       // Encoding the Bitmap data
@@ -385,7 +458,7 @@ begin
 
     // Copying previous values
     fNewSize := Size;
-    fNewOffset := Offset;
+    fNewDimension := fDimension;
   end;
 
   // Writing Padding
@@ -397,56 +470,8 @@ begin
 end;
 
 procedure TVmuLcdEntry.ExportToFile(const FileName: TFileName);
-var
-  IwadFileStream: TFileStream;
-  Bitmap: TBitmap;
-  Buffer: array[0..255] of Byte;
-  i, b, Factor, X, Y: Integer;
-  PixelOn: Boolean;
-  
 begin
-  IwadFileStream := TFileStream.Create(Owner.SourceFileName, fmOpenRead);
-  Bitmap := TBitmap.Create;
-  try
-    // Init Bitmap properties
-    with Bitmap do begin
-      Monochrome := True; // 1bpp
-      Width := Dimension.Width;
-      Height := Dimension.Height;
-    end;
-
-    // Skipping Image Size infos
-    IwadFileStream.Seek(Offset + SizeOf(TImageDimension), soFromBeginning);
-
-    // Reading the LCD data entry
-    IwadFileStream.Read(Buffer, Size);
-    
-    // Initializing 1bpp decoder
-    Factor := Size div Dimension.Height; // 8 bits in one Byte
-    X := 0;
-    
-    // Decoding LCD data
-    for i := 0 to Size - 1 do begin
-
-      // Pre-calculating coordonates
-      Y := i div Factor;    
-      if (i mod Factor) = 0 then
-        X := 0;
-
-      // Drawing on the Bitmap 
-      for b := 7 downto 0 do begin
-        PixelOn := ((Buffer[i] shr b) and 1) = 1;
-        if PixelOn then
-          Bitmap.Canvas.Pixels[X, Y] := clBlack;
-        Inc(X);
-      end;
-    end;
-
-    Bitmap.SaveToFile(FileName);
-  finally
-    Bitmap.free;
-    IwadFileStream.Free;
-  end;
+  DecodedImage.SaveToFile(FileName);
 end;
 
 function TVmuLcdEntry.ImportFromFile(const FileName: TFileName): Boolean;

@@ -7,9 +7,9 @@ uses
   
 type
   EXMLConfigurationFile = class(Exception);
-  EInvalidConfigID = class(EXmlConfigurationFile);
+  EInvalidConfigID = class(EXMLConfigurationFile);
 
-  TXmlConfigurationFile = class
+  TXMLConfigurationFile = class
   private
     fXMLDocument: IXMLDocument;
     fLoadedFileName: TFileName;
@@ -45,7 +45,7 @@ uses
   
 { TXmlConfigurationFile }
 
-constructor TXmlConfigurationFile.Create(const FileName: TFileName;
+constructor TXMLConfigurationFile.Create(const FileName: TFileName;
   const ConfigID: string);
 begin
   CoInitialize(nil);
@@ -55,7 +55,7 @@ begin
   InitDocument;
 end;
 
-destructor TXmlConfigurationFile.Destroy;
+destructor TXMLConfigurationFile.Destroy;
 begin
   XMLDocument.SaveToFile(LoadedFileName);
   XMLDocument.Active := False;
@@ -64,7 +64,7 @@ begin
 end;
 
 
-function TXmlConfigurationFile.GetSectionNode(Section: string;
+function TXMLConfigurationFile.GetSectionNode(Section: string;
   var ResultNode: IXMLNode; AllowCreate: Boolean): Boolean;
 begin
   Result := False;
@@ -84,7 +84,7 @@ begin
   end; // else
 end;
 
-procedure TXmlConfigurationFile.InitDocument;
+procedure TXMLConfigurationFile.InitDocument;
 var
   ReadConfigID: string;
 
@@ -117,14 +117,14 @@ begin
     XMLDocument.DocumentElement := XMLDocument.CreateNode(ConfigID);
 end;
 
-function TXmlConfigurationFile.ReadBool(const Section, Key: string;
+function TXMLConfigurationFile.ReadBool(const Section, Key: string;
   DefaultValue: Boolean): Boolean;
 begin
   Result := StrToBool(ReadString(Section,
     Key, LowerCase(BoolToStr(DefaultValue, True))));
 end;
 
-procedure TXmlConfigurationFile.ReadFormAttributes(const Section: string;
+procedure TXMLConfigurationFile.ReadFormAttributes(const Section: string;
   Form: TForm);
 begin
   Form.Left := ReadInteger(Section, 'left', Form.Left);
@@ -135,7 +135,7 @@ begin
     Integer(Form.WindowState)));
 end;
 
-procedure TXmlConfigurationFile.ReadFormAttributes(Form: TForm);
+procedure TXMLConfigurationFile.ReadFormAttributes(Form: TForm);
 var
   Section: string;
 
@@ -144,13 +144,13 @@ begin
   ReadFormAttributes(Section, Form);
 end;
 
-function TXmlConfigurationFile.ReadInteger(const Section, Key: string;
+function TXMLConfigurationFile.ReadInteger(const Section, Key: string;
   DefaultValue: Integer): Integer;
 begin
   Result := StrToInt(ReadString(Section, Key, IntToStr(DefaultValue)));
 end;
 
-function TXmlConfigurationFile.ReadString(const Section, Key: string;
+function TXMLConfigurationFile.ReadString(const Section, Key: string;
   DefaultValue: string): string;
 var
   RootNode, Node: IXMLNode;
@@ -167,12 +167,12 @@ begin
   end;
 end;
 
-procedure TXmlConfigurationFile.WriteBool(const Section, Key: string; Value: Boolean);
+procedure TXMLConfigurationFile.WriteBool(const Section, Key: string; Value: Boolean);
 begin
   WriteString(Section, Key, LowerCase(BoolToStr(Value, True)));
 end;
 
-procedure TXmlConfigurationFile.WriteFormAttributes(const Section: string;
+procedure TXMLConfigurationFile.WriteFormAttributes(const Section: string;
   Form: TForm);
 begin
   WriteInteger(Section, 'state', Integer(Form.WindowState));
@@ -190,7 +190,7 @@ begin
   end;
 end;
 
-procedure TXmlConfigurationFile.WriteFormAttributes(Form: TForm);
+procedure TXMLConfigurationFile.WriteFormAttributes(Form: TForm);
 var
   Section: string;
 
@@ -199,13 +199,13 @@ begin
   WriteFormAttributes(Section, Form);
 end;
 
-procedure TXmlConfigurationFile.WriteInteger(const Section, Key: string;
+procedure TXMLConfigurationFile.WriteInteger(const Section, Key: string;
   Value: Integer);
 begin
   WriteString(Section, Key, IntToStr(Value));
 end;
 
-procedure TXmlConfigurationFile.WriteString(const Section, Key, Value: string);
+procedure TXMLConfigurationFile.WriteString(const Section, Key, Value: string);
 var
   RootNode,
   CurrentNode: IXMLNode;

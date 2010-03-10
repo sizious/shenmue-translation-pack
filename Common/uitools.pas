@@ -3,19 +3,24 @@ unit uitools;
 interface
 
 uses
-  Windows, SysUtils, Forms, ComCtrls;
+  Windows, SysUtils, Classes, Forms, ComCtrls, JvToolbar;
+
+type
+  EUserInterfaceException = class(Exception);
+  EInvalidToolBarButton = class(EUserInterfaceException);
 
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion(LangID, SubLangID: Byte): string;
 function GetShortApplicationTitle: string;
+procedure InitToolBarControl(SourceForm: TForm; ToolBar: TJvToolBar);
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 
 implementation
 
 uses
-  ShellApi;
-  
+  Menus, ShellApi;
+
 //------------------------------------------------------------------------------
 
 function GetShortApplicationTitle: string;
@@ -27,9 +32,11 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-(*  Based on the original function published by Nono40 (nono40.developpez.com)
-    Thanks to Olivier Lance:
-      http://delphi.developpez.com/faq/?page=systemedivers#langidcquoi *)
+(*
+  Based on the original function published by Nono40 (nono40.developpez.com)
+  Thanks to Olivier Lance:
+        http://delphi.developpez.com/faq/?page=systemedivers#langidcquoi
+*)
 function ExtractApplicationVersion(const wLanguage: LANGID): string;
 const
   VERSION_INFO_VALUE = '04E4';
@@ -132,6 +139,41 @@ begin
   ShellExecuteInfo.lpVerb := 'properties';
   ShellExecuteInfo.lpFile := PChar(FileName);
   ShellExecuteEx(@ShellExecuteInfo);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure InitToolBarControl(SourceForm: TForm; ToolBar: TJvToolBar);
+var
+  i: Integer;
+  MenuName: TComponentName;
+  MenuItem: TMenuItem;
+  ShortCutStr: string;
+
+begin
+  // Associating each ToolButton with the appropriate MenuItem
+  for i := 0 to ToolBar.ButtonCount - 1 do
+    if ToolBar.Buttons[i].Style = tbsButton then begin
+      // Searching the MenuItem corresponding at the ToolButton
+      MenuName := 'mi' +
+        Copy(ToolBar.Buttons[i].Name, 3, Length(ToolBar.Buttons[i].Name) - 2);
+      MenuItem := SourceForm.FindComponent(MenuName) as TMenuItem;
+
+      // Setting action for the ToolButton
+      if Assigned(MenuItem) then begin
+        ToolBar.Buttons[i].Caption := StringReplace(MenuItem.Caption, '&', '', [rfReplaceAll]);
+        ShortCutStr := ShortCutToText(MenuItem.ShortCut);
+        if ShortCutStr <> '' then
+          ShortCutStr := ' (' + ShortCutStr + ')';
+        ToolBar.Buttons[i].Hint := ToolBar.Buttons[i].Caption + ShortCutStr
+          + '|' + MenuItem.Hint;
+        ToolBar.Buttons[i].OnClick := MenuItem.OnClick;
+      end {$IFNDEF DEBUG}; {$ELSE} else
+        raise EInvalidToolBarButton.Create(
+          'InitToolBarControl: Invalid main menu item: "' + MenuName + '".'
+        );
+      {$ENDIF}
+    end; // Style = tbsButton
 end;
 
 //------------------------------------------------------------------------------

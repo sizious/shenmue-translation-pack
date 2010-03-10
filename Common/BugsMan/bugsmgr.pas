@@ -7,22 +7,21 @@ uses
   Dialogs, ExtCtrls, StdCtrls, Buttons;
 
 type
-  TExceptionCallBackEvent =
-    procedure(Sender: TObject; ExceptionMessage: string) of object;
+  TExceptionCallBack = procedure(Sender: TObject; ExceptionMessage: string) of object;
 
   TBugsHandlerInterface = class(TObject)
   private
     fSaveLogRequest: TNotifyEvent;
-    fExceptionCallBack: TExceptionCallBackEvent;
+    fExceptionCallBack: TExceptionCallBack;
     fQuitRequest: TNotifyEvent;
-    procedure SetExceptionCallBack(const Value: TExceptionCallBackEvent);
+    procedure SetExceptionCallBack(const Value: TExceptionCallBack);
     procedure SetQuitRequest(const Value: TNotifyEvent);
     procedure SetSaveLogRequest(const Value: TNotifyEvent);
   public
     constructor Create;
     destructor Destroy; override;
     procedure Execute(Sender: TObject; E: Exception);
-    property OnExceptionCallBack: TExceptionCallBackEvent read
+    property OnExceptionCallBack: TExceptionCallBack read
       fExceptionCallBack write SetExceptionCallBack;
     property OnSaveLogRequest: TNotifyEvent read fSaveLogRequest
       write SetSaveLogRequest;
@@ -51,7 +50,7 @@ type
     fErrorMsg : string;
     fErrorType : string;
     fErrorSender : string;
-    fExceptionCallBack: TExceptionCallBackEvent;
+    fExceptionCallBack: TExceptionCallBack;
     fQuitRequest: TNotifyEvent;
     fSaveLogRequest: TNotifyEvent;
     fQuitAction: Boolean;
@@ -60,19 +59,22 @@ type
   public
     { Déclarations publiques }
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
-    property OnExceptionCallBack: TExceptionCallBackEvent read
+    property OnExceptionCallBack: TExceptionCallBack read
       fExceptionCallBack write fExceptionCallBack;
     property OnSaveLogRequest: TNotifyEvent read fSaveLogRequest
       write fSaveLogRequest;
     property OnQuitRequest: TNotifyEvent read fQuitRequest write fQuitRequest;
   end;
 
-var
-  frmBugsHandler: TfrmBugsHandler;
+(* var
+  frmBugsHandler: TfrmBugsHandler; *)
 
 implementation
 
 {$R *.dfm}
+
+var
+  frmBugsHandler: TfrmBugsHandler;
 
 //------------------------------------------------------------------------------
 
@@ -146,8 +148,17 @@ end;
 
 constructor TBugsHandlerInterface.Create;
 begin
+{$IFDEF DEBUG}
+  if Assigned(frmBugsHandler) then
+    raise Exception.Create('Please remove the frmBugsHandler from the' +
+      '''Form created by Delphi'' in the Project option dialog.'
+    );
+{$ENDIF}
+
   frmBugsHandler := TfrmBugsHandler.Create(nil);
 end;
+
+//------------------------------------------------------------------------------
 
 destructor TBugsHandlerInterface.Destroy;
 begin
@@ -156,6 +167,8 @@ begin
   frmBugsHandler.Free;
   inherited;
 end;
+
+//------------------------------------------------------------------------------
 
 procedure TBugsHandlerInterface.Execute(Sender: TObject; E: Exception);
 begin
@@ -179,13 +192,17 @@ begin
   end;
 end;
 
+//------------------------------------------------------------------------------
+
 procedure TBugsHandlerInterface.SetExceptionCallBack(
-  const Value: TExceptionCallBackEvent);
+  const Value: TExceptionCallBack);
 begin
   fExceptionCallBack := Value;
   if Assigned(OnExceptionCallBack) then
     frmBugsHandler.OnExceptionCallBack := OnExceptionCallBack;
 end;
+ 
+//------------------------------------------------------------------------------
 
 procedure TBugsHandlerInterface.SetQuitRequest(const Value: TNotifyEvent);
 begin
@@ -194,11 +211,15 @@ begin
     frmBugsHandler.OnQuitRequest := OnQuitRequest;
 end;
 
+//------------------------------------------------------------------------------
+
 procedure TBugsHandlerInterface.SetSaveLogRequest(const Value: TNotifyEvent);
 begin
   fSaveLogRequest := Value;
   if Assigned(OnSaveLogRequest) then
     frmBugsHandler.OnSaveLogRequest := OnSaveLogRequest;
 end;
+
+//------------------------------------------------------------------------------
 
 end.

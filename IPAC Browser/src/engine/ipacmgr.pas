@@ -356,6 +356,7 @@ begin
     DeleteFile(InternalWorkingSourceFile);
   Sections.Clear;
   Content.Clear;
+  fSourceFileName := ''; // fix v1.1
 end;
 
 constructor TIpacEditor.Create;

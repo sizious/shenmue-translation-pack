@@ -97,7 +97,7 @@ object frmDebugLog: TfrmDebugLog
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
+  OnDeactivate = FormDeactivate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -138,7 +138,7 @@ object frmDebugLog: TfrmDebugLog
         ShortCut = 16467
         OnClick = miSaveClick
       end
-      object N2: TMenuItem
+      object miSeparator1: TMenuItem
         Caption = '-'
       end
       object miClose: TMenuItem
@@ -154,7 +154,7 @@ object frmDebugLog: TfrmDebugLog
         Hint = 'Reset and clear the Debug log.'
         OnClick = miClearAllClick
       end
-      object N1: TMenuItem
+      object miSeparator2: TMenuItem
         Caption = '-'
       end
       object miCopy: TMenuItem

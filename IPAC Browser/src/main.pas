@@ -1,5 +1,5 @@
 unit main;
-
+   
 interface
 
 uses
@@ -131,6 +131,10 @@ type
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
     procedure BugsHandlerQuitRequest(Sender: TObject);
+    procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
+    procedure DebugLogMainFormToFront(Sender: TObject);
+    procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);    
+    procedure DebugLogWindowActivated(Sender: TObject);
     procedure FreeApplication;
     function GetSelectedContentEntry: TIpacSectionListItem;
     procedure SetDebugLogVisible(const Value: Boolean);
@@ -144,13 +148,12 @@ type
     procedure Clear; overload;
     procedure Clear(const UpdateOnlyUI: Boolean); overload;
     procedure ClearColumnsImages;
-    function ExtendedKindToFilterString(
-      SectionKind: TIpacSectionKind): string;
+    function ExtendedKindToFilterString(SectionKind: TIpacSectionKind): string;
     function GetFileOperationDialogFilterIndex(
       TargetDialog: TOpenDialog): Integer;
-    procedure InitToolbarControl;
     procedure InitBugsHandler;
     procedure InitContentPopupMenuControl;
+    procedure InitDebugLog;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
@@ -184,19 +187,19 @@ type
 
   ExceptionGUI = class(Exception);
   EIpacNotOpened = class(ExceptionGUI);
-  EInvalidToolbarButton = class(ExceptionGUI);
 
 var
   frmMain: TfrmMain;
   IPACEditor: TIpacEditor;
   BugsHandler: TBugsHandlerInterface;
+  DebugLog: TDebugLogHandlerInterface;
 
 implementation
 
 {$R *.dfm}
 
 uses
-  GZipMgr, Utils, FileProp, About, Shell;
+  GZipMgr, Utils, FileProp, About, Shell, UiTools;
 
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
@@ -215,8 +218,7 @@ end;
 
 procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
 begin
-  if Assigned(frmDebugLog) then
-    frmDebugLog.AddLine(LineType, Text);
+  DebugLog.AddLine(LineType, Text);
 end;
 
 procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
@@ -227,7 +229,6 @@ end;
 
 procedure TfrmMain.aeMainHint(Sender: TObject);
 begin
-  frmDebugLog.ResetStatus;
   StatusText := Application.Hint;
   aeMain.CancelDispatch;
 end;
@@ -267,7 +268,7 @@ end;
 
 procedure TfrmMain.BugsHandlerSaveLogRequest(Sender: TObject);
 begin
-  frmDebugLog.SaveLogFile;  
+  DebugLog.SaveLogFile;
 end;
 
 procedure TfrmMain.Clear;
@@ -282,6 +283,29 @@ var
 begin
   for i := 0 to lvIpacContent.Columns.Count - 1 do
     lvIpacContent.Column[i].ImageIndex := -1;
+end;
+
+procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);
+end;
+
+procedure TfrmMain.DebugLogMainFormToFront(Sender: TObject);
+begin
+  BringToFront;
+end;
+
+procedure TfrmMain.DebugLogVisibilityChange(Sender: TObject;
+  const Visible: Boolean);
+begin
+  fDebugLogVisible := Visible;
+  miDebugLog.Checked := Visible;
+  tbDebugLog.Down := Visible;
+end;
+
+procedure TfrmMain.DebugLogWindowActivated(Sender: TObject);
+begin
+  StatusText := '';
 end;
 
 function TfrmMain.ExtendedKindToFilterString(
@@ -440,13 +464,16 @@ begin
 
   // Initialize the Bugs Handler
   InitBugsHandler;
-  
+
+  // Initialize the Debug Log
+  InitDebugLog;
+
   // Creating the main IPAC Editor object
   IPACEditor := TIpacEditor.Create;
   Clear;
 
   // Initialize some UI controls
-  InitToolbarControl;
+  InitToolBarControl(Self, tbMain);
   InitContentPopupMenuControl;
 
   // Init the file Association menu
@@ -477,6 +504,9 @@ begin
 
   // Destroying BugsHandler
   BugsHandler.Free;
+
+  // Destroying Debug Log
+  DebugLog.Free;
   
   // Saving configuration
   SaveConfigMain;
@@ -515,9 +545,9 @@ end;
 procedure TfrmMain.miDEBUG_TEST3Click(Sender: TObject);
 {$IFDEF DEBUG}
 begin
-  frmDebugLog.addline(ltinformation, 'information');
-  frmDebugLog.AddLine(ltWarning, 'test warning');
-  frmDebugLOG.addline(ltCritical, 'CRITICAL!!!');
+  DebugLog.AddLine(ltinformation, 'information');
+  DebugLog.AddLine(ltWarning, 'test warning');
+  DebugLog.AddLine(ltCritical, 'CRITICAL!!!');
 {$ELSE}
 begin
 {$ENDIF}
@@ -553,6 +583,21 @@ begin
   miImport2.Hint := miImport.Hint;
   miExport2.Hint := miExport.Hint;
   miExportAll2.Hint := miExportAll.Hint;
+end;
+
+procedure TfrmMain.InitDebugLog;
+begin
+  DebugLog := TDebugLogHandlerInterface.Create;
+  with DebugLog do begin
+    // Setting up events
+    OnException := DebugLogExceptionEvent;
+    OnMainWindowBringToFront := DebugLogMainFormToFront;
+    OnVisibilityChange := DebugLogVisibilityChange;
+    OnWindowActivated := DebugLogWindowActivated;
+
+    // Setting up the properties
+    Configuration := GetConfigurationObject; // in this order!
+  end;
 end;
 
 function TfrmMain.GetFileOperationDialogFilterIndex(
@@ -638,36 +683,6 @@ begin
     sbMain.Panels[1].Text := 'Modified'
   else
     sbMain.Panels[1].Text := '';
-end;
-
-procedure TfrmMain.InitToolbarControl;
-var
-  i: Integer;
-  MenuName: TComponentName;
-  MenuItem: TMenuItem;
-  ShortCutStr: string;
-
-begin
-  // Associating each ToolButton with the appropriate MenuItem
-  for i := 0 to tbMain.ButtonCount - 1 do
-    if tbMain.Buttons[i].Style = tbsButton then begin
-      // Searching the MenuItem corresponding at the ToolButton
-      MenuName := 'mi' +
-        Copy(tbMain.Buttons[i].Name, 3, Length(tbMain.Buttons[i].Name) - 2);
-      MenuItem := FindComponent(MenuName) as TMenuItem;
-
-      // Setting action for the ToolButton
-      if Assigned(MenuItem) then begin
-        tbMain.Buttons[i].Caption := StringReplace(MenuItem.Caption, '&', '', [rfReplaceAll]);
-        ShortCutStr := ShortCutToText(MenuItem.ShortCut);
-        if ShortCutStr <> '' then
-          ShortCutStr := ' (' + ShortCutStr + ')';
-        tbMain.Buttons[i].Hint := tbMain.Buttons[i].Caption + ShortCutStr
-          + '|' + MenuItem.Hint;
-        tbMain.Buttons[i].OnClick := MenuItem.OnClick;
-      end else
-        raise EInvalidToolbarButton.Create('Invalid main menu item : ' + MenuName + '.');
-    end; // Style = tbsButton
 end;
 
 procedure TfrmMain.JvDragDropDrop(Sender: TObject; Pos: TPoint;
@@ -926,17 +941,8 @@ end;
 
 procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);
 begin
-  if fDebugLogVisible <> Value then begin
-    fDebugLogVisible := Value;
-    miDebugLog.Checked := Value;
-    tbDebugLog.Down := Value;
-    
-    if Value then
-      frmDebugLog.Show
-    else
-      if frmDebugLog.Visible then
-        frmDebugLog.Close;
-  end;
+  // the fDebugLogVisible flag is changed in DebugLogVisibilityChange
+  DebugLog.Active := Value;
 end;
 
 procedure TfrmMain.SetFileAssociated(const Value: Boolean);
