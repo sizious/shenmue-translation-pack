@@ -1,5 +1,7 @@
 program vmulcded;
 
+{$R 'about\credits.res' 'about\credits.rc'}
+
 uses
   Windows,
   Forms,
@@ -10,7 +12,9 @@ uses
   xmlconf in '..\..\Common\xmlconf.pas',
   preview in 'preview.pas' {frmPreview},
   uitools in '..\..\Common\uitools.pas',
-  utils in 'utils.pas';
+  utils in 'utils.pas',
+  about in '..\..\Common\About\about.pas' {frmAbout},
+  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler};
 
 {$R *.res}
 
@@ -29,6 +33,8 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'Shenmue VMU Screen Editor';
+  InitConfigurationFile;
+  
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmPreview, frmPreview);
   {$IFDEF DEBUG}
@@ -37,6 +43,11 @@ begin
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
 {$ENDIF}
 
+  // Load the file passed in parameter if we have any
+  if ParamCount > 0 then
+    frmMain.LoadFile(ParamStr(1));
+
+  // Run the application
   Application.Run;
 
 {$IFDEF DEBUG}

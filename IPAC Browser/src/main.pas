@@ -475,6 +475,12 @@ begin
   // Initialize some UI controls
   InitToolBarControl(Self, tbMain);
   InitContentPopupMenuControl;
+  // Workaround for this shitty IDE!!!
+  with lvIpacContent do begin
+    SmallImages := ilIpacContent;
+    PopupMenu := pmIpacContent;
+    HeaderImages := ilHeader;
+  end;
 
   // Init the file Association menu
   fFileAssociated := ShellExtension.IsFilesAssociated;
@@ -873,10 +879,16 @@ begin
       [IpacEditor.SourceFileName])
     )
   else
-    AddDebug(ltWarning,
+    ReportFailure('Unable to save the file on the disk!',
+      Format('Unable to save on disk for "%s".', [IPACEditor.SourceFileName]),
+      'Save failed',
+      ltWarning
+    );
+(*    AddDebug(ltWarning,
       Format('Unable to save on disk for "%s".',
       [IPACEditor.SourceFileName])
-    );
+    ); *)
+
   LoadFile(IPACEditor.SourceFileName);
 end;
 
