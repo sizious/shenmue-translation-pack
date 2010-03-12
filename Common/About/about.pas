@@ -21,6 +21,7 @@ type
     bvUp: TBevel;
     mCredits: TMemo;
     procedure bCloseClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }
   public
@@ -55,7 +56,7 @@ var
 procedure InitAboutBox(const AppTitle, AppVersion: string);
 begin
   sLongAppTitle := AppTitle;
-  sShortAppTitle := GetShortApplicationTitle;
+  sShortAppTitle := GetApplicationShortTitle;
   sAppVersion := AppVersion;
 end;
 
@@ -91,5 +92,13 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+
+procedure TfrmAbout.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Char(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
+end;
 
 end.

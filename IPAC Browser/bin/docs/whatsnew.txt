@@ -12,6 +12,7 @@ FIXED:
 - The ".BIN" filter was added in the "Open" function.
 - Little fix in the IPAC Editor Engine: when a file is opened, closed and 
   re-opened again, the main window title wasn't updated.
+- When the save on disk fails, the user is now warned.
 ___                           _________________________________________________
 ___| Version 1.0: 2010-03-02 |_________________________________________________
     

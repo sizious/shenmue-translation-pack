@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, LCDEdit, ImgList, ComCtrls, ToolWin, JvExComCtrls, JvToolBar,
-  JvListView, ExtCtrls, StdCtrls, JvBaseDlg, JvBrowseFolder, ExtDlgs, DebugLog;
+  JvListView, ExtCtrls, StdCtrls, JvBaseDlg, JvBrowseFolder, ExtDlgs, DebugLog,
+  AppEvnts, BugsMgr, JvComponentBase, JvDragDrop;
 
 type
   TfrmMain = class(TForm)
@@ -69,6 +70,10 @@ type
     ToolButton17: TToolButton;
     tbAbout: TToolButton;
     miReload: TMenuItem;
+    aeMain: TApplicationEvents;
+    miDEBUG: TMenuItem;
+    GenerateException1: TMenuItem;
+    JvDragDrop: TJvDragDrop;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
@@ -86,6 +91,16 @@ type
     procedure miPreviewClick(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
       var DefaultDraw: Boolean);
+    procedure miProjectHomeClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure aeMainException(Sender: TObject; E: Exception);
+    procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure GenerateException1Click(Sender: TObject);
+    procedure miReloadClick(Sender: TObject);
+    procedure miCheckForUpdateClick(Sender: TObject);
+    procedure aeMainHint(Sender: TObject);
+    procedure JvDragDropDrop(Sender: TObject; Pos: TPoint; Value: TStrings);
   private
     { Déclarations privées }
     fFileModified: Boolean;
@@ -93,10 +108,16 @@ type
     fDebugLogVisible: Boolean;
     fScreenPreview: Boolean;
     fStoredCaption: string;
+    fQuitOnFailure: Boolean;
+    procedure BugsHandlerExceptionCallBack(Sender: TObject;
+      ExceptionMessage: string);
+    procedure BugsHandlerSaveLogRequest(Sender: TObject);
+    procedure BugsHandlerQuitRequest(Sender: TObject);    
     procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
     procedure DebugLogMainFormToFront(Sender: TObject);
     procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);
     procedure DebugLogWindowActivated(Sender: TObject);
+    procedure FreeApplication;
     function GetStatusText: string;
     procedure SetStatusText(const Value: string);
     function GetSelectedContentEntry: TVmuLcdEntry;
@@ -105,8 +126,13 @@ type
   protected
     procedure Clear; overload;
     procedure Clear(const UpdateOnlyUI: Boolean); overload;
+    procedure InitBugsHandler;
+    procedure InitContextPopup;
     procedure InitDebugLog;
-    procedure LoadFile(FileName: TFileName);
+    procedure LoadConfig;
+    procedure ReportFailure(Text, AdditionalDebugText, Caption: string;
+      FailureType: TLineType);
+    procedure SaveConfig;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
@@ -114,13 +140,15 @@ type
     procedure SetControlsStateUndoImporting(State: Boolean);
     procedure SetWindowTitleCaption(const FileName: TFileName);
     procedure UpdateFileModifiedState;
-    property StoredCaption: string read fStoredCaption write fStoredCaption;    
+    property StoredCaption: string read fStoredCaption write fStoredCaption;
+    property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;        
   public
     { Déclarations publiques }
     procedure AddDebug(LineType: TLineType; Text: string);
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    procedure LoadFile(FileName: TFileName);    
     property DebugLogVisible: Boolean read fDebugLogVisible
-      write SetDebugLogVisible;    
+      write SetDebugLogVisible;
     property FileModified: Boolean read fFileModified;
     property SelectedContentUI: TListItem read fSelectedContentUI;
     property ScreenPreview: Boolean read fScreenPreview write SetScreenPreview;
@@ -136,17 +164,47 @@ var
 
   LcdEditor: TVmuLcdEditor;
   DebugLog: TDebugLogHandlerInterface;
-
+  BugsHandler: TBugsHandlerInterface;
+  
 implementation
 
 {$R *.dfm}
 
 uses
-  Themes, Preview, UITools, Utils;
+  Themes, Preview, UITools, Utils, About;
   
 procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
 begin
   DebugLog.AddLine(LineType, Text);
+end;
+
+procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);
+  aeMain.CancelDispatch;
+end;
+
+procedure TfrmMain.aeMainHint(Sender: TObject);
+begin
+  StatusText := Application.Hint;
+  aeMain.CancelDispatch;
+end;
+
+procedure TfrmMain.BugsHandlerExceptionCallBack(Sender: TObject;
+  ExceptionMessage: string);
+begin
+  AddDebug(ltCritical, ExceptionMessage);
+end;
+
+procedure TfrmMain.BugsHandlerQuitRequest(Sender: TObject);
+begin
+  QuitOnFailure := True;
+  Close;
+end;
+
+procedure TfrmMain.BugsHandlerSaveLogRequest(Sender: TObject);
+begin
+  DebugLog.SaveLogFile;
 end;
 
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
@@ -167,7 +225,7 @@ end;
 
 procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
 begin
-  showmessage('DebugLogExceptionEvent');
+  BugsHandler.Execute(Sender, E);
 end;
 
 procedure TfrmMain.DebugLogMainFormToFront(Sender: TObject);
@@ -193,11 +251,38 @@ begin
   Clear(False);
 end;
 
+procedure TfrmMain.FormActivate(Sender: TObject);
+begin
+  aeMain.OnException := aeMainException;
+  aeMain.Activate;
+end;
+
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if (not QuitOnFailure) and (not SaveFileOnDemand(True)) then begin
+    Action := caNone;
+    Exit;
+  end;
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  aeMain.OnException := nil;
+
+{$IFNDEF DEBUG}
+  miDEBUG.Visible := False;
+{$ENDIF}
+
   // Initialize modules
+  InitBugsHandler;
   InitDebugLog;
   LcdEditor := TVmuLcdEditor.Create;
+
+  // Init the About Box
+  InitAboutBox(
+    Application.Title,
+    GetAppVersion
+  );
 
   // Init the Main Form
   Caption := Application.Title + ' v' + GetAppVersion;
@@ -207,14 +292,34 @@ begin
 
   // Init the UI
   InitToolBarControl(Self, tbMain);
+  InitContextPopup;  
   Clear(False);
+
+  // Load the configuration
+  LoadConfig;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  SaveConfig;
+  FreeApplication;
+end;
+
+procedure TfrmMain.FreeApplication;
+begin
   // Destroying modules
   LcdEditor.Free;
   DebugLog.Free;
+  BugsHandler.Free;
+end;
+
+procedure TfrmMain.GenerateException1Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  raise Exception.Create('TEST EXCEPTION');
+{$ELSE}
+begin
+{$ENDIF}
 end;
 
 function TfrmMain.GetSelectedContentEntry: TVmuLcdEntry;
@@ -232,6 +337,33 @@ begin
   Result := sbMain.Panels[2].Text;
 end;
 
+procedure TfrmMain.InitBugsHandler;
+begin
+  QuitOnFailure := False;
+  BugsHandler := TBugsHandlerInterface.Create;
+  try
+    BugsHandler.OnExceptionCallBack := BugsHandlerExceptionCallBack;
+    BugsHandler.OnSaveLogRequest := BugsHandlerSaveLogRequest;
+    BugsHandler.OnQuitRequest := BugsHandlerQuitRequest;
+  except
+    on E: Exception do
+      ReportFailure('Unable to initialize the Bugs Handler!',
+        'Reason: "' + E.Message + '"', 'Critical', ltWarning);
+  end;
+end;
+
+procedure TfrmMain.InitContextPopup;
+begin
+  miUndo2.Caption := miUndo.Caption;
+  miUndo2.Hint := miUndo.Hint;
+  miImport2.Caption := miImport.Caption;
+  miImport2.Hint := miImport.Hint;
+  miExport2.Caption := miExport.Caption;
+  miExport2.Hint := miExport.Hint;
+  miExportAll2.Caption := miExportAll.Caption;
+  miExportAll2.Hint := miExportAll.Hint;
+end;
+
 procedure TfrmMain.InitDebugLog;
 begin
   DebugLog := TDebugLogHandlerInterface.Create;
@@ -241,15 +373,44 @@ begin
     OnMainWindowBringToFront := DebugLogMainFormToFront;
     OnVisibilityChange := DebugLogVisibilityChange;
     OnWindowActivated := DebugLogWindowActivated;
+  end;
 
-    // Setting up the properties
-//    Configuration := GetConfigurationObject; // in this order!
+  // Setting up the properties
+  DebugLog.Configuration := Configuration; // in this order!
+end;
+
+procedure TfrmMain.JvDragDropDrop(Sender: TObject; Pos: TPoint;
+  Value: TStrings);
+begin
+  if not SaveFileOnDemand(False) then Exit;
+  if Value.Count > 0 then begin
+    if Value.Count > 1 then
+      ReportFailure('Only one file can be dropped at the same time on the application.',
+        Format('FilesDroppedCount: %d', [Value.Count]), 'Warning', ltWarning);
+    LoadFile(Value[0]);
   end;
 end;
 
 procedure TfrmMain.miPreviewClick(Sender: TObject);
 begin
   ScreenPreview := not ScreenPreview;
+end;
+
+procedure TfrmMain.miProjectHomeClick(Sender: TObject);
+begin
+  OpenLink(Handle, 'http://shenmuesubs.sourceforge.net/');
+end;
+
+procedure TfrmMain.LoadConfig;
+begin
+  with Configuration do begin
+    if not FirstConfiguration then begin
+      Position := poDesigned;    
+      ReadFormAttributes(Self);
+      lvIwadContent.ColumnsOrder := ReadString('main', 'columns',
+        lvIwadContent.ColumnsOrder);      
+    end;
+  end;
 end;
 
 procedure TfrmMain.LoadFile(FileName: TFileName);
@@ -265,8 +426,8 @@ begin
 
   // Checking the file
   if not FileExists(FileName) then begin
-(*    ReportFailure('The file "' + FileName + '" doesn''t exists.',
-      'FullFileName: ' + FileName, 'Warning', ltWarning); *)
+    ReportFailure('The file "' + FileName + '" doesn''t exists.',
+      'FullFileName: ' + FileName, 'Warning', ltWarning);
     Exit;
   end;
 
@@ -330,14 +491,14 @@ begin
 
     end else begin
       StatusText := 'IWAD empty ! Loading aborted...';
-(*      ReportFailure('This file contains a valid IPAC section, but the section itself is empty.',
+      ReportFailure('This file contains a valid IWAD section, but the section itself is empty.',
         'FileName: ' + FileName, 'Nothing to edit in this file', ltInformation);
-*)    end;
+    end;
 
   end else
-(*    ReportFailure('This file isn''t a valid IWAD file.',
+    ReportFailure('This file isn''t a valid IWAD file.',
       'FileName: ' + FileName, 'Warning', ltWarning);
-*) msgbox('error','error', 0);
+
 
   StatusText := '';
 end;
@@ -350,6 +511,16 @@ begin
     SetControlsStateUndoImporting(SelectedContentEntry.Updated);
     frmPreview.AssignBitmap(SelectedContentEntry.DecodedImage);
   end;
+end;
+
+procedure TfrmMain.miAboutClick(Sender: TObject);
+begin
+  RunAboutBox;
+end;
+
+procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
+begin
+  OpenLink(Handle, 'https://sourceforge.net/projects/shenmuesubs/files/');
 end;
 
 procedure TfrmMain.miCloseClick(Sender: TObject);
@@ -378,8 +549,11 @@ begin
           Application.ProcessMessages;
       end;
       frmMain.StatusText := '';
-      MsgBox('All the IWAD content was succesfully exported.',
-        'Information', MB_ICONINFORMATION);
+      AddDebug(ltInformation,
+        Format('All the IWAD content was succesfully exported for the "%s" file.',
+          [LcdEditor.SourceFileName]
+        )
+      );
     end;
 end;
 
@@ -440,6 +614,14 @@ begin
   Close;
 end;
 
+procedure TfrmMain.miReloadClick(Sender: TObject);
+begin
+  if not SaveFileOnDemand(True) then Exit;
+  LoadFile(LcdEditor.SourceFileName);
+  AddDebug(ltInformation, 'Successfully reloaded the file "'
+    + LcdEditor.SourceFileName + '".');
+end;
+
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
 var
   Buf: string;
@@ -479,11 +661,10 @@ begin
       [LcdEditor.SourceFileName])
     )
   else
-    MsgBox(
-      Format('Unable to save on disk for "%s".',
-      [LcdEditor.SourceFileName]),
-      'Warning',
-      MB_ICONWARNING
+    ReportFailure('Unable to save the file on the disk!',
+      Format('Unable to save on disk for "%s".', [LcdEditor.SourceFileName]),
+      'Save failed',
+      ltWarning
     );
   LoadFile(LcdEditor.SourceFileName);
 end;
@@ -510,6 +691,33 @@ begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
 end;
 
+procedure TfrmMain.ReportFailure(Text, AdditionalDebugText, Caption: string;
+  FailureType: TLineType);
+var
+  MsgIcon: Integer;
+  
+begin
+  MsgIcon := 0;
+  case FailureType of
+    ltInformation: MsgIcon := MB_ICONINFORMATION;
+    ltWarning: MsgIcon := MB_ICONWARNING;
+    ltCritical: MsgIcon := MB_ICONERROR;
+  end;
+
+  if AdditionalDebugText <> '' then
+    AdditionalDebugText := ' [' + AdditionalDebugText + '].';
+  AddDebug(FailureType, Text + AdditionalDebugText);
+  MsgBox(Text, Caption, MsgIcon + MB_OK);
+end;
+
+procedure TfrmMain.SaveConfig;
+begin
+  with Configuration do begin
+    WriteFormAttributes(Self);
+    WriteString('main', 'columns', lvIwadContent.ColumnsOrder);
+  end;
+end;
+
 function TfrmMain.SaveFileOnDemand(CancelButton: Boolean): Boolean;
 var
   CanDo: Integer;
@@ -519,7 +727,7 @@ var
 begin
   Result := True;
   if not FileModified then Exit;
-  
+
   Result := False;
 
   MsgBtns := MB_YESNO;
@@ -579,7 +787,6 @@ begin
   miUndo.Enabled := State;
   miUndo2.Enabled := State;
   tbUndo.Enabled := State;
-//  btnUndo.Enabled := State;
 end;
 
 procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);

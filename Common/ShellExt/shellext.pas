@@ -109,10 +109,9 @@ begin
   for i := Low(FilesAssoc) to High(FilesAssoc) do
     FileAssociationList.Add(FilesAssoc[i]);
 
-  fRegistryApplicationName := GetShortApplicationTitle;
+  fRegistryApplicationName := GetApplicationShortTitle;
   fRegistryOpenWithTheApplication := 'Open with ' + fRegistryApplicationName;
-  fRegistryApplicationName :=
-    LowerCase(StringReplace(fRegistryApplicationName, ' ', '', [rfReplaceAll]));
+  fRegistryApplicationName := GetApplicationCodeName;
 end;
 
 //------------------------------------------------------------------------------

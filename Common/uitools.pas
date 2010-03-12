@@ -11,9 +11,11 @@ type
 
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion(LangID, SubLangID: Byte): string;
-function GetShortApplicationTitle: string;
+function GetApplicationCodeName: string;
+function GetApplicationShortTitle: string;
 procedure InitToolBarControl(SourceForm: TForm; ToolBar: TJvToolBar);
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
+function OpenLink(const Handle: THandle; const LinkURL: string): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 
 implementation
@@ -23,12 +25,23 @@ uses
 
 //------------------------------------------------------------------------------
 
-function GetShortApplicationTitle: string;
+// Returns the Application.Title without the "Shenmue " string before
+// Eg: "Shenmue IPAC Browser" becomes "IPAC Browser"
+function GetApplicationShortTitle: string;
 const
   SHENMUE_TITLE_SIGN = 'Shenmue ';
 
 begin
-  Result := StringReplace(Application.Title, SHENMUE_TITLE_SIGN, '', [rfReplaceAll]);
+  Result := StringReplace(Application.Title, SHENMUE_TITLE_SIGN, '', []);
+end;
+
+//------------------------------------------------------------------------------
+
+// Returns a "encoded" string from Application.Title
+// Eg: "Shenmue IPAC Browser" becomes "ipacbrowser".
+function GetApplicationCodeName: string;
+begin
+  Result := LowerCase(StringReplace(GetApplicationShortTitle, ' ', '', [rfReplaceAll]))
 end;
 
 //------------------------------------------------------------------------------
@@ -178,4 +191,12 @@ end;
 
 //------------------------------------------------------------------------------
 
+function OpenLink(const Handle: THandle; const LinkURL: string): Boolean;
+begin
+  Result := ShellExecute(Handle, 'open', PChar(LinkURL), '', '', SW_SHOWNORMAL) > 32;
+end;
+
+//------------------------------------------------------------------------------
+
+    
 end.
