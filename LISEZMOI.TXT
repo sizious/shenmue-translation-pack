@@ -64,6 +64,11 @@
       
  * SPR Utils
    Cet outil est un éditeur de sprites au format SPR.
+ 
+ * VMU Screen Editor
+   Ce petit éditeur permet de modifier les écrans affichés par le VMU de la 
+   Dreamcast, dans le but de traduire certaines actions (comme par exemple 
+   "Saving...").
  __                    ________________________________________________________
  __| COMMENT COMPiLER |________________________________________________________
   
