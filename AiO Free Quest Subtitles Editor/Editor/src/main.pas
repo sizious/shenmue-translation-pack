@@ -38,7 +38,7 @@ const
   APP_VERSION =
     '2.6' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'March 4, 2010 @06:05PM';
+  COMPIL_DATE_TIME = 'March 13, 2010 @06:45PM';
 
 type
   TGlobalTranslationModule = class;

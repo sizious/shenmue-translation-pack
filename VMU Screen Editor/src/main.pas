@@ -398,7 +398,7 @@ end;
 
 procedure TfrmMain.miProjectHomeClick(Sender: TObject);
 begin
-  OpenLink(Handle, 'http://shenmuesubs.sourceforge.net/');
+  OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
 procedure TfrmMain.LoadConfig;
@@ -520,7 +520,7 @@ end;
 
 procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
 begin
-  OpenLink(Handle, 'https://sourceforge.net/projects/shenmuesubs/files/');
+  OpenLink('https://sourceforge.net/projects/shenmuesubs/files/');
 end;
 
 procedure TfrmMain.miCloseClick(Sender: TObject);

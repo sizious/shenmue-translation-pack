@@ -372,6 +372,20 @@ object frmMain: TfrmMain
     end
     object miHelp: TMenuItem
       Caption = '&Help'
+      object miProjectHome: TMenuItem
+        Caption = '&Project home...'
+        Hint = 'Browse the project home page.'
+        ShortCut = 112
+        OnClick = miProjectHomeClick
+      end
+      object miCheckForUpdate: TMenuItem
+        Caption = '&Check for update...'
+        Hint = 'Open the SourceForge project webpage.'
+        OnClick = miCheckForUpdateClick
+      end
+      object N10: TMenuItem
+        Caption = '-'
+      end
       object miAbout: TMenuItem
         Caption = '&About...'
         Hint = 'I don'#39't know what'#39's it. Maybe you shouldn'#39't select this!'

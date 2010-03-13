@@ -341,7 +341,7 @@ object frmMain: TfrmMain
     object miHelp: TMenuItem
       Caption = '&Help'
       object miProjectHome: TMenuItem
-        Caption = '&Project Home...'
+        Caption = '&Project home...'
         Hint = 'Browse the project home page.'
         ShortCut = 112
         OnClick = miProjectHomeClick

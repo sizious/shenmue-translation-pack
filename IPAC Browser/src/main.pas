@@ -84,6 +84,9 @@ type
     JvDragDrop: TJvDragDrop;
     N7: TMenuItem;
     miAssociate: TMenuItem;
+    miCheckForUpdate: TMenuItem;
+    miProjectHome: TMenuItem;
+    N10: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
@@ -116,6 +119,8 @@ type
     procedure miPropertiesClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure miAssociateClick(Sender: TObject);
+    procedure miProjectHomeClick(Sender: TObject);
+    procedure miCheckForUpdateClick(Sender: TObject);
   private
     { Déclarations privées }
     fStoredCaption: string;
@@ -323,6 +328,11 @@ end;
 procedure TfrmMain.miAutoSaveClick(Sender: TObject);
 begin
   AutoSave := not AutoSave;
+end;
+
+procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
+begin
+  OpenLink('https://sourceforge.net/projects/shenmuesubs/files/');
 end;
 
 procedure TfrmMain.miCloseClick(Sender: TObject);
@@ -819,6 +829,11 @@ begin
   with odOpen do
     if Execute then
       LoadFile(FileName);
+end;
+
+procedure TfrmMain.miProjectHomeClick(Sender: TObject);
+begin
+  OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
 procedure TfrmMain.miPropertiesClick(Sender: TObject);

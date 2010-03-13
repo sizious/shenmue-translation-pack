@@ -15,7 +15,7 @@ function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
 procedure InitToolBarControl(SourceForm: TForm; ToolBar: TJvToolBar);
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
-function OpenLink(const Handle: THandle; const LinkURL: string): Boolean;
+function OpenLink(const LinkURL: string): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 
 implementation
@@ -191,9 +191,11 @@ end;
 
 //------------------------------------------------------------------------------
 
-function OpenLink(const Handle: THandle; const LinkURL: string): Boolean;
+function OpenLink(const LinkURL: string): Boolean;
 begin
-  Result := ShellExecute(Handle, 'open', PChar(LinkURL), '', '', SW_SHOWNORMAL) > 32;
+  Result := ShellExecute(
+    Application.Handle, 'open', PChar(LinkURL), '', '', SW_SHOWNORMAL
+  ) > 32;
 end;
 
 //------------------------------------------------------------------------------
