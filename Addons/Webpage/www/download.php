@@ -3,6 +3,28 @@
 	include_once("./engine/footer.php");
 	include_once("./engine/topbtn.php");		
 	print_header("download");	
+	
+	function make_program_link($program_name, $link_text) {
+		$program_url = str_replace(" ", "%20", $program_name);
+		return '<a target="_blank" href="'.
+			'http://sourceforge.net/projects/shenmuesubs/files/'.
+			$program_url.'/">'.$link_text.'</a>';
+	}
+	
+	function print_download_item($section_name, $program_name, $description, $image, $image_legend) {
+		echo '
+		
+<!-- '.$program_name.' -->
+<a name="'.$section_name.'"></a><h2>'.$program_name.'</h2>
+<p>'.$description.'</p>
+<div align="center">
+	<a target="_blank" href="./images/screens/fullsize/'.$image.'"><img src="./images/screens/thumbs/'.$image.'"/></a>
+	<div class="img_legend">'.$image_legend.'</div>
+</div>
+		';
+		print_set_to_top();
+	}
+	
 ?>
 <h1>Download</h1>
 
@@ -17,6 +39,7 @@
 	<li><a href="#ipac">IPAC Browser</a></li>	
 	<li><a href="#mt">Models Textures Editor</a></li>
 	<li><a href="#spr">SPR Utils</a></li>
+	<li><a href="#lcd">VMU Screen Editor</a></li>	
 </ul>
 
 <p>If you are interested to get the source code (written in <em>Delphi 2007</em>), <a href="#source">click here</a>. 
@@ -121,6 +144,16 @@ file format. The first interest of it is to gather many files in single big one.
 	<div class="img_legend">Editing a Shenmue II sprite file</div>			
 </div>
 <?php print_set_to_top(); ?>
+
+<?php
+	$url = make_program_link("VMU Screen Editor", "This utility");
+	$desc = $url." was made in order to edit the VMU screen on Shenmue I and ".
+		"II for the <strong>Dreamcast</strong> platform (only). The VMU is the ".
+		"<strong>Dreamcast</strong> memory card with an embedded LCD. ".
+		"This application isn't really needed but I know you love useless stuffs ".
+		"like this!";
+	print_download_item("lcd", "VMU Screen Editor", $desc, "vmulcded.png", "The editor in action!");
+?>
 
 <a name="source"></a><h1>Source</h1>
 
