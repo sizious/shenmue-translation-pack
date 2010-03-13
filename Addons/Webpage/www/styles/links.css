@@ -1,0 +1,11 @@
+ul.links div {
+	font-size: 10px;
+	margin-bottom: 5px;
+}
+
+ul.links img {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	vertical-align: middle;
+}

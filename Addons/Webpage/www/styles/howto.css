@@ -1,0 +1,44 @@
+div #prerequists {
+	margin-bottom: 10px; 
+	margin-top: 10px;
+	width: 100%;
+}
+
+#prerequists th {
+	width: 50%;
+ 	text-align: center;
+	font-weight: bold;
+	font-size: 10px;
+	padding: 0;
+	background-color: transparent;
+}
+
+#prerequists td {
+	vertical-align: top;
+	padding: 2px;
+}
+
+#prerequists ul {
+	margin-top: 2px;
+}
+
+#gameversion table {
+	width: 100%;
+}
+
+#gameversion td {
+	padding: 2px;
+	font-size: 11px;
+}
+
+/* #gameversion th {
+	background-color: black;
+	padding: 2px;
+}
+ */
+#howto_version {
+	float: right;
+	font-size: 10px;
+	font-style: italic;
+	color: #FFFF59;
+}

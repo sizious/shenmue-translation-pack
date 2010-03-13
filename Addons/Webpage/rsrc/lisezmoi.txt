@@ -1,0 +1,31 @@
+INFORMATIONS GENERALES
+
+Les kits téléchargés ont été réalisés par l'équipe de kitgraphiquegratuit.org. 
+Le site de téléchargement est http://www.kitgraphiquegratuit.org
+
+:CONTENU DE L'ARCHIVE:
+
+L'archive que vous télécharger contient les fichiers suivants :
+
+    * un fichier index.html et un fichier style.css
+    * un dossier "images" contenant toutes les images du kit
+    * Le ou les .PSD
+    * la présente licence
+
+Termes et conditions de la licence
+
+En téléchargeant et utilisant ce kit graphique, vous acceptez les conditions de la présente licence.
+
+Les images et réalisations graphiques de ce kit graphique restent l'entière propriété de son auteur, à savoir kitgraphiquegratuit.org. 
+
+Vous n'êtes pas autorisé à :
+
+    * modifier ce kit web en vue de le redistribuer sous quelque forme que ce soit
+    * redistribuer ce kit web contre paiement
+    * utiliser toute ou partie des images de ce kit web en dehors du site web pour lequel il a été téléchargé
+    * modifier ou supprimer les mentions de copyright présente sur le css et dans ce kit
+
+NOUS CONTACTER
+
+Pour toutes informations supplémentaires concernant les kits graphiques, n'hésitez pas à nous contacter : "webmaster@kitgraphiquegratuit.org" 
+Ou visiter notre forum : http://www.kitgraphiquegratuit.org/forum/  
