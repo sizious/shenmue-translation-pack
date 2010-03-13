@@ -62,6 +62,10 @@
       
  * SPR Utils
    This's an editor for SPR files.
+
+ * VMU Screen Editor
+   This tiny tool allow you to edit the LCD screen of the VMU, in order to 
+   translate some actions (for example "Saving"...).
  __                  __________________________________________________________
  __| HOW TO COMPiLE |__________________________________________________________
  
