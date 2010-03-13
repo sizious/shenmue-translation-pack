@@ -1,0 +1,84 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                             ________________________________________________
+ __| Shenmue VMU Screen Editor |________________________________________________
+
+  Cet éditeur est un éditeur bonus pour vous, les fans de Shenmue! Il n'est pas
+  très utile mais c'est toujours sympa. Il permet d'éditer les écrans qui sont
+  affichés par le VMU, pratique pour traduire certaines actions (comme 
+  sauvegarder... etc.).
+ 
+  Les jeux supportés sont:
+    - Shenmue I (DC)
+    - Shenmue II (DC)
+
+  Cet utilitaire est uniquement valable pour la Dreamcast, car le VMU est un
+  périphérique Dreamcast. What's Shenmue n'est pas supporté tout simplement car
+  AM2 n'utilise pas le VMU dans ce jeu (qui est une démo, donc normal je 
+  dirais). 
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  Vous devez avoir IPAC Browser sur votre disque quelque part avant de 
+  commencer, étant donné que vous devez extraire le fichier LCD.IWD du fichier
+  MISC/COLD_*.BIN. Pour faire ça rien de plus simple:
+   
+   1. Lancez IPAC Browser
+   2. Sélectionnez le bon fichier COLD_*.BIN (COLD.BIN, COLD_F.BIN...) dans le
+      dossier MISC pour Shenmue I, ou le fichier MISC/COLD.BIN pour Shenmue II
+	  et ouvrez-le dans IPAC Browser.
+   3. Dans la liste, cliquez-droit sur LCD.IWD "LCD Table" et sélectionnez
+      l'option "Export...". Sauvegardez le fichier où vous voulez.
+   4. Ouvrez le fichier "LCD.IWD" dans Shenmue VMU Screen Editor.
+   5. Amusez-vous bien! L'usage de cet outil est similaire à IPAC Browser.
+   
+  Une fois fini, imporez le fichier LCD.IWD modifié avec IPAC Browser, en 
+  utilisant la procédure inverse (je pense que vous avez compris).
+   
+  Veuillez notez que vous avez la possibilité de remplacer l'écran LCD avec un 
+  bitmap de taille différente à celle de l'origine, mais je ne sais pas quel 
+  effet cela a sur le jeu de le faire. Ainsi je ne vous le recommande pas.
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône principale a été créée par SevLila et Djizeuss, faite originellement 
+  pour VMU Tool PC, un outil créé par moi également. Je vous salue vous deux, 
+  j'espère que vous allez bien!
+  
+  Cet outil est dédicacé à IlDucci de Sega Saturno. Merci l'ami pour l'aide sur
+  ce truc. Merci également à Kent Hansen aka SnowBro pour son outil Tile 
+  Molester vraiment génial ainsi qu'à son code source Java qui m'a beaucoup 
+  aidé.
+  
+  Pour les crédits complets, rendez-vous dans la boîte de dialogue "A propos".
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+ _____________________________________________________________________[ FIN ]___

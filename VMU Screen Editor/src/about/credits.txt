@@ -4,7 +4,7 @@ Main coder:
 Thanks to:
 Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-, alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, PlusTuta, Nerox92, Master Kyodai, yazgoo, the MetaGames-EU and Shenmue Dojo forums and everyone supporting us!
 
-This utility is dedicaced to IlDucci from Sega Saturno!
+This utility is dedicaced to IlDucci from Sega Saturno! Thanks buddy for helping me on this. Thanks Kent Hansen aka SnowBro for the great Tile Molester utility and for his Java source code which helped me a lot.
 
 -- About us --
 
