@@ -5,8 +5,11 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           _________________________________________________
-___| Version 1.1: 2010-03-?? |_________________________________________________
+___| Version 1.1: 2010-03-13 |_________________________________________________
     
+ADDED:
+- "Project home" and "Check for update" links added to the Help menu.
+
 FIXED:
 - Little fix in the "Export all" function.
 - The ".BIN" filter was added in the "Open" function.
