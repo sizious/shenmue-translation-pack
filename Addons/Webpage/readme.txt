@@ -1,0 +1,1 @@
+This folder contains the Shenmue Translation Pack Source Webpage.

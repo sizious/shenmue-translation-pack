@@ -1,0 +1,11 @@
+Avant tout placez la police d'ecriture du dossier "Police Utilisé" dans le dossier :
+C:\WINDOWS\Fonts
+
+Ouvrez le fichier "header.PSD" avec Photoshop.
+Utilisez l'outil texte (Raccourci "T") pour modifier votre titre :
+clic droit sur la zone du titre/ sélectionnez "modifier le texte", remplacez monsite.com par le titre de votre site. 
+Note : vous pouvez également modifier l'emplacement du titre via l'outil déplacement (raccourci "V").
+Lorsque le titre est modifié enregistrez le au format .jpg dans le dossier "images" du kit pour que les changements s'appliquent.
+
+
+Pour toutes questions ou aides supplémentaire : http://KitGraphiqueGratuit.org

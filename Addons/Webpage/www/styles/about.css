@@ -1,0 +1,19 @@
+#gpl {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+#contact img {
+	vertical-align: middle; 
+	margin: 0; 
+	padding: 0;
+}
+
+#contact a:hover {
+	color: white;
+	border-bottom: 1px solid white;
+}
+
+#contact a {
+	color: white;
+}

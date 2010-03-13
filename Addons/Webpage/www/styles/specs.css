@@ -1,0 +1,17 @@
+#specs table {
+/* 	border: 0px solid white; */
+	/* margin: 0 auto; */
+	width: 100%;
+}
+
+#specs td {
+	padding: 2px;
+	font-size: 11px;
+}
+
+/*
+#specs th {
+	background-color: black;
+	padding: 2px;
+} 
+*/

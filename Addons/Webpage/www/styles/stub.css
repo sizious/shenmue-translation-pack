@@ -1,0 +1,49 @@
+/*copyright by kitgraphiquegratuit.org*/
+body,html        {background:#000 url(../images/layout/fond.jpg) repeat-x;margin:0;padding:0;background-attachment: fixed;margin:0;padding:0;text-align:center}	    
+.conteneur       {margin: 0 auto 0;width: 800px;position:relative;background-color:#000;text-align:left}	
+#header          {height:179px; background:url(../images/layout/header.jpg);margin:0 auto 0 auto;width:800px}  
+#header2         {width:800px;margin:0;padding: 0;height:30px;background: url(../images/layout/menu.jpg) } 
+	
+#left            {width: 350px;color:#fff;font:12px/13px arial;padding:0 0 0 25px}   
+#right           {width: 390px;color:#fff;font:12px/13px arial;right:0;padding:0 10px 0 0 } 
+#separation      {width:20px ;margin:0 0 0 0;padding: 10px 0 10px 0}    
+#headertop td 				 {width:390px ;margin:0;padding:0}   
+#headertop td.centre 		 {width:20px ;margin:0;background: url(../images/layout/separation.jpg) repeat-y;}  
+#headertop table.haut		 {width:800px ;margin:20px 0 0 0;padding:0}
+
+a	 			 {color: #0079CA;text-decoration: none;margin: 0;outline:none;font-weight: bold;} 	
+a:hover	 	     {color: #fff;text-decoration: none;margin: 0}	   
+/* span		   {color:#FFFF59;text-decoration:none;outline:none;font:bold 14px "trebuchet ms";}	 */
+/* img, p, h1, h2, h3, h4, h5, h6, Span, object, table, td, tr{border:0;margin:0;padding:0}  */
+img, p, h1, h2, h3, h4, h5, h6, span, object {border:0;margin:0;padding:0}
+
+/*Menu horizontal*/
+#menu, #menu ul        {padding : 0;margin : 0 0 0 51px; list-style : none;text-align : center;font-family: verdana ; font-size: 7pt}
+#menu a                {display : block;height:30px;color: grey;text-decoration : none;line-height: 30px;width: 100px;font-weight: bold;background: url(../images/layout/bouton.jpg); outline:none}
+#menu li               {float : left;}
+#menu a:hover          {background: url(../images/layout/menu_hover.jpg); color: white;}
+
+/*plandusite*/
+#plandusite, #plandusite ul  {padding : 0;margin :0 8px 0 0; list-style : none;text-align : center;font-family: verdana ; font-size: 7pt}
+#plandusite a                {display : block;height:7pt;color:#0064A6;text-decoration : none;line-height: 7pt;font-weight: bold; outline:none;width:65px;border-right: solid 1px white}
+#plandusite li               {float : right;bottom:0;margin:41px 0 0 0}
+#plandusite a:hover          {color:#FFF;}
+
+ 
+/*Pied et copyright*/
+.separateur         {clear: both;visibility: hidden; }
+#pied               {background:url(../images/layout/pied.jpg) no-repeat;height:58px;width:800px;margin: 0 auto 0 auto;padding: 0;}
+a.copyright         {position:absolute;bottom:0.5%;width:155px;height:10px;left:6%} 
+img                 {border:0;margin:2px 0 0 0}	  
+
+.copyright  a    	{position:absolute;padding :0;margin :22px 0 0 0;color:#fff;font:12px arial;right:190px;text-decoration: none;outline:none}  
+.copyleft   a    	{position:absolute;padding :0;margin :22px 0 0 0;color:#fff;font:13px arial;right:13px;text-decoration: none;outline:none;width: 130px;height:18px} 	
+
+
+.haut_contenu   {width:772px;background: url(../images/layout/haut_contenu.jpg);margin:0 auto 0 auto;padding:0;height:29px}
+.fond_contenu   {width:756px;background: url(../images/layout/fond_contenu.jpg);margin:0 auto 0 auto;padding:0 8px 0 8px;color:#fff;font:12px/13px arial;} 
+.bas_contenu    {width:772px;background: url(../images/layout/bas_contenu.jpg) ;margin:0 auto 0 auto;padding:0;height:26px;}		
+
+ul {
+	list-style-type: square;
+}

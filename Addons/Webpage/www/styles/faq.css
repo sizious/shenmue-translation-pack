@@ -1,0 +1,16 @@
+#faq_version {
+	text-align: right;
+	font-size: 10px;
+	font-style: italic;
+	float: right;
+	color: #FFFF59;
+}
+
+#faq div.answer {
+	display: none;
+}
+
+#faq  p.question {
+	 margin: 0; 
+	 padding: 0;
+}

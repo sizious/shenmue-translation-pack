@@ -1,0 +1,30 @@
+/*#addons div {
+	font-size: 10px;
+	margin-bottom: 5px;
+}*/
+
+.download_button_container {
+	margin: 0;
+	padding-bottom: 10px;
+	text-align: center;
+/* 	border: 1px solid blue; */
+}
+
+#download_button a {
+	margin-right: auto;
+	margin-left: auto; 
+	display: block;
+	height: 60px;
+	width: 190px;
+	background: url(../images/buttons/dl.png) no-repeat top left;
+/* 	border: 1px solid red;	 */
+}
+
+#download_button a:hover {
+	background: url(../images/buttons/dl_hover.png) no-repeat top left; 
+}
+
+#addons td {
+	padding: 2px;
+	font-size: 11px;
+}

@@ -1,0 +1,96 @@
+#left h1 { color:#FFFF59; font: 13px arial; margin:0 0 10px 0; padding:0; font-weight: bold; }
+
+p { margin: 0 0 10px 0; text-align: justify;}
+
+#menu a#active {
+	color: yellow;
+	background: url(../images/layout/menu_active.jpg); 
+}
+
+#menu a:hover#active {
+	color: white;
+	background: url(../images/layout/menu_hover.jpg); 
+}
+
+#content p {margin:0; padding-bottom: 10px;}
+
+#content h1 {
+	color:#FFFF59;text-decoration:none;outline:none;font:bold 18px "trebuchet ms"; margin-bottom: 10px;
+	border-bottom: 1px #7b7b29 solid;	
+}
+
+#content h2 {
+	color:#FFFF59;text-decoration:none;outline:none;font:bold 16px "trebuchet ms"; margin-bottom: 10px;
+	border-bottom: 1px #7b7b29 dashed;	
+}
+
+#content h3 {
+	color:#FFFF59;text-decoration:none;outline:none;font:bold 14px "trebuchet ms"; margin-bottom: 10px;
+	border-bottom: 1px #484818 dotted;	
+}
+
+#sflogo {
+	margin-top: 20px; margin-left: 2px; float: left;
+}
+
+#content ol {
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 3px;
+	margin-bottom: 8px;
+}
+
+.set_to_top {
+	font-size: 10px;
+	text-align: right;
+	padding: 0;
+	margin: 0;
+}
+
+div.img_legend {
+	font-style: italic;	
+	font-size: 10px;
+}
+
+div.code {
+	border: 1px solid white;
+	padding: 4px;
+	margin: 5px 0px 10px 0px;
+	font-family: "Courier New", "Courier";
+	background-color: black;
+}
+
+/* Warning signal */
+#warning-wrap {
+	margin-bottom: 10px;
+}
+
+#warning-wrap a:hover {
+	color: blue;
+	border-bottom: 1px solid blue;
+}
+
+#warning-wrap a {
+	color: #914df6;
+	border-bottom: 1px dotted #914df6;
+}
+
+#warning-wrap table.warning {	
+	width: 500px;
+	border: 3px double red;
+	font-weight: bold;
+	color: red;
+	padding: 2px;
+	background-color: #ffd9de;
+	text-align: center;
+}
+
+th {
+	background-color: black;
+	padding: 2px;
+}
+
+
+
+
+
