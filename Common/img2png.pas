@@ -283,7 +283,7 @@ begin
   // Exception raised if the Engine doesn't exists
   if not FileExists(EngineFile) then
     raise EPVRConverterEngineNotExists
-      .Create('PVRConverter.RunEngine: The PVR conversion engine doesn''t exists!');
+      .Create('PVRConverter.RunEngine [img2png]: The PVR conversion engine doesn''t exists!');
 
   // Creating the batch file
   BatchTarget := ChangeFileExt(fTargetFileName, '.bat');
