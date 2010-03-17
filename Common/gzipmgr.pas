@@ -62,7 +62,7 @@ begin
   
   // Checking up the engine
   if not FileExists(GZipExec) then
-    raise EGZipEngineMissing.Create('GZipDecompress [GZipMgr]: Engine doesn''t exists. ' +
+    raise EGZipEngineMissing.Create('GZipExecuteAction [GZipMgr]: Engine doesn''t exists. ' +
       'Please call GZipInitEngine() first.');
 
   // Checking the source file
@@ -107,7 +107,7 @@ begin
     CloseFile(FBatchFile);
   except
     on E:Exception do
-      raise EGZipBatchFileWriting.Create('GZipExtract [GZipMgr]: Error '
+      raise EGZipBatchFileWriting.Create('GZipExecuteAction [GZipMgr]: Error '
         + 'when creating process Batch File.');
   end;
 
