@@ -56,7 +56,7 @@ type
 implementation
 
 uses
-  SysTools, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, TextDB;
+  SysTools, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, TextDB;
   
 { TSubtitlesContainer }
 
@@ -135,7 +135,10 @@ begin
         // Adding subtitles
         for i := 0 to SubtitlesNode.Attributes['Count'] - 1 do begin
           SubtitleEntryNode := SubtitlesNode.ChildNodes[i];
-          Add(SubtitleEntryNode.Attributes['Code'], SubtitleEntryNode.NodeValue);
+          if not VarIsNull(SubtitleEntryNode.NodeValue) then
+            Add(SubtitleEntryNode.Attributes['Code'], SubtitleEntryNode.NodeValue)
+          else
+            Add(SubtitleEntryNode.Attributes['Code'], '');
         end;
       end;
 

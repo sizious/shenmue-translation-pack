@@ -5,6 +5,12 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.7: 2010-03-?? |__________________________________________________
+
+FIXED:
+- Small bug in the Subtitles Corrector function: when a string in the database
+  was empty, the database parser crashed with an exception error.
+___                           __________________________________________________
 ___| Version 2.6: 2010-03-13 |__________________________________________________
 
 FIXED:
