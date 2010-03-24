@@ -13,7 +13,6 @@ type
     mmMain: TMainMenu;
     miFile: TMenuItem;
     miQuit: TMenuItem;
-    lvIwadContent: TJvListView;
     miOpen: TMenuItem;
     odOpen: TOpenDialog;
     sbMain: TStatusBar;
@@ -74,6 +73,7 @@ type
     miDEBUG: TMenuItem;
     GenerateException1: TMenuItem;
     JvDragDrop: TJvDragDrop;
+    lvIwadContent: TJvListView;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
@@ -297,6 +297,9 @@ begin
 
   // Load the configuration
   LoadConfig;
+
+  // Fix for the Delphi IDE!
+  lvIwadContent.PopupMenu := pmIwadContent;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);

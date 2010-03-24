@@ -42,7 +42,8 @@ var
   
 begin
   if not FileExists(SevenZipDecExec) then
-    raise ESevenZipEngineMissing.Create('SevenZipExtract [LZMADec]: Engine doesn''t exists. Please call SevenZipInitEngine() first.');
+    raise ESevenZipEngineMissing.Create('SevenZipExtract [LZMADec]: Engine '
+      + 'doesn''t exists. Please call SevenZipInitEngine() first.');
 
   if not DirectoryExists(OutputDir) then
     ForceDirectories(OutputDir);

@@ -20,81 +20,6 @@ object frmMain: TfrmMain
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object lvIwadContent: TJvListView
-    AlignWithMargins = True
-    Left = 3
-    Top = 29
-    Width = 486
-    Height = 295
-    Align = alClient
-    Columns = <
-      item
-        Caption = '#'
-        Width = 20
-      end
-      item
-        Caption = 'Name'
-        Width = 80
-      end
-      item
-        Caption = 'Offset'
-      end
-      item
-        Caption = 'Size'
-      end
-      item
-        Caption = 'Width'
-      end
-      item
-        Caption = 'Height'
-      end
-      item
-        Caption = 'Updated'
-        Width = 55
-      end>
-    ColumnClick = False
-    GridLines = True
-    ReadOnly = True
-    RowSelect = True
-    TabOrder = 0
-    ViewStyle = vsReport
-    OnSelectItem = lvIwadContentSelectItem
-    ColumnsOrder = '0=20,1=80,2=50,3=50,4=50,5=50,6=55'
-    HeaderImagePosition = hipRight
-    Groups = <>
-    ExtendedColumns = <
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end
-      item
-        HeaderImagePosition = hipRight
-        UseParentHeaderImagePosition = False
-      end>
-    ExplicitTop = 30
-    ExplicitWidth = 381
-    ExplicitHeight = 291
-  end
   object sbMain: TStatusBar
     Left = 0
     Top = 327
@@ -123,7 +48,7 @@ object frmMain: TfrmMain
     EdgeBorders = [ebTop]
     Images = ilToolBar
     List = True
-    TabOrder = 2
+    TabOrder = 1
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
     object ToolButton1: TToolButton
@@ -233,6 +158,82 @@ object frmMain: TfrmMain
       Caption = 'tbAbout'
       ImageIndex = 9
     end
+  end
+  object lvIwadContent: TJvListView
+    AlignWithMargins = True
+    Left = 3
+    Top = 29
+    Width = 486
+    Height = 295
+    Align = alClient
+    Columns = <
+      item
+        Caption = '#'
+        Width = 20
+      end
+      item
+        Caption = 'Name'
+        Width = 80
+      end
+      item
+        Caption = 'Offset'
+      end
+      item
+        Caption = 'Size'
+      end
+      item
+        Caption = 'Width'
+      end
+      item
+        Caption = 'Height'
+      end
+      item
+        Caption = 'Updated'
+        Width = 55
+      end>
+    ColumnClick = False
+    GridLines = True
+    ReadOnly = True
+    RowSelect = True
+    PopupMenu = pmIwadContent
+    TabOrder = 2
+    ViewStyle = vsReport
+    OnSelectItem = lvIwadContentSelectItem
+    ColumnsOrder = '0=20,1=80,2=50,3=50,4=50,5=50,6=55'
+    HeaderImagePosition = hipRight
+    Groups = <>
+    ExtendedColumns = <
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end
+      item
+        HeaderImagePosition = hipRight
+        UseParentHeaderImagePosition = False
+      end>
+    ExplicitTop = 30
+    ExplicitWidth = 381
+    ExplicitHeight = 291
   end
   object mmMain: TMainMenu
     Left = 12
@@ -370,7 +371,10 @@ object frmMain: TfrmMain
   end
   object odOpen: TOpenDialog
     DefaultExt = 'IWD'
-    Filter = 'LCD Package Files (*.IWD)|*.IWD|All Files (*.*)|*.*'
+    Filter = 
+      'All Supported Files (*.IWD;*.BIN)|*.IWD;*.BIN|LCD Package Files ' +
+      '(*.IWD)|*.IWD|Generic Binary Files (*.BIN)|*.BIN|All Files (*.*)' +
+      '|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Open the IWAD package from...'
     Left = 12
@@ -430,7 +434,10 @@ object frmMain: TfrmMain
   end
   object sdSave: TSaveDialog
     DefaultExt = 'IWD'
-    Filter = 'LCD Package Files (*.IWD)|*.IWD|All Files (*.*)|*.*'
+    Filter = 
+      'All Supported Files (*.IWD;*.BIN)|*.IWD;*.BIN|LCD Package Files ' +
+      '(*.IWD)|*.IWD|Generic Binary Files (*.BIN)|*.BIN|All Files (*.*)' +
+      '|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save the IWAD package to...'
     Left = 44
@@ -1255,9 +1262,9 @@ object frmMain: TfrmMain
     Top = 188
   end
   object JvDragDrop: TJvDragDrop
-    DropTarget = Owner
+    DropTarget = lvIwadContent
     OnDrop = JvDragDropDrop
-    Left = 8
-    Top = 224
+    Left = 12
+    Top = 248
   end
 end
