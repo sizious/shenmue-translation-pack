@@ -102,7 +102,9 @@ var
   CharsListTwo: TCharsList;
 
 implementation
-uses charsutils;
+
+uses
+  charsutils, SysTools;
 
 constructor TSrfEntry.Create;
 begin
@@ -150,8 +152,8 @@ begin
     repeat
       ReadLn(F, Line);
       if (Line <> '') and (Line[1] <> '#') then begin
-        decBuf := ParseSection(',', Line, 0);
-        charBuf := ParseSection(',', Line, 1);
+        decBuf := ParseStr(',', Line, 0);
+        charBuf := ParseStr(',', Line, 1);
         charBuf := Copy(charBuf, 2, 1);
         Add(charBuf, StrToInt(decBuf));
       end;

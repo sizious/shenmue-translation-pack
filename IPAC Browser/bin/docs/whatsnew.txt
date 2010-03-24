@@ -5,6 +5,14 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           _________________________________________________
+___| Version 1.2: 2010-03-?? |_________________________________________________
+
+FIXED:
+- When two or more instances were running and one of them was closed, temporary
+  directory was cleaned, and this should happens only if the lastest instance
+  is closed!
+- The "Properties" window is now cleaned when you open an invalid file.    
+___                           _________________________________________________
 ___| Version 1.1: 2010-03-13 |_________________________________________________
     
 ADDED:

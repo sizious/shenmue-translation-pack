@@ -291,7 +291,7 @@ begin
   Constraints.MinWidth := Width;
 
   // Init the UI
-  InitToolBarControl(Self, tbMain);
+  ToolBarInitControl(Self, tbMain);
   InitContextPopup;  
   Clear(False);
 
@@ -829,19 +829,8 @@ end;
 
 procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
   var DefaultDraw: Boolean);
-var
-  ElementDetails: TThemedElementDetails;
-  NewRect : TRect;
-
 begin
-  // Thank you ...
-  // http://www.brandonstaggs.com/2009/06/29/give-a-delphi-ttoolbar-a-proper-themed-background/
-  if ThemeServices.ThemesEnabled then begin
-    NewRect := Sender.ClientRect;
-    NewRect.Top := NewRect.Top - GetSystemMetrics(SM_CYMENU);
-    ElementDetails := ThemeServices.GetElementDetails(trRebarRoot);
-    ThemeServices.DrawElement(Sender.Canvas.Handle, ElementDetails, NewRect);
-  end;
+  ToolBarCustomDraw(Sender);
 end;
 
 procedure TfrmMain.UpdateFileModifiedState;

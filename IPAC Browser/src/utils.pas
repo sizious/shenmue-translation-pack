@@ -131,7 +131,7 @@ end;
 
 procedure DeleteWorkingTempDirectory;
 begin
-  if DirectoryExists(sWorkingTempDirectory) then
+  if (GetApplicationInstancesCount = 1) and DirectoryExists(sWorkingTempDirectory) then
     DeleteDirectory(sWorkingTempDirectory);
 end;
 

@@ -10,7 +10,7 @@ interface
 uses
   Classes, SysUtils;
 
-function ParseSection(substr:String; s:String; n:Integer): string;
+//function ParseSection(substr:String; s:String; n:Integer): string;
 function CountPos(const subtext: string; Text: string): Integer;
 procedure CharsCount(const Text: String);
 
@@ -19,8 +19,11 @@ var
 
 implementation
 
+uses
+  SysTools;
+  
 //This function retrieve the text between the defined substring
-function ParseSection(substr:String; s:String; n:Integer): string;
+(*function ParseSection(substr:String; s:String; n:Integer): string;
 var i: Integer;
 begin
         S := S + substr;
@@ -31,7 +34,7 @@ begin
         end;
 
         Result := Copy(s, 1, pos(substr, s)-1);
-end;
+end;*)
 
 //This function count the number of occurence of the defined substring
 function CountPos(const subtext: string; Text: string): Integer;
@@ -56,7 +59,7 @@ begin
   Finalize(lineCharsCnt);
   SetLength(lineCharsCnt, lineNum+1);
   for i := 0 to lineNum do begin
-    lineText := Trim(parseSection(sLineBreak, Text, i));
+    lineText := Trim(ParseStr(sLineBreak, Text, i));
     lineCnt := Length(lineText);
     if lineCnt = 0 then begin
       lineCharsCnt[i] := lineCnt;

@@ -1,23 +1,24 @@
 unit systools;
 
-{$WARN SYMBOL_PLATFORM OFF}
-
 interface
 
 uses
-  Windows, SysUtils, Classes; //, PNGImage; // why pngimage is used here??
+  Windows, SysUtils, Classes;
 
 function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
+function GetApplicationInstancesCount: Integer;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetTempDir: TFileName;
 function GetTempFileName: TFileName;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
+procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
+function ParseStr(SubStr, S: string; n: Integer): string;
 function StringArrayBinarySearch(SortedSource: array of string;
   SearchValue: string): Integer;
 function StringArraySequentialSearch(Source: array of string;
@@ -30,8 +31,43 @@ function RunAndWait(const TargetFileName: TFileName) : Boolean;
 implementation
 //------------------------------------------------------------------------------
 
+{$WARN SYMBOL_PLATFORM OFF}
+
+uses
+  TlHelp32;
+  
 const
   HexValues = '0123456789ABCDEF';
+
+//------------------------------------------------------------------------------
+
+// This function retrieve the text between the defined substring
+function ParseStr(SubStr, S: string; n: Integer): string;
+var
+  i, Value: Integer;
+
+begin
+  S := S + substr;
+
+  for i := 1 to n do begin
+    Value := Pos(SubStr, S) + Length(SubStr);
+    S := Copy(S, Value, Length(S) - Value);
+  end;
+
+  Result := Copy(S, 1, Pos(SubStr, S) - 1);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
+var
+  i: Integer;
+
+begin
+  Destination.Clear;
+  for i := Low(Source) to High(Source) do
+    Destination.Add(Pointer(Source[i]));
+end;
 
 //------------------------------------------------------------------------------
 
@@ -316,6 +352,50 @@ end;
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 begin
   Result := Windows.MoveFile(PChar(ExistingFileName), PChar(NewFileName));
+end;
+
+//------------------------------------------------------------------------------
+
+// Thanks to phidels.com and Zeus^SFX
+function GetApplicationInstancesCount: Integer;
+var
+  Snapshot: THandle;
+  Module: TModuleEntry32;
+  Process: TProcessEntry32;
+  ExeFile: TFileName;
+
+  // This function checks if the process found is the same as ParamStr(0)
+  function SameProcessFound: Boolean;
+  begin
+    Result := False;
+    if SameText(Process.szExeFile, ExeFile) then
+      if Module32First(Snapshot, Module) then // get the first module for this process...
+        Result := SameText(Module.szExePath, ParamStr(0)); // the first module is the full path ExeFile
+      // after, with Module32Next, we get every DLL loaded by the process.
+  end;
+  
+begin
+  Result := 0;
+
+  Snapshot := CreateToolHelp32SnapShot(TH32CS_SNAPMODULE or TH32CS_SNAPPROCESS, 0);
+  try
+    Module.dwSize := SizeOf(TModuleEntry32);
+    Process.dwSize := SizeOf(TProcessEntry32);
+    ExeFile := ExtractFileName(ParamStr(0));
+    
+    // Retrieving each process information
+    Process32First(Snapshot, Process);
+    repeat
+
+      // Check if we found the same process running...
+      if SameProcessFound then
+        Inc(Result);
+
+    until not Process32Next(Snapshot, Process);
+
+  finally
+    CloseHandle(Snapshot);
+  end;
 end;
 
 //------------------------------------------------------------------------------

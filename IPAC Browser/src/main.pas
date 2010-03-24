@@ -219,6 +219,8 @@ begin
   SetControlsStateUndoImporting(False);
   SetControlsStateFileOperations(False);
   SetControlsStateSaveOperation(False);
+  if Assigned(frmProperties) then
+    frmProperties.Clear;
 end;
 
 procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
@@ -483,7 +485,7 @@ begin
   Clear;
 
   // Initialize some UI controls
-  InitToolBarControl(Self, tbMain);
+  ToolBarInitControl(Self, tbMain);
   InitContentPopupMenuControl;
   // Workaround for this shitty IDE!!!
   with lvIpacContent do begin
@@ -661,19 +663,8 @@ end;
 
 procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
   var DefaultDraw: Boolean);
-var
-  ElementDetails: TThemedElementDetails;
-  NewRect : TRect;
-
 begin
-  // Thank you ...
-  // http://www.brandonstaggs.com/2009/06/29/give-a-delphi-ttoolbar-a-proper-themed-background/
-  if ThemeServices.ThemesEnabled then begin
-    NewRect := Sender.ClientRect;
-    NewRect.Top := NewRect.Top - GetSystemMetrics(SM_CYMENU);
-    ElementDetails := ThemeServices.GetElementDetails(trRebarRoot);
-    ThemeServices.DrawElement(Sender.Canvas.Handle, ElementDetails, NewRect);
-  end;
+  ToolBarCustomDraw(Sender);
 end;
 
 procedure TfrmMain.UpdateFileModifiedState;

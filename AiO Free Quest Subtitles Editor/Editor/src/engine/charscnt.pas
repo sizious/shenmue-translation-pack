@@ -15,24 +15,13 @@ uses
   Windows, SysUtils;
   
 procedure CalculateCharsCount(Subtitle: string; var Line1Count, Line2Count: Integer);
-function parse_section(substr:String; s:String; n:Integer): string;
+
 
 implementation
 
-//This function retrieve the text between the defined substring
-function parse_section(substr:String; s:String; n:Integer): string;
-var i:integer;
-begin
-  S := S + substr;
-
-  for i:=1 to n do
-  begin
-          S := copy(s, Pos(substr, s) + Length(substr), Length(s) - Pos(substr, s) + Length(substr));
-  end;
-
-  Result := Copy(s, 1, pos(substr, s)-1);
-end;
-
+uses
+  SysTools;
+  
 //This function ('CountPos') come from this site:
 //http://www.delphitricks.com/source-code/strings/count_the_number_of_occurrences_of_a_substring_within_a_string.html
 function CountPos(const subtext: string; Text: string): Integer;
@@ -59,8 +48,8 @@ begin
 
         if StrPos(PChar(Subtitle), PChar('¡õ')) <> nil then
         begin
-                line1 := parse_section('¡õ', Subtitle, 0);
-                line2 := parse_section('¡õ', Subtitle, 1);
+                line1 := ParseStr('¡õ', Subtitle, 0);
+                line2 := ParseStr('¡õ', Subtitle, 1);
         end
         else
         begin

@@ -56,7 +56,6 @@ object frmMain: TfrmMain
     GridLines = True
     ReadOnly = True
     RowSelect = True
-    PopupMenu = pmIwadContent
     TabOrder = 0
     ViewStyle = vsReport
     OnSelectItem = lvIwadContentSelectItem
@@ -1258,7 +1257,7 @@ object frmMain: TfrmMain
   object JvDragDrop: TJvDragDrop
     DropTarget = Owner
     OnDrop = JvDragDropDrop
-    Left = 12
-    Top = 284
+    Left = 8
+    Top = 224
   end
 end

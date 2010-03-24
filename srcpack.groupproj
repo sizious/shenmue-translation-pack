@@ -15,6 +15,7 @@
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
     <Projects Include="IPAC Browser\src\ipacedit.dproj" />
     <Projects Include="Models Textures Editor\src\mteditor.dproj" />
+    <Projects Include="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" />
     <Projects Include="SPR Utils\src\sprutils.dproj" />
     <Projects Include="VMU Screen Editor\src\vmulcded.dproj" />
   </ItemGroup>
@@ -141,14 +142,23 @@
   <Target Name="fontutil:Make">
     <MSBuild Projects="Font Utility\src\fontutil.dproj" Targets="Make" />
   </Target>
+  <Target Name="nzmbiked">
+    <MSBuild Projects="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" Targets="" />
+  </Target>
+  <Target Name="nzmbiked:Clean">
+    <MSBuild Projects="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="nzmbiked:Make">
+    <MSBuild Projects="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;hdissect;preview;vmulcded;fontutil" />
+    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;hdissect;preview;vmulcded;fontutil;nzmbiked" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;hdissect:Clean;preview:Clean;vmulcded:Clean;fontutil:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;hdissect:Clean;preview:Clean;vmulcded:Clean;fontutil:Clean;nzmbiked:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;hdissect:Make;preview:Make;vmulcded:Make;fontutil:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;hdissect:Make;preview:Make;vmulcded:Make;fontutil:Make;nzmbiked:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
