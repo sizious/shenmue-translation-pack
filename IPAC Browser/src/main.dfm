@@ -3803,7 +3803,7 @@ object frmMain: TfrmMain
     Top = 192
   end
   object JvDragDrop: TJvDragDrop
-    DropTarget = Owner
+    DropTarget = lvIpacContent
     OnDrop = JvDragDropDrop
     Left = 42
     Top = 284

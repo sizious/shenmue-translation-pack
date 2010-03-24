@@ -109,8 +109,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 357
-    ExplicitWidth = 585
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -124,7 +122,6 @@ object frmMain: TfrmMain
     TabOrder = 4
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
-    ExplicitWidth = 585
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
