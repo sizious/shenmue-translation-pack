@@ -5,7 +5,9 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   nbikedit in 'engine\nbikedit.pas',
-  systools in '..\..\Common\systools.pas';
+  systools in '..\..\Common\systools.pas',
+  uitools in '..\..\Common\uitools.pas',
+  datadefs in 'engine\datadefs.pas';
 
 {$R *.res}
 

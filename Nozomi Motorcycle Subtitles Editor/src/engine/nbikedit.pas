@@ -3,174 +3,80 @@ unit nbikedit;
 interface
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, DataDefs;
   
 type
   TNozomiMotorcycleSequenceEditor = class;
-
-  // JAP versions are unsupported!
-  TNozomiMotorcycleSequenceGameVersion = (
-    gvUnknow, gvJapDisc3, gvJapDisc4, gvUsaDisc3, gvPalDisc3, gvUsaPalDisc4
-  );
 
   TNozomiMotorcycleSequenceSubtitleItem = class(TObject)
   private
     fText: string;
     fIndex: Integer;
     fOwner: TNozomiMotorcycleSequenceEditor;
-    fPointerOffset: Integer;
+    fStringOffset: Integer;
+    fStringPointerOffset: Integer;
+    fOriginalTextLength: Integer;
+    fNewStringOffset: Integer;
+    function GetPatchValue: Integer;
   protected
-    procedure WriteSubtitle(var F: TFileStream);
+    function DecodeText(const S: string): string;
+    function EncodeText(const S: string): string;
+    procedure WriteSubtitle(var Output: TFileStream);
+    property NewStringOffset: Integer read fNewStringOffset;
+    property OriginalTextLength: Integer read fOriginalTextLength;
+    property PatchValue: Integer read GetPatchValue;
   public
     property Index: Integer read fIndex;
-    property Text: string read fText write fText;
-    property PointerOffset: Integer read fPointerOffset;
+    property StringPointerOffset: Integer read fStringPointerOffset;
+    property StringOffset: Integer read fStringOffset;
+    property Text: string read fText write fText;        
     property Owner: TNozomiMotorcycleSequenceEditor read fOwner;
   end;
 
   TNozomiMotorcycleSequenceEditor = class(TObject)
   private
+    fStringPointersList: TList;
+    fValuesToUpdateList: TList;
     fSubtitleList: TList;
     fSourceFileName: TFileName;
+    fStringTableOffset: Integer;
+    fFileVersion: TNozomiMotorcycleSequenceGameVersion;
+    fLoaded: Boolean;
     function GetCount: Integer;
     function GetSubtitleItem(Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
   protected
-    procedure Add(StringPointerOffset: Integer; var Input: TFileStream);
+    procedure Add(const StrPointerOffset: Integer; var Input: TFileStream);
+    function RetrieveGameVersion(var F: TFileStream): Boolean;
+    property StringPointersList: TList read fStringPointersList;
+    property ValuesToUpdateList: TList read fValuesToUpdateList;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    procedure LoadFromFile(const FileName: TFileName);
+    function LoadFromFile(const FileName: TFileName): Boolean;
     procedure SaveToFile(const FileName: TFileName);
     property Count: Integer read GetCount;
-    property Items[Index: Integer]: TNozomiMotorcycleSequenceSubtitleItem 
+    property FileVersion: TNozomiMotorcycleSequenceGameVersion read fFileVersion;
+    property Items[Index: Integer]: TNozomiMotorcycleSequenceSubtitleItem
       read GetSubtitleItem; default;
+    property Loaded: Boolean read fLoaded;
     property SourceFileName: TFileName read fSourceFileName;
+    property StringTableOffset: Integer read fStringTableOffset;
   end;
 
 implementation
 
-type
-  TGameVersionDetector = record
-    Offset: Integer;
-    Value: Integer;
-    Result: TNozomiMotorcycleSequenceGameVersion;
-  end;
-  
-const
-  // DISC3: Subtitles offset where to update
-  DISC3_ALL_POINTERS_SUBTITLES: array[0..11] of Integer = (
-    $03A8, // Like a dream I once saw,<br>it passes by as it touches my cheek.
-    $03C3, // This street leading to the ocean<br>carries the smell of sea.
-    $03D9, // Before love makes me tell a white lie.
-    $03EE, // This loneliness...<br>I want you to hold it in your arms now.
-    $0403, // If you will always be by my side,
-    $0418, // there'll be no sorrow or tears in my eyes.
-    $042E, // Can't live without you.<br>Why did you have to decide?
-    $0443, // You won't be aware of my pains and lies.
-    $0458, // Don't leave me alone, stay with me.
-    $046D, // I don't know if you'll ever look back.
-    $0482, // I'll remember you forever.
-    $0EBF  // (End of the subtitle table)
-  );
-
-  // DISC3: Offset to update with new locations
-  DISC3_PAL_POINTERS_UPDATE: array[0..18] of Integer = (
-    $0FB7, // $71 $FC $00 $00 $33 $13 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $102E, // $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $14A7, // $CD $CC $CC $3D $CD $CC $CC $3D $CD $CC $CC $3D $CD $CC $CC $3D
-    $15EE, // $9A $99 $99 $3E $9A $99 $99 $3E $9A $99 $99 $3E $9A $99 $99 $3E
-    $1732, // $00 $00 $20 $41 $00 $00 $48 $43 $00 $00 $40 $3F $12 $06 $00 $FF
-    $1744, // $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $174F, // SCROLL27.SPR
-    $1754, // sprite
-    $1760, // 01BIKEB
-    $176E, // a1_nbike.snd
-    $1792, // SCROLL25.SPR
-    $1797, // sprite
-    $17A6, // M_01BIKE.BIN
-    $184D, // SCROLL25.SPR
-    $1852, // sprite
-    $1861, // M_01BIKE.BIN
-    $1886, // SCROLL25.SPR
-    $188B, // sprite
-    $189A  // M_01BIKE.BIN
-  );
-
-  DISC3_USA_POINTERS_UPDATE: array[0..18] of Integer = (
-    $0FB7, // $71 $FC $00 $00 $33 $13 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $102E, // $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $1375, // $CD $CC $CC $3D $CD $CC $CC $3D $CD $CC $CC $3D $CD $CC $CC $3D
-    $14BC, // $9A $99 $99 $3E $9A $99 $99 $3E $9A $99 $99 $3E $9A $99 $99 $3E
-    $1600, // $00 $00 $20 $41 $00 $00 $48 $43 $00 $00 $40 $3F $12 $06 $00 $FF
-    $1612, // $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $161D,
-    $1622,
-    $162E,
-    $163C,
-    $1660,
-    $1665,
-    $1674,
-    $171B,
-    $1720,
-    $172F,
-    $1754,
-    $1759,
-    $1768
-  );
-
-  // DISC4: Subtitles offset where to update
-  DISC4_ALL_POINTERS_SUBTITLES: array[0..11] of Integer = (
-    $0409, // Like a dream I once saw,<br>it passes by as it touches my cheek.
-    $0424, // This street leading to the ocean<br>carries the smell of sea.
-    $043A, // Before love makes me tell a white lie.
-    $044F, // This loneliness...<br>I want you to hold it in your arms now.
-    $0464, // If you will always be by my side,
-    $0479, // there'll be no sorrow or tears in my eyes.
-    $048F, // Can't live without you.<br>Why did you have to decide?
-    $04A4, // You won't be aware of my pains and lies.
-    $04B9, // Don't leave me alone, stay with me.
-    $04CE, // I don't know if you'll ever look back.
-    $04E3, // I'll remember you forever.
-    $0C48  // (End of the subtitle table)
-  );
-
-  // DISC4: Offset to update with new locations
-  DISC4_ALL_POINTERS_UPDATE: array[0..12] of Integer = (
-    $0D40,
-    $0DB7,
-    $1230,
-    $1377,
-    $14C6,
-    $14D8,
-    $14E3,
-    $14E8,
-    $14F4,
-    $1502,
-    $1526,
-    $152B,
-    $1539
-  );
-
-  SUBTITLE_DELIMITER  =  #$81#$9C#$90#$C2;
-  SUBTITLE_LINEBREAK  =  #$81#$95;
-
-  GAME_VERSION_DETECTION: array[0..4] of TGameVersionDetector = (
-    (Offset: $135A; Value: $50; Result: gvJapDisc3),  // Unsupported!
-    (Offset: $135A; Value: $70; Result: gvPalDisc3),
-    (Offset: $135A; Value: $13; Result: gvUsaDisc3),
-    (Offset: $135A; Value: $00; Result: gvJapDisc4),  // Unsupported!
-    (Offset: $135A; Value: $10; Result: gvUsaPalDisc4)
-  );
+uses
+  SysTools;
 
 { TNozomiMotorcycleSequenceEditor }
 
-procedure TNozomiMotorcycleSequenceEditor.Add(StringPointerOffset: Integer; 
+procedure TNozomiMotorcycleSequenceEditor.Add(const StrPointerOffset: Integer;
   var Input: TFileStream);
 var
   NewItem: TNozomiMotorcycleSequenceSubtitleItem;
   Subtitle: string;
-  StringOffsetValue: Integer;
+  ItemIndex, StrOffset: Integer;
   c: Char;
   Done: Boolean;
   
@@ -178,8 +84,9 @@ begin
   // Initializing the Subtitle decoder
   Done := False;
   Subtitle := '';
-  Input.Read(StringOffsetValue, 4);
-  Input.Seek(StringOffsetValue, soFromBeginning);
+  Input.Seek(StrPointerOffset, soFromBeginning);
+  Input.Read(StrOffset, 4);
+  Input.Seek(StrOffset, soFromBeginning);
 
   // Reading the subtitle
   while not Done do begin  
@@ -190,21 +97,24 @@ begin
       Done := True;
   end;
 
-  // Parsing the subtitle
-  Subtitle := StringReplace(Subtitle, SUBTITLE_DELIMITER, '', [rfReplaceAll]);
-  Subtitle := StringReplace(Subtitle, SUBTITLE_LINEBREAK, '<br>', [rfReplaceAll]);
-  
   // Adding the new item to the internal list
   NewItem := TNozomiMotorcycleSequenceSubtitleItem.Create;
+  ItemIndex := fSubtitleList.Add(NewItem);
   with NewItem do begin
     fOwner := Self;
-    fPointerOffset := StringPointerOffset;
-    fText := Subtitle; 
+    fStringPointerOffset := StrPointerOffset;
+    fText := DecodeText(Subtitle);
+    fIndex := ItemIndex;
+    fOriginalTextLength := Length(Subtitle);
+    fStringOffset := StrOffset;
   end;
-  NewItem.fIndex := fSubtitleList.Add(NewItem);
 
 {$IFDEF DEBUG}
-  WriteLn(IntToHex(StringPointerOffset, 4), ': "', NewItem.Text, '"');
+  WriteLn('#', Format('%2.2d', [NewItem.Index]), ', Ptr=0x',
+    IntToHex(NewItem.StringPointerOffset, 4), ', Str=0x',
+    IntToHex(NewItem.StringOffset, 4), sLineBreak,
+    '  "', NewItem.Text, '"'
+  );
 {$ENDIF}
 end;
 
@@ -213,20 +123,29 @@ var
   i: Integer;
 
 begin
-  for i := 0 to fSubtitleList.Count - 1 do
+  fSourceFileName := '';
+  fLoaded := False;
+  for i := 0 to Count - 1 do
     TNozomiMotorcycleSequenceSubtitleItem(fSubtitleList[i]).Free;
   fSubtitleList.Clear;
+  fStringPointersList.Clear;
+  fValuesToUpdateList.Clear;
 end;
 
 constructor TNozomiMotorcycleSequenceEditor.Create;
 begin
   fSubtitleList := TList.Create;
+  fStringPointersList := TList.Create;
+  fValuesToUpdateList := TList.Create;
+  Clear;
 end;
 
 destructor TNozomiMotorcycleSequenceEditor.Destroy;
 begin
   Clear;
   fSubtitleList.Free;
+  fStringPointersList.Free;
+  fValuesToUpdateList.Free;
   inherited;
 end;
 
@@ -238,26 +157,40 @@ end;
 function TNozomiMotorcycleSequenceEditor.GetSubtitleItem(
   Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
 begin
-  Result := TNozomiMotorcycleSequenceSubtitleItem(Items[Index]);
+  Result := TNozomiMotorcycleSequenceSubtitleItem(fSubtitleList[Index]);
 end;
 
-procedure TNozomiMotorcycleSequenceEditor.LoadFromFile(
-  const FileName: TFileName);
+function TNozomiMotorcycleSequenceEditor.LoadFromFile(
+  const FileName: TFileName): Boolean;
 var
   Input: TFileStream;
   i: Integer;
   
 begin
-  Input := TFileStream.Create(FileName, fmOpenRead);
-  try         
-    fSourceFileName := FileName;
-    
-    // Detect the file version
+{$IFDEF DEBUG}
+  WriteLn(sLineBreak, '*** READING FILE ***', sLineBreak);
+{$ENDIF}
 
-    // Reading the subtitle table
-    for i := Low(DISC3_ALL_POINTERS_SUBTITLES) to High(DISC3_ALL_POINTERS_SUBTITLES) do begin
-      Input.Seek(DISC3_ALL_POINTERS_SUBTITLES[i], soFromBeginning);
-      Add(DISC3_ALL_POINTERS_SUBTITLES[i], Input);
+  Input := TFileStream.Create(FileName, fmOpenRead);
+  try
+    Clear;
+
+    // Detect the file version
+    Result := RetrieveGameVersion(Input);
+    if Result then begin
+
+      // The file was successfully opened
+      fSourceFileName := FileName;
+      fLoaded := True;
+
+      // Calculating the beginning of the subtitles table
+      Input.Seek(Integer(StringPointersList[0]), soFromBeginning);
+      Input.Read(fStringTableOffset, 4);
+
+      // Reading the subtitle table
+      for i := 0 to StringPointersList.Count - 1 do
+        Add(Integer(StringPointersList[i]), Input);
+
     end;
     
   finally
@@ -265,20 +198,182 @@ begin
   end;  
 end;
 
+function TNozomiMotorcycleSequenceEditor.RetrieveGameVersion(var F: TFileStream): Boolean;
+var
+  i: Integer;
+  Value: Byte;
+
+begin
+  // Identifying the file version
+  i := 0;
+  repeat
+    F.Seek(GAME_VERSION_DETECTION[i].Offset, soFromBeginning);
+    F.Read(Value, SizeOf(Value));
+    Result := GAME_VERSION_DETECTION[i].Value = Value;
+    if Result then
+      fFileVersion := GAME_VERSION_DETECTION[i].Result;
+    Inc(i);
+  until (Result) or (i > High(GAME_VERSION_DETECTION));
+
+  // The file version was detected
+  if Result then begin
+    IntegerArrayToList(DISC3_ALL_POINTERS_SUBTITLES, fStringPointersList);
+    case FileVersion of
+      // DISC3 USA
+      gvUsaDisc3:
+        IntegerArrayToList(DISC3_USA_POINTERS_UPDATE, fValuesToUpdateList);
+      // DISC3 PAL
+      gvPalDisc3:
+        IntegerArrayToList(DISC3_PAL_POINTERS_UPDATE, fValuesToUpdateList);
+      // DISC4 USA/PAL
+      gvUsaPalDisc4:
+        begin
+          IntegerArrayToList(DISC4_ALL_POINTERS_SUBTITLES, fStringPointersList);
+          IntegerArrayToList(DISC4_ALL_POINTERS_UPDATE, fValuesToUpdateList);
+        end;
+    end; // case FileVersion
+  end; // if Result
+end;
+
 procedure TNozomiMotorcycleSequenceEditor.SaveToFile(const FileName: TFileName);
 var
   Input, Output: TFileStream;
-
+  OutputFileName: TFileName;
+  Value, i, TotalPatchValue: Integer;
+  Header: TSequenceDataHeader;
+  
 begin
+{$IFDEF DEBUG}
+  WriteLn(sLineBreak, '*** SAVING FILE ***', sLineBreak);
+{$ENDIF}
+
+  OutputFileName := FileName; //GetTempFileName;
+
   Input := TFileStream.Create(SourceFileName, fmOpenRead);
-  Output := GetTempFileName;
+  Output := TFileStream.Create(OutputFileName, fmCreate);
+  try
+
+    // Positionning on the SCN3 section
+    Input.Seek(0, soFromBeginning);
+
+    // Copy everything without original subtitle table
+    Output.CopyFrom(Input, StringTableOffset);
+
+    // Writing the subtitles table
+    TotalPatchValue := 0; // don't know but it works...
+    for i := 0 to Count - 1 do begin
+      // Writing the subtitle
+      Items[i].WriteSubtitle(Output);
+
+      // Updating the string pointer value
+      Output.Seek(Items[i].StringPointerOffset, soFromBeginning);
+      Output.Write(Items[i].NewStringOffset, 4);
+      Output.Seek(0, soFromEnd);
+
+      // Calculating the TotalPatchValue
+      Inc(TotalPatchValue, Items[i].PatchValue);
+    end;
+
+    // Writing the lastest dummy subtitle (which is 1 byte length)
+    Value := $0;
+    Output.Write(Value, 1);
+
+    // Updating misc pointer values
+{$IFDEF DEBUG}
+    WriteLn(sLineBreak, 'Updating pointers:');
+{$ENDIF}
+    for i := 0 to ValuesToUpdateList.Count - 1 do begin
+      Output.Seek(Integer(ValuesToUpdateList[i]), soFromBeginning);
+{$IFDEF DEBUG}
+      Write('  #', Format('%2.2d', [i]),
+        ': Ptr=0x', IntToHex(Integer(ValuesToUpdateList[i]), 4));
+{$ENDIF}
+      Output.Read(Value, 4);
+{$IFDEF DEBUG}
+      Write(', OldValue=0x', IntToHex(Value, 4));
+{$ENDIF}
+      Output.Seek(-4, soCurrent);
+      Inc(Value, TotalPatchValue);
+{$IFDEF DEBUG}
+      WriteLn(', NewValue=0x', IntToHex(Value, 4));
+{$ENDIF}
+      Output.Write(Value, 4);
+    end;
+
+    // Writing the file footer
+    Input.Seek(Integer(ValuesToUpdateList[0]), soFromBeginning);
+    Input.Read(Value, 4);
+    Input.Seek(Value, soFromBeginning);    
+{$IFDEF DEBUG}
+    Write('Writing footer: offset=0x', IntToHex(Value, 4));
+{$ENDIF}
+    Value := Input.Size - Value;
+{$IFDEF DEBUG}
+    WriteLn(', size=', Value);
+{$ENDIF}
+    Output.Seek(0, soFromEnd);
+    Output.CopyFrom(Input, Value);
+
+    // Updating the section header
+    Output.Seek(0, soFromBeginning);
+    Output.Read(Header, SizeOf(TSequenceDataHeader));
+    Output.Seek(0, soFromBeginning);
+    Inc(Header.Size, TotalPatchValue);
+    Inc(Header.DataSize1, TotalPatchValue);
+    Inc(Header.DataSize2, TotalPatchValue);
+    Output.Write(Header, SizeOf(TSequenceDataHeader));
+    
+  finally
+    Input.Free;
+    Output.Free;
+  end;
 end;
 
 { TNozomiMotorcycleSubtitleItem }
 
-procedure TNozomiMotorcycleSequenceSubtitleItem.WriteSubtitle(var F: TFileStream);
+function TNozomiMotorcycleSequenceSubtitleItem.DecodeText(const S: string): string;
 begin
+  Result := StringReplace(S, SUBTITLE_DELIMITER, '', [rfReplaceAll]);
+  Result := StringReplace(Result, SUBTITLE_LINEBREAK, '<br>', [rfReplaceAll]);
+end;
 
+function TNozomiMotorcycleSequenceSubtitleItem.EncodeText(const S: string): string;
+begin
+  Result := SUBTITLE_DELIMITER
+    + StringReplace(S, '<br>', SUBTITLE_LINEBREAK, [rfReplaceAll]);
+end;
+
+function TNozomiMotorcycleSequenceSubtitleItem.GetPatchValue: Integer;
+begin
+  Result := Length(EncodeText(Text)) - OriginalTextLength;
+end;
+
+procedure TNozomiMotorcycleSequenceSubtitleItem.WriteSubtitle(
+  var Output: TFileStream);
+var
+  TempSubtitle: string;
+  NullByte: Byte;
+
+begin
+  fNewStringOffset := Output.Position;
+
+  // Writing subtitle header
+  TempSubtitle := EncodeText(Text);
+
+  // Writing subtitle text
+  Output.Write(TempSubtitle[1], Length(TempSubtitle));
+
+  // Writing one null byte
+  NullByte := $00;
+  Output.Write(NullByte, 1);
+
+{$IFDEF DEBUG}
+  WriteLn(
+    'Ptr=0x', IntToHex(StringPointerOffset, 4), ', OldValue=0x',
+    IntToHex(StringOffset, 4), ', NewValue=0x', IntToHex(NewStringOffset, 4),
+    sLineBreak, '  "', Text, '"'
+  );
+{$ENDIF}
 end;
 
 end.

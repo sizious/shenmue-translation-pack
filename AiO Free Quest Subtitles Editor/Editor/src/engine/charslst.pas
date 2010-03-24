@@ -55,7 +55,7 @@ type
 implementation
 
 uses
-  CharsCnt, ScnfUtil;
+  CharsCnt, ScnfUtil, SysTools;
 
 { TCharsList }
 
@@ -187,8 +187,8 @@ begin
   repeat
     ReadLn(F, mainLine);
     if (mainLine <> '') and (mainLine[1] <> '#') then begin
-      ChrCode := StrToInt(parse_section(';', mainLine, 0));
-      Chr := AnsiDequotedStr(parse_section(';', mainLine, 1), '''')[1];
+      ChrCode := StrToInt(ParseStr(';', mainLine, 0));
+      Chr := AnsiDequotedStr(ParseStr(';', mainLine, 1), '''')[1];
       AddEntry(Chr, ChrCode);
     end;
   until EOF(F);

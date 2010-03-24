@@ -209,7 +209,8 @@ initialization
 //------------------------------------------------------------------------------
 
 finalization
-  GZipClearEngine;
+  if GetApplicationInstancesCount = 1 then
+    GZipClearEngine;
 
 //==============================================================================
 

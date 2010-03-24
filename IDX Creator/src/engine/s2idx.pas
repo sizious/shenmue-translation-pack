@@ -29,7 +29,6 @@ type
     fIDXStatus: TIDXStatusEvent;
     fIDXCreationEndEvent: TIDXCreationEndEvent;
     fIDXCreationProgressEvent: TIDXCreationProgressEvent;
-    function parse_section(substr:String; s:String; n:Integer): string;
   public
     function MakeIDX(InputAFS: string; OutputIDX: string): Boolean;
     property OnStart: TIDXCreationStartEvent read fIDXCreationStart write fIDXCreationStart;
@@ -43,23 +42,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  cStreams;
-
-//------------------------------------------------------------------------------
-  
-//This function retrieve the text between the defined substring
-function TS2IDXCreator.parse_section(substr:String; s:String; n:Integer): string;
-var i:integer;
-begin
-        S := S + substr;
-
-        for i:=1 to n do
-        begin
-                S := copy(s, Pos(substr, s) + Length(substr), Length(s) - Pos(substr, s) + Length(substr));
-        end;
-
-        Result := Copy(s, 1, pos(substr, s)-1);
-end;
+  cStreams, SysTools;
 
 //------------------------------------------------------------------------------
 
@@ -272,7 +255,7 @@ begin
                       end;
 
                       //Finding what to delete in the filename...
-                      delete1 := parse_section('.', files_infos[srf_list[i]], 0);
+                      delete1 := ParseStr('.', files_infos[srf_list[i]], 0);
 
                       for i2:=0 to current_files_list.Count-1 do
                       begin

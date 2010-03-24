@@ -64,7 +64,7 @@ implementation
 { TCharIdInfosTable }
 
 uses
-  CharsCnt;
+  CharsCnt, SysTools;
   
 procedure TNPCInfosTable.AddEntry(GameVersion: TGameVersion; CharID: string;
   Gender: TGenderType; AgeType: TAgeType);
@@ -186,10 +186,10 @@ begin
 
       if not (FirstLine and ContainsTitleLine) then begin
         try
-          GameVer := parse_section(';', mainLine, 0);
-          ChrCode := parse_section(';', mainLine, 1);
-          Gender := parse_section(';', mainLine, 2)[1];
-          AgeType := parse_section(';', mainLine, 3)[1];
+          GameVer := ParseStr(';', mainLine, 0);
+          ChrCode := ParseStr(';', mainLine, 1);
+          Gender := ParseStr(';', mainLine, 2)[1];
+          AgeType := ParseStr(';', mainLine, 3)[1];
         except
           Gender := 'U';
           AgeType := 'U';

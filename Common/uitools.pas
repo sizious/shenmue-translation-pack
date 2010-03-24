@@ -13,15 +13,16 @@ function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion(LangID, SubLangID: Byte): string;
 function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
-procedure InitToolBarControl(SourceForm: TForm; ToolBar: TJvToolBar);
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 function OpenLink(const LinkURL: string): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
+procedure ToolBarCustomDraw(Toolbar: TToolBar);
+procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
 
 implementation
 
 uses
-  Menus, ShellApi;
+  Themes, Menus, ShellApi;
 
 //------------------------------------------------------------------------------
 
@@ -156,7 +157,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure InitToolBarControl(SourceForm: TForm; ToolBar: TJvToolBar);
+procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
 var
   i: Integer;
   MenuName: TComponentName;
@@ -187,6 +188,24 @@ begin
         );
       {$ENDIF}
     end; // Style = tbsButton
+end;
+
+//------------------------------------------------------------------------------
+
+procedure ToolBarCustomDraw(Toolbar: TToolBar);
+var
+  ElementDetails: TThemedElementDetails;
+  NewRect : TRect;
+
+begin
+  // Thank you ...
+  // http://www.brandonstaggs.com/2009/06/29/give-a-delphi-ttoolbar-a-proper-themed-background/
+  if ThemeServices.ThemesEnabled then begin
+    NewRect := Toolbar.ClientRect;
+    NewRect.Top := NewRect.Top - GetSystemMetrics(SM_CYMENU);
+    ElementDetails := ThemeServices.GetElementDetails(trRebarRoot);
+    ThemeServices.DrawElement(Toolbar.Canvas.Handle, ElementDetails, NewRect);
+  end;
 end;
 
 //------------------------------------------------------------------------------
