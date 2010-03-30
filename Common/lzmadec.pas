@@ -1,4 +1,4 @@
-unit lzmadec;
+unit LZMADec;
 
 interface
 

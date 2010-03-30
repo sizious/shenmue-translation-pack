@@ -1,4 +1,4 @@
-unit debuglog;
+unit DebugLog;
 
 // =============================================================================
 // DEBUG LOG MODULE
@@ -80,6 +80,7 @@ type
     // Methods
     procedure AddLine(LineType: TLineType; const Text: string);
     procedure SaveLogFile;
+    procedure Report(LineType: TLineType; MsgText, AdditionalDebugText: string);
 
     // Properties
     property Configuration: TXMLConfigurationFile
@@ -164,6 +165,7 @@ type
     { Déclarations publiques }
     procedure AddLine(LineType: TLineType; const Text: string);
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    procedure Report(LineType: TLineType; MsgText, AdditionalDebugText: string);
     procedure LoadConfig;
     procedure SaveConfig;
     procedure SaveLogFile;
@@ -469,6 +471,37 @@ end;
 
 //------------------------------------------------------------------------------
 
+procedure TfrmDebugLog.Report(LineType: TLineType; MsgText,
+  AdditionalDebugText: string);
+var
+  MsgIcon: Integer;
+
+begin
+  MsgIcon := 0;
+  case LineType of
+    ltInformation:
+      begin
+        MsgIcon := MB_ICONINFORMATION;
+        Caption := 'Information';
+      end;
+    ltWarning:
+      begin
+        MsgIcon := MB_ICONWARNING;
+        Caption := 'Warning';
+      end;
+    ltCritical:
+      begin
+        MsgIcon := MB_ICONERROR;
+        Caption := 'Error';
+      end;
+  end;
+
+  if AdditionalDebugText <> '' then
+    AdditionalDebugText := ' [' + AdditionalDebugText + '].';
+  AddLine(LineType, Text + AdditionalDebugText);
+  MsgBox(Text, Caption, MsgIcon + MB_OK);
+end;
+
 procedure TfrmDebugLog.ResetStatus;
 begin
   sbDebug.SimpleText := '';
@@ -518,6 +551,12 @@ end;
 function TDebugLogHandlerInterface.GetConfiguration: TXMLConfigurationFile;
 begin
   Result := DebugLogWindow.Configuration;
+end;
+
+procedure TDebugLogHandlerInterface.Report(LineType: TLineType; MsgText,
+  AdditionalDebugText: string);
+begin
+  DebugLogWindow.Report(LineType, MsgText, AdditionalDebugText);
 end;
 
 //------------------------------------------------------------------------------

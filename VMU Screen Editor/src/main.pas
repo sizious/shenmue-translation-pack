@@ -243,7 +243,7 @@ end;
 
 procedure TfrmMain.DebugLogWindowActivated(Sender: TObject);
 begin
-//  showmessage('DebugLogWindowActivated');
+  StatusText := '';
 end;
 
 procedure TfrmMain.Clear;
@@ -698,7 +698,7 @@ procedure TfrmMain.ReportFailure(Text, AdditionalDebugText, Caption: string;
   FailureType: TLineType);
 var
   MsgIcon: Integer;
-  
+
 begin
   MsgIcon := 0;
   case FailureType of

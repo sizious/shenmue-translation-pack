@@ -51,6 +51,9 @@ function IsTheSameCharsList(GameVersion1, GameVersion2: TGameVersion): Boolean;
 implementation
 //------------------------------------------------------------------------------
 
+uses
+  SysTools;
+  
 const
   DATA_BASE_DIR               = 'data';
 
@@ -187,8 +190,7 @@ end;
 //------------------------------------------------------------------------------
 
 initialization
-  DatasDirectory :=
-    IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + DATA_BASE_DIR + '\';
+  DatasDirectory := GetApplicationDirectory + DATA_BASE_DIR + '\';
 
 //------------------------------------------------------------------------------
 

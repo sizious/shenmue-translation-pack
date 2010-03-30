@@ -1,4 +1,4 @@
-unit systools;
+unit SysTools;
 
 interface
 
@@ -10,6 +10,7 @@ procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
+function GetApplicationDirectory: TFileName;
 function GetApplicationInstancesCount: Integer;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetTempDir: TFileName;
@@ -58,6 +59,14 @@ begin
       );
 
   Result := Copy(S, 1, Pos(SubStr, S) - 1);
+end;
+
+//------------------------------------------------------------------------------
+
+function GetApplicationDirectory: TFileName;
+begin
+  Result :=
+    IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
 end;
 
 //------------------------------------------------------------------------------

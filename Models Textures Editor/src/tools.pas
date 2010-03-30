@@ -26,10 +26,9 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main, ShellApi;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main, ShellApi, SysTools;
 
 var
-  AppDir,
   ConfigFileName: TFileName;
 
 //------------------------------------------------------------------------------
@@ -273,8 +272,7 @@ end;
 //------------------------------------------------------------------------------
 
 initialization
-  AppDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
-  ConfigFileName := AppDir + 'config.xml';
+  ConfigFileName := GetApplicationDirectory + 'config.xml';
 //  PreviousSelectedPathFileName := AppDir + 'selpath.ini';
 //  InitWrapStr;
 

@@ -62,6 +62,11 @@
    Cet outil permet d'éditer les textures MT5/MT6/MT7, dans le but de traduire
    certains sprites.
       
+ * Nozomi Motorcycle Subtitles Editor
+   Cet éditeur est un éditeur spécial pour la cinématique "Nozomi and the 
+   Motorcycle" qui se lance à la fin du disque 3. Cette séquence est spéciale
+   car le format de sous-titres utilisé est très différent de tout le reste.
+
  * SPR Utils
    Cet outil est un éditeur de sprites au format SPR.
  

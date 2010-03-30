@@ -1,4 +1,4 @@
-unit xmlconf;
+unit XMLConf;
 
 interface
 

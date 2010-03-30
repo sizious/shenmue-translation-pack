@@ -144,7 +144,7 @@ var
   Previewer: TSubtitlesPreviewWindow;
   
 implementation
-uses charsutils, subutils, about, UITools;
+uses charsutils, subutils, about, UITools, SysTools;
 {$R *.dfm}
 
 function TfrmMain.MsgBox(const Text: string; const Caption: string; Flags: Integer): Integer;
@@ -603,7 +603,7 @@ begin
 
   SrfList := TStringList.Create;
   SrfStruct := TSrfStruct.Create;
-  DataDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)+'\data');
+  DataDir := GetApplicationDirectory +'data\';
   
   //Accentuated characters list
   with ShenmueI1 do begin

@@ -79,6 +79,10 @@ object frmMain: TfrmMain
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'Textures'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         430
         355)

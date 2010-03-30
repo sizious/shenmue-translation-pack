@@ -6,7 +6,6 @@ uses
   Windows, SysUtils, XmlConf;
 
 function GetAppVersion: string;
-function GetApplicationDirectory: TFileName;
 function GetConfigurationObject: TXMLConfigurationFile;
 function GetWorkingTempDirectory: TFileName;
 procedure LoadConfigMain;
@@ -32,14 +31,6 @@ var
 function GetConfigurationObject: TXMLConfigurationFile;
 begin
   Result := Configuration;
-end;
-
-//------------------------------------------------------------------------------
-
-function GetApplicationDirectory: TFileName;
-begin
-  GetApplicationDirectory :=
-    IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 end;
 
 //------------------------------------------------------------------------------

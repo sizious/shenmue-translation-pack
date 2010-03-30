@@ -19,10 +19,12 @@ type
     fOriginalTextLength: Integer;
     fNewStringOffset: Integer;
     function GetPatchValue: Integer;
+    function GetEditor: TNozomiMotorcycleSequenceEditor;
   protected
     function DecodeText(const S: string): string;
     function EncodeText(const S: string): string;
     procedure WriteSubtitle(var Output: TFileStream);
+    property Editor: TNozomiMotorcycleSequenceEditor read GetEditor;
     property NewStringOffset: Integer read fNewStringOffset;
     property OriginalTextLength: Integer read fOriginalTextLength;
     property PatchValue: Integer read GetPatchValue;
@@ -37,17 +39,19 @@ type
   TNozomiMotorcycleSequenceSubtitleList = class(TObject)
   private
     fSubtitleList: TList;
+    fOwner: TNozomiMotorcycleSequenceEditor;
     function GetCount: Integer;
     function GetSubtitleItem(Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
   protected
     procedure Add(const StrPointerOffset: Integer; var Input: TFileStream);
     procedure Clear;
   public
-    constructor Create(AOwner TNozomiMotorcycleSequenceEditor);
+    constructor Create(AOwner: TNozomiMotorcycleSequenceEditor);
     destructor Destroy; override;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TNozomiMotorcycleSequenceSubtitleItem
       read GetSubtitleItem; default;
+    property Owner: TNozomiMotorcycleSequenceEditor read fOwner;
   end;
 
   TNozomiMotorcycleSequenceEditor = class(TObject)
@@ -74,7 +78,8 @@ type
     destructor Destroy; override;
     procedure Clear;
     function LoadFromFile(const FileName: TFileName): Boolean;
-    procedure SaveToFile(const FileName: TFileName);
+    function Save: Boolean;
+    function SaveToFile(const FileName: TFileName): Boolean;
     property FileVersion: TNozomiMotorcycleSequenceGameVersion read fFileVersion;
     property Charset: TShenmueCharsetCodec read fCharset;
     property Loaded: Boolean read fLoaded;
@@ -110,7 +115,7 @@ end;
 constructor TNozomiMotorcycleSequenceEditor.Create;
 begin
   fCharset := TShenmueCharsetCodec.Create;
-  fSubtitles := TNozomiMotorcycleSequenceSubtitleList.Create;
+  fSubtitles := TNozomiMotorcycleSequenceSubtitleList.Create(Self);
   fStringPointersList := TList.Create;
   fValuesToUpdateList := TList.Create;
   fFileSectionsList := TFileSectionsList.Create(Self);
@@ -231,13 +236,21 @@ begin
   F.Seek(SavedPosition, soFromBeginning);
 end;
 
-procedure TNozomiMotorcycleSequenceEditor.SaveToFile(const FileName: TFileName);
+function TNozomiMotorcycleSequenceEditor.Save: Boolean;
+begin
+  Result := SaveToFile(SourceFileName);
+end;
+
+function TNozomiMotorcycleSequenceEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
   i: Integer;
   Input, Output, UpdatedSceneFile: TFileStream;
   OutputTempFileName: TFileName;
 
 begin
+  Result := False;
+  if not Loaded then Exit;
+  
   // Patch the extracted Scene info file
   UpdateDumpedSceneFile;
 
@@ -273,7 +286,7 @@ begin
 
     // Updating target
     if FileExists(OutputTempFileName) then begin
-      CopyFile(OutputTempFileName, FileName, False);
+      Result := CopyFile(OutputTempFileName, FileName, False);
       DeleteFile(OutputTempFileName);
     end;
 
@@ -385,14 +398,18 @@ end;
 
 function TNozomiMotorcycleSequenceSubtitleItem.DecodeText(const S: string): string;
 begin
-  Result := StringReplace(S, SUBTITLE_DELIMITER, '', [rfReplaceAll]);
-  Result := StringReplace(Result, SUBTITLE_LINEBREAK, '<br>', [rfReplaceAll]);
+  Result := StringReplace(S, SUBTITLE_DELIMITER, '', []);
+  Result := Editor.Charset.Decode(Result);
 end;
 
 function TNozomiMotorcycleSequenceSubtitleItem.EncodeText(const S: string): string;
 begin
-  Result := SUBTITLE_DELIMITER
-    + StringReplace(S, '<br>', SUBTITLE_LINEBREAK, [rfReplaceAll]);
+  Result := SUBTITLE_DELIMITER + Editor.Charset.Encode(S);
+end;
+
+function TNozomiMotorcycleSequenceSubtitleItem.GetEditor: TNozomiMotorcycleSequenceEditor;
+begin
+  Result := Owner.Owner;
 end;
 
 function TNozomiMotorcycleSequenceSubtitleItem.GetPatchValue: Integer;
@@ -487,9 +504,11 @@ begin
   fSubtitleList.Clear;
 end;
 
-constructor TNozomiMotorcycleSequenceSubtitleList.Create;
+constructor TNozomiMotorcycleSequenceSubtitleList.Create(
+  AOwner: TNozomiMotorcycleSequenceEditor);
 begin
   fSubtitleList := TList.Create;
+  fOwner := AOwner;
 end;
 
 destructor TNozomiMotorcycleSequenceSubtitleList.Destroy;
