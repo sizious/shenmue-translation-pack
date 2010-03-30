@@ -34,12 +34,14 @@ type
     miHelp: TMenuItem;
     miDEBUG: TMenuItem;
     miDEBUG_TEST1: TMenuItem;
+    miSave: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
       var DefaultDraw: Boolean);
     procedure miOpenClick(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
   private
     { Déclarations privées }
     procedure Clear;
@@ -85,10 +87,10 @@ begin
     Clear;
 
     // Loading the view
-    for i := 0 to SequenceEditor.Count - 1 do
+    for i := 0 to SequenceEditor.Subtitles.Count - 1 do
       with lvSubs.Items.Add do begin
         Caption := IntToStr(i);
-        SubItems.Add(SequenceEditor[i].Text);
+        SubItems.Add(SequenceEditor.Subtitles[i].Text);
       end;
   end;  
 end;
@@ -108,8 +110,8 @@ begin
   SequenceEditor.Items[7].Text := 'Woohoo! This''s the lastest SiZiOUS hack.<br>Enjoy this GREAT exploit!';
   SequenceEditor.Items[8].Text := 'Woohoo! This''s the lastest SiZiOUS hack.<br>Enjoy this GREAT exploit!'; *)
 
-  for i := 0 to SequenceEditor.Count - 1 do
-    SequenceEditor[i].Text :=
+  for i := 0 to SequenceEditor.Subtitles.Count - 1 do
+    SequenceEditor.Subtitles[i].Text :=
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr<br>abcdefghijklmnopqrABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   SequenceEditor.SaveToFile('PAL_DISC4.HAK');
@@ -120,7 +122,13 @@ end;
 
 procedure TfrmMain.miOpenClick(Sender: TObject);
 begin
-  LoadFile('PAL_DISC4.SCN');
+  LoadFile('MAPINFO.BIN');
+end;
+
+procedure TfrmMain.miSaveClick(Sender: TObject);
+begin
+//  SequenceEditor.Subtitles[2].Text := 'MOTHA FOCKA!';
+  SequenceEditor.SaveToFile('blah.bin');
 end;
 
 procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;

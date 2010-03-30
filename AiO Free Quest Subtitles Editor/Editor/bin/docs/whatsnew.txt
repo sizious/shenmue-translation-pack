@@ -9,7 +9,8 @@ ___| Version 2.7: 2010-03-?? |__________________________________________________
 
 FIXED:
 - Small bug in the Subtitles Corrector function: when a string in the database
-  was empty, the database parser crashed with an exception error.
+  was empty, the database parser crashed with an exception error (Thx Shendream)
+- The NPC list was updated: the KZM_ character was missing (Thx Shendream)
 ___                           __________________________________________________
 ___| Version 2.6: 2010-03-13 |__________________________________________________
 
