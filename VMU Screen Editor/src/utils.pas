@@ -14,7 +14,7 @@ procedure InitConfigurationFile;
 implementation
 
 uses
-  Forms, UITools;
+  Forms, SysTools, UITools;
 
 const
   CONFIG_FILENAME = 'config.xml';
@@ -24,14 +24,6 @@ const
 function GetAppVersion: string;
 begin
   Result := GetApplicationVersion(LANG_FRENCH, SUBLANG_FRENCH);
-end;
-
-//------------------------------------------------------------------------------
-
-function GetApplicationDirectory: TFileName;
-begin
-  GetApplicationDirectory :=
-    IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 end;
 
 //------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-unit gzipmgr;
+unit GZipMgr;
 
 interface
 

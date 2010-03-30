@@ -18,7 +18,8 @@ uses
   UAfsStruct in 'engine\UAfsStruct.pas',
   UIdxStruct in 'engine\UIdxStruct.pas',
   UIdxCreation in 'engine\UIdxCreation.pas',
-  s1idx_intf in 'engine\s1idx_intf.pas';
+  s1idx_intf in 'engine\s1idx_intf.pas',
+  systools in '..\..\Common\systools.pas';
 
 //------------------------------------------------------------------------------
 

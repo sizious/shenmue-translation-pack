@@ -28,7 +28,6 @@ const
   WORKING_TEMP_DIR = 'FQEditor';
 
 var
-  AppDir: TFileName;
   ConfigFileName: TFileName;
   PreviousSelectedPathFileName: TFileName;
   sWrapStr: string; // used for MsgBox
@@ -219,9 +218,8 @@ end;
 
 initialization
   sWorkingTempDirectory := ''; // see GetWorkingTempDirectory
-  AppDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
-  ConfigFileName := AppDir + 'config.xml';
-  PreviousSelectedPathFileName := AppDir + 'selpath.ini';
+  ConfigFileName := GetApplicationDirectory + 'config.xml';
+  PreviousSelectedPathFileName := GetApplicationDirectory + 'selpath.ini';
   InitWrapStr;
 
 //------------------------------------------------------------------------------

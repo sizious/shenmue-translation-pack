@@ -1,4 +1,4 @@
-unit imgtools;
+unit ImgTools;
 
 interface
 

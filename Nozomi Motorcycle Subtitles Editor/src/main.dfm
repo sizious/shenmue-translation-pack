@@ -1,48 +1,48 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'frmMain'
-  ClientHeight = 381
-  ClientWidth = 491
+  Caption = '< Dynamic Title > // NBIK Editor'
+  ClientHeight = 432
+  ClientWidth = 472
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = mmMain
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    491
-    381)
+    472
+    432)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
-    Left = 8
-    Top = 245
+    Left = 4
+    Top = 244
     Width = 43
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Old text:'
-    ExplicitTop = 210
+    ExplicitTop = 301
   end
   object lblText: TLabel
-    Left = 8
-    Top = 311
+    Left = 4
+    Top = 324
     Width = 48
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'New text:'
-    ExplicitTop = 276
+    ExplicitTop = 381
   end
   object lvSubs: TListView
     Left = 4
     Top = 28
-    Width = 485
-    Height = 190
+    Width = 466
+    Height = 210
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -51,21 +51,20 @@ object frmMain: TfrmMain
       end
       item
         AutoSize = True
-        Caption = 'Text'
+        Caption = 'Subtitles'
       end>
     ColumnClick = False
     ReadOnly = True
     RowSelect = True
     TabOrder = 0
     ViewStyle = vsReport
-    ExplicitWidth = 436
-    ExplicitHeight = 155
+    OnSelectItem = lvSubsSelectItem
   end
   object mOldSub: TMemo
-    Left = 64
-    Top = 224
-    Width = 425
-    Height = 61
+    Left = 4
+    Top = 259
+    Width = 466
+    Height = 63
     Anchors = [akLeft, akRight, akBottom]
     Color = clBtnFace
     Font.Charset = ANSI_CHARSET
@@ -78,13 +77,11 @@ object frmMain: TfrmMain
     ScrollBars = ssHorizontal
     TabOrder = 1
     WordWrap = False
-    ExplicitTop = 189
-    ExplicitWidth = 376
   end
-  object memoText: TMemo
-    Left = 64
-    Top = 291
-    Width = 425
+  object mNewSub: TMemo
+    Left = 4
+    Top = 340
+    Width = 466
     Height = 60
     Anchors = [akLeft, akRight, akBottom]
     Font.Charset = ANSI_CHARSET
@@ -96,13 +93,12 @@ object frmMain: TfrmMain
     ScrollBars = ssHorizontal
     TabOrder = 2
     WordWrap = False
-    ExplicitTop = 256
-    ExplicitWidth = 376
+    OnChange = mNewSubChange
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 362
-    Width = 491
+    Top = 413
+    Width = 472
     Height = 19
     Panels = <
       item
@@ -117,13 +113,11 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 327
-    ExplicitWidth = 442
   end
   object tbMain: TJvToolBar
     Left = 0
     Top = 0
-    Width = 491
+    Width = 472
     Height = 26
     DisabledImages = ilToolBarDisabled
     EdgeBorders = [ebTop]
@@ -132,7 +126,6 @@ object frmMain: TfrmMain
     TabOrder = 4
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
-    ExplicitWidth = 442
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -193,7 +186,7 @@ object frmMain: TfrmMain
       ImageIndex = 9
     end
   end
-  object MainMenu1: TMainMenu
+  object mmMain: TMainMenu
     Left = 8
     Top = 52
     object miFile: TMenuItem
@@ -206,9 +199,19 @@ object frmMain: TfrmMain
         Caption = 'miSave'
         OnClick = miSaveClick
       end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object miQuit: TMenuItem
+        Caption = '&Quit'
+        OnClick = miQuitClick
+      end
     end
     object miView: TMenuItem
       Caption = 'miView'
+      object miDebugLog: TMenuItem
+        Caption = 'miDebugLog'
+      end
     end
     object miHelp: TMenuItem
       Caption = 'miHelp'
@@ -1032,5 +1035,27 @@ object frmMain: TfrmMain
       00008001C001FDC700008001C001C0C300008001C001C0E300008001C001C0E3
       00008001C001C04300008001C001800300018001C001C803807F8001C001FC03
       C0FF8001C003FE07FFFFFFFFC007FFFF}
+  end
+  object odOpen: TOpenDialog
+    DefaultExt = 'BIN'
+    FileName = 'MAPINFO.BIN'
+    Filter = 
+      'NBIK Sequence File (MAPINFO.BIN)|MAPINFO.BIN|Generic Binary File' +
+      's (*.BIN)|*.BIN|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Title = 'Select the file to open...'
+    Left = 8
+    Top = 80
+  end
+  object sdSave: TSaveDialog
+    DefaultExt = 'BIN'
+    FileName = 'MAPINFO.BIN'
+    Filter = 
+      'NBIK Sequence File (MAPINFO.BIN)|MAPINFO.BIN|Generic Binary File' +
+      's (*.BIN)|*.BIN|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Export the current entry to...'
+    Left = 8
+    Top = 108
   end
 end

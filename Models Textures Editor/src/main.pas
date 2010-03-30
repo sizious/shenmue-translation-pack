@@ -214,8 +214,8 @@ var
 implementation
 
 uses
-  ShellApi, MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools, texprop,
-  about;
+  ShellApi, MTScan_Intf, Progress, SelDir, TexView, Common, Img2Png, Tools,
+  texprop, about, SysTools;
 
 const
   DEFAULT_WIDTH = 600;
@@ -1005,7 +1005,7 @@ procedure TfrmMain.SetApplicationConfigParameters;
 begin
   if not LoadConfig then begin
     AutoSave := False;
-    SourceDirectory := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
+    SourceDirectory := GetApplicationDirectory;
     MakeBackup := True;
   end;
 end;

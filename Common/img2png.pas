@@ -5,7 +5,7 @@
   - Pvr2Png 1.01 by Gzav
   - PvrX2Png 0.1 by SiZiOUS
 *)
-unit img2png;
+unit Img2Png;
 
 interface
 

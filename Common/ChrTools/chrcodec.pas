@@ -198,6 +198,7 @@ var
 
 begin
   ShenmueCode := BytesToString(ShenmueCode);
+  WindowsCode := BytesToString(WindowsCode);
   
   // Adding the new item to the Charset
   Item := TCharsetListItem.Create;
@@ -349,6 +350,9 @@ var
   Value, i: Integer;
 
 begin
+  Result := EncodedString;
+  if (Pos('#', EncodedString) = 0) or (EncodedString = '#') then Exit;
+
   Result := '';
   StringList := TStringList.Create;
   try

@@ -1,4 +1,4 @@
-unit uitools;
+unit UITools;
 
 interface
 
@@ -9,8 +9,10 @@ type
   EUserInterfaceException = class(Exception);
   EInvalidToolBarButton = class(EUserInterfaceException);
 
+function BR(const Text: string): string;
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
-function GetApplicationVersion(LangID, SubLangID: Byte): string;
+function GetApplicationVersion: string; overload;
+function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
 function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
@@ -23,6 +25,13 @@ implementation
 
 uses
   Themes, Menus, ShellApi;
+
+//------------------------------------------------------------------------------
+
+function BR(const Text: string): string;
+begin
+  Result := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
+end;
 
 //------------------------------------------------------------------------------
 
@@ -102,6 +111,13 @@ end;
 function GetApplicationVersion(LangID, SubLangID: Byte): string;
 begin
   Result := ExtractApplicationVersion(MakeLangID(LangID, SubLangID));
+end;
+
+//------------------------------------------------------------------------------
+
+function GetApplicationVersion: string;
+begin
+  Result := GetApplicationVersion(LANG_FRENCH, SUBLANG_FRENCH);
 end;
 
 //------------------------------------------------------------------------------
