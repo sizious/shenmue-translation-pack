@@ -1,18 +1,19 @@
-unit nbikedit;
+unit NBIKEdit;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, DataDefs;
+  Windows, SysUtils, Classes, DataDefs, FSParser, ChrCodec;
   
 type
   TNozomiMotorcycleSequenceEditor = class;
+  TNozomiMotorcycleSequenceSubtitleList = class;
 
   TNozomiMotorcycleSequenceSubtitleItem = class(TObject)
   private
     fText: string;
     fIndex: Integer;
-    fOwner: TNozomiMotorcycleSequenceEditor;
+    fOwner: TNozomiMotorcycleSequenceSubtitleList;
     fStringOffset: Integer;
     fStringPointerOffset: Integer;
     fOriginalTextLength: Integer;
@@ -30,23 +31,42 @@ type
     property StringPointerOffset: Integer read fStringPointerOffset;
     property StringOffset: Integer read fStringOffset;
     property Text: string read fText write fText;        
-    property Owner: TNozomiMotorcycleSequenceEditor read fOwner;
+    property Owner: TNozomiMotorcycleSequenceSubtitleList read fOwner;
+  end;
+
+  TNozomiMotorcycleSequenceSubtitleList = class(TObject)
+  private
+    fSubtitleList: TList;
+    function GetCount: Integer;
+    function GetSubtitleItem(Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
+  protected
+    procedure Add(const StrPointerOffset: Integer; var Input: TFileStream);
+    procedure Clear;
+  public
+    constructor Create(AOwner TNozomiMotorcycleSequenceEditor);
+    destructor Destroy; override;
+    property Count: Integer read GetCount;
+    property Items[Index: Integer]: TNozomiMotorcycleSequenceSubtitleItem
+      read GetSubtitleItem; default;
   end;
 
   TNozomiMotorcycleSequenceEditor = class(TObject)
   private
     fStringPointersList: TList;
     fValuesToUpdateList: TList;
-    fSubtitleList: TList;
+
     fSourceFileName: TFileName;
     fStringTableOffset: Integer;
     fFileVersion: TNozomiMotorcycleSequenceGameVersion;
     fLoaded: Boolean;
-    function GetCount: Integer;
-    function GetSubtitleItem(Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
+    fFileSectionsList: TFileSectionsList;
+    fDumpedSceneInputFileName: TFileName;
+    fSubtitles: TNozomiMotorcycleSequenceSubtitleList;
+    fCharset: TShenmueCharsetCodec;
   protected
-    procedure Add(const StrPointerOffset: Integer; var Input: TFileStream);
+    procedure UpdateDumpedSceneFile;
     function RetrieveGameVersion(var F: TFileStream): Boolean;
+    property DumpedSceneInputFileName: TFileName read fDumpedSceneInputFileName;
     property StringPointersList: TList read fStringPointersList;
     property ValuesToUpdateList: TList read fValuesToUpdateList;
   public
@@ -55,11 +75,11 @@ type
     procedure Clear;
     function LoadFromFile(const FileName: TFileName): Boolean;
     procedure SaveToFile(const FileName: TFileName);
-    property Count: Integer read GetCount;
     property FileVersion: TNozomiMotorcycleSequenceGameVersion read fFileVersion;
-    property Items[Index: Integer]: TNozomiMotorcycleSequenceSubtitleItem
-      read GetSubtitleItem; default;
+    property Charset: TShenmueCharsetCodec read fCharset;
     property Loaded: Boolean read fLoaded;
+    property Sections: TFileSectionsList read fFileSectionsList;
+    property Subtitles: TNozomiMotorcycleSequenceSubtitleList read fSubtitles;
     property SourceFileName: TFileName read fSourceFileName;
     property StringTableOffset: Integer read fStringTableOffset;
   end;
@@ -71,130 +91,101 @@ uses
 
 { TNozomiMotorcycleSequenceEditor }
 
-procedure TNozomiMotorcycleSequenceEditor.Add(const StrPointerOffset: Integer;
-  var Input: TFileStream);
-var
-  NewItem: TNozomiMotorcycleSequenceSubtitleItem;
-  Subtitle: string;
-  ItemIndex, StrOffset: Integer;
-  c: Char;
-  Done: Boolean;
-  
-begin
-  // Initializing the Subtitle decoder
-  Done := False;
-  Subtitle := '';
-  Input.Seek(StrPointerOffset, soFromBeginning);
-  Input.Read(StrOffset, 4);
-  Input.Seek(StrOffset, soFromBeginning);
-
-  // Reading the subtitle
-  while not Done do begin  
-    Input.Read(c, 1);
-    if c <> #0 then
-      Subtitle := Subtitle + c
-    else
-      Done := True;
-  end;
-
-  // Adding the new item to the internal list
-  NewItem := TNozomiMotorcycleSequenceSubtitleItem.Create;
-  ItemIndex := fSubtitleList.Add(NewItem);
-  with NewItem do begin
-    fOwner := Self;
-    fStringPointerOffset := StrPointerOffset;
-    fText := DecodeText(Subtitle);
-    fIndex := ItemIndex;
-    fOriginalTextLength := Length(Subtitle);
-    fStringOffset := StrOffset;
-  end;
-
-{$IFDEF DEBUG}
-  WriteLn('#', Format('%2.2d', [NewItem.Index]), ', Ptr=0x',
-    IntToHex(NewItem.StringPointerOffset, 4), ', Str=0x',
-    IntToHex(NewItem.StringOffset, 4), sLineBreak,
-    '  "', NewItem.Text, '"'
-  );
-{$ENDIF}
-end;
-
 procedure TNozomiMotorcycleSequenceEditor.Clear;
-var
-  i: Integer;
-
 begin
   fSourceFileName := '';
   fLoaded := False;
-  for i := 0 to Count - 1 do
-    TNozomiMotorcycleSequenceSubtitleItem(fSubtitleList[i]).Free;
-  fSubtitleList.Clear;
+
   fStringPointersList.Clear;
   fValuesToUpdateList.Clear;
+
+//  Sections.Clear;
+  Subtitles.Clear;
+
+  // clean the dumped scene file
+  if FileExists(DumpedSceneInputFileName) then
+    DeleteFile(DumpedSceneInputFileName);
 end;
 
 constructor TNozomiMotorcycleSequenceEditor.Create;
 begin
-  fSubtitleList := TList.Create;
+  fCharset := TShenmueCharsetCodec.Create;
+  fSubtitles := TNozomiMotorcycleSequenceSubtitleList.Create;
   fStringPointersList := TList.Create;
   fValuesToUpdateList := TList.Create;
+  fFileSectionsList := TFileSectionsList.Create(Self);
   Clear;
 end;
 
 destructor TNozomiMotorcycleSequenceEditor.Destroy;
 begin
   Clear;
-  fSubtitleList.Free;
+  fSubtitles.Free;
   fStringPointersList.Free;
   fValuesToUpdateList.Free;
+  fFileSectionsList.Free;
+  fCharset.Free;
   inherited;
-end;
-
-function TNozomiMotorcycleSequenceEditor.GetCount: Integer;
-begin
-  Result := fSubtitleList.Count;
-end;
-
-function TNozomiMotorcycleSequenceEditor.GetSubtitleItem(
-  Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
-begin
-  Result := TNozomiMotorcycleSequenceSubtitleItem(fSubtitleList[Index]);
 end;
 
 function TNozomiMotorcycleSequenceEditor.LoadFromFile(
   const FileName: TFileName): Boolean;
 var
   Input: TFileStream;
+  DumpedSceneInput: TFileStream;
   i: Integer;
   
 begin
 {$IFDEF DEBUG}
-  WriteLn(sLineBreak, '*** READING FILE ***', sLineBreak);
+  WriteLn('*** READING FILE ***');
 {$ENDIF}
 
   Input := TFileStream.Create(FileName, fmOpenRead);
   try
     Clear;
 
-    // Detect the file version
-    Result := RetrieveGameVersion(Input);
+    // Parsing the file
+    ParseFileSections(Input, fFileSectionsList);
+    i := Sections.IndexOf(SCENE_SECTION_ID);
+    Result := i <> -1;
+
+    // We found a SCN3 section
     if Result then begin
 
-      // The file was successfully opened
-      fSourceFileName := FileName;
-      fLoaded := True;
+      // Initializing the SCN3 FileStream receiver
+      fDumpedSceneInputFileName := GetTempFileName;
+      DumpedSceneInput := TFileStream.Create(DumpedSceneInputFileName, fmCreate);
 
-      // Calculating the beginning of the subtitles table
-      Input.Seek(Integer(StringPointersList[0]), soFromBeginning);
-      Input.Read(fStringTableOffset, 4);
+      // Dumping the SCN3 section
+      Input.Seek(Sections[i].Offset, soFromBeginning);
+      DumpedSceneInput.CopyFrom(Input, Sections[i].Size);
+      DumpedSceneInput.Seek(0, soFromBeginning);
 
-      // Reading the subtitle table
-      for i := 0 to StringPointersList.Count - 1 do
-        Add(Integer(StringPointersList[i]), Input);
+      // Detect the file version
+      Result := RetrieveGameVersion(DumpedSceneInput);
+      if Result then begin
 
-    end;
-    
+        // The file was successfully opened
+        fSourceFileName := FileName;
+        fLoaded := True;
+
+        // Calculating the beginning of the subtitles table
+        DumpedSceneInput.Seek(Integer(StringPointersList[0]), soFromBeginning);
+        DumpedSceneInput.Read(fStringTableOffset, 4);
+
+        // Reading the subtitle table
+{$IFDEF DEBUG}
+        WriteLn(sLineBreak, 'Reading subtitle table:');
+{$ENDIF}
+        for i := 0 to StringPointersList.Count - 1 do
+          Subtitles.Add(Integer(StringPointersList[i]), DumpedSceneInput);
+      end; // Result
+
+    end; // Result
+
   finally
     Input.Free;
+    DumpedSceneInput.Free;
   end;  
 end;
 
@@ -202,8 +193,11 @@ function TNozomiMotorcycleSequenceEditor.RetrieveGameVersion(var F: TFileStream)
 var
   i: Integer;
   Value: Byte;
+  SavedPosition: LongWord;
 
 begin
+  SavedPosition := F.Position;
+
   // Identifying the file version
   i := 0;
   repeat
@@ -233,12 +227,67 @@ begin
         end;
     end; // case FileVersion
   end; // if Result
+
+  F.Seek(SavedPosition, soFromBeginning);
 end;
 
 procedure TNozomiMotorcycleSequenceEditor.SaveToFile(const FileName: TFileName);
 var
+  i: Integer;
+  Input, Output, UpdatedSceneFile: TFileStream;
+  OutputTempFileName: TFileName;
+
+begin
+  // Patch the extracted Scene info file
+  UpdateDumpedSceneFile;
+
+  // Write the new MAPINFO.BIN file
+  OutputTempFileName := GetTempFileName;
+  Input := TFileStream.Create(SourceFileName, fmOpenRead);
+  Output := TFileStream.Create(OutputTempFileName, fmCreate);
+  try
+
+    for i := 0 to Sections.Count - 1 do begin
+
+      // Writing patched section
+      if Sections[i].Name = SCENE_SECTION_ID then begin
+
+        UpdatedSceneFile := TFileStream.Create(DumpedSceneInputFileName, fmOpenRead);
+        try
+          Output.CopyFrom(UpdatedSceneFile, UpdatedSceneFile.Size);
+        finally
+          UpdatedSceneFile.Free;
+        end;
+
+      end else begin
+        // Writing normal section
+        Input.Seek(Sections[i].Offset, soFromBeginning);
+        Output.CopyFrom(Input, Sections[i].Size);
+      end;
+
+    end;
+
+  finally
+    Input.Free;
+    Output.Free;
+
+    // Updating target
+    if FileExists(OutputTempFileName) then begin
+      CopyFile(OutputTempFileName, FileName, False);
+      DeleteFile(OutputTempFileName);
+    end;
+
+    // Load the new updated file if needed
+    if SourceFileName = FileName then
+      LoadFromFile(SourceFileName);
+      
+  end;
+end;
+
+procedure TNozomiMotorcycleSequenceEditor.UpdateDumpedSceneFile;
+var
   Input, Output: TFileStream;
-  OutputFileName: TFileName;
+  OutputTempFileName: TFileName;
   Value, i, TotalPatchValue: Integer;
   Header: TSequenceDataHeader;
   
@@ -247,31 +296,28 @@ begin
   WriteLn(sLineBreak, '*** SAVING FILE ***', sLineBreak);
 {$ENDIF}
 
-  OutputFileName := FileName; //GetTempFileName;
+  OutputTempFileName := GetTempFileName;
 
-  Input := TFileStream.Create(SourceFileName, fmOpenRead);
-  Output := TFileStream.Create(OutputFileName, fmCreate);
+  Input := TFileStream.Create(DumpedSceneInputFileName, fmOpenRead);
+  Output := TFileStream.Create(OutputTempFileName, fmCreate);
   try
-
-    // Positionning on the SCN3 section
-    Input.Seek(0, soFromBeginning);
 
     // Copy everything without original subtitle table
     Output.CopyFrom(Input, StringTableOffset);
 
     // Writing the subtitles table
     TotalPatchValue := 0; // don't know but it works...
-    for i := 0 to Count - 1 do begin
+    for i := 0 to Subtitles.Count - 1 do begin
       // Writing the subtitle
-      Items[i].WriteSubtitle(Output);
+      Subtitles[i].WriteSubtitle(Output);
 
       // Updating the string pointer value
-      Output.Seek(Items[i].StringPointerOffset, soFromBeginning);
-      Output.Write(Items[i].NewStringOffset, 4);
+      Output.Seek(Subtitles[i].StringPointerOffset, soFromBeginning);
+      Output.Write(Subtitles[i].NewStringOffset, 4);
       Output.Seek(0, soFromEnd);
 
       // Calculating the TotalPatchValue
-      Inc(TotalPatchValue, Items[i].PatchValue);
+      Inc(TotalPatchValue, Subtitles[i].PatchValue);
     end;
 
     // Writing the lastest dummy subtitle (which is 1 byte length)
@@ -326,6 +372,12 @@ begin
   finally
     Input.Free;
     Output.Free;
+
+    // Deleting old DumpedSceneFile
+    if FileExists(OutputTempFileName) then begin
+      CopyFile(OutputTempFileName, DumpedSceneInputFileName, False);
+      DeleteFile(OutputTempFileName);
+    end;
   end;
 end;
 
@@ -374,6 +426,88 @@ begin
     sLineBreak, '  "', Text, '"'
   );
 {$ENDIF}
+end;
+
+{ TNozomiMotorcycleSequenceSubtitleList }
+
+procedure TNozomiMotorcycleSequenceSubtitleList.Add(
+  const StrPointerOffset: Integer; var Input: TFileStream);
+var
+  NewItem: TNozomiMotorcycleSequenceSubtitleItem;
+  Subtitle: string;
+  ItemIndex, StrOffset: Integer;
+  c: Char;
+  Done: Boolean;                                   
+  
+begin
+  // Initializing the Subtitle decoder
+  Done := False;
+  Subtitle := '';
+  Input.Seek(StrPointerOffset, soFromBeginning);
+  Input.Read(StrOffset, 4);
+  Input.Seek(StrOffset, soFromBeginning);
+
+  // Reading the subtitle
+  while not Done do begin  
+    Input.Read(c, 1);
+    if c <> #0 then
+      Subtitle := Subtitle + c
+    else
+      Done := True;
+  end;
+
+  // Adding the new item to the internal list
+  NewItem := TNozomiMotorcycleSequenceSubtitleItem.Create;
+  ItemIndex := fSubtitleList.Add(NewItem);
+  with NewItem do begin
+    fOwner := Self;
+    fStringPointerOffset := StrPointerOffset;
+    fText := DecodeText(Subtitle);
+    fIndex := ItemIndex;
+    fOriginalTextLength := Length(Subtitle);
+    fStringOffset := StrOffset;
+  end;
+
+{$IFDEF DEBUG}
+  WriteLn('  #', Format('%2.2d', [NewItem.Index]), ', Ptr=0x',
+    IntToHex(NewItem.StringPointerOffset, 4), ', Str=0x',
+    IntToHex(NewItem.StringOffset, 4), sLineBreak,
+    '    "', NewItem.Text, '"'
+  );
+{$ENDIF}
+end;
+
+procedure TNozomiMotorcycleSequenceSubtitleList.Clear;
+var
+  i: Integer;
+  
+begin
+  for i := 0 to Count - 1 do
+    TNozomiMotorcycleSequenceSubtitleItem(fSubtitleList[i]).Free;
+  fSubtitleList.Clear;
+end;
+
+constructor TNozomiMotorcycleSequenceSubtitleList.Create;
+begin
+  fSubtitleList := TList.Create;
+end;
+
+destructor TNozomiMotorcycleSequenceSubtitleList.Destroy;
+begin
+  Clear;
+  fSubtitleList.Free;
+  inherited;
+end;
+
+function TNozomiMotorcycleSequenceSubtitleList.GetCount: Integer;
+begin
+  Result := fSubtitleList.Count;
+end;
+
+function TNozomiMotorcycleSequenceSubtitleList.GetSubtitleItem(
+  Index: Integer): TNozomiMotorcycleSequenceSubtitleItem;
+begin
+  Result := TNozomiMotorcycleSequenceSubtitleItem(fSubtitleList[Index]);
 end;
 
 end.

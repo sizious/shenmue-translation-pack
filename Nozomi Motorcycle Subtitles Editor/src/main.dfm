@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'frmMain'
-  ClientHeight = 346
-  ClientWidth = 442
+  ClientHeight = 381
+  ClientWidth = 491
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,31 +16,33 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    442
-    346)
+    491
+    381)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 8
-    Top = 210
+    Top = 245
     Width = 43
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Old text:'
+    ExplicitTop = 210
   end
   object lblText: TLabel
     Left = 8
-    Top = 276
+    Top = 311
     Width = 48
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'New text:'
+    ExplicitTop = 276
   end
   object lvSubs: TListView
     Left = 4
     Top = 28
-    Width = 436
-    Height = 155
+    Width = 485
+    Height = 190
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -56,11 +58,13 @@ object frmMain: TfrmMain
     RowSelect = True
     TabOrder = 0
     ViewStyle = vsReport
+    ExplicitWidth = 436
+    ExplicitHeight = 155
   end
   object mOldSub: TMemo
     Left = 64
-    Top = 189
-    Width = 376
+    Top = 224
+    Width = 425
     Height = 61
     Anchors = [akLeft, akRight, akBottom]
     Color = clBtnFace
@@ -74,11 +78,13 @@ object frmMain: TfrmMain
     ScrollBars = ssHorizontal
     TabOrder = 1
     WordWrap = False
+    ExplicitTop = 189
+    ExplicitWidth = 376
   end
   object memoText: TMemo
     Left = 64
-    Top = 256
-    Width = 376
+    Top = 291
+    Width = 425
     Height = 60
     Anchors = [akLeft, akRight, akBottom]
     Font.Charset = ANSI_CHARSET
@@ -90,11 +96,13 @@ object frmMain: TfrmMain
     ScrollBars = ssHorizontal
     TabOrder = 2
     WordWrap = False
+    ExplicitTop = 256
+    ExplicitWidth = 376
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 327
-    Width = 442
+    Top = 362
+    Width = 491
     Height = 19
     Panels = <
       item
@@ -109,11 +117,13 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
+    ExplicitTop = 327
+    ExplicitWidth = 442
   end
   object tbMain: TJvToolBar
     Left = 0
     Top = 0
-    Width = 442
+    Width = 491
     Height = 26
     DisabledImages = ilToolBarDisabled
     EdgeBorders = [ebTop]
@@ -122,6 +132,7 @@ object frmMain: TfrmMain
     TabOrder = 4
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
+    ExplicitWidth = 442
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -183,13 +194,17 @@ object frmMain: TfrmMain
     end
   end
   object MainMenu1: TMainMenu
-    Left = 524
-    Top = 8
+    Left = 8
+    Top = 52
     object miFile: TMenuItem
       Caption = 'miFile'
       object miOpen: TMenuItem
         Caption = 'miOpen'
         OnClick = miOpenClick
+      end
+      object miSave: TMenuItem
+        Caption = 'miSave'
+        OnClick = miSaveClick
       end
     end
     object miView: TMenuItem

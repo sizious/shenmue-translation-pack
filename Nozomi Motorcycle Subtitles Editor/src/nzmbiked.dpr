@@ -7,7 +7,9 @@ uses
   nbikedit in 'engine\nbikedit.pas',
   systools in '..\..\Common\systools.pas',
   uitools in '..\..\Common\uitools.pas',
-  datadefs in 'engine\datadefs.pas';
+  datadefs in 'engine\datadefs.pas',
+  fsparser in '..\..\Common\fsparser.pas',
+  chrcodec in '..\..\Common\ChrTools\chrcodec.pas';
 
 {$R *.res}
 

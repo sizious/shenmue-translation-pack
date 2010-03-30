@@ -44,15 +44,18 @@ const
 // This function retrieve the text between the defined substring
 function ParseStr(SubStr, S: string; n: Integer): string;
 var
-  i, Value: Integer;
+  i: Integer;
 
 begin
-  S := S + substr;
+  S := S + SubStr;
 
-  for i := 1 to n do begin
-    Value := Pos(SubStr, S) + Length(SubStr);
-    S := Copy(S, Value, Length(S) - Value);
-  end;
+  for i := 1 to n do
+    S :=
+      Copy(
+        S,
+        Pos(SubStr, S) + Length(SubStr),
+        Length(S) - Pos(SubStr, S) + Length(SubStr)
+      );
 
   Result := Copy(S, 1, Pos(SubStr, S) - 1);
 end;

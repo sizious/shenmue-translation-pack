@@ -1,7 +1,7 @@
 # Shenmue Series NPC Infos
 #
 # List created by Shendream and [big_fury]SiZiOUS
-# Last update the January, 29 2010.
+# Last update the March 25th, 2010.
 #
 # GameVersion: SM1 = Shenmue I, WSM: What's Shenmue, SM2: Shenmue II
 # Gender: M = Male, F = Female
@@ -14,7 +14,7 @@ GameVersion;CharID;Gender;Type
 WSM;AKMI;U;U
 # todo...
 
-# Shenmue I (JAP/PAL) (DC)
+# Shenmue I (JAP/USA/PAL) (DC)
 SM1;AKMI;F;A
 SM1;AKSK;M;A
 SM1;AKTG;M;A
@@ -673,6 +673,7 @@ SM2;KYG_;F;A
 SM2;KYJ_;F;A
 SM2;KYO_;M;A
 SM2;KYX_;F;A
+SM2;KZM_;F;A
 SM2;KZN_;M;A
 SM2;LCN_;M;A
 SM2;LKN_;M;A
