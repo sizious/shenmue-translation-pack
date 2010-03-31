@@ -40,6 +40,11 @@ type
     N1: TMenuItem;
     miQuit: TMenuItem;
     miDebugLog: TMenuItem;
+    miSaveAs: TMenuItem;
+    miReload: TMenuItem;
+    miClose: TMenuItem;
+    miPreview: TMenuItem;
+    miAbout: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -51,16 +56,20 @@ type
       Selected: Boolean);
     procedure mNewSubChange(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
+    procedure miDebugLogClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
     fSelectedSubtitle: TNozomiMotorcycleSequenceSubtitleItem;
     fDebugLogVisible: Boolean;
-    procedure Clear;
+    procedure Clear(const UpdateOnlyUI: Boolean); overload;
+    procedure Clear; overload;
     procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
     procedure DebugLogMainFormToFront(Sender: TObject);
     procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);
     procedure DebugLogWindowActivated(Sender: TObject);
+    procedure ModulesFree;
+    procedure ModulesInit;
     function GetSelectedSubtitle: string;
     function GetStatusText: string;
     procedure InitDebugLog;
@@ -69,6 +78,7 @@ type
     procedure SetStatusText(const Value: string);
     procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
+    procedure SetControlsStateSaveOperation(State: Boolean);    
   public
     { Déclarations publiques }
     function IsSubtitleSelected: Boolean;
@@ -91,9 +101,23 @@ implementation
 uses
   Config, UITools;
   
+procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
+begin
+  if not UpdateOnlyUI then begin
+    SequenceEditor.Clear;
+    lvSubs.Clear;
+  end;
+
+//  UpdateFileModifiedState;
+  SetControlsStateFileOperations(False);
+  SetControlsStateSaveOperation(False);
+
+  StatusText := '';
+end;
+
 procedure TfrmMain.Clear;
 begin
-  lvSubs.Clear;
+  Clear(False);
 end;
 
 procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
@@ -123,17 +147,37 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title + ' v' + GetApplicationVersion;
 
-  InitDebugLog;
-  
-  SequenceEditor := TNozomiMotorcycleSequenceEditor.Create;
+  ModulesInit;
 
-  // Load charset
-  SequenceEditor.Charset.LoadFromFile('data\chrlist1.csv');
+  // Init UI
+  ToolBarInitControl(Self, tbMain);
+  Clear;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  ModulesFree;
+end;
+
+procedure TfrmMain.ModulesFree;
+begin
+  // Destroying NBIK Sequence Editor
   SequenceEditor.Free;
+
+  // Destroying Debug Log
+  DebugLog.Free;
+end;
+
+procedure TfrmMain.ModulesInit;
+begin
+  // Init Debug Log
+  InitDebugLog;
+
+  // Init NBIK Sequence Editor
+  SequenceEditor := TNozomiMotorcycleSequenceEditor.Create;
+
+  // Load charset
+  SequenceEditor.Charset.LoadFromFile('data\chrlist1.csv');
 end;
 
 function TfrmMain.GetSelectedSubtitle: string;
@@ -217,7 +261,7 @@ begin
 
         // Updating the current item with the new values
         with ListItem do
-          with SequenceEditor.Items[i] do begin
+          with SequenceEditor.Subtitles[i] do begin
             Data := Pointer(i);
             Caption := IntToStr(i);
             SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
@@ -238,13 +282,13 @@ begin
 *)
     end else begin
       StatusText := 'IWAD empty ! Loading aborted...';
-      DebugLog.Report('This file contains a valid IWAD section, but the section itself is empty.',
-        'FileName: ' + FileName, 'Nothing to edit in this file', ltInformation);
+      DebugLog.Report(ltInformation, 'This file contains a valid IWAD section, but the section itself is empty.',
+        'FileName: ' + FileName);
     end;
 
   end else
-    DebugLog.Report('This file isn''t a valid IWAD file.',
-      'FileName: ' + FileName, 'Warning', ltWarning);
+    DebugLog.Report(ltWarning, 'This file isn''t a valid IWAD file.',
+      'FileName: ' + FileName);
 
 
   StatusText := '';
@@ -262,6 +306,11 @@ begin
     mOldSub.Text := SelectedSubtitle;
     mNewSub.Text := SelectedSubtitle;
   end;
+end;
+
+procedure TfrmMain.miDebugLogClick(Sender: TObject);
+begin
+  DebugLogVisible := not DebugLogVisible;
 end;
 
 procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
@@ -309,9 +358,8 @@ begin
       'disk for "%s".', [SequenceEditor.SourceFileName])
     )
   else
-    DebugLog.Report('Unable to save the file on the disk!',
-      Format('Unable to save on disk for "%s".', [SequenceEditor.SourceFileName]),
-      ltWarning
+    DebugLog.Report(ltWarning, 'Unable to save the file on the disk!',
+      Format('Unable to save on disk for "%s".', [SequenceEditor.SourceFileName])
     );
   LoadFile(SequenceEditor.SourceFileName);
 end;
@@ -323,18 +371,22 @@ end;
 
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
 begin
-(*  miClose.Enabled := State;
-  miImport.Enabled := State;
+  miClose.Enabled := State;
+(*  miImport.Enabled := State;
   miImport2.Enabled := State;
   tbImport.Enabled := State;
   miExport.Enabled := State;
   miExport2.Enabled := State;
-  tbExport.Enabled := State;
-  miExportAll.Enabled := State;
-  miExportAll2.Enabled := State;
-  tbExportAll.Enabled := State;
+  tbExport.Enabled := State; *)
   miReload.Enabled := State;
-  tbReload.Enabled := State; *)
+  tbReload.Enabled := State;
+end;
+
+procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);
+begin
+  tbSave.Enabled := State;
+  miSave.Enabled := State;
+  miSaveAs.Enabled := State;
 end;
 
 procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);
@@ -352,7 +404,11 @@ end;
 
 procedure TfrmMain.SetStatusText(const Value: string);
 begin
-  sbMain.Panels[2].Text := Value;
+  if Value = '' then
+    sbMain.Panels[2].Text := 'Ready'
+  else
+    sbMain.Panels[2].Text := Value;
+  Application.ProcessMessages;
 end;
 
 procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;

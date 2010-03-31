@@ -195,9 +195,18 @@ object frmMain: TfrmMain
         Caption = 'miOpen'
         OnClick = miOpenClick
       end
+      object miReload: TMenuItem
+        Caption = 'miReload'
+      end
       object miSave: TMenuItem
         Caption = 'miSave'
         OnClick = miSaveClick
+      end
+      object miSaveAs: TMenuItem
+        Caption = 'miSaveAs'
+      end
+      object miClose: TMenuItem
+        Caption = 'miClose'
       end
       object N1: TMenuItem
         Caption = '-'
@@ -211,10 +220,17 @@ object frmMain: TfrmMain
       Caption = 'miView'
       object miDebugLog: TMenuItem
         Caption = 'miDebugLog'
+        OnClick = miDebugLogClick
+      end
+      object miPreview: TMenuItem
+        Caption = 'miPreview'
       end
     end
     object miHelp: TMenuItem
       Caption = 'miHelp'
+      object miAbout: TMenuItem
+        Caption = 'miAbout'
+      end
     end
     object miDEBUG: TMenuItem
       Caption = 'DEBUG'
