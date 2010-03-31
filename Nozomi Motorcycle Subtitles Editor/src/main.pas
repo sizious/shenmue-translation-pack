@@ -99,7 +99,10 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools;
+  Config, UITools, SubModif;
+
+var
+  SubtitlesUpdatedStateChecker: TSubtitlesUpdatedChecker;
   
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
@@ -166,6 +169,9 @@ begin
 
   // Destroying Debug Log
   DebugLog.Free;
+
+  // Destroying Subtitles Updated State Checker
+  SubtitlesUpdatedStateChecker.Free;
 end;
 
 procedure TfrmMain.ModulesInit;
@@ -178,6 +184,10 @@ begin
 
   // Load charset
   SequenceEditor.Charset.LoadFromFile('data\chrlist1.csv');
+
+  (*  Init Subtitles Updated State Checker, this object is here to know the
+      "Modified" state with precision. *)
+  SubtitlesUpdatedStateChecker := TSubtitlesUpdatedChecker.Create;
 end;
 
 function TfrmMain.GetSelectedSubtitle: string;
