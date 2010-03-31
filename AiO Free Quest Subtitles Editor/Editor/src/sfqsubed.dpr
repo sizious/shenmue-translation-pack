@@ -46,11 +46,11 @@ uses
   npclist in 'engine\npc\npclist.pas',
   imgtools in '..\..\..\Common\imgtools.pas',
   pakfmgr in 'engine\npc\pakf\pakfmgr.pas',
-  viewer_intf in '..\..\..\Common\Preview\src\viewer_intf.pas',
-  oldskool_font_mapper in '..\..\..\Common\Preview\src\oldskool_font_mapper.pas',
-  oldskool_font_vcl in '..\..\..\Common\Preview\src\oldskool_font_vcl.pas',
-  viewer in '..\..\..\Common\Preview\src\viewer.pas' {frmSubsPreview},
-  uitools in '..\..\..\Common\uitools.pas';
+  uitools in '..\..\..\Common\uitools.pas',
+  viewer_intf in '..\..\..\Common\SubsUtil\Preview\viewer_intf.pas',
+  oldskool_font_mapper in '..\..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas',
+  oldskool_font_vcl in '..\..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
+  viewer in '..\..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview};
 
 {$R *.res}
 
@@ -73,6 +73,7 @@ begin
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmFileInfo, frmFileInfo);
+  Application.CreateForm(TfrmSubsPreview, frmSubsPreview);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

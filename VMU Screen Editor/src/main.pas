@@ -294,12 +294,11 @@ begin
   ToolBarInitControl(Self, tbMain);
   InitContextPopup;  
   Clear(False);
+  // Fix for the Delphi IDE!
+  lvIwadContent.PopupMenu := pmIwadContent;
 
   // Load the configuration
   LoadConfig;
-
-  // Fix for the Delphi IDE!
-  lvIwadContent.PopupMenu := pmIwadContent;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);

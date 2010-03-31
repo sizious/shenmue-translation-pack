@@ -195,7 +195,6 @@ object frmMain: TfrmMain
     GridLines = True
     ReadOnly = True
     RowSelect = True
-    PopupMenu = pmIwadContent
     TabOrder = 2
     ViewStyle = vsReport
     OnSelectItem = lvIwadContentSelectItem
