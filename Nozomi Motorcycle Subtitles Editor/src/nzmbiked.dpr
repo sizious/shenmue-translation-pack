@@ -12,7 +12,8 @@ uses
   debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
   xmlconf in '..\..\Common\xmlconf.pas',
   config in 'config.pas',
-  chrcodec in '..\..\Common\SubsUtil\chrcodec.pas';
+  chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
+  submodif in '..\..\Common\SubsUtil\submodif.pas';
 
 {$R *.res}
 

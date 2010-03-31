@@ -97,6 +97,8 @@
       
       
       
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">nzmbiked.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -111,6 +113,7 @@
     </DCCReference>
     <DCCReference Include="..\..\Common\fsparser.pas" />
     <DCCReference Include="..\..\Common\SubsUtil\chrcodec.pas" />
+    <DCCReference Include="..\..\Common\SubsUtil\submodif.pas" />
     <DCCReference Include="..\..\Common\systools.pas" />
     <DCCReference Include="..\..\Common\uitools.pas" />
     <DCCReference Include="..\..\Common\xmlconf.pas" />
