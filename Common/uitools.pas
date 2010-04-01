@@ -6,8 +6,8 @@ uses
   Windows, SysUtils, Classes, Forms, ComCtrls, JvToolbar;
 
 type
-  EUserInterfaceException = class(Exception);
-  EInvalidToolBarButton = class(EUserInterfaceException);
+  EUserInterface = class(Exception);
+  EInvalidToolBarButton = class(EUserInterface);
 
 function BR(const Text: string): string;
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;

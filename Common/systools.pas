@@ -5,6 +5,10 @@ interface
 uses
   Windows, SysUtils, Classes;
 
+type
+  ESystemTools = class(Exception);
+  EDataDirectoryNotFound = class(ESystemTools);
+  
 function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
@@ -12,6 +16,7 @@ function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function GetApplicationDirectory: TFileName;
 function GetApplicationInstancesCount: Integer;
+function GetApplicationDataDirectory: TFileName;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetTempDir: TFileName;
 function GetTempFileName: TFileName;
@@ -38,7 +43,9 @@ uses
   TlHelp32;
   
 const
-  HexValues = '0123456789ABCDEF';
+  HEXADECIMAL_VALUES  = '0123456789ABCDEF';
+
+  DATA_BASEDIR        = 'data';
 
 //------------------------------------------------------------------------------
 
@@ -129,9 +136,9 @@ begin
   case Length(Hex) of
     0: Result := 0;
     1..8: for i:=1 to Length(Hex) do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+      Result := 16*Result + Pos(Upcase(Hex[i]), HEXADECIMAL_VALUES)-1;
     else for i:=1 to 8 do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+      Result := 16*Result + Pos(Upcase(Hex[i]), HEXADECIMAL_VALUES)-1;
   end;
 end;
 
@@ -147,9 +154,9 @@ begin
   case Length(Hex) of
     0: Result := 0;
     1..16: for i:=1 to Length(Hex) do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+      Result := 16*Result + Pos(Upcase(Hex[i]), HEXADECIMAL_VALUES)-1;
     else for i:=1 to 16 do
-      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+      Result := 16*Result + Pos(Upcase(Hex[i]), HEXADECIMAL_VALUES)-1;
   end;
 end;
 
@@ -408,6 +415,16 @@ begin
   finally
     CloseHandle(Snapshot);
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetApplicationDataDirectory: TFileName;
+begin
+  Result := GetApplicationDirectory + DATA_BASEDIR + '\';
+  if not DirectoryExists(Result) then
+    raise EDataDirectoryNotFound.Create('GetApplicationDataDirectory: '
+      + 'Sorry, the data directory wasn''t found ("' + Result + '") !');
 end;
 
 //------------------------------------------------------------------------------
