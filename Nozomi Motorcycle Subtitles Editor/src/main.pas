@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, NbikEdit, ComCtrls, Menus, ImgList, ToolWin, JvExComCtrls,
-  JvToolBar, DebugLog;
+  JvToolBar, DebugLog, SubModif;
 
 type
   TfrmMain = class(TForm)
@@ -62,6 +62,8 @@ type
     fSelectedSubtitleUI: TListItem;
     fSelectedSubtitle: TNozomiMotorcycleSequenceSubtitleItem;
     fDebugLogVisible: Boolean;
+    fFileModified: Boolean;
+    fSelectedSubtitlePrevInfo: TSubtitlesTextManagerListItem;
     procedure Clear(const UpdateOnlyUI: Boolean); overload;
     procedure Clear; overload;
     procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
@@ -78,14 +80,19 @@ type
     procedure SetStatusText(const Value: string);
     procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
-    procedure SetControlsStateSaveOperation(State: Boolean);    
+    procedure SetControlsStateSaveOperation(State: Boolean);
+    procedure SetFileModified(const Value: Boolean);
+    procedure UpdateFileModifiedState;
   public
     { Déclarations publiques }
     function IsSubtitleSelected: Boolean;
     property DebugLogVisible: Boolean read fDebugLogVisible
       write SetDebugLogVisible;
+    property FileModified: Boolean read fFileModified write SetFileModified;
     property SelectedSubtitle: string read GetSelectedSubtitle
       write SetSelectedSubtitle;
+    property SelectedSubtitlePrevInfo: TSubtitlesTextManagerListItem read
+      fSelectedSubtitlePrevInfo;
     property StatusText: string read GetStatusText write SetStatusText;
   end;
 
@@ -99,11 +106,11 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SubModif;
+  Config, UITools;
 
 var
-  SubtitlesUpdatedStateChecker: TSubtitlesUpdatedChecker;
-  
+  SubtitlesTextManager: TSubtitlesTextManager;
+
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
   if not UpdateOnlyUI then begin
@@ -116,6 +123,7 @@ begin
   SetControlsStateSaveOperation(False);
 
   StatusText := '';
+  FileModified := False;
 end;
 
 procedure TfrmMain.Clear;
@@ -170,8 +178,8 @@ begin
   // Destroying Debug Log
   DebugLog.Free;
 
-  // Destroying Subtitles Updated State Checker
-  SubtitlesUpdatedStateChecker.Free;
+  // Destroying the original and old subtitle manager object
+  SubtitlesTextManager.Free;
 end;
 
 procedure TfrmMain.ModulesInit;
@@ -181,13 +189,11 @@ begin
 
   // Init NBIK Sequence Editor
   SequenceEditor := TNozomiMotorcycleSequenceEditor.Create;
+  SequenceEditor.Charset.LoadFromFile('data\chrlist1.csv');   // Load charset
 
-  // Load charset
-  SequenceEditor.Charset.LoadFromFile('data\chrlist1.csv');
-
-  (*  Init Subtitles Updated State Checker, this object is here to know the
-      "Modified" state with precision. *)
-  SubtitlesUpdatedStateChecker := TSubtitlesUpdatedChecker.Create;
+  (* Manage the original subtitle (=AM2 original text) and the
+     old subtitle (=before any modifications) *)
+  SubtitlesTextManager := TSubtitlesTextManager.Create;
 end;
 
 function TfrmMain.GetSelectedSubtitle: string;
@@ -248,6 +254,9 @@ begin
     // Filling the UI with the IWAD content
     if SequenceEditor.Loaded then begin
 
+      // Initializing Text Corrector Database
+      SubtitlesTextManager.Initialize(SequenceEditor);
+
       // Adding entries
       for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
         ListItem := nil;
@@ -266,7 +275,7 @@ begin
           repeat
             ListItem.SubItems.Add('');
             Inc(j);
-          until j = 6;
+          until j = 2;
         end;
 
         // Updating the current item with the new values
@@ -275,6 +284,7 @@ begin
             Data := Pointer(i);
             Caption := IntToStr(i);
             SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
+            SubItems[1] := BR(SequenceEditor.Charset.Decode(SubtitlesTextManager.Subtitles[i].InitialText));
           end;
       end;
 
@@ -300,17 +310,21 @@ begin
     DebugLog.Report(ltWarning, 'This file isn''t a valid IWAD file.',
       'FileName: ' + FileName);
 
-
   StatusText := '';
 end;
 
 procedure TfrmMain.lvSubsSelectItem(Sender: TObject; Item: TListItem;
   Selected: Boolean);
+var
+  Index: Integer;
+
 begin
   if Selected then begin
     // Setting the variables to store the selected item
     fSelectedSubtitleUI := Item;
-    fSelectedSubtitle := SequenceEditor.Subtitles[Integer(Item.Data)];
+    Index := Integer(Item.Data);
+    fSelectedSubtitle := SequenceEditor.Subtitles[Index];
+    fSelectedSubtitlePrevInfo := SubtitlesTextManager.Subtitles[Index];
 
     // Refresh the view
     mOldSub.Text := SelectedSubtitle;
@@ -377,6 +391,7 @@ end;
 procedure TfrmMain.mNewSubChange(Sender: TObject);
 begin
   SelectedSubtitle := mNewSub.Text;
+  UpdateFileModifiedState;
 end;
 
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
@@ -404,6 +419,16 @@ begin
   DebugLog.Active := Value;
 end;
 
+procedure TfrmMain.SetFileModified(const Value: Boolean);
+begin
+  fFileModified := Value;
+  if Value then
+    sbMain.Panels[1].Text := 'Modified'
+  else
+    sbMain.Panels[1].Text := '';
+  SetControlsStateSaveOperation(fFileModified);
+end;
+
 procedure TfrmMain.SetSelectedSubtitle(const Value: string);
 begin
   if IsSubtitleSelected then begin
@@ -425,6 +450,22 @@ procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
   var DefaultDraw: Boolean);
 begin
   ToolBarCustomDraw(Sender);
+end;
+
+procedure TfrmMain.UpdateFileModifiedState;
+var
+  i: Integer;
+  Modified: Boolean;
+  OldSubtitle, NewSubtitle: string;
+  
+begin
+  Modified := False;
+  for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
+    OldSubtitle := SubtitlesTextManager.Subtitles[i].OriginalText;
+    NewSubtitle := SequenceEditor.Subtitles[i].RawText;
+    Modified := Modified or (OldSubtitle <> NewSubtitle);
+  end;
+  FileModified := Modified;
 end;
 
 end.

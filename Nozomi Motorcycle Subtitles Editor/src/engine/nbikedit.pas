@@ -20,6 +20,7 @@ type
     fNewStringOffset: Integer;
     function GetPatchValue: Integer;
     function GetEditor: TNozomiMotorcycleSequenceEditor;
+    function GetRawText: string;
   protected
     function DecodeText(const S: string): string;
     function EncodeText(const S: string): string;
@@ -30,9 +31,10 @@ type
     property PatchValue: Integer read GetPatchValue;
   public
     property Index: Integer read fIndex;
+    property RawText: string read GetRawText;
     property StringPointerOffset: Integer read fStringPointerOffset;
     property StringOffset: Integer read fStringOffset;
-    property Text: string read fText write fText;        
+    property Text: string read fText write fText;
     property Owner: TNozomiMotorcycleSequenceSubtitleList read fOwner;
   end;
 
@@ -415,6 +417,11 @@ end;
 function TNozomiMotorcycleSequenceSubtitleItem.GetPatchValue: Integer;
 begin
   Result := Length(EncodeText(Text)) - OriginalTextLength;
+end;
+
+function TNozomiMotorcycleSequenceSubtitleItem.GetRawText: string;
+begin
+  Result := Editor.Charset.Encode(Text);
 end;
 
 procedure TNozomiMotorcycleSequenceSubtitleItem.WriteSubtitle(

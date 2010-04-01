@@ -47,11 +47,15 @@ object frmMain: TfrmMain
     Columns = <
       item
         Caption = '#'
-        Width = 40
+        Width = 20
       end
       item
-        AutoSize = True
-        Caption = 'Subtitles'
+        Caption = 'Subtitle'
+        Width = 210
+      end
+      item
+        Caption = 'Original'
+        Width = 210
       end>
     ColumnClick = False
     ReadOnly = True

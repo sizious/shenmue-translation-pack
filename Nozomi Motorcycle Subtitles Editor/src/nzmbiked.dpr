@@ -13,7 +13,7 @@ uses
   xmlconf in '..\..\Common\xmlconf.pas',
   config in 'config.pas',
   chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
-  submodif in '..\..\Common\SubsUtil\submodif.pas';
+  submodif in 'engine\submodif.pas';
 
 {$R *.res}
 
