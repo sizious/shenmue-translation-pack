@@ -17,6 +17,7 @@ function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 function OpenLink(const LinkURL: string): Boolean;
+function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 procedure ToolBarCustomDraw(Toolbar: TToolBar);
 procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
@@ -235,5 +236,19 @@ end;
 
 //------------------------------------------------------------------------------
 
-    
+function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
+var
+  HandleMenu: THandle;
+  Value: LongWord;
+
+begin
+  Value := MF_DISABLED;
+  if State then
+    Value := MF_ENABLED;
+  HandleMenu := GetSystemMenu(Form.Handle, False);
+  Result := EnableMenuItem(HandleMenu, SC_CLOSE, Value);
+end;
+
+//------------------------------------------------------------------------------
+
 end.

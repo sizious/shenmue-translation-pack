@@ -114,7 +114,11 @@ begin
     until Done or (FS.Position >= FS.Size);
 
     FS.Seek(SavedOffset, soFromBeginning);
-                            
+
+{$IFDEF DEBUG}
+    WriteLn('');
+{$ENDIF}
+
   except
     on E:Exception do begin
       E.Message := Format('%s.ParseFileSections: %s', [UNIT_NAME, E.Message]);

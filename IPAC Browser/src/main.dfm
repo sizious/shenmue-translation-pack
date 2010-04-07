@@ -53,14 +53,12 @@ object frmMain: TfrmMain
     ReadOnly = True
     RowSelect = True
     PopupMenu = pmIpacContent
-    SmallImages = ilIpacContent
     TabOrder = 0
     ViewStyle = vsReport
     OnColumnClick = lvIpacContentColumnClick
     OnSelectItem = lvIpacContentSelectItem
     ColumnsOrder = '0=160,1=100,2=65,3=65,4=70'
     HeaderImagePosition = hipRight
-    HeaderImages = ilHeader
     Groups = <>
     ExtendedColumns = <
       item

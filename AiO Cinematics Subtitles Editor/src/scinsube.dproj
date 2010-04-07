@@ -40,12 +40,6 @@
     <DelphiCompile Include="scinsube.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas" />
-    <DCCReference Include="..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas" />
-    <DCCReference Include="..\..\Common\SubsUtil\Preview\viewer.pas">
-      <Form>frmSubsPreview</Form>
-    </DCCReference>
-    <DCCReference Include="..\..\Common\SubsUtil\Preview\viewer_intf.pas" />
     <DCCReference Include="..\..\Common\systools.pas" />
     <DCCReference Include="..\..\Common\uitools.pas" />
     <DCCReference Include="about.pas">

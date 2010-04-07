@@ -31,7 +31,7 @@ begin
 {$ENDIF}
 
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
+  Application.MainFormOnTaskbar := False;
   Application.Title := 'Shenmue VMU Screen Editor';
   InitConfigurationFile;
   

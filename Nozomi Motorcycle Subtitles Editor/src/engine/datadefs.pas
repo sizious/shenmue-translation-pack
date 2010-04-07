@@ -2,6 +2,9 @@ unit DataDefs;
 
 interface
 
+const
+  GAME_VERSION_DETECTOR_MAX_CHARS = 8;
+
 type
   TSequenceDataHeader = record
     NameID: array[0..3] of Char;  // SCN3
@@ -25,7 +28,7 @@ type
   
   TGameVersionDetector = record
     Offset: Integer;
-    Value: Byte;
+    Value: array[0..GAME_VERSION_DETECTOR_MAX_CHARS - 1] of Char;
     Result: TNozomiMotorcycleSequenceGameVersion;
   end;
   
@@ -129,12 +132,11 @@ const
 
   SUBTITLE_DELIMITER  =  #$81#$9C#$90#$C2;
 
-  SUBTITLE_LINE_MAXLENGTH = 44;
-
+  // Offset is Absolute values inside the extracted SCN file !
   GAME_VERSION_DETECTION: array[0..2] of TGameVersionDetector = (
-    (Offset: $135A; Value: $70; Result: gvPalDisc3),
-    (Offset: $135A; Value: $13; Result: gvUsaDisc3),
-    (Offset: $135A; Value: $10; Result: gvUsaPalDisc4)
+    (Offset: $24EC; Value: #$22#$02#$00#$00#$EA#$D3#$FF#$FF; Result: gvPalDisc3),
+    (Offset: $246C; Value: #$E4#$F8#$FF#$FF#$C8#$D1#$FF#$FF; Result: gvUsaDisc3),
+    (Offset: $1568; Value: #$70#$4E#$42#$49#$4B#$50#$63#$1B; Result: gvUsaPalDisc4)
   );
     
 implementation

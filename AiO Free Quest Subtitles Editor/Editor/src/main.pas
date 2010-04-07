@@ -27,7 +27,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Menus, SCNFEdit, SCNFUtil, MultiScan, ExtCtrls, ScnfScan,
   JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
-  AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer_Intf, TextData,
+  AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer, TextData,
   ImgList, ViewUpd, Progress, TextDB;
 
 const
@@ -522,7 +522,7 @@ var
 
   BatchSubsExporter: TSubsMassExporterThread;         // enable to batch export subtitles
 
-  Previewer: TSubtitlesPreviewWindow;                 // Implements the Subtitles Previewer
+  Previewer: TSubtitlesPreviewer;                 // Implements the Subtitles Previewer
 
   TextDatabaseCorrector: TTextDatabaseCorrector;      // Implements the TextCorrectionDatabase
 
@@ -992,7 +992,7 @@ begin
   (*MultiTranslation := TMultiTranslationModule.Create;*)
 
   // Create the Subtitles Previewer
-  Previewer := TSubtitlesPreviewWindow.Create(GetBitmapFontDatasDirectory);
+  Previewer := TSubtitlesPreviewer.Create(GetBitmapFontDatasDirectory);
   Previewer.OnWindowClosed := PreviewWindowClosedEvent;
 
   // Create the main object: SCNF Editor (Subtitles Editor)

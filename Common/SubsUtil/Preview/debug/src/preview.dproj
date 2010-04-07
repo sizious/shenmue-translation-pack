@@ -42,7 +42,6 @@
     <DCCReference Include="..\..\viewer.pas">
       <Form>frmSubsPreview</Form>
     </DCCReference>
-    <DCCReference Include="..\..\viewer_intf.pas" />
     <DCCReference Include="main.pas">
       <Form>Form1</Form>
     </DCCReference>

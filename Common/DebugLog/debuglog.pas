@@ -41,6 +41,9 @@ unit DebugLog;
     - SiZ!
 *)
 
+// Define this to debug this module
+// {$DEFINE DEBUG_DEBUGLOG}
+
 interface
 
 uses
@@ -49,8 +52,6 @@ uses
   JvStatusBar, AppEvnts, XmlConf;
 
 type
-
-
   TfrmDebugLog = class;
 
   TLineType = (ltInformation, ltWarning, ltCritical);
@@ -207,10 +208,10 @@ begin
 //  SelStart := mDebug.SelStart;
 //  mDebug.SelLength := 0;
 //  mDebug.SelStart := Length(mDebug.Lines.Text) - 1;
-{$IFDEF DEBUG}
+{$IFDEF DEBUG} {$IFDEF DEBUG_DEBUGLOG}
   WriteLn('Debug: SelStart: ', mDebug.SelStart, ', SelLength: ', mDebug.SelLength,
     ', TextLength: ', Length(mDebug.Lines.Text));
-{$ENDIF}
+{$ENDIF}{$ENDIF}
 
   mDebug.SelAttributes.Color := Attr.Color;
   mDebug.SelAttributes.Style := Attr.Style;
@@ -498,8 +499,8 @@ begin
 
   if AdditionalDebugText <> '' then
     AdditionalDebugText := ' [' + AdditionalDebugText + '].';
-  AddLine(LineType, Text + AdditionalDebugText);
-  MsgBox(Text, Caption, MsgIcon + MB_OK);
+  AddLine(LineType, MsgText + AdditionalDebugText);
+  MsgBox(MsgText, Caption, MsgIcon + MB_OK);
 end;
 
 procedure TfrmDebugLog.ResetStatus;
@@ -527,6 +528,11 @@ begin
       '''Form created by Delphi'' in the Project option dialog.' + sLineBreak +
       'If you do so, that means another instance of TDebugLogHandlerInterface is already running.'
     );
+
+  if Application.MainFormOnTaskbar then
+    raise Exception.Create('Please set the Application.MainFormOnTaskbar to False'
+      + ' in order to use this module properly.');
+
 {$ENDIF}
 
   fFormDebugLog := TfrmDebugLog.Create(nil);

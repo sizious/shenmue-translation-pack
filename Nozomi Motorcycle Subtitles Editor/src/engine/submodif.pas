@@ -56,7 +56,7 @@ uses
   SysTools;
 
 const
-  DEFAULT_TEXTDB = 'textdb.txt';
+  DEFAULT_TEXTDB = 'nbiktext.db';
 
 { TSubtitlesModifiedStateItemsList }
 

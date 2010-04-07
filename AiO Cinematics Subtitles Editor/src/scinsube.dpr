@@ -10,11 +10,7 @@ uses
   subutils in 'engine\subutils.pas',
   about in 'about.pas' {frmAbout},
   systools in '..\..\Common\systools.pas',
-  uitools in '..\..\Common\uitools.pas',
-  viewer_intf in '..\..\Common\SubsUtil\Preview\viewer_intf.pas',
-  oldskool_font_mapper in '..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas',
-  oldskool_font_vcl in '..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
-  viewer in '..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview};
+  uitools in '..\..\Common\uitools.pas';
 
 {$R *.res}
 
@@ -27,6 +23,5 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'Shenmue AiO Cinematics Subtitles Editor';
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmSubsPreview, frmSubsPreview);
   Application.Run;
 end.
