@@ -10,6 +10,7 @@ ___| Version 1.1: 2010-03-?? |_________________________________________________
 FIXED:
 - Added the *.BIN filter to the open/save dialog. You can now edit the LCD.BIN
   file from the MISC folder of the Shenmue Passport Disc.
+- Fixed a Debug Log window position bug when a hint was shown.
 - Some minor fixes.
 ___                           _________________________________________________
 ___| Version 1.0: 2010-03-13 |_________________________________________________

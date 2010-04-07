@@ -1,5 +1,7 @@
 program nzmbiked;
 
+{$R 'about\credits.res' 'about\credits.rc'}
+
 uses
   Windows,
   Forms,
@@ -13,7 +15,13 @@ uses
   xmlconf in '..\..\Common\xmlconf.pas',
   config in 'config.pas',
   chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
-  submodif in 'engine\submodif.pas';
+  submodif in 'engine\submodif.pas',
+  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  imgtools in '..\..\Common\imgtools.pas',
+  oldskool_font_mapper in '..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas',
+  oldskool_font_vcl in '..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
+  viewer in '..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
+  about in '..\..\Common\About\about.pas' {frmAbout};
 
 {$R *.res}
 
@@ -30,13 +38,14 @@ begin
 {$ENDIF}
 
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
+  Application.MainFormOnTaskbar := False;
   Application.Title := 'Shenmue Nozomi Motorcycle Subtitles Editor';
 
   // Initialize the configuration engine
   InitConfiguration;
 
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmAbout, frmAbout);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Viewer_Intf;
+  Dialogs, StdCtrls, Viewer;
 
 type
   TForm1 = class(TForm)
@@ -25,7 +25,7 @@ type
 
 var
   Form1: TForm1;
-  Previewer: TSubtitlesPreviewWindow;
+  Previewer: TSubtitlesPreviewer;
 
 implementation
 
@@ -45,7 +45,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   DatasDirectory :=
     IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + 'data';
-  Previewer := TSubtitlesPreviewWindow.Create(DatasDirectory);
+  Previewer := TSubtitlesPreviewer.Create(DatasDirectory);
   Previewer.OnWindowClosed := PreviewerClosedEvent;
 
   // ä Ä â Â á À à Á ï Ï î Î í Í ë Ë ê Ê

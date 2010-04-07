@@ -10,17 +10,19 @@ type
   
 function Configuration: TXMLConfigurationFile;
 procedure InitConfiguration;
+procedure LoadConfig;
+procedure SaveConfig;
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  SysTools, UITools;
+  Forms, SysTools, UITools, Main;
 
 const
   CONFIG_FILENAME = 'config.xml';
-
+  
 var
   _Configuration: TXMLConfigurationFile;
 
@@ -47,6 +49,33 @@ begin
       'object wasn''t initialized! Call InitConfigurationFile() first.');
 
   Result := _Configuration;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure LoadConfig;
+begin
+  with Configuration do begin
+    if not FirstConfiguration then begin
+      frmMain.Position := poDesigned;
+      ReadFormAttributes(frmMain);
+    end;
+    frmMain.lvSubs.ColumnsOrder := ReadString('main', 'columns', frmMain.lvSubs.ColumnsOrder);
+    frmMain.DecodeSubtitles := ReadBool('main', 'decodesubs', frmMain.DecodeSubtitles);
+    frmMain.PreviewerVisible := ReadBool('main', 'preview', frmMain.PreviewerVisible);
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure SaveConfig;
+begin
+  with Configuration do begin
+    WriteFormAttributes(frmMain);
+    WriteString('main', 'columns', frmMain.lvSubs.ColumnsOrder);
+    WriteBool('main', 'decodesubs', frmMain.DecodeSubtitles);
+    WriteBool('main', 'preview', frmMain.PreviewerVisible);
+  end;
 end;
 
 //------------------------------------------------------------------------------

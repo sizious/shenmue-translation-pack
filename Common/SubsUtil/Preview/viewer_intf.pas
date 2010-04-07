@@ -227,7 +227,8 @@ end;
 procedure TSubtitlesPreviewWindow.WindowClosedEvent(Sender: TObject;
   var Action: TCloseAction);
 begin
-  if Assigned(fWindowClosed) then fWindowClosed(Sender);
+  if Assigned(fWindowClosed) then
+    fWindowClosed(Sender);
 end;
 
 end.

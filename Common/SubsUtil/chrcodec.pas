@@ -390,9 +390,11 @@ var
   OriginalCode, TranslatedCode: string;
 
 begin
+  Result := '';
+  if S = '' then Exit;
+
   StartPos := 1;
   OriginalLength := Length(S);
-  Result := '';
 
   OriginalCodeMaxLength := 0;
   case Operation of

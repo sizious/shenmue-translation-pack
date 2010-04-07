@@ -31,7 +31,7 @@ type
 var
   frmAbout: TfrmAbout;
 
-procedure InitAboutBox(const AppTitle, AppVersion: string);
+procedure InitAboutBox(const AppTitle, AppVersion: string; ShortAppTitle: string = '');
 procedure RunAboutBox;
 
 //------------------------------------------------------------------------------
@@ -53,10 +53,13 @@ var
 
 //------------------------------------------------------------------------------
 
-procedure InitAboutBox(const AppTitle, AppVersion: string);
+procedure InitAboutBox(const AppTitle, AppVersion: string; ShortAppTitle: string = '');
 begin
   sLongAppTitle := AppTitle;
-  sShortAppTitle := GetApplicationShortTitle;
+  if ShortAppTitle = '' then
+    sShortAppTitle := GetApplicationShortTitle
+  else
+    sShortAppTitle := ShortAppTitle;
   sAppVersion := AppVersion;
 end;
 
