@@ -63,6 +63,8 @@ begin
     frmMain.lvSubs.ColumnsOrder := ReadString('main', 'columns', frmMain.lvSubs.ColumnsOrder);
     frmMain.DecodeSubtitles := ReadBool('main', 'decodesubs', frmMain.DecodeSubtitles);
     frmMain.PreviewerVisible := ReadBool('main', 'preview', frmMain.PreviewerVisible);
+    frmMain.OriginalSubtitleField := ReadBool('main', 'originalsubsfield', frmMain.OriginalSubtitleField);
+    frmMain.OriginalSubtitlesColumn := ReadBool('main', 'originalsubscolumn', frmMain.OriginalSubtitlesColumn);
   end;
 end;
 
@@ -75,6 +77,8 @@ begin
     WriteString('main', 'columns', frmMain.lvSubs.ColumnsOrder);
     WriteBool('main', 'decodesubs', frmMain.DecodeSubtitles);
     WriteBool('main', 'preview', frmMain.PreviewerVisible);
+    WriteBool('main', 'originalsubsfield', frmMain.OriginalSubtitleField);
+    WriteBool('main', 'originalsubscolumn', frmMain.OriginalSubtitlesColumn);
   end;
 end;
 

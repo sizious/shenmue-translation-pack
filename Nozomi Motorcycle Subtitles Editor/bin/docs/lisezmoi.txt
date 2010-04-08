@@ -1,0 +1,86 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                                              _______________________________
+ __| Shenmue Nozomi Motorcycle Subtitles Editor |_______________________________
+
+  Cet éditeur est un éditeur de sous-titres pour UNE seule cinématique du jeu:
+  "Nozomi and the Motorcycle". Cette séquence est jouée vers la fin du jeu et
+  est donc par conséquent uniquement présente sur le CD3.
+  
+  Cet éditeur ne fait rien d'autre à part modifier cette unique séquence.
+ 
+  Les jeux supportés sont:
+    - Shenmue I (NTSC-U/PAL) (DC)
+    - US Shenmue (NTSC-J) (DC)
+	
+  Notez que la version NTSC-J de Shenmue I n'est pas supportée, pour la simple
+  et bonne raison qu'il n'y a pas de sous-titres à éditer dans cette version.
+
+  Cet utilitaire est uniquement valable pour la Dreamcast, car le premier
+  épisode est disponible uniquement sur cette dernière.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  Tout d'abord, vous devez savoir qu'il existe deux versions de cette 
+  cinématique dans le jeu: une sur le CD3 (affichée lors du déroulement normal
+  du jeu) et une sur le CD4 (affichée via l'option "Théatre" du CD Passport).
+  L'éditeur supporte la modification des deux versions de fichier de façon 
+  totalement transparente.
+   
+  - Pour traduire la scène du CD3: 
+    Rendez-vous dans le dossier "./SCENE/03/NBIK/" puis ouvrez le fichier 
+    "MAPINFO.BIN" dans l'outil.
+	
+  - Pour traduire la scène du CD4:
+    Rendez-vous dans le dossier "./SCENE/99/NBIK/" puis ouvrez le fichier 
+    "MAPINFO.BIN" dans l'outil.
+
+  L'éditeur s'utilise de la même façon que les autres éditeurs de sous-titres.
+
+  Une fois que vous avez terminé la traduction, remplacez simplement le fichier
+  "MAPINFO.BIN" ainsi édité pour avoir la scène traduite dans le jeu.
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône principale a été créée par FixIcon (Mr Missiku).
+  
+  Cet outil est dédicacé à IlDucci de Sega Saturno. Merci pour m'avoir indiqué
+  le problème et surtout que la soluce se trouvait dans le dossier 
+  NBIK/MAPINFO.BIN.
+  
+  Aux gars d'AM2, franchement, je me demande pourquoi vous avez fait ça. 
+  Pourquoi ne pas avoir utilisé le système habituel des SRF? Ca se voit que 
+  vous avez développé votre jeu dans l'urgence...
+  
+  Pour les crédits complets, rendez-vous dans la boîte de dialogue "A propos".
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+ _____________________________________________________________________[ FIN ]___

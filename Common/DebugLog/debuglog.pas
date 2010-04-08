@@ -476,6 +476,7 @@ procedure TfrmDebugLog.Report(LineType: TLineType; MsgText,
   AdditionalDebugText: string);
 var
   MsgIcon: Integer;
+  MsgCaption: string;
 
 begin
   MsgIcon := 0;
@@ -483,24 +484,25 @@ begin
     ltInformation:
       begin
         MsgIcon := MB_ICONINFORMATION;
-        Caption := 'Information';
+        MsgCaption := 'Information';
       end;
     ltWarning:
       begin
         MsgIcon := MB_ICONWARNING;
-        Caption := 'Warning';
+        MsgCaption := 'Warning';
       end;
     ltCritical:
       begin
         MsgIcon := MB_ICONERROR;
-        Caption := 'Error';
+        MsgCaption := 'Error';
       end;
   end;
 
   if AdditionalDebugText <> '' then
     AdditionalDebugText := ' [' + AdditionalDebugText + '].';
   AddLine(LineType, MsgText + AdditionalDebugText);
-  MsgBox(MsgText, Caption, MsgIcon + MB_OK);
+//  MsgBox(MsgText, MsgCaption, MsgIcon + MB_OK);
+  MessageBox(Application.Handle, PChar(MsgText), PChar(MsgCaption), MsgIcon + MB_OK);
 end;
 
 procedure TfrmDebugLog.ResetStatus;

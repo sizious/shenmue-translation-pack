@@ -9,10 +9,6 @@ uses
 
 type
   TfrmMain = class(TForm)
-    Label1: TLabel;
-    mOldSub: TMemo;
-    mNewSub: TMemo;
-    lblText: TLabel;
     mmMain: TMainMenu;
     miFile: TMenuItem;
     sbMain: TStatusBar;
@@ -48,7 +44,7 @@ type
     N3: TMenuItem;
     N4: TMenuItem;
     aeMain: TApplicationEvents;
-    Exception1: TMenuItem;
+    miDEBUG_TEST2: TMenuItem;
     miCharset: TMenuItem;
     N5: TMenuItem;
     miOriginal: TMenuItem;
@@ -59,7 +55,19 @@ type
     ProjectHome1: TMenuItem;
     N7: TMenuItem;
     Checkforupdate1: TMenuItem;
+    miDEBUG_TEST3: TMenuItem;
     lvSubs: TJvListView;
+    miDEBUG_TEST4: TMenuItem;
+    lOldSub: TLabel;
+    mOldSub: TMemo;
+    lblText: TLabel;
+    mNewSub: TMemo;
+    Label3: TLabel;
+    eFirstLineLength: TEdit;
+    Label4: TLabel;
+    eSecondLineLength: TEdit;
+    Label8: TLabel;
+    eSubCount: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -77,7 +85,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure miCloseClick(Sender: TObject);
     procedure miReloadClick(Sender: TObject);
-    procedure Exception1Click(Sender: TObject);
+    procedure miDEBUG_TEST2Click(Sender: TObject);
     procedure miPreviewClick(Sender: TObject);
     procedure lvSubsSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
@@ -87,6 +95,8 @@ type
     procedure miAboutClick(Sender: TObject);
     procedure miOriginalClick(Sender: TObject);
     procedure miOriginalColumnClick(Sender: TObject);
+    procedure miDEBUG_TEST3Click(Sender: TObject);
+    procedure miDEBUG_TEST4Click(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -173,7 +183,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, About;
+  Config, UITools, SysTools, ChrCount, About;
 
 var
   SubtitlesTextManager: TSubtitlesTextManager;
@@ -186,6 +196,10 @@ begin
     fSelectedSubtitleUI := nil;
     fSelectedSubtitle := nil;
     fSelectedSubtitlePrevInfo := nil;
+    mOldSub.Text := '';
+    mNewSub.Text := '';
+    UpdateSubtitleLengthControls('', eFirstLineLength, eSecondLineLength);
+    eSubCount.Text := '0';
   end;
 
 //  UpdateFileModifiedState;
@@ -258,9 +272,64 @@ begin
   StatusText := '';
 end;
 
-procedure TfrmMain.Exception1Click(Sender: TObject);
+procedure TfrmMain.miDEBUG_TEST2Click(Sender: TObject);
 begin
 {$IFDEF DEBUG}  raise Exception.Create('TEST EXCEPTION'); {$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST3Click(Sender: TObject);
+begin
+{$IFDEF DEBUG}
+  WriteLn(SequenceEditor.Subtitles.TransformText('If you will always be by my side,éé'));
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST4Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  i, j: Integer;
+
+  function GetRandomString: string;
+  const
+    ALPHA = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  var
+    x: Integer;
+
+  begin
+    Result := '';
+    for x := 0 to Random(90) do begin
+      Result := Result + ALPHA[Random(Length(ALPHA)) + 1];
+    end;
+  end;
+
+begin
+
+  SequenceEditor.LoadFromFile('USA_DISC4.BIN');
+
+  try
+//    i := -1;
+//    j := -1;
+
+    for i := 1 to 20 do begin
+
+      for j := 0 to SequenceEditor.Subtitles.Count - 1 do
+        SequenceEditor.Subtitles[j].Text := GetRandomString;
+
+      SequenceEditor.Save;
+      Application.ProcessMessages;
+    end;
+
+  except
+    on E:Exception do begin
+//      E.Message := 'TEST: "' + E.Message + '". i = ' + IntToStr(i) + ', j = ' + IntToStr(j);
+      raise;
+    end;
+  end;
+
+{$ELSE}
+begin
+{$ENDIF}
 end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
@@ -292,9 +361,10 @@ begin
   Constraints.MinWidth := Width;
 
   // 'Original' column
-  OriginalSubtitlesColumnObjectWidth := 210;
+  fOriginalSubtitlesColumnObject := lvSubs.Columns[2];
+  OriginalSubtitlesColumnObjectWidth := lvSubs.Columns[2].Width;
   OriginalSubtitlesColumn := True;
-
+  
   // Init Modules
   ModulesInit;
 
@@ -302,7 +372,7 @@ begin
   Clear;
 
   // Load configuration
-  LoadConfig;  
+  LoadConfig;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -316,7 +386,7 @@ end;
 
 procedure TfrmMain.ModulesFree;
 begin
-  // Disabling the Close button (because freeing MultiTranslation view can be long)
+  // Disabling the Close button
   miQuit.Enabled := False;
   SetCloseWindowButtonState(Self, False);
 
@@ -394,11 +464,16 @@ end;
 
 procedure TfrmMain.RefreshOldTextField;
 begin
-  if OriginalSubtitleField then
-    mOldSub.Text :=
-      SequenceEditor.Subtitles.TransformText(SelectedSubtitlePrevInfo.InitialText)
-  else
+  if OriginalSubtitleField then begin
+    lOldSub.Caption := 'Original text:';
+    mOldSub.Text := '';
+    if Assigned(SelectedSubtitlePrevInfo) then
+      mOldSub.Text := SequenceEditor.Subtitles.TransformText(
+        SelectedSubtitlePrevInfo.InitialText);
+  end else begin
+    lOldSub.Caption := 'Old text:';
     mOldSub.Text := SelectedSubtitle;
+  end;
 end;
 
 procedure TfrmMain.RefreshSubtitleSelection;
@@ -507,11 +582,14 @@ begin
   // Loading the file
   if SequenceEditor.LoadFromFile(FileName) then begin
 
-    // Filling the UI with the IWAD content
+    // Filling the UI with the content
     if SequenceEditor.Loaded then begin
 
       // Initializing Text Corrector Database
       SubtitlesTextManager.Initialize(SequenceEditor);
+
+      // Display the subtitles count
+      eSubCount.Text := IntToStr(SequenceEditor.Subtitles.Count);
 
       // Adding entries
       for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
@@ -540,9 +618,10 @@ begin
             Data := Pointer(i);
             Caption := IntToStr(i);
             SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
-            SubItems[1] := BR(SequenceEditor.Charset.Decode(SubtitlesTextManager.Subtitles[i].InitialText));
+            SubItems[1] := BR(SequenceEditor.Charset.Decode(
+              SubtitlesTextManager.Subtitles[i].InitialText));
           end;
-      end;
+      end;                   
 
       // Updating UI
       if not UpdateUI then begin
@@ -562,7 +641,7 @@ begin
     end;
 
   end else
-    DebugLog.Report(ltWarning, 'This file isn''t a valid NBIK MAPINFO.BIN file.',
+    DebugLog.Report(ltWarning, 'This file isn''t a supported NBIK sequence MAPINFO.BIN file.',
       'FileName: ' + FileName);
 
   StatusText := '';
@@ -696,11 +775,17 @@ end;
 
 procedure TfrmMain.mNewSubChange(Sender: TObject);
 begin
+  // Update the subtitle
   SelectedSubtitle := mNewSub.Text;
+
+  // Update the modified state
   UpdateFileModifiedState;
 
   // Update Previewer
   Previewer.Update(SelectedSubtitle);
+
+  // Update the subtitle length count
+  UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);
 end;
 
 function TfrmMain.SaveFileOnDemand(CancelButton: Boolean): Boolean;
@@ -862,12 +947,15 @@ var
   i: Integer;
   Modified: Boolean;
   OldSubtitle, NewSubtitle: string;
-  
+
 begin
   Modified := False;
   for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
     OldSubtitle := SubtitlesTextManager.Subtitles[i].OriginalText;
     NewSubtitle := SequenceEditor.Subtitles[i].RawText;
+(*{$IFDEF DEBUG}
+    WriteLn(i, ' Old: "', OldSubtitle, '"', sLineBreak, i, ' New: "', NewSubtitle, '"');
+{$ENDIF}*)
     Modified := Modified or (OldSubtitle <> NewSubtitle);
   end;
   FileModified := Modified;

@@ -7,21 +7,27 @@
   Extracted from Chars Count v3.0 by Manic (Manic Corp.)
 }
 
-unit charscnt;
+unit ChrCount;
 
 interface
 
 uses
-  Windows, SysUtils;
+  Windows, SysUtils, StdCtrls;
   
 procedure CalculateCharsCount(Subtitle: string; var Line1Count, Line2Count: Integer);
-
+procedure UpdateSubtitleLengthControls(SubtitleText: string;
+  FirstLengthEditControl, SecondLengthEditControl: TEdit);
 
 implementation
 
 uses
-  SysTools;
+  Graphics, SysTools;
+
+const
+  SUBTITLE_LINE_MAXLENGTH = 44;
   
+//------------------------------------------------------------------------------
+
 //This function ('CountPos') come from this site:
 //http://www.delphitricks.com/source-code/strings/count_the_number_of_occurrences_of_a_substring_within_a_string.html
 function CountPos(const subtext: string; Text: string): Integer;
@@ -36,14 +42,17 @@ begin
         end;
 end;
 
+//------------------------------------------------------------------------------
+
 procedure CalculateCharsCount(Subtitle: string; var Line1Count, Line2Count: Integer);
 var
   line1, line2:String;
   num_substr:Integer;
-  
+
 begin
   Subtitle := StringReplace(Subtitle, '<br>', '¡õ', [rfReplaceAll]);
   Subtitle := StringReplace(Subtitle, #13#10, '¡õ', [rfReplaceAll]);
+  Subtitle := StringReplace(Subtitle, #$81#$95, '¡õ', [rfReplaceAll]);
   Subtitle := StringReplace(Subtitle, '...', '=@', [rfReplaceAll]);
 
         if StrPos(PChar(Subtitle), PChar('¡õ')) <> nil then
@@ -80,5 +89,36 @@ begin
                Line2Count := 0;
         end;
 end;
+
+//------------------------------------------------------------------------------
+
+procedure CheckIfSubLengthIsCorrect(const Value: Integer;
+  Field: TEdit);
+begin
+  if Value > SUBTITLE_LINE_MAXLENGTH then begin
+    Field.Font.Color := clRed;
+    Field.Font.Style := [fsBold];
+  end else begin
+    Field.Font.Color := clWindowText;
+    Field.Font.Style := [];
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure UpdateSubtitleLengthControls(SubtitleText: string;
+  FirstLengthEditControl, SecondLengthEditControl: TEdit);
+var
+  Line1, Line2: Integer;
+
+begin
+  CalculateCharsCount(SubtitleText, Line1, Line2);
+  FirstLengthEditControl.Text := IntToStr(Line1);
+  CheckIfSubLengthIsCorrect(Line1, FirstLengthEditControl);
+  SecondLengthEditControl.Text := IntToStr(Line2);
+  CheckIfSubLengthIsCorrect(Line2, SecondLengthEditControl);
+end;
+
+//------------------------------------------------------------------------------
 
 end.
