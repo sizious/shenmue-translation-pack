@@ -13,17 +13,12 @@ The SHENTRAD Team is Manic, from Québec, and SiZiOUS from France (and Portugal!)
 Icons authors:
 Microsoft (Office 2007)
 Iconaholic
-Umut Pulatk (Main icon)
+FixIcon / Mr Missiku (Main icon)
 
 Thanks to the authors of the following libraries...
 
-Embedded binaries:
-GZip
-
 Delphi libraries:
 DCL
-DFF Library
-Fundamentals Utilities Library
 PNGImage
 Project JEDI
 
@@ -40,3 +35,5 @@ shenmuesubs.sourceforge.net
 Cheers !
 
 The SHENTRAD Team, here to breake the language barrier!
+
+Oh and forget about the free Audi RS6... It's a great joke!

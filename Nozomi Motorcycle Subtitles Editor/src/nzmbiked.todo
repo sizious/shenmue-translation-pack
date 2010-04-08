@@ -1,0 +1,7 @@
+{TODO 3 : Ajouter éventuellement une option d'import/export...}
+{TODO 2 : 
+Ajouter une boite Propriété, contenant
+- Les sections du fichier
+- Infos sur la section SCNF (pointers, offset, etc)
+- Version du fichier}
+{DONE 1 : Ajouter les champs Chars Count...}

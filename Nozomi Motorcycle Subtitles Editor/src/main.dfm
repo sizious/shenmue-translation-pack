@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Dynamic Title > // NBIK Editor'
-  ClientHeight = 416
+  ClientHeight = 376
   ClientWidth = 492
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,71 +20,52 @@ object frmMain: TfrmMain
   OnDestroy = FormDestroy
   DesignSize = (
     492
-    416)
+    376)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object lOldSub: TLabel
     Left = 4
-    Top = 228
+    Top = 217
     Width = 43
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Old text:'
-    ExplicitTop = 301
   end
   object lblText: TLabel
     Left = 4
-    Top = 308
+    Top = 272
     Width = 48
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'New text:'
-    ExplicitTop = 381
   end
-  object mOldSub: TMemo
+  object Label3: TLabel
     Left = 4
-    Top = 243
-    Width = 486
-    Height = 63
-    Anchors = [akLeft, akRight, akBottom]
-    Color = clBtnFace
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    MaxLength = 90
-    ParentFont = False
-    ReadOnly = True
-    ScrollBars = ssHorizontal
-    TabOrder = 0
-    WordWrap = False
-    ExplicitTop = 259
-    ExplicitWidth = 466
+    Top = 333
+    Width = 77
+    Height = 13
+    Anchors = [akLeft, akBottom]
+    Caption = 'First line length:'
   end
-  object mNewSub: TMemo
-    Left = 4
-    Top = 324
-    Width = 486
-    Height = 60
-    Anchors = [akLeft, akRight, akBottom]
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    MaxLength = 90
-    ParentFont = False
-    ScrollBars = ssHorizontal
-    TabOrder = 1
-    WordWrap = False
-    OnChange = mNewSubChange
-    ExplicitTop = 340
-    ExplicitWidth = 466
+  object Label4: TLabel
+    Left = 142
+    Top = 333
+    Width = 91
+    Height = 13
+    Anchors = [akLeft, akBottom]
+    Caption = 'Second line length:'
+  end
+  object Label8: TLabel
+    Left = 372
+    Top = 333
+    Width = 75
+    Height = 13
+    Anchors = [akRight, akBottom]
+    Caption = 'Subtitles count:'
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 397
+    Top = 357
     Width = 492
     Height = 19
     Panels = <
@@ -100,8 +81,7 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 413
-    ExplicitWidth = 472
+    ExplicitTop = 327
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -112,7 +92,7 @@ object frmMain: TfrmMain
     EdgeBorders = [ebTop]
     Images = ilToolBar
     List = True
-    TabOrder = 3
+    TabOrder = 1
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
     object ToolButton1: TToolButton
@@ -190,8 +170,8 @@ object frmMain: TfrmMain
   object lvSubs: TJvListView
     Left = 4
     Top = 28
-    Width = 486
-    Height = 194
+    Width = 484
+    Height = 187
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -200,21 +180,100 @@ object frmMain: TfrmMain
       end
       item
         Caption = 'Subtitle'
-        Width = 210
+        Width = 200
+      end
+      item
+        Caption = 'Original'
       end>
     ColumnClick = False
     ReadOnly = True
     RowSelect = True
-    TabOrder = 4
+    TabOrder = 2
     ViewStyle = vsReport
     OnSelectItem = lvSubsSelectItem
-    ColumnsOrder = '0=20,1=210'
+    ColumnsOrder = '0=20,1=200,2=50'
     Groups = <>
     ExtendedColumns = <
       item
       end
       item
+      end
+      item
       end>
+  end
+  object mOldSub: TMemo
+    Left = 4
+    Top = 232
+    Width = 484
+    Height = 38
+    Anchors = [akLeft, akRight, akBottom]
+    Color = clBtnFace
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Lines.Strings = (
+      '## LINE_1 ##'
+      '## LINE_2 ##')
+    MaxLength = 90
+    ParentFont = False
+    ReadOnly = True
+    TabOrder = 3
+    WordWrap = False
+  end
+  object mNewSub: TMemo
+    Left = 4
+    Top = 287
+    Width = 484
+    Height = 39
+    Anchors = [akLeft, akRight, akBottom]
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Lines.Strings = (
+      '## LINE_1 ##'
+      '## LINE_2 ##')
+    MaxLength = 90
+    ParentFont = False
+    TabOrder = 4
+    WordWrap = False
+    OnChange = mNewSubChange
+  end
+  object eFirstLineLength: TEdit
+    Left = 100
+    Top = 329
+    Width = 30
+    Height = 21
+    Anchors = [akLeft, akBottom]
+    Color = clBtnFace
+    ReadOnly = True
+    TabOrder = 5
+    Text = '(nb)'
+  end
+  object eSecondLineLength: TEdit
+    Left = 242
+    Top = 329
+    Width = 30
+    Height = 21
+    Anchors = [akLeft, akBottom]
+    Color = clBtnFace
+    ReadOnly = True
+    TabOrder = 6
+    Text = '(nb)'
+  end
+  object eSubCount: TEdit
+    Left = 452
+    Top = 330
+    Width = 36
+    Height = 21
+    Anchors = [akRight, akBottom]
+    Color = clBtnFace
+    ReadOnly = True
+    TabOrder = 7
+    Text = '(nb)'
   end
   object mmMain: TMainMenu
     Left = 12
@@ -340,15 +399,23 @@ object frmMain: TfrmMain
         Caption = 'SequenceEditor'
         OnClick = miDEBUG_TEST1Click
       end
-      object Exception1: TMenuItem
+      object miDEBUG_TEST2: TMenuItem
         Caption = 'Exception'
-        OnClick = Exception1Click
+        OnClick = miDEBUG_TEST2Click
+      end
+      object miDEBUG_TEST3: TMenuItem
+        Caption = 'Charset'
+        OnClick = miDEBUG_TEST3Click
+      end
+      object miDEBUG_TEST4: TMenuItem
+        Caption = 'Strong Test SeqEdit'
+        OnClick = miDEBUG_TEST4Click
       end
     end
   end
   object ilToolBarDisabled: TImageList
-    Left = 322
-    Top = 6
+    Left = 318
+    Top = 65532
     Bitmap = {
       494C01010C000E00040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
@@ -885,8 +952,8 @@ object frmMain: TfrmMain
       C0FF8001C003FE07FFFFFFFFC007FFFF}
   end
   object ilToolBar: TImageList
-    Left = 292
-    Top = 6
+    Left = 288
+    Top = 65532
     Bitmap = {
       494C01010C000E00040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
