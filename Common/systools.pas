@@ -11,6 +11,7 @@ type
   
 function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
+procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
@@ -40,12 +41,29 @@ implementation
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  TlHelp32;
+  TlHelp32, Forms;
   
 const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
 
   DATA_BASEDIR        = 'data';
+
+//------------------------------------------------------------------------------
+
+// Thanks Michel Bardou
+procedure Delay(Milliseconds: Double);
+var
+  StartTime: TDateTime;
+
+begin
+  StartTime := Now;
+  // Transforme les millisecondes en fractions de jours
+  Milliseconds := Milliseconds / 24 / 60 / 60 / 1000;
+  repeat
+    Sleep(1);
+    Application.ProcessMessages;
+  until Now > (StartTime + Milliseconds);
+end;
 
 //------------------------------------------------------------------------------
 
@@ -336,6 +354,9 @@ var
   Stream: TFileStream;
   
 begin
+  Result := -1;
+  if not FileExists(FileName) then Exit;
+  
   Stream := TFileStream.Create(FileName, fmOpenRead);
   try
     Result := Stream.Size;

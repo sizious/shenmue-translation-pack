@@ -2,6 +2,9 @@ unit FontMgr;
 
 // {$DEFINE DEBUG_FONTMGR}
 
+// Define this to put Application.ProcessMessage inside the functions.
+{$DEFINE PROCESS_MESSAGES}
+
 interface
 
 uses
@@ -62,6 +65,9 @@ implementation
 //==============================================================================
 
 uses
+{$IFDEF PROCESS_MESSAGES}
+  Forms,
+{$ENDIF}
   Math;
 
 const
@@ -155,6 +161,10 @@ begin
     // Reading each data block from the file
     repeat
       NumRead := InStream.Read(Buffer, MAX_BUFFER_SIZE);
+
+{$IFDEF PROCESS_MESSAGES}
+      Application.ProcessMessages;
+{$ENDIF}
 
       // Decoding Font data
       for i := 0 to NumRead - 1 do begin
@@ -259,6 +269,10 @@ begin
 
       // For each value of the Buffer
       for i := 0 to CurrentBlockSize - 1 do begin
+
+{$IFDEF PROCESS_MESSAGES}
+      Application.ProcessMessages;
+{$ENDIF}
 
         // For each bit in Buffer[j] (One Byte = 8 bits, so b := 0 to 7)
         for Bit := 0 to 7 do begin
