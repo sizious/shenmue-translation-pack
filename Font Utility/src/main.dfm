@@ -18,15 +18,15 @@ object frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object bvl: TBevel
-    Left = 4
-    Top = 259
-    Width = 353
+    Left = 3
+    Top = 258
+    Width = 357
     Height = 2
   end
   object gbFiles: TGroupBox
-    Left = 4
-    Top = 51
-    Width = 353
+    Left = 3
+    Top = 4
+    Width = 358
     Height = 98
     Caption = ' Files input : '
     TabOrder = 0
@@ -67,6 +67,7 @@ object frmMain: TfrmMain
       Height = 25
       Caption = '...'
       TabOrder = 2
+      OnClick = bInputClick
     end
     object bOutput: TButton
       Left = 316
@@ -75,12 +76,13 @@ object frmMain: TfrmMain
       Height = 25
       Caption = '...'
       TabOrder = 3
+      OnClick = bOutputClick
     end
   end
   object rgAction: TRadioGroup
-    Left = 4
-    Top = 8
-    Width = 353
+    Left = 3
+    Top = 108
+    Width = 358
     Height = 37
     Caption = ' Operation : '
     Columns = 2
@@ -89,11 +91,12 @@ object frmMain: TfrmMain
       'Decode'
       'Encode')
     TabOrder = 1
+    OnClick = rgActionClick
   end
   object gbBytes: TGroupBox
     Left = 4
-    Top = 155
-    Width = 353
+    Top = 152
+    Width = 357
     Height = 46
     Caption = ' Bytes per line in the encoded file : '
     TabOrder = 2
@@ -160,11 +163,12 @@ object frmMain: TfrmMain
     Height = 25
     Caption = '&Execute'
     TabOrder = 3
+    OnClick = bExecuteClick
   end
   object gbChars: TGroupBox
     Left = 4
-    Top = 207
-    Width = 353
+    Top = 204
+    Width = 357
     Height = 46
     Caption = ' Characters per line in the decoded file : '
     TabOrder = 4
@@ -185,6 +189,7 @@ object frmMain: TfrmMain
       Checked = True
       TabOrder = 0
       TabStop = True
+      OnClick = rbCharsAutoClick
     end
     object rbCharsCustom: TRadioButton
       Left = 152
@@ -193,6 +198,7 @@ object frmMain: TfrmMain
       Height = 17
       Caption = 'Custom'
       TabOrder = 1
+      OnClick = rbCharsCustomClick
     end
     object eCharsCustom: TEdit
       Left = 217
@@ -211,17 +217,24 @@ object frmMain: TfrmMain
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitLeft = 196
-    ExplicitTop = 328
-    ExplicitWidth = 0
   end
   object bQuit: TButton
-    Left = 236
-    Top = 266
+    Left = 240
+    Top = 267
     Width = 121
     Height = 25
     Caption = '&Quit'
     TabOrder = 6
     OnClick = bQuitClick
+  end
+  object od: TOpenDialog
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Left = 288
+    Top = 26
+  end
+  object sd: TSaveDialog
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Left = 286
+    Top = 66
   end
 end
