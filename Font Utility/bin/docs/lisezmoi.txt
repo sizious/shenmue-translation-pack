@@ -1,0 +1,100 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                        _____________________________________________________
+ __| Shenmue Font Utility |_____________________________________________________
+ 
+  Cet outil additionnel a été créé dans le but de modifier les polices 
+  utilisées à l'écran par le jeu (dans les menus, les sous-titres, etc.).
+  
+  Cet éditeur fonctionne avec toutes les versions de Shenmue, et à priori, 
+  c'est également le cas pour tous les jeux utilisant ce type de police.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  Les polices se trouvent à différents endroits:
+   - Un dossier "./FONT/" (What's Shenmue)
+   - Dans les fichiers COLD_*.BIN (Shenmue). 
+     Utilisez dans ce cas IPAC Browser pour les extraires (DC_KANJI, DC_KANA et 
+     RYOU).
+   - Dans COLD.BIN (Shenmue II). Utilisez également IPAC Browser pour extraire
+     la police et la ré-injecter une fois modifiée.
+   
+  A l'heure actuelle, nous n'avons pas déterminé où étaient précisément les 
+  fichiers de police à modifier, étant donné que le jeu peut comporter jusqu'à
+  5 exemplaires des fichiers de polices. C'est un peu problématique, on le 
+  reconnait...
+  
+  Notez que les polices peuvent s'identifier par leur nom de fichier:
+   - DC_KANJI
+   - DC_KANA
+   - RYOU
+   - WAZA
+   
+  Pour utiliser le programme (facilement):
+    1. Sélectionnez le fichier à encoder/décoder
+    2. Cliquez sur l'option voulue, "Encode" ou "Decode"
+    3. Laisser les paramètres sur "Autodetect"
+    4. Cliquez sur 'Execute'.	
+
+  Explications des paramètres:
+   * Bytes per line in the encoded file (Octets par ligne):   
+     Spécifie le nombre d'octets utilisés pour dessiner une ligne de caractères
+     à l'écran. Par exemple, si le caractère "A" est codé sur 2 octets par 
+     ligne, cela signifie donc que la première ligne composant le "A" est 
+     composé de 2 octets * 8 bits = 16 bits, ou 1 bit = 1 pixel, donc 16 pixels.
+     Le dessin du "A" est réalisé en mettant ces 16 bits à 1 (= noir) ou 0 
+     (= blanc). Un caractère fait toujours 15 lignes de hauteur.
+     
+   * Characters per column (Caractères par colonne):
+     Indique le nombre de caractères (de dessins) à mettre par colonne. 
+     Attention, si vous spécifiez une valeur trop petite pour contenir tous les
+     caractères, le Bitmap sera réajusté automatiquement. De même, si vous 
+     spécifiez une valeur trop grande, des cases en "trop" seront rajoutés. Cela
+     peut entrainer une instabilité au niveau du jeu si le fichier décodé est 
+     mal ré-encodé.
+     
+     Si vous ne savez pas quoi mettre comme valeur, mettez "1", cela aura pour 
+     effet de mettre tous les caractères sur la même colonne et générera un
+     fichier Bitmap d'un kilomètre de long, cependant, vous serez sûr de bien
+     décoder le fichier. Ce paramètre est plus pour avoir une vision 
+     "confortable" de la police que vraiment nécessaire.      
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône principale a été créée par Iconaholic (pack iCandy Toolbar).
+  
+  Cet outil est dédicacé à IlDucci de Sega Saturno ainsi qu'à Shendream de
+  Shenmue Master. Merci à vous deux pour m'avoir indiqué comment me servir de
+  TileMolester de SnowBro qui m'a réellement été utile pour comprendre comment
+  décoder les polices. Merci pour sa source Java au passage.
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+ _____________________________________________________________________[ FIN ]___

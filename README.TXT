@@ -50,6 +50,10 @@
    test your work in real-time with nullDC. You must mount the generated image
    in a Virtual Drive, otherwise, it doesn't work.
    
+ * Font Utility
+   This additional tool was made to edit the in-game fonts (for the menus, 
+   subtitles, etc.).
+
  * IDX Creator
    This stuff allows to re-create correct IDX files corresponding to each AFS.
  

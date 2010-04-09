@@ -156,7 +156,7 @@ begin
   rbBytesAuto.Checked := True;
   rbCharsAuto.Checked := True;
   StatusText := '';
-  eCharsCustom.Text := '16';
+  eCharsCustom.Text := '1';
   eBytesCustom.Text := '4';
   sbMain.SimpleText := 'Ready';  
 end;
