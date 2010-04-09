@@ -38,7 +38,7 @@ const
   APP_VERSION =
     '2.7' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'March ??, 2010 @06:45PM';
+  COMPIL_DATE_TIME = 'April 8, 2010 @03:13PM';
 
 type
   TGlobalTranslationModule = class;
@@ -1527,6 +1527,8 @@ procedure TfrmMain.miMultiTranslateClick(Sender: TObject);
   CanDo: Integer;*)
 
 begin
+  if not SaveFileIfNeeded(True) then Exit;
+  
   frmMultiTranslation := TfrmMultiTranslation.Create(Application);
   try
     frmMultiTranslation.ShowModal;

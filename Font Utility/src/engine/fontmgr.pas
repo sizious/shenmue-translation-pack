@@ -1,4 +1,4 @@
-unit fontmgr;
+unit FontMgr;
 
 // {$DEFINE DEBUG_FONTMGR}
 

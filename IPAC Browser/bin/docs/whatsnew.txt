@@ -5,13 +5,15 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           _________________________________________________
-___| Version 1.2: 2010-03-?? |_________________________________________________
+___| Version 1.2: 2010-04-08 |_________________________________________________
 
 FIXED:
 - When two or more instances were running and one of them was closed, temporary
   directory was cleaned, and this should happens only if the lastest instance
   is closed!
-- The "Properties" window is now cleaned when you open an invalid file.    
+- The "Properties" window is now cleaned when you open an invalid file.  
+- Fixed a Debug Log window 'bring to front' bug when a hint by the toolbar 
+  was shown.  
 ___                           _________________________________________________
 ___| Version 1.1: 2010-03-13 |_________________________________________________
     
