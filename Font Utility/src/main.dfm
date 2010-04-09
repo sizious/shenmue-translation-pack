@@ -170,14 +170,14 @@ object frmMain: TfrmMain
     Top = 204
     Width = 357
     Height = 46
-    Caption = ' Characters per line in the decoded file : '
+    Caption = ' Characters per column in the decoded file : '
     TabOrder = 4
     object lCharsCustom: TLabel
       Left = 259
       Top = 20
-      Width = 91
+      Width = 83
       Height = 13
-      Caption = 'Characters per line'
+      Caption = 'Chars per column'
       Enabled = False
     end
     object rbCharsAuto: TRadioButton

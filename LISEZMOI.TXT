@@ -50,6 +50,10 @@
    Cet outil permet de créer une image Nero Burning Rom de test prête à être 
    lancée dans nullDC, via un lecteur virtuel.
    
+ * Font Utility
+   Cet outil additionel a été créé afin de modifier les polices utilisées par
+   le jeu (dans les menus, les sous-titres, etc.).
+
  * IDX Creator
    IDX Creator permet de recréer les fichiers IDX qui vont de paire avec les
    fichiers AFS contenant les SRF traduits.
