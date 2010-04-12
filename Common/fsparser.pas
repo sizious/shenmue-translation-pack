@@ -10,6 +10,11 @@ uses
   Windows, SysUtils, Classes {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF};
   
 type
+  TSectionEntry = record
+    Name: array[0..3] of Char;
+    Size: LongWord;
+  end;
+
   TFileSectionsList = class;
 
   // Item of TFileSectionsList
@@ -75,12 +80,6 @@ type
 {$ENDIF}
 
 procedure ParseFileSections(var FS: TFileStream; var Result: TFileSectionsList);
-type
-  TSectionEntry = record
-    Name: array[0..3] of Char;
-    Size: LongWord;
-  end;
-
 var
   SectionEntry: TSectionEntry;
   SavedOffset, Offset, NextSectionOffset: LongWord;
@@ -106,7 +105,9 @@ begin
 
       // Reading the header
       FS.Read(SectionEntry, SizeOf(TSectionEntry));
-      Result.Add(SectionEntry.Name, Offset, SectionEntry.Size);
+      if (SectionEntry.Name <> '') or
+        ((SectionEntry.Size > 0) and (SectionEntry.Size <= FS.Size)) then
+        Result.Add(SectionEntry.Name, Offset, SectionEntry.Size);
       NextSectionOffset := Offset + SectionEntry.Size;
 
       // Skipping section
