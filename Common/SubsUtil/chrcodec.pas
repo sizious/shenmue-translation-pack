@@ -303,6 +303,7 @@ begin
 
   // Classical loop (non-optimized)
 
+  ItemIndex := -1;
   MaxIndex := Count - 1;
   while not (Result or (ItemIndex = MaxIndex)) do begin
     Inc(ItemIndex);

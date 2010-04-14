@@ -6,7 +6,9 @@ uses
   main in 'main.pas' {frmMain},
   memoedit in 'engine\memoedit.pas',
   fsparser in '..\..\Common\fsparser.pas',
-  chrparse in '..\..\Common\SubsUtil\chrparse.pas';
+  chrparse in '..\..\Common\SubsUtil\chrparse.pas',
+  strdeps in 'engine\strdeps.pas',
+  uitools in '..\..\Common\uitools.pas';
 
 {$R *.res}
 
@@ -24,9 +26,9 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  Application.Title := 'Shenmue Diary Editor';
   Application.CreateForm(TfrmMain, frmMain);
-
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
