@@ -3,13 +3,14 @@ unit UITools;
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, ComCtrls, JvToolbar;
+  Windows, SysUtils, Classes, Forms, ComCtrls, StdCtrls, JvToolbar;
 
 type
   EUserInterface = class(Exception);
   EInvalidToolBarButton = class(EUserInterface);
 
 function BR(const Text: string): string;
+procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion: string; overload;
 function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
@@ -25,7 +26,18 @@ procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
 implementation
 
 uses
-  Themes, Menus, ShellApi;
+  Themes, Menus, ShellApi, Graphics;
+
+//------------------------------------------------------------------------------
+
+procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
+begin
+  Edit.Enabled := Enable;
+  if Enable then
+    Edit.Color := clWindow
+  else
+    Edit.Color := clBtnFace;
+end;
 
 //------------------------------------------------------------------------------
 
