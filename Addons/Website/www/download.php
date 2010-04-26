@@ -12,16 +12,19 @@
 	}
 	
 	function print_download_item($section_name, $program_name, $description, $image, $image_legend) {
-		echo '
+/*		$description = str_replace("\n", chr(13), $description);		
+		$description = str_replace("\t", chr(8), $description);	 */
 		
-<!-- '.$program_name.' -->
-<a name="'.$section_name.'"></a><h2>'.$program_name.'</h2>
-<p>'.$description.'</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/'.$image.'"><img src="./images/screens/thumbs/'.$image.'"/></a>
-	<div class="img_legend">'.$image_legend.'</div>
+		echo "
+		
+<!-- ".$program_name." -->
+<a name=\"".$section_name."\"></a><h2>".$program_name."</h2>
+<p>".$description."</p>
+<div align=\"center\">
+	<a target=\"_blank\" href=\"./images/screens/fullsize/".$image."\"><img src=\"./images/screens/thumbs/".$image."\"/></a>
+	<div class=\"img_legend\">".$image_legend."</div>
 </div>
-		';
+		";
 		print_set_to_top();
 	}
 	
@@ -30,16 +33,17 @@
 
 <p>The project is composed by several tools. You can click on each of them to get a short description.</p>
 <ul>
-	<li><a href="#adpcm">ADPCM Streaming Toolkit</a></li>
-	<li><a href="#afs">AFS Utils</a></li>
-	<li><a href="#srf">AiO Cinematics Subtitles Editor</a></li>
-	<li><a href="#fq">AiO Free Quest Subtitles Editor</a></li>
-	<li><a href="#test">Dreamcast Test Environment</a></li>
-	<li><a href="#idx">IDX Creator</a></li>
-	<li><a href="#ipac">IPAC Browser</a></li>	
-	<li><a href="#mt">Models Textures Editor</a></li>
-	<li><a href="#spr">SPR Utils</a></li>
-	<li><a href="#lcd">VMU Screen Editor</a></li>	
+<?php
+	// Print each Download item	
+	$handle = fopen( "rsrc/download/files.csv", "r" );
+	fgetcsv( $handle ); // skip the first row
+	while ( ( $data = fgetcsv( $handle, 1000, ";" ) ) !== FALSE ) {
+?>
+	<li><a href="#<?php echo $data[0]; ?>"><?php echo $data[1]; ?></a></li>	
+<?php
+	}
+	fclose( $handle );
+?>
 </ul>
 
 <p>If you are interested to get the source code (written in <em>Delphi 2007</em>), <a href="#source">click here</a>. 
@@ -47,112 +51,27 @@ This website spread some <a href="#addons">additional tools</a> that may be usef
 
 <p>To download the <strong>Shenmue Translation Pack</strong>, <a target="_blank" href="https://sourceforge.net/projects/shenmuesubs/files/" title="Download the Shenmue Translation Pack">click here</a> or the button below.</p>
 
+<!-- Download button -->
 <div class="download_button_container" id="download_button">
+	<div style="display: none;">
+		<img src="./images/buttons/dl.png" />
+		<img src="./images/buttons/dl_hover.png" />
+	</div>
 	<a target="_blank" href="https://sourceforge.net/projects/shenmuesubs/files/" title="Download the Shenmue Translation Pack">&nbsp;</a>
 </div>
 
 <p>If you prefer know for what is each tool designed in this pack, read below.</p>
 
-<!-- ADPCM Streaming Toolkit -->
-<a name="adpcm"></a><h2>ADPCM Streaming Toolkit</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/ADPCM%20Streaming%20Toolkit/">This toolkit</a> was made to decode <strong>Yamaha AICA ADPCM Stream</strong> audio files (.STR) to the common <strong>RIFF WAVE</strong> (.WAV) audio format. This toolkit can be useful to help the translation.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/str2wav.png"><img src="./images/screens/thumbs/str2wav.png"/></a>
-	<div class="img_legend">Decoding a random STR file...</div>
-</div>
-<?php print_set_to_top(); ?>
-
-<!-- AFS Utils -->
-<a name="afs"></a><h2>AFS Utils</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/AFS%20Utils/">This tool</a> allows opening, creating and editing AFS files packages. AFS file packages are archives like WinRAR ones but with no compression. Many games are using this
-file format. The first interest of it is to gather many files in single big one. In some special cases, an index file (IDX) is used with the AFS archive.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/afsutils.png"><img src="./images/screens/thumbs/afsutils.png"/></a>
-	<div class="img_legend">Browsing a Shenmue II cinematic file package</div>
-</div>
-<?php print_set_to_top(); ?>
-
-<!-- AiO Cinematics Subtitles Editor -->
-<a name="srf"></a><h2>AiO Cinematics Subtitles Editor</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/Cinematics%20Subtitles%20Editor/">This utility</a> is the subtitles editor for SRF files which can be found in AFS packages. SRF files contains the subtitles for the cinematic scenes.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/scinsube.png"><img src="./images/screens/thumbs/scinsube.png"/></a>
-	<div class="img_legend">Editing a Shenmue I SRF file</div>	
-</div>
-<?php print_set_to_top(); ?>
- 
-<!-- AiO Free Quest Subtitles Editor -->
-<a name="fq"></a><h2>AiO Free Quest Subtitles Editor</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/Free%20Quest%20Subtitles%20Editor/">This proggy</a> is the subtitles editor for PKS files inside the HUMANS.AFS package. PKS files contains subtitles used in the Free Quest mode.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/sfqsubed.png"><img src="./images/screens/thumbs/sfqsubed.png"/></a>
-	<div class="img_legend">Showing a Shenmue II NPC character (ID: CH1_)</div>	
-</div>
-<?php print_set_to_top(); ?>
-
-<!-- Dreamcast Test Environment -->
-<a name="test"></a><h2>Dreamcast Test Environment</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/Dreamcast%20Test%20Environment/">This tools pack</a> was made to simplify the testing for every Shenmue <strong>Dreamcast</strong> episode.</p>
-<div>Prerequists:</div>
-<ul>
-	<li>The dump of the game you want to translate (GDI dumps are supported)</li>
-	<li>The <strong>nullDC Dreamcast emulator</strong> (<a target="_blank" href="http://www.emudev.org/nullDC-new/">Official site</a> or <a href="#addons">here</a>)</li>
-	<li>A virtual drive (<a target="_blank" href="http://www.alcohol-soft.com/">Alcohol 52%/120%</a> or <a target="_blank" href="http://www.daemon-tools.cc/"/>Daemon Tools</a>)</li>
-	<li>A lot of disk space</li>
-</ul>
-<p>This pack is based on the <a href="#addons">Selfboot DATA Pack</a> by <strong>FamilyGuy</strong>.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/shentest.png"><img src="./images/screens/thumbs/shentest.png"/></a>
-	<div class="img_legend">Generating a Shenmue Dreamcast Image...</div>	
-</div>
-<?php print_set_to_top(); ?>
-  
-<!-- IDX Creator -->
-<a name="idx"></a><h2>IDX Creator</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/IDX%20Creator/">This stuff</a> allows to re-create correct IDX files corresponding to each AFS containing subtitles.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/idxwrite.png"><img src="./images/screens/thumbs/idxwrite.png"/></a>
-	<div class="img_legend">Generating a new Shenmue I IDX file</div>		
-</div>
-<?php print_set_to_top(); ?>
-
-<!-- IPAC Browser -->
-<a name="ipac"></a><h2>IPAC Browser</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/IPAC%20Browser/">This utility</a> was done to explore and edit PKS/PKF/BIN data files.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/ipacedit.png"><img src="./images/screens/thumbs/ipacedit.png"/></a>
-	<div class="img_legend">Explorating a random IPAC section-based file...</div>		
-</div>
-<?php print_set_to_top(); ?>
-   
-<!-- Models Textures Editor -->
-<a name="mt"></a><h2>Models Textures Editor</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/Models%20Textures%20Editor/"/>This tool</a> is a texture editor for MT5/MT6/MT7 files, in case of some sprites must be translated. MTx files are files containing object models and textures.</p>
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/mteditor.png"><img src="./images/screens/thumbs/mteditor.png"/></a>
-	<div class="img_legend">Showing a texture from a Shenmue II MT7 file</div>			
-</div>
-<?php print_set_to_top(); ?>
-      
-<!-- SPR Utils --> 
-<a name="spr"></a><h2>SPR Utils</h2>
-<p><a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/SPR%20Utils/">This application</a> is an editor for SPR files. SPR files are embedded PVR textures file with a propriatery format. SPR stands for <strong>sprite</strong>.</p>
-<p>This tool was made to edit some title screen textures.</p>
-
-<div align="center">
-	<a target="_blank" href="./images/screens/fullsize/sprutils.png"><img src="./images/screens/thumbs/sprutils.png"/></a>
-	<div class="img_legend">Editing a Shenmue II sprite file</div>			
-</div>
-<?php print_set_to_top(); ?>
-
 <?php
-	$url = make_program_link("VMU Screen Editor", "This utility");
-	$desc = $url." was made in order to edit the VMU screen on Shenmue I and ".
-		"II for the <strong>Dreamcast</strong> platform (only). The VMU is the ".
-		"<strong>Dreamcast</strong> memory card with an embedded LCD. ".
-		"This application isn't really needed but I know you love useless stuffs ".
-		"like this!";
-	print_download_item("lcd", "VMU Screen Editor", $desc, "vmulcded.png", "The editor in action!");
+	// Print each Download item	
+	$handle = fopen( "rsrc/download/files.csv", "r" );
+	fgetcsv( $handle ); // skip the first row
+	while ( ( $data = fgetcsv( $handle, 1000, ";" ) ) !== FALSE ) {
+		$url = make_program_link( $data[1], $data[4] );
+		$desc = $url.$data[5];
+		print_download_item( $data[0], $data[1], $desc, $data[2], $data[3] );
+	}
+	fclose( $handle );
 ?>
 
 <a name="source"></a><h1>Source</h1>
@@ -290,12 +209,6 @@ file format. The first interest of it is to gather many files in single big one.
 		<td align="center">FamilyGuy</td>
 		<td>This pack allow you to create auto-boot CD-R images for your Dreamcast.</td>
 	</tr>		
-	<tr>
-		<td><a href="rsrc/addons/shenmue_ingame_font_hacking_pack.rar"/>Shenmue In-game Font Hacking pack</a></td>
-		<td align="center">?</td>
-		<td align="center"><a target="_blank" href="http://shenmueangel.free.fr/">Shendream</a></td>
-		<td>This pack contains a tool and a tutorial to hack the in-game font used in subtitles.</td>
-	</tr>
 	<tr>
 		<td><a href="rsrc/addons/tilemolester-0.16-full.7z"/>Tile Molester</a></td>
 		<td align="center">0.16</td>
