@@ -653,7 +653,7 @@ begin
 
   CanDo := MsgBox(
     'This function will build the Global-Translation list from the actual loaded files. ' + WrapStr +
-    'If you have many files, this can takes some minutes. ' + WrapStr +
+    'If you have many files, this can take some minutes. ' + WrapStr +
     'Continue ?',
     'Global-Translation retriever question',
     MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);

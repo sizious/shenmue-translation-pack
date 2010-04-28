@@ -28,18 +28,21 @@ type
     property StringRelativeOffset: Integer read fStringRelativeOffset;
   end;
 
+  // This class is here to allow the dynamic-linking of some strings used in the memo.
+  // In fact some string in the memo are pointed by multi-offsets.
+  // this class is here to update each pointers with the new string value.
   TDiaryEditorStringsDependances = class(TObject)
   private
     fItemsList: TList;
     function GetCount: Integer;
     function GetItem(
       Index: Integer): TPointerOffsetsList;
-  protected
-    procedure Clear;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(const StringRelativeOffset: Integer; ItemEntry: Pointer);
+    procedure Add(const StringRelativeOffset: Integer; ItemEntry: Pointer;
+      var NewItem: Boolean);
+    procedure Clear;
     function IndexOf(const StringRelativeOffset: Integer;
       var ItemIndex: Integer): Boolean;
     procedure ExportToCSV(const FileName: TFileName);
@@ -87,13 +90,15 @@ end;
 { TDiaryEditorStringsDependances }
 
 procedure TDiaryEditorStringsDependances.Add(
-  const StringRelativeOffset: Integer; ItemEntry: Pointer);
+  const StringRelativeOffset: Integer; ItemEntry: Pointer;
+  var NewItem: Boolean);
 var
   Index: Integer;
   Item: TPointerOffsetsList;
   ItemFound: Boolean;
   
 begin
+  NewItem := False;
   ItemFound := IndexOf(StringRelativeOffset, Index);
 
   // Adding a new StringRelativeOffset dependance entry to the list
@@ -101,6 +106,7 @@ begin
     Item := TPointerOffsetsList.Create;
     Item.fStringRelativeOffset := StringRelativeOffset;
     fItemsList.Add(Item);
+    NewItem := True;
   end else
     Item := Items[Index];
 

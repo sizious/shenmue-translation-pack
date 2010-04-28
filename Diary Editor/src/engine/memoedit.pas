@@ -6,6 +6,9 @@ uses
   Windows, SysUtils, Classes, FSParser, StrDeps;
 
 type
+  EDiaryEditor = class(Exception);
+  EMessageTextNotEditable = class(EDiaryEditor);
+
   TDiaryEditor = class;
 
   TDiaryEditorMessagesList = class;
@@ -19,10 +22,14 @@ type
     fStringPointerOffset: LongWord;
     fStringOffset: LongWord;
     fPageIndex: Integer;
+    fAllowStringWrite: Boolean;
+    fNewStringOffset: LongWord;
     function GetEditor: TDiaryEditor;
     procedure SetText(const Value: string);
   protected
+    property AllowStringWrite: Boolean read fAllowStringWrite;
     property Editor: TDiaryEditor read GetEditor;
+    property NewStringOffset: LongWord read fNewStringOffset;
   public
     constructor Create(AOwner: TDiaryEditorMessagesList);
     property Editable: Boolean read fEditable;
@@ -43,7 +50,7 @@ type
     function GetItem(Index: Integer): TDiaryEditorMessagesListItem;
     function GetCount: Integer;
   protected
-    procedure Add(Item: TDiaryEditorMessagesListItem);
+    function Add(Item: TDiaryEditorMessagesListItem): Integer;
     procedure Clear;
   public
     constructor Create(AOwner: TDiaryEditorPagesListItem);
@@ -92,15 +99,20 @@ type
     fSections: TFileSectionsList;
     fStartMessagesOffset: LongWord;
     fDependancesList: TDiaryEditorStringsDependances;
+    fFileLoaded: Boolean;
   protected
     procedure AddEntry(var Input: TFileStream; const StrPointerOffset,
       StrOffset: LongWord; const PageNumber: Integer);
+    procedure Clear;
+    procedure WriteUpdatedSections(const fnMEMO, fnMSTR: TFileName);
     property Dependances: TDiaryEditorStringsDependances read fDependancesList;         
     property StartMessagesOffset: LongWord read fStartMessagesOffset;
   public
     constructor Create;
     destructor Destroy; override;
     function LoadFromFile(const FileName: TFileName): Boolean;
+    function SaveToFile(const FileName: TFileName): Boolean;
+    property Loaded: Boolean read fFileLoaded;
     property Pages: TDiaryEditorPagesList read fPages;
     property Sections: TFileSectionsList read fSections;
   end;
@@ -108,7 +120,10 @@ type
 implementation
 
 uses
-  ChrParse;
+  Common, SysTools, ChrUtils;
+
+const
+  UNEDITABLE_OFFSET_VALUE = $FFFFFFFF;
   
 { TDiaryEditor }
 
@@ -116,7 +131,7 @@ procedure TDiaryEditor.AddEntry(var Input: TFileStream; const StrPointerOffset,
   StrOffset: LongWord; const PageNumber: Integer);
 var
   SavedPosition: Int64;
-  NewItem: TDiaryEditorMessagesListItem;
+  NewMsgItem: TDiaryEditorMessagesListItem;
   StringAbsoluteOffset: LongWord;
   Messages: TDiaryEditorMessagesList;
 
@@ -128,42 +143,50 @@ begin
   Messages := Pages.GetRequestedPage(PageNumber).Messages;
 
   // Creating the new object
-  NewItem := TDiaryEditorMessagesListItem.Create(Messages);
+  NewMsgItem := TDiaryEditorMessagesListItem.Create(Messages);
 
   // Initializing the new entry
-  NewItem.fStringPointerOffset := StrPointerOffset;
-  NewItem.fStringOffset := StrOffset;
-  NewItem.fEditable := (StrOffset <> $FFFFFFFF);
-  NewItem.fText := '';
-  NewItem.fPageIndex := PageNumber;
+  NewMsgItem.fStringPointerOffset := StrPointerOffset;
+  NewMsgItem.fStringOffset := StrOffset;
+  NewMsgItem.fEditable := (StrOffset <> UNEDITABLE_OFFSET_VALUE);
+  NewMsgItem.fText := '';
+  NewMsgItem.fPageIndex := PageNumber;
+  NewMsgItem.fAllowStringWrite := NewMsgItem.fEditable;
 
 {$IFDEF DEBUG}
   StringAbsoluteOffset := 0;
 {$ENDIF}
 
   // Adding to the list
-  Messages.Add(NewItem);
+  NewMsgItem.fIndex := Messages.Add(NewMsgItem);
 
   // Reading the text if possible
-  if NewItem.Editable then begin
+  if NewMsgItem.Editable then begin
     // Retrieve the string
-    StringAbsoluteOffset := StartMessagesOffset + NewItem.StringOffset;
+    StringAbsoluteOffset := StartMessagesOffset + NewMsgItem.StringOffset;
     Input.Seek(StringAbsoluteOffset, soFromBeginning);
-    NewItem.fText := ReadNullTerminatedString(Input);
+    NewMsgItem.fText := ReadNullTerminatedString(Input);
 
     // Adding a string depandence reference
-    Dependances.Add(StrOffset, NewItem);
+    Dependances.Add(StrOffset, NewMsgItem, NewMsgItem.fAllowStringWrite);
   end;
 
   // Restore saved position
   Input.Seek(SavedPosition, soFromBeginning);
 
 {$IFDEF DEBUG}
-  if NewItem.Editable then
-    WriteLn('#P:', NewItem.PageIndex, ';L:', NewItem.Index, ', StrAbsoluteOffset=',
-      StringAbsoluteOffset, ', Ptr=', NewItem.StringPointerOffset, ', Str=',
-      NewItem.StringOffset, sLineBreak, '  "', NewItem.Text, '"');
+  if NewMsgItem.Editable then
+    WriteLn('#P:', NewMsgItem.PageIndex, ';L:', NewMsgItem.Index, ', StrAbsoluteOffset=',
+      StringAbsoluteOffset, ', Ptr=', NewMsgItem.StringPointerOffset, ', Str=',
+      NewMsgItem.StringOffset, sLineBreak, '  "', NewMsgItem.Text, '"');
 {$ENDIF}
+end;
+
+procedure TDiaryEditor.Clear;
+begin
+  Pages.Clear;
+  Dependances.Clear;
+//  fStartMessagesOffset := 0;
 end;
 
 constructor TDiaryEditor.Create;
@@ -187,7 +210,7 @@ const
 
 var
   Input: TFileStream;
-  MaxPosition, PageNumber, EntryCount: Integer;
+  i, MaxPosition, PageNumber, EntryCount: Integer;
   StrPointerOffset, StrOffset: LongWord;
   MemoSection: TFileSectionsListItem;
 
@@ -199,34 +222,107 @@ begin
     // Parsing the file
     ParseFileSections(Input, fSections);
 
-    fStartMessagesOffset := Sections[Sections.IndexOf('MSTR')].Offset + SizeOf(TSectionEntry);
+    // Initializing StartMessagesOffset
+    i := Sections.IndexOf(MSTR_SIGN); // MSTR is the section containing the strings
+    if i <> -1 then
+      fStartMessagesOffset := Sections[i].Offset + SizeOf(TSectionEntry);
 
-    // Getting the max position
-    MemoSection := Sections[Sections.IndexOf('MEMO')];
-    MaxPosition := MemoSection.Offset + MemoSection.Size;
+    // Search the Memo section, contains the MSTR strings pointers
+    i := Sections.IndexOf(MEMO_SIGN);
+    fFileLoaded := i <> -1;
 
-    // Seek 'MEMO' header
-    Input.Seek(SizeOf(TSectionEntry), soFromBeginning);
+    // Analyzing MEMO and MSTR sections
+    if Loaded then begin
+      // Clearing the object
+      Clear;
+      
+      // Getting the max position
+      MemoSection := Sections[i];
+      MaxPosition := MemoSection.Offset + MemoSection.Size;
 
-    // Read each string list
-    PageNumber := 0;
-    EntryCount := 0;
-    repeat
+      // Seek 'MEMO' header
+      Input.Seek(SizeOf(TSectionEntry), soFromBeginning);
 
-      StrPointerOffset := Input.Position;
-      Input.Read(StrOffset, 4);
+      // Read each string list
+      PageNumber := 0;
+      EntryCount := 0;
+      repeat
 
-      AddEntry(Input, StrPointerOffset, StrOffset, PageNumber);
+        StrPointerOffset := Input.Position;
+        Input.Read(StrOffset, 4);
 
-      Inc(EntryCount);
-      if (EntryCount mod MAX_LINE_PER_PAGE) = 0 then
-        Inc(PageNumber);
+        AddEntry(Input, StrPointerOffset, StrOffset, PageNumber);
 
-    until Input.Position >= MaxPosition;
+        Inc(EntryCount);
+        if (EntryCount mod MAX_LINE_PER_PAGE) = 0 then
+          Inc(PageNumber);
+
+      until Input.Position >= MaxPosition;
+    end; // Loaded
 
   finally
     Input.Free;
   end;
+end;
+
+function TDiaryEditor.SaveToFile(const FileName: TFileName): Boolean;
+var
+  fnMEMO, fnMSTR: TFileName;
+  
+begin
+  Result := False;
+  if not Loaded then Exit;
+
+  // Update the MEMO and MSTR sections.
+  fnMEMO := GetTempFileName;
+  fnMSTR := GetTempFileName;
+  WriteUpdatedSections(fnMEMO, fnMSTR);
+
+  Reconstruire le fichier MEMODATA.BIN, mise à jour de la section RUBI également...
+end;
+
+procedure TDiaryEditor.WriteUpdatedSections(const fnMEMO, fnMSTR: TFileName);
+var
+  p: Integer;
+  m: Integer;
+  Messages: TDiaryEditorMessagesList;
+  MEMO_FStream, MSTR_FStream: TFileStream;
+  Item: TDiaryEditorMessagesListItem;
+  StrOffset: LongWord;
+  
+begin
+  MEMO_FStream := TFileStream.Create(fnMEMO, fmCreate);
+  MSTR_FStream := TFileStream.Create(fnMSTR, fmCreate);
+  try
+
+    for p := 0 to Pages.Count - 1 do begin
+      Messages := Pages[p].Messages;
+
+      for m := 0 to Messages.Count - 1 do begin
+        Item := Messages[m];
+
+        StrOffset := UNEDITABLE_OFFSET_VALUE;
+
+        // Write the string in the MSTR section
+        if Item.AllowStringWrite then begin
+          Item.fNewStringOffset := MSTR_FStream.Position;
+          WriteNullTerminatedString(MSTR_FStream, Item.Text);
+          StrOffset := Item.fNewStringOffset;
+        end;
+
+        // Write the MEMO offset
+        MEMO_FStream.Write(StrOffset, UINT32_SIZE);
+
+      end; // m
+
+    end; // p
+
+    
+  finally
+    MEMO_FStream.Free;
+    MSTR_FStream.Free;
+  end;
+
 end;
 
 { TDiaryEditorMessagesListItem }
@@ -244,16 +340,21 @@ end;
 
 procedure TDiaryEditorMessagesListItem.SetText(const Value: string);
 var
-  i, Index: Integer;
+  i, DependancesIndex: Integer;
   Item: TDiaryEditorMessagesListItem;
 
 begin
+  if not Editable then
+    raise EMessageTextNotEditable.Create(
+      Format('This item [Page:%d, Message:%d] is NOT editable!', [PageIndex, Index])
+    );
+
   fText := Value;
 
   // Update string dependancies
-  if Editor.Dependances.IndexOf(fStringOffset, Index) then
-    for i := 0 to Editor.Dependances[Index].Count - 1 do begin
-      Item := TDiaryEditorMessagesListItem(Editor.Dependances[Index][i]);
+  if Editor.Dependances.IndexOf(fStringOffset, DependancesIndex) then
+    for i := 0 to Editor.Dependances[DependancesIndex].Count - 1 do begin
+      Item := TDiaryEditorMessagesListItem(Editor.Dependances[DependancesIndex][i]);
       Item.fText := Value;
     end;
 end;
@@ -356,9 +457,9 @@ end;
 
 { TDiaryEditorMessagesList }
 
-procedure TDiaryEditorMessagesList.Add(Item: TDiaryEditorMessagesListItem);
+function TDiaryEditorMessagesList.Add(Item: TDiaryEditorMessagesListItem): Integer;
 begin
-  Item.fIndex := fItemsList.Add(Item);
+  Result := fItemsList.Add(Item);
 end;
 
 procedure TDiaryEditorMessagesList.Clear;
