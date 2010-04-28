@@ -5,10 +5,13 @@ interface
 uses
   Windows, SysUtils, Classes;
 
+const
+  UINT32_SIZE = 4;
+
 type
   ESystemTools = class(Exception);
   EDataDirectoryNotFound = class(ESystemTools);
-  
+
 function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure Delay(Milliseconds: Double);
@@ -228,7 +231,9 @@ end;
 
 function GetTempFileName: TFileName;
 begin
-  Result := GetTempDir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
+  repeat
+    Result := GetTempDir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
+  until not FileExists(Result);
 end;
 
 //------------------------------------------------------------------------------

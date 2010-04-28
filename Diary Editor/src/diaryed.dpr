@@ -6,9 +6,11 @@ uses
   main in 'main.pas' {frmMain},
   memoedit in 'engine\memoedit.pas',
   fsparser in '..\..\Common\fsparser.pas',
-  chrparse in '..\..\Common\SubsUtil\chrparse.pas',
   strdeps in 'engine\strdeps.pas',
-  uitools in '..\..\Common\uitools.pas';
+  uitools in '..\..\Common\uitools.pas',
+  systools in '..\..\Common\systools.pas',
+  common in 'engine\common.pas',
+  chrutils in '..\..\Common\SubsUtil\chrutils.pas';
 
 {$R *.res}
 
