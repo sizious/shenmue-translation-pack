@@ -17,6 +17,7 @@ function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
 function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
+procedure MakeNumericOnly(Handle: THandle);
 function OpenLink(const LinkURL: string): Boolean;
 function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
@@ -27,6 +28,15 @@ implementation
 
 uses
   Themes, Menus, ShellApi, Graphics;
+//------------------------------------------------------------------------------
+
+// Thanks How To Do Things
+// http://www.howtodothings.com/computers/a855-how-to-make-a-tedit-numeric.html
+procedure MakeNumericOnly(Handle: THandle);
+begin
+  SetWindowLong(Handle, GWL_STYLE,
+  GetWindowLong(Handle, GWL_STYLE) or ES_NUMBER);
+end;
 
 //------------------------------------------------------------------------------
 

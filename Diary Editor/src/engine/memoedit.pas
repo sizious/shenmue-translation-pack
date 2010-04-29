@@ -26,10 +26,12 @@ type
     fNewStringOffset: LongWord;
     function GetEditor: TDiaryEditor;
     procedure SetText(const Value: string);
+    procedure SetNewStringOffset(const Value: LongWord);
   protected
     property AllowStringWrite: Boolean read fAllowStringWrite;
     property Editor: TDiaryEditor read GetEditor;
-    property NewStringOffset: LongWord read fNewStringOffset;
+    property NewStringOffset: LongWord read fNewStringOffset
+      write SetNewStringOffset;
   public
     constructor Create(AOwner: TDiaryEditorMessagesList);
     property Editable: Boolean read fEditable;
@@ -87,6 +89,7 @@ type
     constructor Create(AOwner: TDiaryEditor);
     destructor Destroy; override;
     procedure ExportToCSV(const FileName: TFileName);
+    procedure ExportToFile(const FileName: TFileName);
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TDiaryEditorPagesListItem
       read GetItem; default;
@@ -97,33 +100,50 @@ type
   private
     fPages: TDiaryEditorPagesList;
     fSections: TFileSectionsList;
-    fStartMessagesOffset: LongWord;
+    fMSTRStringsStartOffset: LongWord;
     fDependancesList: TDiaryEditorStringsDependances;
     fFileLoaded: Boolean;
+    fSectionIndexRUBI: Integer;
+    fSectionIndexMEMO: Integer;
+    fSectionIndexMSTR: Integer;
+    fRUBIStringStartOffset: LongWord;
+    fSourceFileName: TFileName;
+    fMakeBackup: Boolean;
   protected
     procedure AddEntry(var Input: TFileStream; const StrPointerOffset,
       StrOffset: LongWord; const PageNumber: Integer);
     procedure Clear;
-    procedure WriteUpdatedSections(const fnMEMO, fnMSTR: TFileName);
-    property Dependances: TDiaryEditorStringsDependances read fDependancesList;         
-    property StartMessagesOffset: LongWord read fStartMessagesOffset;
+    procedure WriteTempUpdatedSections(var InStream: TFileStream;
+      const MEMOFileName, RUBIFileName, MSTRFileName: TFileName);
+    property Dependances: TDiaryEditorStringsDependances read fDependancesList;
+    property MSTRStringsStartOffset: LongWord read fMSTRStringsStartOffset;    
+    property RUBIStringsStartOffset: LongWord read fRUBIStringStartOffset;
+    property SectionIndexMEMO: Integer read fSectionIndexMEMO;
+    property SectionIndexMSTR: Integer read fSectionIndexMSTR;
+    property SectionIndexRUBI: Integer read fSectionIndexRUBI;
   public
     constructor Create;
     destructor Destroy; override;
     function LoadFromFile(const FileName: TFileName): Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
+    property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
     property Loaded: Boolean read fFileLoaded;
     property Pages: TDiaryEditorPagesList read fPages;
     property Sections: TFileSectionsList read fSections;
+    property SourceFileName: TFileName read fSourceFileName;
   end;
 
 implementation
 
 uses
-  Common, SysTools, ChrUtils;
+  Common, SysTools, ChrUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
 
 const
-  UNEDITABLE_OFFSET_VALUE = $FFFFFFFF;
+  MSTR_SIGN = 'MSTR';
+  MEMO_SIGN = 'MEMO';
+  RUBI_SIGN = 'RUBI';
+  EMPTY_STRING_OFFSET_VALUE = $FFFFFFFF;
+  MSTR_PADDING_SIZE = 8;
   
 { TDiaryEditor }
 
@@ -148,10 +168,11 @@ begin
   // Initializing the new entry
   NewMsgItem.fStringPointerOffset := StrPointerOffset;
   NewMsgItem.fStringOffset := StrOffset;
-  NewMsgItem.fEditable := (StrOffset <> UNEDITABLE_OFFSET_VALUE);
+  NewMsgItem.fEditable := (StrOffset <> EMPTY_STRING_OFFSET_VALUE);
   NewMsgItem.fText := '';
   NewMsgItem.fPageIndex := PageNumber;
   NewMsgItem.fAllowStringWrite := NewMsgItem.fEditable;
+  NewMsgItem.fNewStringOffset := EMPTY_STRING_OFFSET_VALUE; // updated when SaveToFile is called
 
 {$IFDEF DEBUG}
   StringAbsoluteOffset := 0;
@@ -163,7 +184,7 @@ begin
   // Reading the text if possible
   if NewMsgItem.Editable then begin
     // Retrieve the string
-    StringAbsoluteOffset := StartMessagesOffset + NewMsgItem.StringOffset;
+    StringAbsoluteOffset := MSTRStringsStartOffset + NewMsgItem.StringOffset;
     Input.Seek(StringAbsoluteOffset, soFromBeginning);
     NewMsgItem.fText := ReadNullTerminatedString(Input);
 
@@ -210,35 +231,52 @@ const
 
 var
   Input: TFileStream;
-  i, MaxPosition, PageNumber, EntryCount: Integer;
+  MaxPosition, PageNumber, EntryCount: Integer;
   StrPointerOffset, StrOffset: LongWord;
-  MemoSection: TFileSectionsListItem;
+  Section: TFileSectionsListItem;
 
 begin
   Result := False;
+  if not FileExists(FileName) then Exit;
 
+  // Try to parse the MEMODATA.BIN file
   Input := TFileStream.Create(FileName, fmOpenRead);
   try
     // Parsing the file
     ParseFileSections(Input, fSections);
 
     // Initializing StartMessagesOffset
-    i := Sections.IndexOf(MSTR_SIGN); // MSTR is the section containing the strings
-    if i <> -1 then
-      fStartMessagesOffset := Sections[i].Offset + SizeOf(TSectionEntry);
+    fSectionIndexMSTR := Sections.IndexOf(MSTR_SIGN); // MSTR is the section containing the strings
+    if SectionIndexMSTR <> -1 then
+      fMSTRStringsStartOffset := Sections[SectionIndexMSTR].Offset
+        + SizeOf(TSectionEntry);
 
     // Search the Memo section, contains the MSTR strings pointers
-    i := Sections.IndexOf(MEMO_SIGN);
-    fFileLoaded := i <> -1;
+    fSectionIndexMEMO := Sections.IndexOf(MEMO_SIGN);
+
+    // Search the RUBI section, contains "japanese" strings...
+    fSectionIndexRUBI := Sections.IndexOf(RUBI_SIGN);
+
+    // The file to be valid must be contains MEMO, RUBI and MSTR sections
+    fFileLoaded := (SectionIndexMEMO <> -1) and (SectionIndexRUBI <> -1)
+      and (SectionIndexMSTR <> -1);
 
     // Analyzing MEMO and MSTR sections
     if Loaded then begin
       // Clearing the object
       Clear;
-      
+      fSourceFileName := FileName;
+
+      // Getting the RUBI starting address in the MSTR section
+      Section := Sections[SectionIndexRUBI];
+      Input.Seek(Section.Offset + SizeOf(TSectionEntry), soFromBeginning);
+      repeat
+        Input.Read(fRUBIStringStartOffset, UINT32_SIZE);
+      until fRUBIStringStartOffset <> EMPTY_STRING_OFFSET_VALUE;
+
       // Getting the max position
-      MemoSection := Sections[i];
-      MaxPosition := MemoSection.Offset + MemoSection.Size;
+      Section := Sections[SectionIndexMEMO];
+      MaxPosition := Section.Offset + Section.Size;
 
       // Seek 'MEMO' header
       Input.Seek(SizeOf(TSectionEntry), soFromBeginning);
@@ -267,48 +305,122 @@ end;
 
 function TDiaryEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
-  fnMEMO, fnMSTR: TFileName;
-  
+  OutFileName, fnMEMO, fnRUBI, fnMSTR: TFileName;
+  i: Integer;
+  InStream, OutStream: TFileStream;
+
+  function WriteUpdatedSection(const SectionName: TFileName): Boolean;
+  var
+    FName: TFileName;
+    UpdatedStream: TFileStream;
+    Header: TSectionEntry;
+
+  begin
+    FName := '';
+
+    (* Determinates if the requested section was updated before by
+       WriteTempUpdatedSections. *)
+    if SectionName = MEMO_SIGN then
+      FName := fnMEMO
+    else if SectionName = RUBI_SIGN then
+      FName := fnRUBI
+    else if SectionName = MSTR_SIGN then
+      FName := fnMSTR;
+
+    // Write the updated section if possible
+    Result := FileExists(FName);
+    if Result then begin
+      UpdatedStream := TFileStream.Create(FName, fmOpenRead);
+      try
+        // Write the section header
+        StrCopy(Header.Name, PChar(SectionName));
+        Header.Size := UpdatedStream.Size + SizeOf(TSectionEntry);
+        OutStream.Write(Header, SizeOf(TSectionEntry));
+
+        // Write the updated section content
+        OutStream.CopyFrom(UpdatedStream, UpdatedStream.Size);
+
+        // Write MSTR Padding if needed
+        if SectionName = MSTR_SIGN then
+          WriteNullBlock(OutStream, MSTR_PADDING_SIZE);
+      finally
+        UpdatedStream.Free;
+        DeleteFile(FName); // clean the temp file
+      end; // try
+    end; // Result
+  end; // function
+
 begin
   Result := False;
   if not Loaded then Exit;
 
-  // Update the MEMO and MSTR sections.
-  fnMEMO := GetTempFileName;
-  fnMSTR := GetTempFileName;
-  WriteUpdatedSections(fnMEMO, fnMSTR);
 
-  Reconstruire le fichier MEMODATA.BIN, mise à jour de la section RUBI également...
+  OutFileName := GetTempFileName;
+
+  OutStream := TFileStream.Create(OutFileName, fmCreate);
+  InStream := TFileStream.Create(SourceFileName, fmOpenRead);
+  try
+    // Update the MEMO, RUBI and MSTR sections.
+    fnMEMO := GetTempFileName;
+    fnRUBI := GetTempFileName;
+    fnMSTR := GetTempFileName;
+    WriteTempUpdatedSections(InStream, fnMEMO, fnRUBI, fnMSTR);
+
+    // Update all sections
+    for i := 0 to Sections.Count - 1 do
+
+      // Write the updated section, and if not, write the raw section from the source
+      if not WriteUpdatedSection(Sections[i].Name) then begin
+        // Write the raw section from the InStream
+        InStream.Seek(Sections[i].Offset, soFromBeginning);
+        OutStream.Write(InStream, Sections[i].Size);
+      end;
+    
+  finally
+    InStream.Free;
+    OutStream.Free;
+
+    // Writing the requested updated file
+    if FileExists(FileName) and (not MakeBackup) then
+      DeleteFile(FileName)
+    else
+      RenameFile(FileName, ChangeFileExt(FileName, '.BAK'));
+    MoveFile(OutFileName, FileName);
+  end;
 end;
 
-procedure TDiaryEditor.WriteUpdatedSections(const fnMEMO, fnMSTR: TFileName);
+procedure TDiaryEditor.WriteTempUpdatedSections(var InStream: TFileStream;
+  const MEMOFileName, RUBIFileName, MSTRFileName: TFileName);
 var
-  p: Integer;
-  m: Integer;
+  p, m, RUBI_PatchValue: Integer;
   Messages: TDiaryEditorMessagesList;
-  MEMO_FStream, MSTR_FStream: TFileStream;
+  MEMO_FStream, RUBI_FStream, MSTR_FStream: TFileStream;
   Item: TDiaryEditorMessagesListItem;
-  StrOffset: LongWord;
-  
-begin
-  MEMO_FStream := TFileStream.Create(fnMEMO, fmCreate);
-  MSTR_FStream := TFileStream.Create(fnMSTR, fmCreate);
-  try
+  StrOffset, Temp: LongWord;
 
+begin
+  MEMO_FStream := TFileStream.Create(MEMOFileName, fmCreate);
+  MSTR_FStream := TFileStream.Create(MSTRFileName, fmCreate);
+  RUBI_FStream := TFileStream.Create(RUBIFileName, fmCreate);
+  try
+    //**************************************************************************
+    // UPDATING MEMO AND MSTR SECTIONS
+    //**************************************************************************
+
+    // Write update MEMO and MSTR sections
     for p := 0 to Pages.Count - 1 do begin
       Messages := Pages[p].Messages;
 
       for m := 0 to Messages.Count - 1 do begin
         Item := Messages[m];
 
-        StrOffset := UNEDITABLE_OFFSET_VALUE;
-
         // Write the string in the MSTR section
         if Item.AllowStringWrite then begin
-          Item.fNewStringOffset := MSTR_FStream.Position;
+          Item.NewStringOffset := MSTR_FStream.Position;
           WriteNullTerminatedString(MSTR_FStream, Item.Text);
-          StrOffset := Item.fNewStringOffset;
-        end;
+          StrOffset := Item.NewStringOffset;
+        end else
+          StrOffset := Item.NewStringOffset;
 
         // Write the MEMO offset
         MEMO_FStream.Write(StrOffset, UINT32_SIZE);
@@ -317,10 +429,38 @@ begin
 
     end; // p
 
+    //**************************************************************************
+    // UPDATING RUBI SECTION
+    //**************************************************************************
+
+    // Calculating the new RUBI string start offset (with a "patch value")
+    RUBI_PatchValue := MSTR_FStream.Size - RUBIStringsStartOffset;
+{$IFDEF DEBUG}
+    WriteLn('RUBI_PatchValue: ', RUBI_PatchValue);
+{$ENDIF}
+
+    // Dump the RUBI "MSTR" file content from the original file
+    MSTR_FStream.Seek(0, soFromEnd);
+    InStream.Seek(MSTRStringsStartOffset
+      + RUBIStringsStartOffset, soFromBeginning);
+    Temp := Sections[SectionIndexMSTR].Size - RUBIStringsStartOffset - MSTR_PADDING_SIZE;
+    MSTR_FStream.CopyFrom(InStream, Temp);
     
+    // Writing the updated RUBI section
+    InStream.Seek(Sections[SectionIndexRUBI].Offset
+      + SizeOf(TSectionEntry), soFromBeginning);
+    Temp := Sections[SectionIndexRUBI].Offset + Sections[SectionIndexRUBI].Size;
+    repeat
+      InStream.Read(StrOffset, UINT32_SIZE);
+      if StrOffset <> EMPTY_STRING_OFFSET_VALUE then
+        Inc(StrOffset, RUBI_PatchValue);
+      RUBI_FStream.Write(StrOffset, UINT32_SIZE);
+    until InStream.Position >= Temp;
+
   finally
     MEMO_FStream.Free;
     MSTR_FStream.Free;
+    RUBI_FStream.Free;
   end;
 
 end;
@@ -336,6 +476,23 @@ end;
 function TDiaryEditorMessagesListItem.GetEditor: TDiaryEditor;
 begin
   Result := (Owner.Owner.Owner.Owner); // Funny !!! But it's correct.
+end;
+
+procedure TDiaryEditorMessagesListItem.SetNewStringOffset(
+  const Value: LongWord);
+var
+  i, DependancesIndex: Integer;
+  CurrentDependance: TPointerOffsetsList;
+
+begin
+  fNewStringOffset := Value;
+
+  // Update every dependances NewStringOffset
+  if Editor.Dependances.IndexOf(StringOffset, DependancesIndex) then begin
+    CurrentDependance := Editor.Dependances[DependancesIndex];
+    for i := 0 to CurrentDependance.Count - 1 do
+      TDiaryEditorMessagesListItem(CurrentDependance[i]).fNewStringOffset := Value;
+  end;
 end;
 
 procedure TDiaryEditorMessagesListItem.SetText(const Value: string);
@@ -407,7 +564,7 @@ begin
         StrText := '(undef)';
         if Msg.Editable then begin
           StrROffset := IntToStr(Msg.StringOffset);
-          StrAOffset := IntToStr(Owner.StartMessagesOffset + Msg.StringOffset);
+          StrAOffset := IntToStr(Owner.MSTRStringsStartOffset + Msg.StringOffset);
           StrText := Msg.Text;
         end;
 
@@ -421,6 +578,31 @@ begin
   finally
     Buffer.Free;
   end;
+end;
+
+procedure TDiaryEditorPagesList.ExportToFile(const FileName: TFileName);
+var
+  XMLDoc: IXMLDocument;
+  p, m: Integer;
+
+begin
+  XMLDoc := TXMLDocument.Create(nil);
+
+  // Setting XMLDocument properties
+  with XMLDoc do begin
+    Options := [doNodeAutoCreate];
+    ParseOptions:= [];
+    NodeIndentStr:= '  ';
+    Active := True;
+    Version := '1.0';
+    Encoding := 'ISO-8859-1';
+  end;
+
+  // Navigating in the list...
+  for p := 0 to Count - 1 do
+    for m := 0 to Items[p].Messages.Count - 1 do begin
+      Items[p].Messages[m].Text  ___ 
+    end;
 end;
 
 function TDiaryEditorPagesList.GetCount: Integer;
