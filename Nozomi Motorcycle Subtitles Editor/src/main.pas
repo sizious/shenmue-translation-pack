@@ -289,20 +289,6 @@ procedure TfrmMain.miDEBUG_TEST4Click(Sender: TObject);
 var
   i, j: Integer;
 
-  function GetRandomString: string;
-  const
-    ALPHA = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-  var
-    x: Integer;
-
-  begin
-    Result := '';
-    for x := 0 to Random(90) do begin
-      Result := Result + ALPHA[Random(Length(ALPHA)) + 1];
-    end;
-  end;
-
 begin
 
   SequenceEditor.LoadFromFile('USA_DISC4.BIN');
@@ -314,7 +300,7 @@ begin
     for i := 1 to 20 do begin
 
       for j := 0 to SequenceEditor.Subtitles.Count - 1 do
-        SequenceEditor.Subtitles[j].Text := GetRandomString;
+        SequenceEditor.Subtitles[j].Text := GetRandomString(90);
 
       SequenceEditor.Save;
       Application.ProcessMessages;

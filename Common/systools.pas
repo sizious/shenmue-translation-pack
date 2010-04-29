@@ -22,6 +22,7 @@ function GetApplicationDirectory: TFileName;
 function GetApplicationInstancesCount: Integer;
 function GetApplicationDataDirectory: TFileName;
 function GetFileSize(const FileName: TFileName): Int64;
+function GetRandomString(const StringMaxLength: Integer): string;
 function GetTempDir: TFileName;
 function GetTempFileName: TFileName;
 function HexToInt(Hex: string): Integer;
@@ -36,6 +37,7 @@ function StringArraySequentialSearch(Source: array of string;
 function Left(SubStr: string; S: string): string;
 function Right(SubStr: string; S: string): string;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
+procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
 
 //------------------------------------------------------------------------------
 implementation
@@ -44,11 +46,10 @@ implementation
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  TlHelp32, Forms;
+  TlHelp32, Forms, Math;
   
 const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
-
   DATA_BASEDIR        = 'data';
 
 //------------------------------------------------------------------------------
@@ -451,6 +452,48 @@ begin
   if not DirectoryExists(Result) then
     raise EDataDirectoryNotFound.Create('GetApplicationDataDirectory: '
       + 'Sorry, the data directory wasn''t found ("' + Result + '") !');
+end;
+
+//------------------------------------------------------------------------------
+
+procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
+const
+  MAX_BUFFER_SIZE = 32;
+
+var
+  Buffer: array[0..MAX_BUFFER_SIZE - 1] of Byte;
+  MissingBlocks, BlockSize: LongWord;
+
+begin
+  MissingBlocks := Size;
+  ZeroMemory(@Buffer, SizeOf(Buffer));
+
+  while MissingBlocks <> 0 do begin
+    // Calculating BlockSize
+    BlockSize := (MissingBlocks mod SizeOf(Buffer));
+    if BlockSize = 0 then
+      BlockSize := SizeOf(Buffer);
+    Dec(MissingBlocks, BlockSize);
+
+    // Writing the Block
+    F.Write(Buffer, BlockSize);
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetRandomString(const StringMaxLength: Integer): string;
+const
+  ALPHA_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+var
+  x: Integer;
+
+begin
+  Result := '';
+  for x := 0 to Random(StringMaxLength) do begin
+    Result := Result + ALPHA_CHARS[Random(Length(ALPHA_CHARS)) + 1];
+  end;
 end;
 
 //------------------------------------------------------------------------------

@@ -81,7 +81,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 327
   end
   object tbMain: TJvToolBar
     Left = 0

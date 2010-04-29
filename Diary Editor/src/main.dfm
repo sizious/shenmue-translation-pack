@@ -1,9 +1,11 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = '## DIARY EDITOR ## // Generated Title'
-  ClientHeight = 467
-  ClientWidth = 604
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = '< Generated Title > // Diary Editor'
+  ClientHeight = 323
+  ClientWidth = 499
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,18 +20,18 @@ object frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object bPrev: TButton
-    Left = 14
-    Top = 284
-    Width = 110
+    Left = 8
+    Top = 273
+    Width = 87
     Height = 25
     Caption = '< Prev'
     TabOrder = 0
     OnClick = bPrevClick
   end
   object bNext: TButton
-    Left = 476
-    Top = 284
-    Width = 110
+    Left = 406
+    Top = 273
+    Width = 87
     Height = 25
     Caption = 'Next >'
     TabOrder = 1
@@ -38,7 +40,7 @@ object frmMain: TfrmMain
   object tbMain: TJvToolBar
     Left = 0
     Top = 0
-    Width = 604
+    Width = 499
     Height = 26
     DisabledImages = ilToolBarDisabled
     EdgeBorders = [ebTop]
@@ -121,8 +123,8 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 448
-    Width = 604
+    Top = 304
+    Width = 499
     Height = 19
     Panels = <
       item
@@ -139,26 +141,26 @@ object frmMain: TfrmMain
       end>
   end
   object ePageNumber: TEdit
-    Left = 14
-    Top = 44
+    Left = 7
+    Top = 33
     Width = 49
     Height = 21
     TabOrder = 4
-    Text = '2'
+    Text = '0'
   end
-  object Button1: TButton
-    Left = 65
-    Top = 43
+  object bGo: TButton
+    Left = 58
+    Top = 32
     Width = 36
     Height = 23
     Caption = 'Go'
     TabOrder = 5
-    OnClick = Button1Click
+    OnClick = bGoClick
   end
   object mOriginalLeft: TMemo
-    Left = 14
-    Top = 68
-    Width = 283
+    Left = 7
+    Top = 57
+    Width = 240
     Height = 87
     Color = clBtnFace
     Lines.Strings = (
@@ -173,49 +175,49 @@ object frmMain: TfrmMain
     WordWrap = False
   end
   object eLeft0: TEdit
-    Left = 14
-    Top = 161
-    Width = 283
+    Left = 7
+    Top = 150
+    Width = 240
     Height = 21
     TabOrder = 7
     Text = '(Left Line 0)'
   end
   object eLeft1: TEdit
-    Left = 14
-    Top = 185
-    Width = 283
+    Left = 7
+    Top = 174
+    Width = 240
     Height = 21
     TabOrder = 8
     Text = '(Left Line 1)'
   end
   object eLeft2: TEdit
-    Left = 14
-    Top = 209
-    Width = 283
+    Left = 7
+    Top = 198
+    Width = 240
     Height = 21
     TabOrder = 9
     Text = '(Left Line 2)'
   end
   object eLeft3: TEdit
-    Left = 14
-    Top = 233
-    Width = 283
+    Left = 7
+    Top = 222
+    Width = 240
     Height = 21
     TabOrder = 10
     Text = '(Left Line 3)'
   end
   object eLeft4: TEdit
-    Left = 14
-    Top = 257
-    Width = 283
+    Left = 7
+    Top = 246
+    Width = 240
     Height = 21
     TabOrder = 11
     Text = '(Left Line 4)'
   end
   object mOriginalRight: TMemo
-    Left = 303
-    Top = 68
-    Width = 283
+    Left = 253
+    Top = 57
+    Width = 240
     Height = 87
     Color = clBtnFace
     Lines.Strings = (
@@ -225,63 +227,91 @@ object frmMain: TfrmMain
     WordWrap = False
   end
   object eRight0: TEdit
-    Left = 303
-    Top = 161
-    Width = 283
+    Left = 253
+    Top = 150
+    Width = 240
     Height = 21
     TabOrder = 13
     Text = '(Right Line 0)'
   end
   object eRight1: TEdit
-    Left = 303
-    Top = 185
-    Width = 283
+    Left = 253
+    Top = 174
+    Width = 240
     Height = 21
     TabOrder = 14
     Text = '(Right Line 1)'
   end
   object eRight2: TEdit
-    Left = 303
-    Top = 209
-    Width = 283
+    Left = 253
+    Top = 198
+    Width = 240
     Height = 21
     TabOrder = 15
     Text = '(Right Line 2)'
   end
   object eRight3: TEdit
-    Left = 303
-    Top = 233
-    Width = 283
+    Left = 253
+    Top = 222
+    Width = 240
     Height = 21
     TabOrder = 16
     Text = '(Right Line 3)'
   end
   object eRight4: TEdit
-    Left = 303
-    Top = 257
-    Width = 283
+    Left = 253
+    Top = 246
+    Width = 240
     Height = 21
     TabOrder = 17
     Text = '(Right Line 4)'
   end
-  object eRightPageNumber: TEdit
-    Left = 537
-    Top = 44
+  object eRightPageNumber: TJvEdit
+    Left = 444
+    Top = 33
     Width = 49
     Height = 21
+    Alignment = taRightJustify
     Color = clBtnFace
     ReadOnly = True
     TabOrder = 18
-    Text = '2'
+    Text = '0'
+  end
+  object bFirst: TButton
+    Left = 98
+    Top = 273
+    Width = 87
+    Height = 25
+    Caption = '<< First'
+    TabOrder = 19
+    OnClick = bFirstClick
+  end
+  object bLast: TButton
+    Left = 316
+    Top = 273
+    Width = 87
+    Height = 25
+    Caption = 'Last >>'
+    TabOrder = 20
+    OnClick = bLastClick
   end
   object mmMain: TMainMenu
     Left = 328
     Top = 65532
     object miFile: TMenuItem
-      Caption = 'miFile'
+      Caption = '&File'
       object miOpen: TMenuItem
-        Caption = 'miOpen'
+        Caption = '&Open...'
+        ShortCut = 16463
         OnClick = miOpenClick
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Quit1: TMenuItem
+        Caption = '&Quit'
+        ShortCut = 16465
+        OnClick = Quit1Click
       end
     end
     object miDEBUG_TEST: TMenuItem
@@ -289,6 +319,10 @@ object frmMain: TfrmMain
       object miDEBUG_TEST1: TMenuItem
         Caption = 'DiaryEditor TEST'
         OnClick = miDEBUG_TEST1Click
+      end
+      object miDEBUG_TEST2: TMenuItem
+        Caption = 'STRONG TEST'
+        OnClick = miDEBUG_TEST2Click
       end
     end
   end

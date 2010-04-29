@@ -9,8 +9,8 @@ uses
   strdeps in 'engine\strdeps.pas',
   uitools in '..\..\Common\uitools.pas',
   systools in '..\..\Common\systools.pas',
-  common in 'engine\common.pas',
-  chrutils in '..\..\Common\SubsUtil\chrutils.pas';
+  chrutils in '..\..\Common\SubsUtil\chrutils.pas',
+  common in 'common.pas';
 
 {$R *.res}
 
