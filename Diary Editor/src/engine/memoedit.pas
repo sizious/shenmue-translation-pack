@@ -24,6 +24,7 @@ type
     fPageIndex: Integer;
     fAllowStringWrite: Boolean;
     fNewStringOffset: LongWord;
+    fFlagCode: Word;
     function GetEditor: TDiaryEditor;
     procedure SetText(const Value: string);
     procedure SetNewStringOffset(const Value: LongWord);
@@ -39,7 +40,8 @@ type
     property PageIndex: Integer read fPageIndex;
     property StringPointerOffset: LongWord read fStringPointerOffset;
     property StringOffset: LongWord read fStringOffset;
-    property Text: string read fText write SetText;    
+    property Text: string read fText write SetText;
+    property FlagCode: Word read fFlagCode write fFlagCode;
     property Owner: TDiaryEditorMessagesList read fOwner;
   end;
 
@@ -90,6 +92,7 @@ type
     destructor Destroy; override;
     procedure ExportToCSV(const FileName: TFileName);
     procedure ExportToFile(const FileName: TFileName);
+    function ImportFromFile(const FileName: TFileName): Boolean;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TDiaryEditorPagesListItem
       read GetItem; default;
@@ -111,7 +114,7 @@ type
     fMakeBackup: Boolean;
   protected
     procedure AddEntry(var Input: TFileStream; const StrPointerOffset,
-      StrOffset: LongWord; const PageNumber: Integer);
+      StrOffset: LongWord; const PageNumber: Integer; const FlagCode: Word);
     procedure Clear;
     procedure WriteTempUpdatedSections(var InStream: TFileStream;
       const MEMOFileName, RUBIFileName, MSTRFileName: TFileName);
@@ -124,7 +127,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function LoadFromFile(const FileName: TFileName): Boolean;
+    function LoadFromFile(const DataFileName, FlagFileName: TFileName): Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
     property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
     property Loaded: Boolean read fFileLoaded;
@@ -136,19 +139,21 @@ type
 implementation
 
 uses
-  Common, SysTools, ChrUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
+  Common, SysTools, ChrUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX,
+  Variants;
 
 const
   MSTR_SIGN = 'MSTR';
   MEMO_SIGN = 'MEMO';
   RUBI_SIGN = 'RUBI';
+  ENCODED_STRING_TAG = '\e';
   EMPTY_STRING_OFFSET_VALUE = $FFFFFFFF;
   MSTR_PADDING_SIZE = 8;
   
 { TDiaryEditor }
 
 procedure TDiaryEditor.AddEntry(var Input: TFileStream; const StrPointerOffset,
-  StrOffset: LongWord; const PageNumber: Integer);
+  StrOffset: LongWord; const PageNumber: Integer; const FlagCode: Word);
 var
   SavedPosition: Int64;
   NewMsgItem: TDiaryEditorMessagesListItem;
@@ -173,6 +178,7 @@ begin
   NewMsgItem.fPageIndex := PageNumber;
   NewMsgItem.fAllowStringWrite := NewMsgItem.fEditable;
   NewMsgItem.fNewStringOffset := EMPTY_STRING_OFFSET_VALUE; // updated when SaveToFile is called
+  NewMsgItem.fFlagCode := FlagCode;
 
 {$IFDEF DEBUG}
   StringAbsoluteOffset := 0;
@@ -225,25 +231,29 @@ begin
   inherited;
 end;
 
-function TDiaryEditor.LoadFromFile(const FileName: TFileName): Boolean;
+function TDiaryEditor.LoadFromFile(const DataFileName,
+  FlagFileName: TFileName): Boolean;
 const
   MAX_LINE_PER_PAGE = 5;
 
 var
-  Input: TFileStream;
-  MaxPosition, PageNumber, EntryCount: Integer;
+  DataInput, FlagInput: TFileStream;
+//  MaxPosition,
+  PageNumber, EntryCount: Integer;
   StrPointerOffset, StrOffset: LongWord;
   Section: TFileSectionsListItem;
-
+  TimeCode: Word;
+  
 begin
   Result := False;
-  if not FileExists(FileName) then Exit;
+  if (not FileExists(DataFileName)) or (not FileExists(FlagFileName)) then Exit;
 
   // Try to parse the MEMODATA.BIN file
-  Input := TFileStream.Create(FileName, fmOpenRead);
+  DataInput := TFileStream.Create(DataFileName, fmOpenRead);
+  FlagInput := TFileStream.Create(FlagFileName, fmOpenRead);
   try
     // Parsing the file
-    ParseFileSections(Input, fSections);
+    ParseFileSections(DataInput, fSections);
 
     // Initializing StartMessagesOffset
     fSectionIndexMSTR := Sections.IndexOf(MSTR_SIGN); // MSTR is the section containing the strings
@@ -260,46 +270,57 @@ begin
     // The file to be valid must be contains MEMO, RUBI and MSTR sections
     fFileLoaded := (SectionIndexMEMO <> -1) and (SectionIndexRUBI <> -1)
       and (SectionIndexMSTR <> -1);
+    EntryCount := 0;
 
     // Analyzing MEMO and MSTR sections
     if Loaded then begin
       // Clearing the object
       Clear;
-      fSourceFileName := FileName;
+      fSourceFileName := DataFileName;
 
       // Getting the RUBI starting address in the MSTR section
       Section := Sections[SectionIndexRUBI];
-      Input.Seek(Section.Offset + SizeOf(TSectionEntry), soFromBeginning);
+      DataInput.Seek(Section.Offset + SizeOf(TSectionEntry), soFromBeginning);
       repeat
-        Input.Read(fRUBIStringStartOffset, UINT32_SIZE);
+        DataInput.Read(fRUBIStringStartOffset, UINT32_SIZE);
       until fRUBIStringStartOffset <> EMPTY_STRING_OFFSET_VALUE;
 
       // Getting the max position
-      Section := Sections[SectionIndexMEMO];
-      MaxPosition := Section.Offset + Section.Size;
+//      Section := Sections[SectionIndexMEMO];
+//      MaxPosition := Section.Offset + Section.Size;
 
       // Seek 'MEMO' header
-      Input.Seek(SizeOf(TSectionEntry), soFromBeginning);
+      DataInput.Seek(SizeOf(TSectionEntry), soFromBeginning);
 
       // Read each string list
       PageNumber := 0;
-      EntryCount := 0;
       repeat
+        // Read the String Offset value from MEMODATA.BIN
+        StrPointerOffset := DataInput.Position;
+        DataInput.Read(StrOffset, 4);
 
-        StrPointerOffset := Input.Position;
-        Input.Read(StrOffset, 4);
+        // Read the Time Code value from MEMOFLG.BIN
+        FlagInput.Read(TimeCode, UINT16_SIZE);
 
-        AddEntry(Input, StrPointerOffset, StrOffset, PageNumber);
+        // Adding the entry
+        AddEntry(DataInput, StrPointerOffset, StrOffset, PageNumber, TimeCode);
 
         Inc(EntryCount);
         if (EntryCount mod MAX_LINE_PER_PAGE) = 0 then
           Inc(PageNumber);
 
-      until Input.Position >= MaxPosition;
+//      until DataInput.Position >= MaxPosition;
+      until FlagInput.Position >= FlagInput.Size;
     end; // Loaded
 
+{$IFDEF DEBUG}
+    WriteLn(sLineBreak, '*** END ***', sLineBreak,
+      'Pages Count: ', Pages.Count, ', Messages Count: ', EntryCount);
+{$ENDIF}
+
   finally
-    Input.Free;
+    DataInput.Free;
+    FlagInput.Free;
   end;
 end;
 
@@ -309,6 +330,7 @@ var
   i: Integer;
   InStream, OutStream: TFileStream;
 
+  // WriteUpdatedSection
   function WriteUpdatedSection(const SectionName: TFileName): Boolean;
   var
     FName: TFileName;
@@ -350,6 +372,7 @@ var
     end; // Result
   end; // function
 
+// SaveToFile Main
 begin
   Result := False;
   if not Loaded then Exit;
@@ -582,27 +605,59 @@ end;
 
 procedure TDiaryEditorPagesList.ExportToFile(const FileName: TFileName);
 var
-  XMLDoc: IXMLDocument;
+  XMLDocument: IXMLDocument;
   p, m: Integer;
-
+  PageNode, MessageNode: IXMLNode;
+  
 begin
-  XMLDoc := TXMLDocument.Create(nil);
-
-  // Setting XMLDocument properties
-  with XMLDoc do begin
-    Options := [doNodeAutoCreate];
-    ParseOptions:= [];
-    NodeIndentStr:= '  ';
-    Active := True;
-    Version := '1.0';
-    Encoding := 'ISO-8859-1';
-  end;
-
-  // Navigating in the list...
-  for p := 0 to Count - 1 do
-    for m := 0 to Items[p].Messages.Count - 1 do begin
-      Items[p].Messages[m].Text  ___ 
+  XMLDocument := TXMLDocument.Create(nil);
+  try
+    // Setting XMLDocument properties
+    with XMLDocument do begin
+      Options := [doNodeAutoCreate];
+      ParseOptions:= [];
+      NodeIndentStr:= '  ';
+      Active := True;
+      Version := '1.0';
+      Encoding := 'utf-8';
     end;
+
+    // Creating root
+    XMLDocument.DocumentElement := XMLDocument.CreateNode('DiaryExport');
+
+    // Navigating in the list...
+    for p := 0 to Count - 1 do begin
+
+      // Initializing the PageNode
+      PageNode := XMLDocument.CreateNode('Page');
+      PageNode.Attributes['Index'] := p;
+
+      // Get all Messages for this Page
+      for m := 0 to Items[p].Messages.Count - 1 do begin
+        // Creating the new item
+        MessageNode := XMLDocument.CreateNode('Message');
+        MessageNode.Attributes['Index'] := m;
+
+        // If editable, then add the MessageText to the XML file
+        if Items[p].Messages[m].Editable then begin
+          MessageNode.NodeValue := Items[p].Messages[m].Text;
+
+          // Adding to the tree
+          PageNode.ChildNodes.Add(MessageNode);
+        end;
+      end;
+
+      // Adding the Page node
+      if PageNode.ChildNodes.Count > 0 then
+        XMLDocument.DocumentElement.ChildNodes.Add(PageNode);
+
+    end;
+
+    XMLDocument.SaveToFile(FileName);
+  finally
+    XMLDocument.Active := False;
+    XMLDocument := nil;
+  end;
 end;
 
 function TDiaryEditorPagesList.GetCount: Integer;
@@ -634,6 +689,71 @@ begin
       Result := TDiaryEditorPagesListItem.Create(Self);
       fItemsList.Add(Result);
     end;
+  end;
+end;
+
+function TDiaryEditorPagesList.ImportFromFile(
+  const FileName: TFileName): Boolean;
+var
+  XMLDocument: IXMLDocument;
+  i, p, m: Integer;
+  PageNode, MessageNode: IXMLNode;
+  MessageText: string;
+  
+begin
+  Result := False;
+  if not FileExists(FileName) then Exit;
+
+  XMLDocument := TXMLDocument.Create(nil);
+  try
+    try
+      // Setting XMLDocument properties
+      with XMLDocument do begin
+        Options := [doNodeAutoCreate];
+        ParseOptions:= [];
+        NodeIndentStr:= '  ';
+        Active := True;
+        Version := '1.0';
+        Encoding := 'utf-8';
+      end;
+
+      // Loading file
+      XMLDocument.LoadFromFile(FileName);
+      
+      // Checking root
+      if XMLDocument.DocumentElement.NodeName <> 'DiaryExport' then Exit;
+
+      // Navigating in the XML Tree...
+      PageNode := XMLDocument.DocumentElement.ChildNodes.First;
+      repeat
+
+        // Read the Messages from this Page
+        for i := 0 to PageNode.ChildNodes.Count - 1 do begin
+          MessageNode := PageNode.ChildNodes[i];
+
+          // Setting PageIndex (p) and MessageIndex (m)
+          p := PageNode.Attributes['Index'];
+          m := MessageNode.Attributes['Index'];
+
+          // Retrieving the Message.Text
+          MessageText := '';
+          if not VarIsNull(MessageNode.NodeValue) then
+            MessageText := MessageNode.NodeValue;
+
+          // Setting the read message text
+          Items[p].Messages[m].Text := MessageText;
+        end;
+
+        // Go the next page
+        PageNode := PageNode.NextSibling;
+      until not Assigned(PageNode);
+
+    except
+      Result := False;
+    end;
+  finally
+    XMLDocument.Active := False;
+    XMLDocument := nil;
   end;
 end;
 

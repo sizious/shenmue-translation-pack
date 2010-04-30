@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, MemoEdit, Menus, ImgList, ComCtrls, ToolWin, JvExComCtrls,
-  JvToolBar, JvEdit, JvExStdCtrls;
+  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls;
 
 type
   TPagePosition = (ptLeft, ptRight);
@@ -53,6 +53,25 @@ type
     bFirst: TButton;
     bLast: TButton;
     miDEBUG_TEST2: TMenuItem;
+    sdSave: TSaveDialog;
+    odOpen: TOpenDialog;
+    aeMain: TApplicationEvents;
+    miExport: TMenuItem;
+    N2: TMenuItem;
+    miDEBUG_TEST3: TMenuItem;
+    eLeftCode0: TEdit;
+    eLeftCode1: TEdit;
+    eLeftCode2: TEdit;
+    eLeftCode3: TEdit;
+    eLeftCode4: TEdit;
+    eRightCode0: TEdit;
+    eRightCode1: TEdit;
+    eRightCode2: TEdit;
+    eRightCode3: TEdit;
+    eRightCode4: TEdit;
+    Label1: TLabel;
+    bvlBottom: TBevel;
+    Label2: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure bNextClick(Sender: TObject);
@@ -66,6 +85,9 @@ type
     procedure bFirstClick(Sender: TObject);
     procedure bLastClick(Sender: TObject);
     procedure miDEBUG_TEST2Click(Sender: TObject);
+    procedure miExportClick(Sender: TObject);
+    procedure miDEBUG_TEST3Click(Sender: TObject);
+    procedure ePageNumberKeyPress(Sender: TObject; var Key: Char);
   private
     fPageNumber: Integer;
     fFileModified: Boolean;
@@ -73,8 +95,9 @@ type
     procedure ClearEdits(PageType: TPagePosition);
     procedure FreeModules;
     procedure InitModules;
+    procedure InitUI;
     function GetLineEdit(Page: TPagePosition; const LineIndex: Integer;
-      var EditCtrl: TEdit): Boolean;
+      var LineEditCtrl, TimeCodeEditCtrl: TEdit): Boolean;
     function GetOriginalTextMemo(Page: TPagePosition): TMemo;
     procedure SetPageNumber(const Value: Integer);
     function GetStatusText: string;
@@ -102,7 +125,7 @@ uses
   
 procedure TfrmMain.bGoClick(Sender: TObject);
 begin
-  PageNumber := StrToIntDef(ePageNumber.Text, 0);
+  PageNumber := StrToIntDef(ePageNumber.Text, PageNumber);
 end;
 
 procedure TfrmMain.bPrevClick(Sender: TObject);
@@ -137,22 +160,31 @@ end;
 procedure TfrmMain.ClearEdits(PageType: TPagePosition);
 var
   i: Integer;
-  EditCtrl: TEdit;
+  LineEditCtrl, TimeCodeLineCtrl: TEdit;
 
 begin
   for i := 0 to 4 do begin
-    if GetLineEdit(PageType, i, EditCtrl) then begin
-      ChangeEditEnabledState(EditCtrl, False);
-      EditCtrl.Text := '';
+    if GetLineEdit(PageType, i, LineEditCtrl, TimeCodeLineCtrl) then begin
+      ChangeEditEnabledState(LineEditCtrl, False);
+      ChangeEditEnabledState(TimeCodeLineCtrl, False);
+      LineEditCtrl.Text := '';
+      TimeCodeLineCtrl.Text := '';
     end;
   end;
   GetOriginalTextMemo(PageType).Clear;
 end;
 
+procedure TfrmMain.ePageNumberKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_RETURN) then begin
+    bGo.Click;
+    Key := #0;
+  end;
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  Caption := Application.Title + ' v' + '0.0';
-  MakeNumericOnly(ePageNumber.Handle);
+  InitUI;
 
   InitModules;
 
@@ -170,23 +202,24 @@ begin
 end;
 
 function TfrmMain.GetLineEdit(Page: TPagePosition;
-  const LineIndex: Integer; var EditCtrl: TEdit): Boolean;
+  const LineIndex: Integer; var LineEditCtrl, TimeCodeEditCtrl: TEdit): Boolean;
 var
-  EditName: string;
+  PagePos, LineEditName, TimeCodeEditName: string;
 
 begin
   // Build the TEdit.Name
   case Page of
-    ptLeft:
-      EditName := 'eLeft';
-    ptRight:
-      EditName := 'eRight';
+    ptLeft  : PagePos := 'eLeft';
+    ptRight : PagePos := 'eRight';
   end;
-  EditName := EditName + IntToStr(LineIndex);
+  LineEditName := PagePos + IntToStr(LineIndex);
+  TimeCodeEditName := PagePos + 'Code' + IntToStr(LineIndex);
 
-  // Search the Edit on the Form
-  EditCtrl := FindComponent(EditName) as TEdit;
-  Result := Assigned(EditCtrl);
+  // Search the Edits on the Form
+  LineEditCtrl := FindComponent(LineEditName) as TEdit;
+  TimeCodeEditCtrl := FindComponent(TimeCodeEditName) as TEdit;
+  
+  Result := Assigned(LineEditCtrl) and Assigned(TimeCodeEditCtrl);
 end;
 
 function TfrmMain.GetOriginalTextMemo(Page: TPagePosition): TMemo;
@@ -208,10 +241,32 @@ begin
   DiaryEditor := TDiaryEditor.Create;
 end;
 
+procedure TfrmMain.InitUI;
+
+  procedure InitTimeCodeEdits(PagePosition: TPagePosition);
+  var
+    i: Integer;
+    Null, EditCtrl: TEdit;
+
+  begin
+    for i := 0 to 4 do
+      if GetLineEdit(PagePosition, i, Null, EditCtrl) then
+        MakeNumericOnly(EditCtrl.Handle);
+  end;
+
+begin
+  Caption := Application.Title + ' v' + '0.0';
+  MakeNumericOnly(ePageNumber.Handle);
+
+  // Init TimeCode edits
+  InitTimeCodeEdits(ptLeft);
+  InitTimeCodeEdits(ptRight);
+end;
+
 function TfrmMain.LoadPage(const LeftPageIndex: Integer): Boolean;
 var
   RightPageIndex: Integer;
-  EditCtrl: TEdit;
+  LineEditCtrl, TimeCodeEditCtrl: TEdit;
 
   function LoadSinglePage(const PageIndex: Integer; Page: TPagePosition): Boolean;
   var
@@ -221,7 +276,7 @@ var
 
   begin
     Result := False;
-    
+
     // Retrieving messages
     Messages := nil;
     if (PageIndex >= 0) and (PageIndex < DiaryEditor.Pages.Count) then
@@ -237,10 +292,12 @@ var
       for i := 0 to Messages.Count - 1 do begin
         MemoCtrl.Lines.Add(Messages[i].Text);
 
-        if GetLineEdit(Page, i, EditCtrl) then
+        if GetLineEdit(Page, i, LineEditCtrl, TimeCodeEditCtrl) then
           if Messages[i].Editable then begin
-            EditCtrl.Text := Messages[i].Text;
-            ChangeEditEnabledState(EditCtrl, True);
+            LineEditCtrl.Text := Messages[i].Text;
+            TimeCodeEditCtrl.Text := IntToStr(Messages[i].FlagCode);
+            ChangeEditEnabledState(LineEditCtrl, True);
+            ChangeEditEnabledState(TimeCodeEditCtrl, True);
           end;
 
       end; // for
@@ -265,7 +322,7 @@ end;
 procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
 {$IFDEF DEBUG}
 begin
-  DiaryEditor.LoadFromFile('memodata.bin');
+  DiaryEditor.LoadFromFile('memodata.bin', 'memoflg.bin');
 //  DiaryEditor.Pages[2].Messages[0].Text := '@55555\eוצותותותותותותותז£!';
   DiaryEditor.Pages[269].Messages[0].Text := 'K-OTIC!!!!';
   DiaryEditor.SaveToFile('BLAh.bin');
@@ -283,7 +340,9 @@ var
 
 begin
 
-  DiaryEditor.LoadFromFile('MEMODATA.BIN');
+  // 1st phase
+  DiaryEditor.LoadFromFile('MEMODATA.BIN', 'MEMOFLG.BIN');
+  DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
 
   for p := 0 to DiaryEditor.Pages.Count - 1 do
     for m := 0 to DiaryEditor.Pages[p].Messages.Count - 1 do begin
@@ -294,14 +353,49 @@ begin
 
   DiaryEditor.SaveToFile('STRONG.BIN');
 
+  // 2nd phase
+  DiaryEditor.LoadFromFile('STRONG.BIN', 'MEMOFLG.BIN');
+  DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
+  DiaryEditor.SaveToFile('STRONG.NEW');
+
 {$ELSE}
 begin
 {$ENDIF}
 end;
 
+procedure TfrmMain.miDEBUG_TEST3Click(Sender: TObject);
+{$IFDEF DEBUG}
+
+  procedure _exp(const Extension: TFileName);
+  begin
+    DiaryEditor.LoadFromFile('MEMODATA.' + Extension, 'MEMOFLG.' + Extension);
+    DiaryEditor.Pages.ExportToCSV(
+      'MSTR' + ExtractFileExt(DiaryEditor.SourceFileName) + '.CSV'
+    );
+  end;
+
+begin
+  _exp('ENG');
+  _exp('FRE');
+  _exp('GER');
+  _exp('SPA');
+  _exp('XB');
+  _exp('XBD');
+
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miExportClick(Sender: TObject);
+begin
+  DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
+  DiaryEditor.Pages.ExportToCSV('MEMODATA.CSV');
+end;
+
 procedure TfrmMain.miOpenClick(Sender: TObject);
 begin
-  DiaryEditor.LoadFromFile('MEMODATA.BIN');
+  DiaryEditor.LoadFromFile('MEMODATA.BIN', 'MEMOFLG.BIN');
   PageNumber := 0;
 end;
 
@@ -322,6 +416,7 @@ end;
 procedure TfrmMain.SetPageNumber(const Value: Integer);
 var
   OldValue: Integer;
+  RightPageIndex: Integer;
 
 begin
   OldValue := fPageNumber;          
@@ -336,16 +431,17 @@ begin
     fPageNumber := OldValue;
     LoadPage(OldValue);
   end;
+  RightPageIndex := fPageNumber + 1;
 
   // Update UI
   bGo.Enabled := DiaryEditor.Loaded;
   ePageNumber.Enabled := DiaryEditor.Loaded;
   bPrev.Enabled := (fPageNumber > 0) and DiaryEditor.Loaded;
-  bNext.Enabled := (fPageNumber < DiaryEditor.Pages.Count - 1) and DiaryEditor.Loaded;
+  bNext.Enabled := (RightPageIndex < DiaryEditor.Pages.Count - 1) and DiaryEditor.Loaded;
   bLast.Enabled := bNext.Enabled;
   bFirst.Enabled := bPrev.Enabled;
   ePageNumber.Text := IntToStr(fPageNumber);
-  eRightPageNumber.Text := IntToStr(fPageNumber + 1);
+  eRightPageNumber.Text := IntToStr(RightPageIndex);
 end;
 
 procedure TfrmMain.SetStatusText(const Value: string);

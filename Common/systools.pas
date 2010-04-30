@@ -6,6 +6,7 @@ uses
   Windows, SysUtils, Classes;
 
 const
+  UINT16_SIZE = 2;
   UINT32_SIZE = 4;
 
 type
