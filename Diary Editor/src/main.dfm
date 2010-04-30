@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = '< Generated Title > // Diary Editor'
-  ClientHeight = 323
+  ClientHeight = 338
   ClientWidth = 499
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,6 +12,7 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Menu = mmMain
   OldCreateOrder = False
   Position = poScreenCenter
@@ -19,19 +20,43 @@ object frmMain: TfrmMain
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
+  object Label1: TLabel
+    Left = 461
+    Top = 268
+    Width = 33
+    Height = 13
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'ID'
+  end
+  object bvlBottom: TBevel
+    Left = 4
+    Top = 285
+    Width = 490
+    Height = 2
+  end
+  object Label2: TLabel
+    Left = 5
+    Top = 268
+    Width = 33
+    Height = 13
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'ID'
+  end
   object bPrev: TButton
-    Left = 8
-    Top = 273
-    Width = 87
+    Left = 4
+    Top = 290
+    Width = 60
     Height = 25
     Caption = '< Prev'
     TabOrder = 0
     OnClick = bPrevClick
   end
   object bNext: TButton
-    Left = 406
-    Top = 273
-    Width = 87
+    Left = 433
+    Top = 289
+    Width = 60
     Height = 25
     Caption = 'Next >'
     TabOrder = 1
@@ -123,7 +148,7 @@ object frmMain: TfrmMain
   end
   object sbMain: TStatusBar
     Left = 0
-    Top = 304
+    Top = 319
     Width = 499
     Height = 19
     Panels = <
@@ -139,18 +164,20 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
+    ExplicitTop = 304
   end
   object ePageNumber: TEdit
-    Left = 7
-    Top = 33
+    Left = 5
+    Top = 32
     Width = 49
     Height = 21
     TabOrder = 4
     Text = '0'
+    OnKeyPress = ePageNumberKeyPress
   end
   object bGo: TButton
-    Left = 58
-    Top = 32
+    Left = 59
+    Top = 31
     Width = 36
     Height = 23
     Caption = 'Go'
@@ -158,9 +185,9 @@ object frmMain: TfrmMain
     OnClick = bGoClick
   end
   object mOriginalLeft: TMemo
-    Left = 7
+    Left = 5
     Top = 57
-    Width = 240
+    Width = 241
     Height = 87
     Color = clBtnFace
     Lines.Strings = (
@@ -175,47 +202,47 @@ object frmMain: TfrmMain
     WordWrap = False
   end
   object eLeft0: TEdit
-    Left = 7
+    Left = 43
     Top = 150
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 7
     Text = '(Left Line 0)'
   end
   object eLeft1: TEdit
-    Left = 7
+    Left = 43
     Top = 174
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 8
     Text = '(Left Line 1)'
   end
   object eLeft2: TEdit
-    Left = 7
+    Left = 43
     Top = 198
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 9
     Text = '(Left Line 2)'
   end
   object eLeft3: TEdit
-    Left = 7
+    Left = 43
     Top = 222
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 10
     Text = '(Left Line 3)'
   end
   object eLeft4: TEdit
-    Left = 7
+    Left = 43
     Top = 246
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 11
     Text = '(Left Line 4)'
   end
   object mOriginalRight: TMemo
-    Left = 253
+    Left = 252
     Top = 57
     Width = 240
     Height = 87
@@ -227,48 +254,48 @@ object frmMain: TfrmMain
     WordWrap = False
   end
   object eRight0: TEdit
-    Left = 253
+    Left = 252
     Top = 150
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 13
     Text = '(Right Line 0)'
   end
   object eRight1: TEdit
-    Left = 253
+    Left = 252
     Top = 174
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 14
     Text = '(Right Line 1)'
   end
   object eRight2: TEdit
-    Left = 253
+    Left = 252
     Top = 198
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 15
     Text = '(Right Line 2)'
   end
   object eRight3: TEdit
-    Left = 253
+    Left = 252
     Top = 222
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 16
     Text = '(Right Line 3)'
   end
   object eRight4: TEdit
-    Left = 253
+    Left = 252
     Top = 246
-    Width = 240
+    Width = 203
     Height = 21
     TabOrder = 17
     Text = '(Right Line 4)'
   end
   object eRightPageNumber: TJvEdit
-    Left = 444
-    Top = 33
+    Left = 442
+    Top = 32
     Width = 49
     Height = 21
     Alignment = taRightJustify
@@ -278,26 +305,106 @@ object frmMain: TfrmMain
     Text = '0'
   end
   object bFirst: TButton
-    Left = 98
-    Top = 273
-    Width = 87
+    Left = 65
+    Top = 290
+    Width = 60
     Height = 25
     Caption = '<< First'
     TabOrder = 19
     OnClick = bFirstClick
   end
   object bLast: TButton
-    Left = 316
-    Top = 273
-    Width = 87
+    Left = 371
+    Top = 289
+    Width = 60
     Height = 25
     Caption = 'Last >>'
     TabOrder = 20
     OnClick = bLastClick
   end
+  object eLeftCode0: TEdit
+    Left = 5
+    Top = 150
+    Width = 33
+    Height = 21
+    TabOrder = 21
+    Text = '9999'
+  end
+  object eLeftCode1: TEdit
+    Left = 5
+    Top = 174
+    Width = 33
+    Height = 21
+    TabOrder = 22
+    Text = '9999'
+  end
+  object eLeftCode2: TEdit
+    Left = 5
+    Top = 198
+    Width = 33
+    Height = 21
+    TabOrder = 23
+    Text = '9999'
+  end
+  object eLeftCode3: TEdit
+    Left = 5
+    Top = 222
+    Width = 33
+    Height = 21
+    TabOrder = 24
+    Text = '9999'
+  end
+  object eLeftCode4: TEdit
+    Left = 5
+    Top = 246
+    Width = 33
+    Height = 21
+    TabOrder = 25
+    Text = '9999'
+  end
+  object eRightCode0: TEdit
+    Left = 461
+    Top = 150
+    Width = 33
+    Height = 21
+    TabOrder = 26
+    Text = '9999'
+  end
+  object eRightCode1: TEdit
+    Left = 461
+    Top = 174
+    Width = 33
+    Height = 21
+    TabOrder = 27
+    Text = '9999'
+  end
+  object eRightCode2: TEdit
+    Left = 461
+    Top = 198
+    Width = 33
+    Height = 21
+    TabOrder = 28
+    Text = '9999'
+  end
+  object eRightCode3: TEdit
+    Left = 461
+    Top = 222
+    Width = 33
+    Height = 21
+    TabOrder = 29
+    Text = '9999'
+  end
+  object eRightCode4: TEdit
+    Left = 461
+    Top = 246
+    Width = 33
+    Height = 21
+    TabOrder = 30
+    Text = '9999'
+  end
   object mmMain: TMainMenu
-    Left = 328
-    Top = 65532
+    Left = 150
+    Top = 72
     object miFile: TMenuItem
       Caption = '&File'
       object miOpen: TMenuItem
@@ -306,6 +413,13 @@ object frmMain: TfrmMain
         OnClick = miOpenClick
       end
       object N1: TMenuItem
+        Caption = '-'
+      end
+      object miExport: TMenuItem
+        Caption = 'miExport'
+        OnClick = miExportClick
+      end
+      object N2: TMenuItem
         Caption = '-'
       end
       object Quit1: TMenuItem
@@ -323,6 +437,10 @@ object frmMain: TfrmMain
       object miDEBUG_TEST2: TMenuItem
         Caption = 'STRONG TEST'
         OnClick = miDEBUG_TEST2Click
+      end
+      object miDEBUG_TEST3: TMenuItem
+        Caption = 'Multi Export'
+        OnClick = miDEBUG_TEST3Click
       end
     end
   end
@@ -1401,5 +1519,31 @@ object frmMain: TfrmMain
       00008001C001FDC700008001C001C0C300008001C001C0E300008001C001C0E3
       00008001C001C04300008001C001800300018001C001C803807F8001C001FC03
       C0FF8001C003FE07FFFFFFFFC007FFFF}
+  end
+  object sdSave: TSaveDialog
+    DefaultExt = 'BIN'
+    FileName = 'MEMODATA'
+    Filter = 
+      'Notebook Files (MEMODATA.BIN)|MEMODATA.BIN|Generic Binary Files ' +
+      '(*.BIN)|*.BIN|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Save the hacked file to...'
+    Left = 184
+    Top = 104
+  end
+  object odOpen: TOpenDialog
+    DefaultExt = 'BIN'
+    FileName = 'MEMODATA'
+    Filter = 
+      'Notebook Files (MEMODATA.BIN)|MEMODATA.BIN|Generic Binary Files ' +
+      '(*.BIN)|*.BIN|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Title = 'Select the file to open...'
+    Left = 150
+    Top = 104
+  end
+  object aeMain: TApplicationEvents
+    Left = 184
+    Top = 72
   end
 end
