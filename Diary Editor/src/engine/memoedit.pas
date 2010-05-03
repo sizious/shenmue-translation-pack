@@ -110,14 +110,15 @@ type
     fSectionIndexMEMO: Integer;
     fSectionIndexMSTR: Integer;
     fRUBIStringStartOffset: LongWord;
-    fSourceFileName: TFileName;
+    fDataSourceFileName: TFileName;
     fMakeBackup: Boolean;
+    fFlagSourceFileName: TFileName;
   protected
     procedure AddEntry(var Input: TFileStream; const StrPointerOffset,
       StrOffset: LongWord; const PageNumber: Integer; const FlagCode: Word);
     procedure Clear;
     procedure WriteTempUpdatedSections(var InStream: TFileStream;
-      const MEMOFileName, RUBIFileName, MSTRFileName: TFileName);
+      const MEMOFileName, RUBIFileName, MSTRFileName, FlagFileName: TFileName);
     property Dependances: TDiaryEditorStringsDependances read fDependancesList;
     property MSTRStringsStartOffset: LongWord read fMSTRStringsStartOffset;    
     property RUBIStringsStartOffset: LongWord read fRUBIStringStartOffset;
@@ -127,13 +128,18 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+{$IFDEF DEBUG}
+    procedure DumpStringDependancies(const FileName: TFileName);
+{$ENDIF}
     function LoadFromFile(const DataFileName, FlagFileName: TFileName): Boolean;
-    function SaveToFile(const FileName: TFileName): Boolean;
+    function Save: Boolean;
+    function SaveToFile(const DataFileName, FlagFileName: TFileName): Boolean;
+    property DataSourceFileName: TFileName read fDataSourceFileName;
+    property FlagSourceFileName: TFileName read fFlagSourceFileName;
     property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
     property Loaded: Boolean read fFileLoaded;
     property Pages: TDiaryEditorPagesList read fPages;
     property Sections: TFileSectionsList read fSections;
-    property SourceFileName: TFileName read fSourceFileName;
   end;
 
 implementation
@@ -146,9 +152,9 @@ const
   MSTR_SIGN = 'MSTR';
   MEMO_SIGN = 'MEMO';
   RUBI_SIGN = 'RUBI';
-  ENCODED_STRING_TAG = '\e';
   EMPTY_STRING_OFFSET_VALUE = $FFFFFFFF;
   MSTR_PADDING_SIZE = 8;
+  MEMO_PADDING_SIZE = 4;
   
 { TDiaryEditor }
 
@@ -173,10 +179,10 @@ begin
   // Initializing the new entry
   NewMsgItem.fStringPointerOffset := StrPointerOffset;
   NewMsgItem.fStringOffset := StrOffset;
-  NewMsgItem.fEditable := (StrOffset <> EMPTY_STRING_OFFSET_VALUE);
+  NewMsgItem.fEditable := (PageNumber > 0); // (StrOffset <> EMPTY_STRING_OFFSET_VALUE);
   NewMsgItem.fText := '';
   NewMsgItem.fPageIndex := PageNumber;
-  NewMsgItem.fAllowStringWrite := NewMsgItem.fEditable;
+  NewMsgItem.fAllowStringWrite := True;
   NewMsgItem.fNewStringOffset := EMPTY_STRING_OFFSET_VALUE; // updated when SaveToFile is called
   NewMsgItem.fFlagCode := FlagCode;
 
@@ -188,7 +194,7 @@ begin
   NewMsgItem.fIndex := Messages.Add(NewMsgItem);
 
   // Reading the text if possible
-  if NewMsgItem.Editable then begin
+  if NewMsgItem.fStringOffset <> EMPTY_STRING_OFFSET_VALUE then begin
     // Retrieve the string
     StringAbsoluteOffset := MSTRStringsStartOffset + NewMsgItem.StringOffset;
     Input.Seek(StringAbsoluteOffset, soFromBeginning);
@@ -202,7 +208,7 @@ begin
   Input.Seek(SavedPosition, soFromBeginning);
 
 {$IFDEF DEBUG}
-  if NewMsgItem.Editable then
+  if NewMsgItem.fStringOffset <> EMPTY_STRING_OFFSET_VALUE then
     WriteLn('#P:', NewMsgItem.PageIndex, ';L:', NewMsgItem.Index, ', StrAbsoluteOffset=',
       StringAbsoluteOffset, ', Ptr=', NewMsgItem.StringPointerOffset, ', Str=',
       NewMsgItem.StringOffset, sLineBreak, '  "', NewMsgItem.Text, '"');
@@ -218,6 +224,7 @@ end;
 
 constructor TDiaryEditor.Create;
 begin
+  fMakeBackup := False;
   fPages := TDiaryEditorPagesList.Create(Self);
   fSections := TFileSectionsList.Create(Self);
   fDependancesList := TDiaryEditorStringsDependances.Create;
@@ -230,6 +237,13 @@ begin
   fDependancesList.Free;
   inherited;
 end;
+
+{$IFDEF DEBUG}
+procedure TDiaryEditor.DumpStringDependancies(const FileName: TFileName);
+begin
+  Dependances.ExportToCSV(FileName);
+end;
+{$ENDIF}
 
 function TDiaryEditor.LoadFromFile(const DataFileName,
   FlagFileName: TFileName): Boolean;
@@ -276,7 +290,10 @@ begin
     if Loaded then begin
       // Clearing the object
       Clear;
-      fSourceFileName := DataFileName;
+
+      // Setting file names
+      fDataSourceFileName := DataFileName;
+      fFlagSourceFileName := FlagFileName;
 
       // Getting the RUBI starting address in the MSTR section
       Section := Sections[SectionIndexRUBI];
@@ -324,11 +341,18 @@ begin
   end;
 end;
 
-function TDiaryEditor.SaveToFile(const FileName: TFileName): Boolean;
+function TDiaryEditor.Save: Boolean;
+begin
+  Result := SaveToFile(DataSourceFileName, FlagSourceFileName)
+    and LoadFromFile(DataSourceFileName, FlagSourceFileName);
+end;
+
+function TDiaryEditor.SaveToFile(const DataFileName,
+  FlagFileName: TFileName): Boolean;
 var
-  OutFileName, fnMEMO, fnRUBI, fnMSTR: TFileName;
+  OutFileName, fnFLAG, fnMEMO, fnRUBI, fnMSTR: TFileName;
   i: Integer;
-  InStream, OutStream: TFileStream;
+  DataStream, OutStream: TFileStream;
 
   // WriteUpdatedSection
   function WriteUpdatedSection(const SectionName: TFileName): Boolean;
@@ -362,7 +386,7 @@ var
         // Write the updated section content
         OutStream.CopyFrom(UpdatedStream, UpdatedStream.Size);
 
-        // Write MSTR Padding if needed
+        // Write MSTR Padding
         if SectionName = MSTR_SIGN then
           WriteNullBlock(OutStream, MSTR_PADDING_SIZE);
       finally
@@ -377,17 +401,17 @@ begin
   Result := False;
   if not Loaded then Exit;
 
-
   OutFileName := GetTempFileName;
 
   OutStream := TFileStream.Create(OutFileName, fmCreate);
-  InStream := TFileStream.Create(SourceFileName, fmOpenRead);
+  DataStream := TFileStream.Create(DataSourceFileName, fmOpenRead);
   try
     // Update the MEMO, RUBI and MSTR sections.
     fnMEMO := GetTempFileName;
     fnRUBI := GetTempFileName;
     fnMSTR := GetTempFileName;
-    WriteTempUpdatedSections(InStream, fnMEMO, fnRUBI, fnMSTR);
+    fnFLAG := GetTempFileName;
+    WriteTempUpdatedSections(DataStream, fnMEMO, fnRUBI, fnMSTR, fnFLAG);
 
     // Update all sections
     for i := 0 to Sections.Count - 1 do
@@ -395,29 +419,28 @@ begin
       // Write the updated section, and if not, write the raw section from the source
       if not WriteUpdatedSection(Sections[i].Name) then begin
         // Write the raw section from the InStream
-        InStream.Seek(Sections[i].Offset, soFromBeginning);
-        OutStream.Write(InStream, Sections[i].Size);
+        DataStream.Seek(Sections[i].Offset, soFromBeginning);
+        OutStream.Write(DataStream, Sections[i].Size);
       end;
-    
+
   finally
-    InStream.Free;
+    DataStream.Free;
     OutStream.Free;
 
-    // Writing the requested updated file
-    if FileExists(FileName) and (not MakeBackup) then
-      DeleteFile(FileName)
-    else
-      RenameFile(FileName, ChangeFileExt(FileName, '.BAK'));
-    MoveFile(OutFileName, FileName);
+    // Writing the requested updated MEMODATA.BIN file
+    MoveTempFile(OutFileName, DataFileName, MakeBackup);
+
+    // Writing the requested updated MEMOFLG.BIN file
+    MoveTempFile(fnFLAG, FlagFileName, MakeBackup);
   end;
 end;
 
 procedure TDiaryEditor.WriteTempUpdatedSections(var InStream: TFileStream;
-  const MEMOFileName, RUBIFileName, MSTRFileName: TFileName);
+  const MEMOFileName, RUBIFileName, MSTRFileName, FlagFileName: TFileName);
 var
   p, m, RUBI_PatchValue: Integer;
   Messages: TDiaryEditorMessagesList;
-  MEMO_FStream, RUBI_FStream, MSTR_FStream: TFileStream;
+  MEMO_FStream, RUBI_FStream, MSTR_FStream, FLAG_FStream: TFileStream;
   Item: TDiaryEditorMessagesListItem;
   StrOffset, Temp: LongWord;
 
@@ -425,6 +448,7 @@ begin
   MEMO_FStream := TFileStream.Create(MEMOFileName, fmCreate);
   MSTR_FStream := TFileStream.Create(MSTRFileName, fmCreate);
   RUBI_FStream := TFileStream.Create(RUBIFileName, fmCreate);
+  FLAG_FStream := TFileStream.Create(FlagFileName, fmCreate);
   try
     //**************************************************************************
     // UPDATING MEMO AND MSTR SECTIONS
@@ -438,19 +462,33 @@ begin
         Item := Messages[m];
 
         // Write the string in the MSTR section
-        if Item.AllowStringWrite then begin
-          Item.NewStringOffset := MSTR_FStream.Position;
-          WriteNullTerminatedString(MSTR_FStream, Item.Text);
-          StrOffset := Item.NewStringOffset;
+        if Item.Text <> '' then begin
+
+          // AllowStringWrite is set to true if we can write the string in the file.
+          if Item.AllowStringWrite then begin
+            Item.NewStringOffset := MSTR_FStream.Position;
+            WriteNullTerminatedString(MSTR_FStream, Item.Text);
+          end;
+          (* else the string was already written, and we'll write only the MEMO
+            String offset (NewStringOffset). *)
+
         end else
-          StrOffset := Item.NewStringOffset;
+          // The text = '' so we don't need to write a string.
+          Item.NewStringOffset := EMPTY_STRING_OFFSET_VALUE;
+
+        // Write the Text Flag
+        FLAG_FStream.Write(Item.FlagCode, UINT16_SIZE);
 
         // Write the MEMO offset
+        StrOffset := Item.NewStringOffset;
         MEMO_FStream.Write(StrOffset, UINT32_SIZE);
 
       end; // m
 
     end; // p
+
+    // Write MSTR Padding
+    WriteNullBlock(MEMO_FStream, MEMO_PADDING_SIZE);
 
     //**************************************************************************
     // UPDATING RUBI SECTION
@@ -484,6 +522,7 @@ begin
     MEMO_FStream.Free;
     MSTR_FStream.Free;
     RUBI_FStream.Free;
+    FLAG_FStream.Free;
   end;
 
 end;
@@ -511,6 +550,7 @@ begin
   fNewStringOffset := Value;
 
   // Update every dependances NewStringOffset
+  // This value is used in WriteTempUpdatedSections
   if Editor.Dependances.IndexOf(StringOffset, DependancesIndex) then begin
     CurrentDependance := Editor.Dependances[DependancesIndex];
     for i := 0 to CurrentDependance.Count - 1 do
@@ -570,13 +610,14 @@ var
   i, j: Integer;
   Page: TDiaryEditorPagesListItem;
   Msg: TDiaryEditorMessagesListItem;
-  StrText, StrROffset, StrAOffset: string;
+  StrCode, StrText, StrROffset, StrAOffset: string;
 
 begin
   Buffer := TStringList.Create;
   try
-    Buffer.Add('Page Number;Line Number;String Pointer Offset;' +
-      'String Relative Offset;String Absolute Offset;Text');
+    Buffer.Add('Page Number;Line Number;String Pointer Offset (MEMO Section);'
+      + 'String Relative Offset (MSTR Section);String Absolute Offset (Calculated)'
+      + ';Code;Text');
     for i := 0 to Count - 1 do begin
       Page := Items[i];
       for j := 0 to Page.Messages.Count - 1 do begin
@@ -584,15 +625,17 @@ begin
 
         StrROffset := '-';
         StrAOffset := '-';
+        StrCode := '-';
         StrText := '(undef)';
         if Msg.Editable then begin
           StrROffset := IntToStr(Msg.StringOffset);
           StrAOffset := IntToStr(Owner.MSTRStringsStartOffset + Msg.StringOffset);
           StrText := Msg.Text;
+          StrCode := IntToStr(Msg.FlagCode);
         end;
 
-        Buffer.Add(Format('%d;%d;%d;%s;%s;"%s"',
-          [i, j, Msg.StringPointerOffset, StrROffset, StrAOffset, StrText]));
+        Buffer.Add(Format('%d;%d;%d;%s;%s;%s;"%s"',
+          [i, j, Msg.StringPointerOffset, StrROffset, StrAOffset, StrCode, StrText]));
           
       end;
     end;
@@ -608,7 +651,8 @@ var
   XMLDocument: IXMLDocument;
   p, m: Integer;
   PageNode, MessageNode: IXMLNode;
-  
+  MessageEntry: TDiaryEditorMessagesListItem;
+
 begin
   XMLDocument := TXMLDocument.Create(nil);
   try
@@ -634,13 +678,16 @@ begin
 
       // Get all Messages for this Page
       for m := 0 to Items[p].Messages.Count - 1 do begin
+        MessageEntry := Items[p].Messages[m];
+
         // Creating the new item
         MessageNode := XMLDocument.CreateNode('Message');
         MessageNode.Attributes['Index'] := m;
+        MessageNode.Attributes['Code'] := MessageEntry.FlagCode;
 
         // If editable, then add the MessageText to the XML file
         if Items[p].Messages[m].Editable then begin
-          MessageNode.NodeValue := Items[p].Messages[m].Text;
+          MessageNode.NodeValue := MessageEntry.Text;
 
           // Adding to the tree
           PageNode.ChildNodes.Add(MessageNode);
@@ -742,6 +789,7 @@ begin
 
           // Setting the read message text
           Items[p].Messages[m].Text := MessageText;
+          Items[p].Messages[m].FlagCode := MessageNode.Attributes['Code'];
         end;
 
         // Go the next page

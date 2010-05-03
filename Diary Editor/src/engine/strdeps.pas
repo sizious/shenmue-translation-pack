@@ -1,3 +1,8 @@
+(*
+  TDiaryEditorStringsDependances
+
+  See the comments below to know the goal of this class.
+*)
 unit StrDeps;
 
 (* Please define this to enable the fast search algorithm, powered by the DCL.
@@ -7,10 +12,11 @@ unit StrDeps;
 interface
 
 uses
-  Windows, SysUtils, Classes
+  Windows, SysUtils, Classes 
   {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF};
 
 type
+  (* Contained in TDiaryEditorStringsDependances *)
   TPointerOffsetsList = class(TObject)
   private
     fItemsList: TList;
@@ -28,9 +34,13 @@ type
     property StringRelativeOffset: Integer read fStringRelativeOffset;
   end;
 
-  // This class is here to allow the dynamic-linking of some strings used in the memo.
-  // In fact some string in the memo are pointed by multi-offsets.
-  // this class is here to update each pointers with the new string value.
+  (*  This class is here to allow the dynamic-linking of some strings used in
+      the memo.
+      In fact some string in the memo are pointed by multi-offsets, that means
+      you have only one string entry in the MSTR section but multi-offsets in
+      the MEMO sections. Example: 'Hello', pointed by 0x0F and 0x10, that means
+      we have two times 'Hello' shown in the UI.
+      This class is here to update each pointers with the new string value. *)
   TDiaryEditorStringsDependances = class(TObject)
   private
     fItemsList: TList;
@@ -49,15 +59,18 @@ type
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TPointerOffsetsList
       read GetItem; default;
-  end;
+  end;                           
 
 implementation
 
+uses
+  MemoEdit;
+  
 { TStringPointerOffsetsList }
 
 procedure TPointerOffsetsList.Add(P: Pointer);
 begin
-  fItemsList.Add(P);
+  fItemsList.Add(P); 
 end;
 
 procedure TPointerOffsetsList.Clear;
@@ -140,17 +153,20 @@ procedure TDiaryEditorStringsDependances.ExportToCSV(const FileName: TFileName);
 var
   i, j: Integer;
   Buffer: TStringList;
+  Item: TPointerOffsetsList;
 
 begin
   Buffer := TStringList.Create;
   try
     Buffer.Add('String Relative Offset (in MSTR section);' +
       'String Pointer Offset (in MEMO section)');
-    for i := 0 to Count - 1 do
-      for j := 0 to Items[i].Count - 1 do begin
+    for i := 0 to Count - 1 do begin
+      Item := Items[i];
+      for j := 0 to Item.Count - 1 do begin
         Buffer.Add(Format('%d;%d', [Items[i].StringRelativeOffset,
-          Items[i][j]]));
+          TDiaryEditorMessagesListItem(Item[j]).StringPointerOffset]));
       end;
+    end;
     Buffer.SaveToFile(FileName);
   finally
     Buffer.Free;

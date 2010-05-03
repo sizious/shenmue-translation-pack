@@ -13,12 +13,14 @@ type
   ESystemTools = class(Exception);
   EDataDirectoryNotFound = class(ESystemTools);
 
-function CopyFile(SourceFileName, DestFileName: TFileName; FailIfExists: Boolean): Boolean;
+function CopyFile(SourceFileName, DestFileName: TFileName;
+  FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
+function FindStr(const SubStr, S: string): Boolean;
 function GetApplicationDirectory: TFileName;
 function GetApplicationInstancesCount: Integer;
 function GetApplicationDataDirectory: TFileName;
@@ -30,6 +32,8 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
+function MoveTempFile(const TempFileName, DestFileName: TFileName;
+  MakeBackup: Boolean): Boolean;
 function ParseStr(SubStr, S: string; n: Integer): string;
 function StringArrayBinarySearch(SortedSource: array of string;
   SearchValue: string): Integer;
@@ -55,6 +59,13 @@ const
 
 //------------------------------------------------------------------------------
 
+function FindStr(const SubStr, S: string): Boolean;
+begin
+  Result := Pos(LowerCase(SubStr), LowerCase(S)) > 0;
+end;
+
+//------------------------------------------------------------------------------
+
 // Thanks Michel Bardou
 procedure Delay(Milliseconds: Double);
 var
@@ -68,6 +79,18 @@ begin
     Sleep(1);
     Application.ProcessMessages;
   until Now > (StartTime + Milliseconds);
+end;
+
+//------------------------------------------------------------------------------
+
+function MoveTempFile(const TempFileName, DestFileName: TFileName;
+  MakeBackup: Boolean): Boolean;
+begin
+  if FileExists(DestFileName) and (not MakeBackup) then
+    DeleteFile(DestFileName)
+  else
+    RenameFile(DestFileName, ChangeFileExt(DestFileName, '.BAK'));
+  Result := MoveFile(TempFileName, DestFileName);
 end;
 
 //------------------------------------------------------------------------------
