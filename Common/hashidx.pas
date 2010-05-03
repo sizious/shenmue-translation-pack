@@ -11,6 +11,7 @@ type
     fOptimizationHashMap: IStrMap;
   public
     constructor Create;
+    destructor Destroy; override;
     procedure Add(const Key: string; const Index: Integer);
     procedure Clear;
     function IndexOf(const Key: string): Integer;
@@ -51,6 +52,12 @@ end;
 constructor THashIndexOptimizer.Create;
 begin
   fOptimizationHashMap := TStrHashMap.Create;
+end;
+
+destructor THashIndexOptimizer.Destroy;
+begin
+  Clear;
+  inherited;
 end;
 
 function THashIndexOptimizer.IndexOf(const Key: string): Integer;
