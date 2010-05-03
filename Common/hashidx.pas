@@ -12,9 +12,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(const Key: string; const Index: Integer);
+    procedure Add(const Key: string; const Index: Integer); overload;
+    procedure Add(const Key, Index: Integer); overload;
     procedure Clear;
-    function IndexOf(const Key: string): Integer;
+    function IndexOf(const Key: string): Integer; overload;
+    function IndexOf(const Key: Integer): Integer; overload;
   end;
 
 implementation
@@ -44,6 +46,11 @@ begin
   fOptimizationHashMap.PutValue(Key, HashItem);
 end;
 
+procedure THashIndexOptimizer.Add(const Key, Index: Integer);
+begin
+  Add(IntToStr(Key), Index);
+end;
+
 procedure THashIndexOptimizer.Clear;
 begin
   fOptimizationHashMap.Clear;
@@ -58,6 +65,11 @@ destructor THashIndexOptimizer.Destroy;
 begin
   Clear;
   inherited;
+end;
+
+function THashIndexOptimizer.IndexOf(const Key: Integer): Integer;
+begin
+  Result := IndexOf(IntToStr(Key));
 end;
 
 function THashIndexOptimizer.IndexOf(const Key: string): Integer;
