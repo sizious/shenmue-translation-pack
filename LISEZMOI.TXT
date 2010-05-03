@@ -65,6 +65,9 @@
  * Models Textures Editor
    Cet outil permet d'éditer les textures MT5/MT6/MT7, dans le but de traduire
    certains sprites.
+
+ * Notebook Editor
+   Ce programme permet de modifier le carnet utilisé dans le jeu.
       
  * Nozomi Motorcycle Subtitles Editor
    Cet éditeur est un éditeur spécial pour la cinématique "Nozomi and the 

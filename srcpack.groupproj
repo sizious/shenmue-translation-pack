@@ -10,7 +10,6 @@
     <Projects Include="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
     <Projects Include="Common\SubsUtil\Preview\debug\src\preview.dproj" />
-    <Projects Include="Diary Editor\src\diaryed.dproj" />
     <Projects Include="Font Utility\src\fontutil.dproj" />
     <Projects Include="IDX Creator\src\idxmaker.dproj" />
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
@@ -152,23 +151,14 @@
   <Target Name="fontutil:Make">
     <MSBuild Projects="Font Utility\src\fontutil.dproj" Targets="Make" />
   </Target>
-  <Target Name="diaryed">
-    <MSBuild Projects="Diary Editor\src\diaryed.dproj" Targets="" />
-  </Target>
-  <Target Name="diaryed:Clean">
-    <MSBuild Projects="Diary Editor\src\diaryed.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="diaryed:Make">
-    <MSBuild Projects="Diary Editor\src\diaryed.dproj" Targets="Make" />
-  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;preview;hdissect;fontutil;diaryed" />
+    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;scinsube;mteditor;convert;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;preview;hdissect;fontutil" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;preview:Clean;hdissect:Clean;fontutil:Clean;diaryed:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;scinsube:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;preview:Clean;hdissect:Clean;fontutil:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;preview:Make;hdissect:Make;fontutil:Make;diaryed:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;scinsube:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;preview:Make;hdissect:Make;fontutil:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

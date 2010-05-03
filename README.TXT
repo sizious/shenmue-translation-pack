@@ -63,11 +63,14 @@
  * Models Textures Editor
    This tool is a texture editor for MT5/MT6/MT7 files, in case of some sprites
    must be translated.
-   
+ 
+ * Notebook Editor
+   This editor is used to modify the in-game Notebook.
+  
  * Nozomi Motorcycle Subtitles Editor
    This special editor was made to translate the "Nozomi and the Motorcycle"
    sequence at the end of the Shenmue DISC3. The subtitle format of this 
-   sequence is special only for this sequence.
+   sequence was only found in this sequence.
    
  * SPR Utils
    This's an editor for SPR files.
