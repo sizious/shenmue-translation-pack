@@ -5,11 +5,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, MemoEdit, Menus, ImgList, ComCtrls, ToolWin, JvExComCtrls,
-  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls;
+  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls, Common;
 
 type
-  TPagePosition = (ptLeft, ptRight);
-  
   TfrmMain = class(TForm)
     bPrev: TButton;
     bNext: TButton;
@@ -49,7 +47,7 @@ type
     eRight4: TEdit;
     eRightPageNumber: TJvEdit;
     N1: TMenuItem;
-    Quit1: TMenuItem;
+    miQuit: TMenuItem;
     bFirst: TButton;
     bLast: TButton;
     miDEBUG_TEST2: TMenuItem;
@@ -72,6 +70,11 @@ type
     Label1: TLabel;
     bvlBottom: TBevel;
     Label2: TLabel;
+    miSave: TMenuItem;
+    miDEBUG_TEST4: TMenuItem;
+    N3: TMenuItem;
+    N4: TMenuItem;
+    miDEBUG_TEST5: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure bNextClick(Sender: TObject);
@@ -81,17 +84,25 @@ type
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
       var DefaultDraw: Boolean);
     procedure miDEBUG_TEST1Click(Sender: TObject);
-    procedure Quit1Click(Sender: TObject);
+    procedure miQuitClick(Sender: TObject);
     procedure bFirstClick(Sender: TObject);
     procedure bLastClick(Sender: TObject);
     procedure miDEBUG_TEST2Click(Sender: TObject);
     procedure miExportClick(Sender: TObject);
     procedure miDEBUG_TEST3Click(Sender: TObject);
     procedure ePageNumberKeyPress(Sender: TObject; var Key: Char);
+    procedure eLeft0Change(Sender: TObject);
+    procedure eLeftCode0Change(Sender: TObject);
+    procedure eLeft0Enter(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
+    procedure miDEBUG_TEST4Click(Sender: TObject);
+    procedure miDEBUG_TEST5Click(Sender: TObject);
   private
+    { Déclarations privées }
     fPageNumber: Integer;
     fFileModified: Boolean;
-    { Déclarations privées }
+    fSelectedMessage: TDiaryEditorMessagesListItem;
+    fSelectedFlagCodeEdit: TEdit;
     procedure ClearEdits(PageType: TPagePosition);
     procedure FreeModules;
     procedure InitModules;
@@ -103,12 +114,15 @@ type
     function GetStatusText: string;
     procedure SetStatusText(const Value: string);
     procedure SetFileModified(const Value: Boolean);
+    property SelectedFlagCodeEdit: TEdit read fSelectedFlagCodeEdit;
   public
     { Déclarations publiques }
     procedure Clear;
     function LoadPage(const LeftPageIndex: Integer): Boolean;
     property FileModified: Boolean read fFileModified write SetFileModified;    
     property PageNumber: Integer read fPageNumber write SetPageNumber;
+    property SelectedMessage: TDiaryEditorMessagesListItem
+      read fSelectedMessage;
     property StatusText: string read GetStatusText write SetStatusText;    
   end;
 
@@ -150,6 +164,7 @@ end;
 
 procedure TfrmMain.Clear;
 begin
+  fSelectedMessage := nil;
   FileModified := False;
   StatusText := '';
   ClearEdits(ptLeft);
@@ -165,13 +180,64 @@ var
 begin
   for i := 0 to 4 do begin
     if GetLineEdit(PageType, i, LineEditCtrl, TimeCodeLineCtrl) then begin
+      // Disabling events
+      LineEditCtrl.OnChange := nil;
+      TimeCodeLineCtrl.OnChange := nil;
+
+      // Disabling fields
       ChangeEditEnabledState(LineEditCtrl, False);
       ChangeEditEnabledState(TimeCodeLineCtrl, False);
+
+      // Deleting text
       LineEditCtrl.Text := '';
       TimeCodeLineCtrl.Text := '';
     end;
   end;
   GetOriginalTextMemo(PageType).Clear;
+end;
+
+procedure TfrmMain.eLeft0Change(Sender: TObject);
+begin
+  // Setting the new text
+  if DiaryEditor.Loaded then begin
+    FileModified := True;
+    SelectedMessage.Text := (Sender as TEdit).Text;
+    ChangeEditEnabledState(SelectedFlagCodeEdit, SelectedMessage.Text <> '');
+    if (SelectedMessage.Text <> '') and (SelectedFlagCodeEdit.Text = '') then
+      SelectedFlagCodeEdit.Text := '0';
+  end;
+end;
+
+procedure TfrmMain.eLeft0Enter(Sender: TObject);
+var
+  LineIndex, PageIndex: Integer;
+  RightPage: Boolean;
+  FlagCodeEditName: string;
+
+begin
+  fSelectedMessage := nil;
+  if DiaryEditor.Loaded then begin
+    // Getting UI infos
+    LineIndex := (Sender as TEdit).Tag;
+    PageIndex := PageNumber; // PageNumber is the GUI value
+    RightPage := FindStr('Right', (Sender as TEdit).Name);
+    FlagCodeEditName := 'Left';
+    if RightPage then begin
+      Inc(PageIndex);
+      FlagCodeEditName := 'Right';
+    end;
+    FlagCodeEditName := 'e' + FlagCodeEditName + 'Code' + IntToStr(LineIndex);
+
+    // Setting the Form properties
+    fSelectedMessage := DiaryEditor.Pages[PageIndex].Messages[LineIndex];
+    fSelectedFlagCodeEdit := FindComponent(FlagCodeEditName) as TEdit;
+  end;
+end;
+
+procedure TfrmMain.eLeftCode0Change(Sender: TObject);
+begin
+  if (DiaryEditor.Loaded) and Assigned(SelectedMessage) then
+    SelectedMessage.FlagCode := StrToIntDef((Sender as TEdit).Text, 0);
 end;
 
 procedure TfrmMain.ePageNumberKeyPress(Sender: TObject; var Key: Char);
@@ -184,10 +250,13 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  // Start Initializing...
   InitUI;
 
+  // Creating Internal Modules
   InitModules;
 
+  // Clearing UI
   Clear;
 end;
 
@@ -267,6 +336,7 @@ function TfrmMain.LoadPage(const LeftPageIndex: Integer): Boolean;
 var
   RightPageIndex: Integer;
   LineEditCtrl, TimeCodeEditCtrl: TEdit;
+  UIReady: Boolean;
 
   function LoadSinglePage(const PageIndex: Integer; Page: TPagePosition): Boolean;
   var
@@ -291,16 +361,27 @@ var
       // Fill UI
       for i := 0 to Messages.Count - 1 do begin
         MemoCtrl.Lines.Add(Messages[i].Text);
+        UIReady := GetLineEdit(Page, i, LineEditCtrl, TimeCodeEditCtrl);
 
-        if GetLineEdit(Page, i, LineEditCtrl, TimeCodeEditCtrl) then
-          if Messages[i].Editable then begin
-            LineEditCtrl.Text := Messages[i].Text;
-            TimeCodeEditCtrl.Text := IntToStr(Messages[i].FlagCode);
+        // disabling temporary the event
+        LineEditCtrl.OnChange := nil;
+        TimeCodeEditCtrl.OnChange := nil;
+
+        // filling the edit
+        if Messages[i].Editable and UIReady then begin
             ChangeEditEnabledState(LineEditCtrl, True);
-            ChangeEditEnabledState(TimeCodeEditCtrl, True);
-          end;
+            TimeCodeEditCtrl.Text := IntToStr(Messages[i].FlagCode);
+            if Messages[i].Text <> '' then begin
+              LineEditCtrl.Text := Messages[i].Text;
+              ChangeEditEnabledState(TimeCodeEditCtrl, True);
+            end;
+        end; // Editable and UIReady
 
+        // Resetting the event
+        TimeCodeEditCtrl.OnChange := eLeftCode0Change;
+        LineEditCtrl.OnChange := eLeft0Change;
       end; // for
+
       Result := True;
     end; // Assigned
 
@@ -324,8 +405,8 @@ procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
 begin
   DiaryEditor.LoadFromFile('memodata.bin', 'memoflg.bin');
 //  DiaryEditor.Pages[2].Messages[0].Text := '@55555\eåöåúåúåúåúåúåúåúæ£!';
-  DiaryEditor.Pages[269].Messages[0].Text := 'K-OTIC!!!!';
-  DiaryEditor.SaveToFile('BLAh.bin');
+//  DiaryEditor.Pages[269].Messages[0].Text := 'K-OTIC!!!!';
+  DiaryEditor.SaveToFile('memodata.hak', 'memoflg.hak');
 {$ELSE}
 begin
 {$ENDIF}
@@ -347,16 +428,18 @@ begin
   for p := 0 to DiaryEditor.Pages.Count - 1 do
     for m := 0 to DiaryEditor.Pages[p].Messages.Count - 1 do begin
       S := GetRandomString(19);
-      if DiaryEditor.Pages[p].Messages[m].Editable then
+      if DiaryEditor.Pages[p].Messages[m].Editable then begin
         DiaryEditor.Pages[p].Messages[m].Text := S;
+        DiaryEditor.Pages[p].Messages[m].FlagCode := Random(9999) + 1;
+      end;
     end;
 
-  DiaryEditor.SaveToFile('STRONG.BIN');
+  DiaryEditor.SaveToFile('STRONG.HAK', 'STRONGFLG.HAK');
 
   // 2nd phase
-  DiaryEditor.LoadFromFile('STRONG.BIN', 'MEMOFLG.BIN');
+  DiaryEditor.LoadFromFile('STRONG.HAK', 'STRONGFLG.HAK');
   DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
-  DiaryEditor.SaveToFile('STRONG.NEW');
+  DiaryEditor.SaveToFile('STRONG.NEW', 'STRONGFLG.NEW');
 
 {$ELSE}
 begin
@@ -370,7 +453,7 @@ procedure TfrmMain.miDEBUG_TEST3Click(Sender: TObject);
   begin
     DiaryEditor.LoadFromFile('MEMODATA.' + Extension, 'MEMOFLG.' + Extension);
     DiaryEditor.Pages.ExportToCSV(
-      'MSTR' + ExtractFileExt(DiaryEditor.SourceFileName) + '.CSV'
+      'MSTR' + ExtractFileExt(DiaryEditor.DataSourceFileName) + '.CSV'
     );
   end;
 
@@ -382,6 +465,56 @@ begin
   _exp('XB');
   _exp('XBD');
 
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST4Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  S: string;
+  p, m, i: Integer;
+
+begin
+
+  // 1st phase
+  DiaryEditor.LoadFromFile('MEMODATA.BIN', 'MEMOFLG.BIN');
+  DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
+  i := 0;
+  
+  repeat
+    WriteLn('*** START PASS ', i, ' ***');
+
+    for p := 0 to DiaryEditor.Pages.Count - 1 do
+      for m := 0 to DiaryEditor.Pages[p].Messages.Count - 1 do begin
+        S := GetRandomString(19);
+        if DiaryEditor.Pages[p].Messages[m].Editable then begin
+          DiaryEditor.Pages[p].Messages[m].Text := S;
+          DiaryEditor.Pages[p].Messages[m].FlagCode := Random(9999) + 1;
+        end;
+      end;
+
+    DiaryEditor.SaveToFile('STRONG.HAK', 'STRONGFLG.HAK');
+    DiaryEditor.LoadFromFile('STRONG.HAK', 'STRONGFLG.HAK');
+
+    WriteLn('*** END PASS ', i, ' ***');    
+    Inc(i);
+  until i = 20;
+
+  // 2nd phase
+  DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
+  DiaryEditor.SaveToFile('STRONG.NEW', 'STRONGFLG.NEW');
+    
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST5Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  DiaryEditor.DumpStringDependancies('STRDEPS.CSV');
 {$ELSE}
 begin
 {$ENDIF}
@@ -399,9 +532,14 @@ begin
   PageNumber := 0;
 end;
 
-procedure TfrmMain.Quit1Click(Sender: TObject);
+procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmMain.miSaveClick(Sender: TObject);
+begin
+  DiaryEditor.SaveToFile('MEMODATA.HAK', 'MEMOFLG.HAK');
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);

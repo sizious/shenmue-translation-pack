@@ -27,7 +27,7 @@ object frmMain: TfrmMain
     Height = 13
     Alignment = taCenter
     AutoSize = False
-    Caption = 'ID'
+    Caption = 'Code'
   end
   object bvlBottom: TBevel
     Left = 4
@@ -42,7 +42,7 @@ object frmMain: TfrmMain
     Height = 13
     Alignment = taCenter
     AutoSize = False
-    Caption = 'ID'
+    Caption = 'Code'
   end
   object bPrev: TButton
     Left = 4
@@ -164,7 +164,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 304
   end
   object ePageNumber: TEdit
     Left = 5
@@ -208,38 +207,52 @@ object frmMain: TfrmMain
     Height = 21
     TabOrder = 7
     Text = '(Left Line 0)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eLeft1: TEdit
+    Tag = 1
     Left = 43
     Top = 174
     Width = 203
     Height = 21
     TabOrder = 8
     Text = '(Left Line 1)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eLeft2: TEdit
+    Tag = 2
     Left = 43
     Top = 198
     Width = 203
     Height = 21
     TabOrder = 9
     Text = '(Left Line 2)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eLeft3: TEdit
+    Tag = 3
     Left = 43
     Top = 222
     Width = 203
     Height = 21
     TabOrder = 10
     Text = '(Left Line 3)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eLeft4: TEdit
-    Left = 43
+    Tag = 4
+    Left = 44
     Top = 246
     Width = 203
     Height = 21
     TabOrder = 11
     Text = '(Left Line 4)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object mOriginalRight: TMemo
     Left = 252
@@ -260,38 +273,52 @@ object frmMain: TfrmMain
     Height = 21
     TabOrder = 13
     Text = '(Right Line 0)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eRight1: TEdit
+    Tag = 1
     Left = 252
     Top = 174
     Width = 203
     Height = 21
     TabOrder = 14
     Text = '(Right Line 1)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eRight2: TEdit
+    Tag = 2
     Left = 252
     Top = 198
     Width = 203
     Height = 21
     TabOrder = 15
     Text = '(Right Line 2)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eRight3: TEdit
+    Tag = 3
     Left = 252
     Top = 222
     Width = 203
     Height = 21
     TabOrder = 16
     Text = '(Right Line 3)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eRight4: TEdit
+    Tag = 4
     Left = 252
     Top = 246
     Width = 203
     Height = 21
     TabOrder = 17
     Text = '(Right Line 4)'
+    OnChange = eLeft0Change
+    OnEnter = eLeft0Enter
   end
   object eRightPageNumber: TJvEdit
     Left = 442
@@ -329,6 +356,7 @@ object frmMain: TfrmMain
     Height = 21
     TabOrder = 21
     Text = '9999'
+    OnChange = eLeftCode0Change
   end
   object eLeftCode1: TEdit
     Left = 5
@@ -412,6 +440,10 @@ object frmMain: TfrmMain
         ShortCut = 16463
         OnClick = miOpenClick
       end
+      object miSave: TMenuItem
+        Caption = 'Save'
+        OnClick = miSaveClick
+      end
       object N1: TMenuItem
         Caption = '-'
       end
@@ -422,10 +454,10 @@ object frmMain: TfrmMain
       object N2: TMenuItem
         Caption = '-'
       end
-      object Quit1: TMenuItem
+      object miQuit: TMenuItem
         Caption = '&Quit'
         ShortCut = 16465
-        OnClick = Quit1Click
+        OnClick = miQuitClick
       end
     end
     object miDEBUG_TEST: TMenuItem
@@ -434,9 +466,23 @@ object frmMain: TfrmMain
         Caption = 'DiaryEditor TEST'
         OnClick = miDEBUG_TEST1Click
       end
+      object miDEBUG_TEST5: TMenuItem
+        Caption = 'Dump String Dependancies'
+        OnClick = miDEBUG_TEST5Click
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
       object miDEBUG_TEST2: TMenuItem
         Caption = 'STRONG TEST'
         OnClick = miDEBUG_TEST2Click
+      end
+      object miDEBUG_TEST4: TMenuItem
+        Caption = 'STRONG TEST 2'
+        OnClick = miDEBUG_TEST4Click
+      end
+      object N3: TMenuItem
+        Caption = '-'
       end
       object miDEBUG_TEST3: TMenuItem
         Caption = 'Multi Export'

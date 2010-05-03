@@ -10,7 +10,8 @@ uses
   uitools in '..\..\Common\uitools.pas',
   systools in '..\..\Common\systools.pas',
   chrutils in '..\..\Common\SubsUtil\chrutils.pas',
-  common in 'common.pas';
+  common in 'common.pas',
+  hashidx in '..\..\Common\hashidx.pas';
 
 {$R *.res}
 
