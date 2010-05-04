@@ -13,6 +13,8 @@ type
   ESystemTools = class(Exception);
   EDataDirectoryNotFound = class(ESystemTools);
 
+  TPlatformVersion = (pvUnknow, pvDreamcast, pvXbox);
+
 function CopyFile(SourceFileName, DestFileName: TFileName;
   FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);

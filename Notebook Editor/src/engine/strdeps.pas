@@ -137,6 +137,11 @@ begin
 
   // Adding the StringPointerOffset to the StringRelativeOffset entry
   Item.Add(ItemEntry);
+
+(*{$IFDEF DEBUG}
+  WriteLn('  #', Item.Index, ' ', Item.StringRelativeOffset, ': ',
+    TDiaryEditorMessagesListItem(ItemEntry).Text);
+{$ENDIF}*)
 end;
 
 procedure TDiaryEditorStringsDependances.Clear;
@@ -147,6 +152,9 @@ begin
   for i := 0 to fItemsList.Count - 1 do
     TPointerOffsetsList(fItemsList[i]).Free;
   fItemsList.Clear;
+{$IFDEF USE_DCL}
+  IndexOptimizer.Clear;
+{$ENDIF}
 end;
 
 constructor TDiaryEditorStringsDependances.Create;

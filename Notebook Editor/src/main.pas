@@ -70,11 +70,14 @@ type
     Label1: TLabel;
     bvlBottom: TBevel;
     Label2: TLabel;
-    miSave: TMenuItem;
+    miSaveAs: TMenuItem;
     miDEBUG_TEST4: TMenuItem;
     N3: TMenuItem;
     N4: TMenuItem;
     miDEBUG_TEST5: TMenuItem;
+    miDEBUG_TEST6: TMenuItem;
+    miSave: TMenuItem;
+    miDEBUG_TEST7: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure bNextClick(Sender: TObject);
@@ -94,9 +97,12 @@ type
     procedure eLeft0Change(Sender: TObject);
     procedure eLeftCode0Change(Sender: TObject);
     procedure eLeft0Enter(Sender: TObject);
-    procedure miSaveClick(Sender: TObject);
+    procedure miSaveAsClick(Sender: TObject);
     procedure miDEBUG_TEST4Click(Sender: TObject);
     procedure miDEBUG_TEST5Click(Sender: TObject);
+    procedure miDEBUG_TEST6Click(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
+    procedure miDEBUG_TEST7Click(Sender: TObject);
   private
     { Déclarations privées }
     fPageNumber: Integer;
@@ -135,7 +141,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UITools, SysTools;
+  UITools, SysTools, FileSel;
   
 procedure TfrmMain.bGoClick(Sender: TObject);
 begin
@@ -482,7 +488,7 @@ begin
   DiaryEditor.LoadFromFile('MEMODATA.BIN', 'MEMOFLG.BIN');
   DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
   i := 0;
-  
+
   repeat
     WriteLn('*** START PASS ', i, ' ***');
 
@@ -498,14 +504,14 @@ begin
     DiaryEditor.SaveToFile('STRONG.HAK', 'STRONGFLG.HAK');
     DiaryEditor.LoadFromFile('STRONG.HAK', 'STRONGFLG.HAK');
 
-    WriteLn('*** END PASS ', i, ' ***');    
+    WriteLn('*** END PASS ', i, ' ***');
     Inc(i);
   until i = 20;
 
   // 2nd phase
   DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
   DiaryEditor.SaveToFile('STRONG.NEW', 'STRONGFLG.NEW');
-    
+
 {$ELSE}
 begin
 {$ENDIF}
@@ -520,6 +526,87 @@ begin
 {$ENDIF}
 end;
 
+procedure TfrmMain.miDEBUG_TEST6Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  S: string;
+  p, m, i: Integer;
+
+begin
+
+  // 1st phase
+  DiaryEditor.LoadFromFile('MEMODATA.BIN', 'RETAIL.XBE');
+  DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
+  i := 0;
+
+  repeat
+    WriteLn('*** START PASS ', i, ' ***');
+
+    for p := 0 to DiaryEditor.Pages.Count - 1 do
+      for m := 0 to DiaryEditor.Pages[p].Messages.Count - 1 do begin
+        S := GetRandomString(19);
+        if DiaryEditor.Pages[p].Messages[m].Editable then begin
+          DiaryEditor.Pages[p].Messages[m].Text := S;
+          DiaryEditor.Pages[p].Messages[m].FlagCode := Random(9999) + 1;
+        end;
+      end;
+
+    DiaryEditor.SaveToFile('XBOXMEMO.HAK', 'XBOXFLG.HAK');
+    DiaryEditor.LoadFromFile('XBOXMEMO.HAK', 'XBOXFLG.HAK');
+
+    WriteLn('*** END PASS ', i, ' ***');
+    Inc(i);
+  until i = 20;
+
+  // 2nd phase
+  DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
+  DiaryEditor.SaveToFile('XBOXMEMO.NEW', 'XBOXFLG.NEW');
+
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST7Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  S: string;
+  p, m, i: Integer;
+
+begin
+
+  // 1st phase
+  DiaryEditor.LoadFromFile('MEMODATA.HAK', 'RETAIL.HAK');
+  DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
+  i := 0;
+
+  repeat
+    WriteLn('*** START PASS ', i, ' ***');
+
+    for p := 0 to DiaryEditor.Pages.Count - 1 do
+      for m := 0 to DiaryEditor.Pages[p].Messages.Count - 1 do begin
+        S := GetRandomString(19);
+        if DiaryEditor.Pages[p].Messages[m].Editable then begin
+          DiaryEditor.Pages[p].Messages[m].Text := S;
+          DiaryEditor.Pages[p].Messages[m].FlagCode := Random(9999) + 1;
+        end;
+      end;
+
+    DiaryEditor.Save;
+
+    WriteLn('*** END PASS ', i, ' ***');
+    Inc(i);
+  until i = 20;
+
+  // 2nd phase
+  DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
+  DiaryEditor.SaveToFile('XBOXMEMO.NEW', 'XBOXFLG.NEW');
+
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
 procedure TfrmMain.miExportClick(Sender: TObject);
 begin
   DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
@@ -528,8 +615,16 @@ end;
 
 procedure TfrmMain.miOpenClick(Sender: TObject);
 begin
-  DiaryEditor.LoadFromFile('MEMODATA.BIN', 'MEMOFLG.BIN');
-  PageNumber := 0;
+  with frmFileSelection do begin
+    SelectionMode := fsmOpen;
+    ShowModal;
+    if ModalResult = mrOK then begin
+      StatusText := 'Loading Notebook data...';
+      DiaryEditor.LoadFromFile(SelectedDataFile, SelectedFlagFile);
+      PageNumber := 0;
+      StatusText := '';
+    end;
+  end;
 end;
 
 procedure TfrmMain.miQuitClick(Sender: TObject);
@@ -537,9 +632,25 @@ begin
   Close;
 end;
 
+procedure TfrmMain.miSaveAsClick(Sender: TObject);
+begin
+  with frmFileSelection do begin
+    SelectionMode := fsmSave;
+    ShowModal;
+    if ModalResult = mrOK then begin
+      StatusText := 'Saving Notebook data...';
+      DiaryEditor.SaveToFile(SelectedDataFile, SelectedFlagFile);
+      StatusText := '';
+    end;
+  end;
+end;
+
 procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
-  DiaryEditor.SaveToFile('MEMODATA.HAK', 'MEMOFLG.HAK');
+  StatusText := 'Saving Notebook data...';
+  DiaryEditor.Save;
+  StatusText := '';
+  FileModified := False;
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);

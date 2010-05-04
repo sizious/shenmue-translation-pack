@@ -3,7 +3,7 @@ unit MemoEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes, FSParser, StrDeps;
+  Windows, SysUtils, Classes, FSParser, StrDeps, SysTools;
 
 type
   EDiaryEditor = class(Exception);
@@ -99,6 +99,31 @@ type
     property Owner: TDiaryEditor read fOwner;
   end;
 
+  // Manage the MEMOFLG.BIN for the Xbox version
+  TXboxExecutableVersion = (xevNotApplicable, xevTrial, xevRetail);
+  
+  TXboxMemoFlagInfo = class(TObject)
+  private
+    fFlagOffset: LongWord;
+    fExecutableVersion: TXboxExecutableVersion;
+    fExecutableFileName: TFileName;
+    fOwner: TDiaryEditor;
+  protected
+    procedure Clear;
+    procedure ExecuteDetection;
+    function IsXboxExecutable(var InFlagStream: TFileStream;
+      var ExecutableVersionResult: TXboxExecutableVersion;
+      var FlagOffsetResult: LongWord): Boolean;
+  public
+    constructor Create(AOwner: TDiaryEditor);
+    destructor Destroy; override;
+    property ExecutableFileName: TFileName read fExecutableFileName;
+    property ExecutableVersion: TXboxExecutableVersion read fExecutableVersion;
+    property FlagOffset: LongWord read fFlagOffset;
+    property Owner: TDiaryEditor read fOwner;
+  end;
+
+  // Main class
   TDiaryEditor = class(TObject)
   private
     fPages: TDiaryEditorPagesList;
@@ -113,6 +138,8 @@ type
     fDataSourceFileName: TFileName;
     fMakeBackup: Boolean;
     fFlagSourceFileName: TFileName;
+    fXboxMemoFlagInfo: TXboxMemoFlagInfo;
+    fPlatformVersion: TPlatformVersion;
   protected
     procedure AddEntry(var Input: TFileStream; const StrPointerOffset,
       StrOffset: LongWord; const PageNumber: Integer; const FlagCode: Word);
@@ -139,22 +166,31 @@ type
     property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
     property Loaded: Boolean read fFileLoaded;
     property Pages: TDiaryEditorPagesList read fPages;
+    property PlatformVersion: TPlatformVersion read fPlatformVersion;
     property Sections: TFileSectionsList read fSections;
+    property XboxMemoFlagInfo: TXboxMemoFlagInfo read fXboxMemoFlagInfo;
   end;
 
 implementation
 
 uses
-  Common, SysTools, ChrUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX,
-  Variants;
+  Common, ChrUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX,
+  Variants
+{$IFDEF DEBUG}
+  , TypInfo
+{$ENDIF};
 
 const
   MSTR_SIGN = 'MSTR';
   MEMO_SIGN = 'MEMO';
   RUBI_SIGN = 'RUBI';
+
   EMPTY_STRING_OFFSET_VALUE = $FFFFFFFF;
+
   MSTR_PADDING_SIZE = 8;
   MEMO_PADDING_SIZE = 4;
+
+  MEMOFLG_SIZE = 2700;
   
 { TDiaryEditor }
 
@@ -219,7 +255,8 @@ procedure TDiaryEditor.Clear;
 begin
   Pages.Clear;
   Dependances.Clear;
-//  fStartMessagesOffset := 0;
+  XboxMemoFlagInfo.Clear;
+  fPlatformVersion := pvUnknow;
 end;
 
 constructor TDiaryEditor.Create;
@@ -228,10 +265,12 @@ begin
   fPages := TDiaryEditorPagesList.Create(Self);
   fSections := TFileSectionsList.Create(Self);
   fDependancesList := TDiaryEditorStringsDependances.Create;
+  fXboxMemoFlagInfo := TXboxMemoFlagInfo.Create(Self);
 end;
 
 destructor TDiaryEditor.Destroy;
 begin
+  fXboxMemoFlagInfo.Free;
   fPages.Free;
   fSections.Free;
   fDependancesList.Free;
@@ -264,7 +303,6 @@ begin
 
   // Try to parse the MEMODATA.BIN file
   DataInput := TFileStream.Create(DataFileName, fmOpenRead);
-  FlagInput := TFileStream.Create(FlagFileName, fmOpenRead);
   try
     // Parsing the file
     ParseFileSections(DataInput, fSections);
@@ -294,40 +332,55 @@ begin
       // Setting file names
       fDataSourceFileName := DataFileName;
       fFlagSourceFileName := FlagFileName;
+      fPlatformVersion := pvDreamcast;
 
-      // Getting the RUBI starting address in the MSTR section
-      Section := Sections[SectionIndexRUBI];
-      DataInput.Seek(Section.Offset + SizeOf(TSectionEntry), soFromBeginning);
-      repeat
-        DataInput.Read(fRUBIStringStartOffset, UINT32_SIZE);
-      until fRUBIStringStartOffset <> EMPTY_STRING_OFFSET_VALUE;
+      (*
+        Handling Xbox MEMOFLG.BIN special case:
+        Extract MEMOFLG.BIN from Xbox XBE if needed.
+      *)
+      XboxMemoFlagInfo.ExecuteDetection;
 
-      // Getting the max position
-//      Section := Sections[SectionIndexMEMO];
-//      MaxPosition := Section.Offset + Section.Size;
+      // Opening Flag File
+      FlagInput := TFileStream.Create(FlagSourceFileName, fmOpenRead);
+      try
+        // Getting the RUBI starting address in the MSTR section
+        Section := Sections[SectionIndexRUBI];
+        DataInput.Seek(Section.Offset + SizeOf(TSectionEntry), soFromBeginning);
+        repeat
+          DataInput.Read(fRUBIStringStartOffset, UINT32_SIZE);
+        until fRUBIStringStartOffset <> EMPTY_STRING_OFFSET_VALUE;
 
-      // Seek 'MEMO' header
-      DataInput.Seek(SizeOf(TSectionEntry), soFromBeginning);
+        // Getting the max position
+  //      Section := Sections[SectionIndexMEMO];
+  //      MaxPosition := Section.Offset + Section.Size;
 
-      // Read each string list
-      PageNumber := 0;
-      repeat
-        // Read the String Offset value from MEMODATA.BIN
-        StrPointerOffset := DataInput.Position;
-        DataInput.Read(StrOffset, 4);
+        // Seek 'MEMO' header
+        DataInput.Seek(SizeOf(TSectionEntry), soFromBeginning);
 
-        // Read the Time Code value from MEMOFLG.BIN
-        FlagInput.Read(TimeCode, UINT16_SIZE);
+        // Read each string list
+        PageNumber := 0;
+        repeat
+          // Read the String Offset value from MEMODATA.BIN
+          StrPointerOffset := DataInput.Position;
+          DataInput.Read(StrOffset, 4);
 
-        // Adding the entry
-        AddEntry(DataInput, StrPointerOffset, StrOffset, PageNumber, TimeCode);
+          // Read the Time Code value from MEMOFLG.BIN
+          FlagInput.Read(TimeCode, UINT16_SIZE);
 
-        Inc(EntryCount);
-        if (EntryCount mod MAX_LINE_PER_PAGE) = 0 then
-          Inc(PageNumber);
+          // Adding the entry
+          AddEntry(DataInput, StrPointerOffset, StrOffset, PageNumber, TimeCode);
 
-//      until DataInput.Position >= MaxPosition;
-      until FlagInput.Position >= FlagInput.Size;
+          Inc(EntryCount);
+          if (EntryCount mod MAX_LINE_PER_PAGE) = 0 then
+            Inc(PageNumber);
+
+  //      until DataInput.Position >= MaxPosition;
+        until FlagInput.Position >= FlagInput.Size;
+
+      finally
+        FlagInput.Free;
+      end; // try FlagInput
+
     end; // Loaded
 
 {$IFDEF DEBUG}
@@ -337,7 +390,6 @@ begin
 
   finally
     DataInput.Free;
-    FlagInput.Free;
   end;
 end;
 
@@ -350,9 +402,11 @@ end;
 function TDiaryEditor.SaveToFile(const DataFileName,
   FlagFileName: TFileName): Boolean;
 var
-  OutFileName, fnFLAG, fnMEMO, fnRUBI, fnMSTR: TFileName;
+  DataTemp, FlagTemp, MEMOSectionTemp, RUBISectionTemp, MSTRSectionTemp, 
+  XBETemp: TFileName;
   i: Integer;
-  DataStream, OutStream: TFileStream;
+  XBEStream, OriginalDataStream, OutTempDataStream,
+  OutTempFlagStream: TFileStream;
 
   // WriteUpdatedSection
   function WriteUpdatedSection(const SectionName: TFileName): Boolean;
@@ -367,11 +421,11 @@ var
     (* Determinates if the requested section was updated before by
        WriteTempUpdatedSections. *)
     if SectionName = MEMO_SIGN then
-      FName := fnMEMO
+      FName := MEMOSectionTemp
     else if SectionName = RUBI_SIGN then
-      FName := fnRUBI
+      FName := RUBISectionTemp
     else if SectionName = MSTR_SIGN then
-      FName := fnMSTR;
+      FName := MSTRSectionTemp;
 
     // Write the updated section if possible
     Result := FileExists(FName);
@@ -381,14 +435,14 @@ var
         // Write the section header
         StrCopy(Header.Name, PChar(SectionName));
         Header.Size := UpdatedStream.Size + SizeOf(TSectionEntry);
-        OutStream.Write(Header, SizeOf(TSectionEntry));
+        OutTempDataStream.Write(Header, SizeOf(TSectionEntry));
 
         // Write the updated section content
-        OutStream.CopyFrom(UpdatedStream, UpdatedStream.Size);
+        OutTempDataStream.CopyFrom(UpdatedStream, UpdatedStream.Size);
 
         // Write MSTR Padding
         if SectionName = MSTR_SIGN then
-          WriteNullBlock(OutStream, MSTR_PADDING_SIZE);
+          WriteNullBlock(OutTempDataStream, MSTR_PADDING_SIZE);
       finally
         UpdatedStream.Free;
         DeleteFile(FName); // clean the temp file
@@ -401,17 +455,18 @@ begin
   Result := False;
   if not Loaded then Exit;
 
-  OutFileName := GetTempFileName;
+  DataTemp := GetTempFileName;
 
-  OutStream := TFileStream.Create(OutFileName, fmCreate);
-  DataStream := TFileStream.Create(DataSourceFileName, fmOpenRead);
+  OutTempDataStream := TFileStream.Create(DataTemp, fmCreate);
+  OriginalDataStream := TFileStream.Create(DataSourceFileName, fmOpenRead);
   try
     // Update the MEMO, RUBI and MSTR sections.
-    fnMEMO := GetTempFileName;
-    fnRUBI := GetTempFileName;
-    fnMSTR := GetTempFileName;
-    fnFLAG := GetTempFileName;
-    WriteTempUpdatedSections(DataStream, fnMEMO, fnRUBI, fnMSTR, fnFLAG);
+    MEMOSectionTemp := GetTempFileName;
+    RUBISectionTemp := GetTempFileName;
+    MSTRSectionTemp := GetTempFileName;
+    FlagTemp := GetTempFileName;
+    WriteTempUpdatedSections(OriginalDataStream, MEMOSectionTemp, 
+      RUBISectionTemp, MSTRSectionTemp, FlagTemp);
 
     // Update all sections
     for i := 0 to Sections.Count - 1 do
@@ -419,20 +474,43 @@ begin
       // Write the updated section, and if not, write the raw section from the source
       if not WriteUpdatedSection(Sections[i].Name) then begin
         // Write the raw section from the InStream
-        DataStream.Seek(Sections[i].Offset, soFromBeginning);
-        OutStream.Write(DataStream, Sections[i].Size);
+        OriginalDataStream.Seek(Sections[i].Offset, soFromBeginning);
+        OutTempDataStream.Write(OriginalDataStream, Sections[i].Size);
       end;
 
   finally
-    DataStream.Free;
-    OutStream.Free;
+    OriginalDataStream.Free;
+    OutTempDataStream.Free;
 
     // Writing the requested updated MEMODATA.BIN file
-    MoveTempFile(OutFileName, DataFileName, MakeBackup);
+    MoveTempFile(DataTemp, DataFileName, MakeBackup);
+
+    // Saving the MEMOFLG.BIN
+    if PlatformVersion = pvXbox then begin
+      // Preparing temporary XBE
+      XBETemp := GetTempFileName;
+      CopyFile(XboxMemoFlagInfo.ExecutableFileName, XBETemp, False);
+            
+      // Patching the XBE with the updated MEMOFLG.BIN
+      OutTempFlagStream := TFileStream.Create(FlagTemp, fmOpenRead);
+      XBEStream := TFileStream.Create(XBETemp, fmOpenWrite);
+      try
+        XBEStream.Seek(XboxMemoFlagInfo.FlagOffset, soFromBeginning);
+        XBEStream.CopyFrom(OutTempDataStream, OutTempDataStream.Size);
+      finally
+        OutTempFlagStream.Free;
+        XBEStream.Free;
+      end;
+
+      // Deleting Old Temp FlagFileName
+      MoveTempFile(FlagTemp, FlagSourceFileName, False);
+      FlagTemp := XBETemp;
+    end;
 
     // Writing the requested updated MEMOFLG.BIN file
-    MoveTempFile(fnFLAG, FlagFileName, MakeBackup);
-  end;
+    MoveTempFile(FlagTemp, FlagFileName, MakeBackup);
+    
+  end; // finally
 end;
 
 procedure TDiaryEditor.WriteTempUpdatedSections(var InStream: TFileStream;
@@ -858,6 +936,121 @@ destructor TDiaryEditorPagesListItem.Destroy;
 begin
   fMessages.Free;
   inherited;
+end;
+
+{ TXboxMemoFlagInfo }
+
+procedure TXboxMemoFlagInfo.Clear;
+begin
+  if (ExecutableVersion <> xevNotApplicable) then
+    if FileExists(Owner.FlagSourceFileName) then
+      DeleteFile(Owner.FlagSourceFileName);
+  fFlagOffset := 0;
+  fExecutableVersion := xevNotApplicable;
+  fExecutableFileName := '';
+end;
+
+constructor TXboxMemoFlagInfo.Create(AOwner: TDiaryEditor);
+begin
+  fOwner := AOwner;
+  fExecutableVersion := xevNotApplicable;
+  fFlagOffset := 0;
+  fExecutableFileName := '';
+end;
+
+destructor TXboxMemoFlagInfo.Destroy;
+begin
+  Clear;
+  inherited;
+end;
+
+procedure TXboxMemoFlagInfo.ExecuteDetection;
+var
+  InFlagStream, OutStream: TFileStream;
+  
+begin
+  InFlagStream := TFileStream.Create(Owner.FlagSourceFileName, fmOpenRead);
+  try
+
+    if IsXboxExecutable(InFlagStream, fExecutableVersion, fFlagOffset) then begin
+      // Setting Xbox File Version
+      Owner.fPlatformVersion := pvXbox;
+      fExecutableFileName := InFlagStream.FileName;
+
+      // Extract the MEMOFLG.BIN
+      Owner.fFlagSourceFileName := GetTempFileName;
+      OutStream := TFileStream.Create(Owner.FlagSourceFileName, fmCreate);
+      try
+        InFlagStream.Seek(FlagOffset, soFromBeginning);
+        OutStream.CopyFrom(InFlagStream, MEMOFLG_SIZE);
+      finally
+        OutStream.Free;
+      end; // try
+
+{$IFDEF DEBUG}
+      WriteLn('MEMOFLG XBE: ExecutableVersion: ',
+        GetEnumName(TypeInfo(TXboxExecutableVersion), Ord(ExecutableVersion)),
+        ', FlagOffset: ', FlagOffset
+      );
+{$ENDIF}
+    end; // IsXboxExecutable
+
+  finally
+    InFlagStream.Free;
+  end;
+end;
+
+function TXboxMemoFlagInfo.IsXboxExecutable(var InFlagStream: TFileStream;
+  var ExecutableVersionResult: TXboxExecutableVersion;
+  var FlagOffsetResult: LongWord): Boolean;
+const
+  XBE_SIGN                = 'XBEH';
+
+  XBE_FLAG_OFFSET_RETAIL  = $4EE128;
+  XBE_FLAG_OFFSET_TRIAL   = $4E5138;
+
+  XBE_CHECK_OFFSET        = $19A;
+  XBE_RETAIL_SIGN         = #$20#$00#$49#$00#$49#$00#$00#$00#$00#$00;
+  XBE_TRIAL_SIGN          = #$54#$00#$72#$00#$69#$00#$61#$00#$6C#$00;
+
+var
+  FileHeader: array[0..3] of Char;
+  Buffer: array[0..9] of Char;
+  SavedPos: Int64;
+
+begin
+  Result := False;
+  FlagOffsetResult := 0;
+  ExecutableVersionResult := xevNotApplicable;
+  SavedPos := InFlagStream.Position;
+
+  // Checking Flag Signature
+  InFlagStream.Seek(0, soFromBeginning);
+  InFlagStream.Read(FileHeader, SizeOf(FileHeader));
+
+  // The file is a Xbox Executable (XBE)
+  if FileHeader = XBE_SIGN then begin
+
+    // Detect the XBE version
+    InFlagStream.Seek(XBE_CHECK_OFFSET, soFromBeginning);
+    InFlagStream.Read(Buffer, SizeOf(Buffer));
+
+    // Check the XBE type
+    Result := True;
+    if StrComp(Buffer, XBE_RETAIL_SIGN) = 0 then begin
+      // The XBE is Retail
+      ExecutableVersionResult := xevRetail;
+      FlagOffsetResult := XBE_FLAG_OFFSET_RETAIL;
+    end else if StrComp(Buffer, XBE_TRIAL_SIGN) = 0 then begin
+      // The XBE is Trial
+      ExecutableVersionResult := xevTrial;
+      FlagOffsetResult := XBE_FLAG_OFFSET_TRIAL;
+    end else
+      Result := False;
+
+  end;
+
+  InFlagStream.Seek(SavedPos, soFromBeginning);
 end;
 
 end.
