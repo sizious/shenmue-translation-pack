@@ -51,6 +51,7 @@ object frmFileSelection: TfrmFileSelection
       Height = 25
       Caption = 'Browse...'
       TabOrder = 1
+      OnClick = btnDataFileNameClick
     end
   end
   object gbxDataFileName: TGroupBox
@@ -87,6 +88,7 @@ object frmFileSelection: TfrmFileSelection
       Height = 25
       Caption = 'Browse...'
       TabOrder = 1
+      OnClick = btnFlagFileNameClick
     end
   end
   object btnCancel: TButton
@@ -129,12 +131,20 @@ object frmFileSelection: TfrmFileSelection
   end
   object odFlag: TOpenDialog
     DefaultExt = 'BIN'
+    FileName = 'MEMOFLG.BIN'
+    Filter = 
+      'Notebook Flag Data Files (MEMOFLG.BIN)|MEMOFLG.BIN|Xbox Executab' +
+      'le Files (*.XBE)|*.XBE|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 264
     Top = 84
   end
   object sdFlag: TSaveDialog
     DefaultExt = 'BIN'
+    FileName = 'MEMOFLG.BIN'
+    Filter = 
+      'Notebook Flag Data Files (MEMOFLG.BIN)|MEMOFLG.BIN|Xbox Executab' +
+      'le Files (*.XBE)|*.XBE|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Left = 232
     Top = 84

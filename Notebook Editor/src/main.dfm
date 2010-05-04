@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = '< Generated Title > // Diary Editor'
+  Caption = '< Generated Title > // Notebook Editor'
   ClientHeight = 338
   ClientWidth = 499
   Color = clBtnFace
@@ -245,7 +245,7 @@ object frmMain: TfrmMain
   end
   object eLeft4: TEdit
     Tag = 4
-    Left = 44
+    Left = 43
     Top = 246
     Width = 203
     Height = 21
@@ -357,38 +357,51 @@ object frmMain: TfrmMain
     TabOrder = 21
     Text = '9999'
     OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eLeftCode1: TEdit
+    Tag = 1
     Left = 5
     Top = 174
     Width = 33
     Height = 21
     TabOrder = 22
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eLeftCode2: TEdit
+    Tag = 2
     Left = 5
     Top = 198
     Width = 33
     Height = 21
     TabOrder = 23
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eLeftCode3: TEdit
+    Tag = 3
     Left = 5
     Top = 222
     Width = 33
     Height = 21
     TabOrder = 24
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eLeftCode4: TEdit
+    Tag = 4
     Left = 5
     Top = 246
     Width = 33
     Height = 21
     TabOrder = 25
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eRightCode0: TEdit
     Left = 461
@@ -397,38 +410,52 @@ object frmMain: TfrmMain
     Height = 21
     TabOrder = 26
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eRightCode1: TEdit
+    Tag = 1
     Left = 461
     Top = 174
     Width = 33
     Height = 21
     TabOrder = 27
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eRightCode2: TEdit
+    Tag = 2
     Left = 461
     Top = 198
     Width = 33
     Height = 21
     TabOrder = 28
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eRightCode3: TEdit
+    Tag = 3
     Left = 461
     Top = 222
     Width = 33
     Height = 21
     TabOrder = 29
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object eRightCode4: TEdit
+    Tag = 4
     Left = 461
     Top = 246
     Width = 33
     Height = 21
     TabOrder = 30
     Text = '9999'
+    OnChange = eLeftCode0Change
+    OnEnter = eLeft0Enter
   end
   object mmMain: TMainMenu
     Left = 150
@@ -441,8 +468,13 @@ object frmMain: TfrmMain
         OnClick = miOpenClick
       end
       object miSave: TMenuItem
-        Caption = 'Save'
+        Caption = '&Save...'
         OnClick = miSaveClick
+      end
+      object miSaveAs: TMenuItem
+        Caption = 'Sa&ve as...'
+        ShortCut = 49235
+        OnClick = miSaveAsClick
       end
       object N1: TMenuItem
         Caption = '-'
@@ -480,6 +512,14 @@ object frmMain: TfrmMain
       object miDEBUG_TEST4: TMenuItem
         Caption = 'STRONG TEST 2'
         OnClick = miDEBUG_TEST4Click
+      end
+      object miDEBUG_TEST6: TMenuItem
+        Caption = 'STRONG TEST 3 XBE'
+        OnClick = miDEBUG_TEST6Click
+      end
+      object miDEBUG_TEST7: TMenuItem
+        Caption = 'STRONG TEST XBE 2'
+        OnClick = miDEBUG_TEST7Click
       end
       object N3: TMenuItem
         Caption = '-'
