@@ -11,9 +11,11 @@ object frmFileSelection: TfrmFileSelection
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel1: TBevel
@@ -108,6 +110,7 @@ object frmFileSelection: TfrmFileSelection
     Caption = '< Generated >'
     ModalResult = 1
     TabOrder = 3
+    OnClick = btnOKClick
   end
   object odData: TOpenDialog
     DefaultExt = 'BIN'

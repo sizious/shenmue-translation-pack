@@ -1,3 +1,8 @@
+(*
+  Shenmue Notebook Editor
+
+  Memo Editor Engine
+*)
 unit MemoEdit;
 
 interface
@@ -91,7 +96,7 @@ type
     constructor Create(AOwner: TDiaryEditor);
     destructor Destroy; override;
     procedure ExportToCSV(const FileName: TFileName);
-    procedure ExportToFile(const FileName: TFileName);
+    function ExportToFile(const FileName: TFileName): Boolean;
     function ImportFromFile(const FileName: TFileName): Boolean;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TDiaryEditorPagesListItem
@@ -143,7 +148,6 @@ type
   protected
     procedure AddEntry(var Input: TFileStream; const StrPointerOffset,
       StrOffset: LongWord; const PageNumber: Integer; const FlagCode: Word);
-    procedure Clear;
     procedure WriteTempUpdatedSections(var InStream: TFileStream;
       const MEMOFileName, RUBIFileName, MSTRFileName, FlagFileName: TFileName);
     property Dependances: TDiaryEditorStringsDependances read fDependancesList;
@@ -155,10 +159,12 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    procedure Clear;    
 {$IFDEF DEBUG}
     procedure DumpStringDependancies(const FileName: TFileName);
 {$ENDIF}
     function LoadFromFile(const DataFileName, FlagFileName: TFileName): Boolean;
+    function Reload: Boolean;
     function Save: Boolean;
     function SaveToFile(const DataFileName, FlagFileName: TFileName): Boolean;
     property DataSourceFileName: TFileName read fDataSourceFileName;
@@ -253,6 +259,7 @@ end;
 
 procedure TDiaryEditor.Clear;
 begin
+  fFileLoaded := False;
   Pages.Clear;
   Dependances.Clear;
   XboxMemoFlagInfo.Clear;
@@ -296,7 +303,8 @@ var
   StrPointerOffset, StrOffset: LongWord;
   Section: TFileSectionsListItem;
   TimeCode: Word;
-  
+  ValidFile: Boolean;
+
 begin
   Result := False;
   if (not FileExists(DataFileName)) or (not FileExists(FlagFileName)) then Exit;
@@ -304,6 +312,9 @@ begin
   // Try to parse the MEMODATA.BIN file
   DataInput := TFileStream.Create(DataFileName, fmOpenRead);
   try
+{$IFDEF DEBUG}
+    WriteLn('*** LOADING MEMO DATA FILE ***');
+{$ENDIF}
     // Parsing the file
     ParseFileSections(DataInput, fSections);
 
@@ -320,12 +331,15 @@ begin
     fSectionIndexRUBI := Sections.IndexOf(RUBI_SIGN);
 
     // The file to be valid must be contains MEMO, RUBI and MSTR sections
-    fFileLoaded := (SectionIndexMEMO <> -1) and (SectionIndexRUBI <> -1)
+    ValidFile := (SectionIndexMEMO <> -1) and (SectionIndexRUBI <> -1)
       and (SectionIndexMSTR <> -1);
     EntryCount := 0;
 
     // Analyzing MEMO and MSTR sections
-    if Loaded then begin
+    if ValidFile then begin
+{$IFDEF DEBUG}
+      WriteLn('*** PARSING FILE ***');
+{$ENDIF}
       // Clearing the object
       Clear;
 
@@ -377,6 +391,9 @@ begin
   //      until DataInput.Position >= MaxPosition;
         until FlagInput.Position >= FlagInput.Size;
 
+        // Setting Loaded value to true
+        fFileLoaded := ValidFile;
+        Result := Loaded;
       finally
         FlagInput.Free;
       end; // try FlagInput
@@ -385,7 +402,8 @@ begin
 
 {$IFDEF DEBUG}
     WriteLn(sLineBreak, '*** END ***', sLineBreak,
-      'Pages Count: ', Pages.Count, ', Messages Count: ', EntryCount);
+      'Pages Count: ', Pages.Count, ', Messages Count: ', EntryCount,
+      sLineBreak);
 {$ENDIF}
 
   finally
@@ -393,10 +411,20 @@ begin
   end;
 end;
 
+function TDiaryEditor.Reload: Boolean;
+var
+  FlagFile: TFileName;
+
+begin
+  FlagFile := FlagSourceFileName;
+  if PlatformVersion = pvXbox then
+    FlagFile := XboxMemoFlagInfo.ExecutableFileName;
+  Result := LoadFromFile(DataSourceFileName, FlagFile);
+end;
+
 function TDiaryEditor.Save: Boolean;
 begin
-  Result := SaveToFile(DataSourceFileName, FlagSourceFileName)
-    and LoadFromFile(DataSourceFileName, FlagSourceFileName);
+  Result := SaveToFile(DataSourceFileName, FlagSourceFileName) and Reload;
 end;
 
 function TDiaryEditor.SaveToFile(const DataFileName,
@@ -455,6 +483,10 @@ begin
   Result := False;
   if not Loaded then Exit;
 
+{$IFDEF DEBUG}
+    WriteLn('*** SAVING MEMO DATA FILE ***');
+{$ENDIF}
+
   DataTemp := GetTempFileName;
 
   OutTempDataStream := TFileStream.Create(DataTemp, fmCreate);
@@ -483,7 +515,7 @@ begin
     OutTempDataStream.Free;
 
     // Writing the requested updated MEMODATA.BIN file
-    MoveTempFile(DataTemp, DataFileName, MakeBackup);
+    Result := MoveTempFile(DataTemp, DataFileName, MakeBackup);
 
     // Saving the MEMOFLG.BIN
     if PlatformVersion = pvXbox then begin
@@ -508,7 +540,7 @@ begin
     end;
 
     // Writing the requested updated MEMOFLG.BIN file
-    MoveTempFile(FlagTemp, FlagFileName, MakeBackup);
+    Result := Result and MoveTempFile(FlagTemp, FlagFileName, MakeBackup);
     
   end; // finally
 end;
@@ -575,14 +607,22 @@ begin
     // Calculating the new RUBI string start offset (with a "patch value")
     RUBI_PatchValue := MSTR_FStream.Size - RUBIStringsStartOffset;
 {$IFDEF DEBUG}
-    WriteLn('RUBI_PatchValue: ', RUBI_PatchValue);
+    WriteLn('RUBI PatchValue: ', RUBI_PatchValue);
 {$ENDIF}
 
     // Dump the RUBI "MSTR" file content from the original file
+{$IFDEF DEBUG}
+    WriteLn('MSTR StringsStartOffset: ', MSTRStringsStartOffset);
+    WriteLn('RUBI StringsStartOffset: ', RUBIStringsStartOffset);
+{$ENDIF}    
     MSTR_FStream.Seek(0, soFromEnd);
     InStream.Seek(MSTRStringsStartOffset
       + RUBIStringsStartOffset, soFromBeginning);
     Temp := Sections[SectionIndexMSTR].Size - RUBIStringsStartOffset - MSTR_PADDING_SIZE;
+{$IFDEF DEBUG}
+    WriteLn('RUBI Dump / Offset: ', (MSTRStringsStartOffset + RUBIStringsStartOffset),
+      ', Size: ', Temp);
+{$ENDIF}
     MSTR_FStream.CopyFrom(InStream, Temp);
     
     // Writing the updated RUBI section
@@ -724,7 +764,7 @@ begin
   end;
 end;
 
-procedure TDiaryEditorPagesList.ExportToFile(const FileName: TFileName);
+function TDiaryEditorPagesList.ExportToFile(const FileName: TFileName): Boolean;
 var
   XMLDocument: IXMLDocument;
   p, m: Integer;
@@ -732,6 +772,9 @@ var
   MessageEntry: TDiaryEditorMessagesListItem;
 
 begin
+  Result := False;
+  if not Owner.Loaded then Exit;
+
   XMLDocument := TXMLDocument.Create(nil);
   try
     // Setting XMLDocument properties
@@ -778,10 +821,12 @@ begin
 
     end;
 
+    // Saving the file
     XMLDocument.SaveToFile(FileName);
   finally
     XMLDocument.Active := False;
     XMLDocument := nil;
+    Result := FileExists(FileName);    
   end;
 end;
 
@@ -827,7 +872,7 @@ var
   
 begin
   Result := False;
-  if not FileExists(FileName) then Exit;
+  if (not FileExists(FileName)) or (not Owner.Loaded) then Exit;
 
   XMLDocument := TXMLDocument.Create(nil);
   try
@@ -874,6 +919,7 @@ begin
         PageNode := PageNode.NextSibling;
       until not Assigned(PageNode);
 
+      Result := True;
     except
       Result := False;
     end;
