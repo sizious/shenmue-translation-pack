@@ -28,6 +28,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnDataFileNameClick(Sender: TObject);
     procedure btnFlagFileNameClick(Sender: TObject);
+    procedure btnOKClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }  
     fSelectionMode: TFileSelectionMode;
@@ -39,6 +41,7 @@ type
       DefaultFileName: TFileName): TFileName;
   public
     { Déclarations publiques }
+    function MsgBox(Text, Title: string; Flags: Integer): Integer;
     property SelectionMode: TFileSelectionMode read fSelectionMode
       write SetSelectionMode;
     property SelectedDataFile: TFileName read GetSelectedDataFile;
@@ -68,9 +71,36 @@ begin
   edtFlagFileName.SetFocus;
 end;
 
+procedure TfrmFileSelection.btnOKClick(Sender: TObject);
+begin
+  if SelectionMode = fsmOpen then
+    if (not FileExists(SelectedDataFile))
+      or (not FileExists(SelectedFlagFile)) then begin
+      MsgBox('At least one input file wasn''t found. Check your input files.',
+        'Warning', MB_ICONWARNING);
+      ModalResult := mrNone;
+    end;
+end;
+
 procedure TfrmFileSelection.FormCreate(Sender: TObject);
 begin
   SelectionMode := fsmOpen;
+end;
+
+procedure TfrmFileSelection.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  case Ord(Key) of
+    VK_ESCAPE:
+      begin
+        Key := #0;
+        Close;
+      end;
+    VK_RETURN:
+      begin
+        Key := #0;
+        ModalResult := mrOK;
+      end;
+  end;
 end;
 
 function TfrmFileSelection.GetSelectedDataFile: TFileName;
@@ -81,6 +111,11 @@ end;
 function TfrmFileSelection.GetSelectedFlagFile: TFileName;
 begin
   Result := edtFlagFileName.Text;
+end;
+
+function TfrmFileSelection.MsgBox(Text, Title: string; Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Title), Flags);
 end;
 
 function TfrmFileSelection.RunDialog(OpenDialog,

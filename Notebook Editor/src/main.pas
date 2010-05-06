@@ -20,9 +20,8 @@ type
     tbSave: TToolButton;
     ToolButton4: TToolButton;
     tbDebugLog: TToolButton;
-    tbPreview: TToolButton;
-    tbOriginal: TToolButton;
-    tbCharset: TToolButton;
+    tbAutoSave: TToolButton;
+    tbMakeBackup: TToolButton;
     ToolButton2: TToolButton;
     tbAbout: TToolButton;
     ilToolBarDisabled: TImageList;
@@ -78,6 +77,30 @@ type
     miDEBUG_TEST6: TMenuItem;
     miSave: TMenuItem;
     miDEBUG_TEST7: TMenuItem;
+    miDEBUG_TEST8: TMenuItem;
+    N5: TMenuItem;
+    miDEBUG_TEST9: TMenuItem;
+    miView: TMenuItem;
+    miHelp: TMenuItem;
+    miOptions: TMenuItem;
+    miMakeBackup: TMenuItem;
+    miDebugLog: TMenuItem;
+    N6: TMenuItem;
+    miGoLastPage: TMenuItem;
+    miGoFirstPage: TMenuItem;
+    miGoNextPage: TMenuItem;
+    miGoPreviousPage: TMenuItem;
+    miReload: TMenuItem;
+    N7: TMenuItem;
+    miClose: TMenuItem;
+    miAutoSave: TMenuItem;
+    N8: TMenuItem;
+    miImport: TMenuItem;
+    miProjectHome: TMenuItem;
+    miCheckForUpdate: TMenuItem;
+    N9: TMenuItem;
+    miAbout: TMenuItem;
+    ToolButton3: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure bNextClick(Sender: TObject);
@@ -103,12 +126,16 @@ type
     procedure miDEBUG_TEST6Click(Sender: TObject);
     procedure miSaveClick(Sender: TObject);
     procedure miDEBUG_TEST7Click(Sender: TObject);
+    procedure miDEBUG_TEST8Click(Sender: TObject);
+    procedure miDEBUG_TEST9Click(Sender: TObject);
+    procedure miCloseClick(Sender: TObject);
   private
     { Déclarations privées }
     fPageNumber: Integer;
     fFileModified: Boolean;
     fSelectedMessage: TDiaryEditorMessagesListItem;
     fSelectedFlagCodeEdit: TEdit;
+    fAutoSave: Boolean;
     procedure ClearEdits(PageType: TPagePosition);
     procedure FreeModules;
     procedure InitModules;
@@ -120,12 +147,16 @@ type
     function GetStatusText: string;
     procedure SetStatusText(const Value: string);
     procedure SetFileModified(const Value: Boolean);
+    procedure SetAutoSave(const Value: Boolean);
     property SelectedFlagCodeEdit: TEdit read fSelectedFlagCodeEdit;
   public
     { Déclarations publiques }
     procedure Clear;
     function LoadPage(const LeftPageIndex: Integer): Boolean;
-    property FileModified: Boolean read fFileModified write SetFileModified;    
+    function MsgBox(const Text, Title: string; Flags: Integer): Integer;
+    function SaveFileOnDemand(const CancelButton: Boolean): Boolean;
+    property AutoSave: Boolean read fAutoSave write SetAutoSave;
+    property FileModified: Boolean read fFileModified write SetFileModified;
     property PageNumber: Integer read fPageNumber write SetPageNumber;
     property SelectedMessage: TDiaryEditorMessagesListItem
       read fSelectedMessage;
@@ -170,6 +201,7 @@ end;
 
 procedure TfrmMain.Clear;
 begin
+  DiaryEditor.Clear;
   fSelectedMessage := nil;
   FileModified := False;
   StatusText := '';
@@ -330,12 +362,15 @@ procedure TfrmMain.InitUI;
   end;
 
 begin
-  Caption := Application.Title + ' v' + '0.0';
+  Caption := Application.Title + ' v' + GetApplicationVersion;
   MakeNumericOnly(ePageNumber.Handle);
 
   // Init TimeCode edits
   InitTimeCodeEdits(ptLeft);
   InitTimeCodeEdits(ptRight);
+
+  // Init Toolbar
+  ToolBarInitControl(Self, tbMain);
 end;
 
 function TfrmMain.LoadPage(const LeftPageIndex: Integer): Boolean;
@@ -404,6 +439,14 @@ begin
     Result := Result and LoadSinglePage(RightPageIndex, ptRight)
   else
     ClearEdits(ptRight);
+end;
+
+procedure TfrmMain.miCloseClick(Sender: TObject);
+begin
+  if not SaveFileOnDemand(True) then Exit;
+  Clear;
+(*  AddDebug(ltInformation, 'Close successfully done for "' +
+    IpacEditor.SourceFileName + '".'); *)
 end;
 
 procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
@@ -535,7 +578,7 @@ var
 begin
 
   // 1st phase
-  DiaryEditor.LoadFromFile('MEMODATA.BIN', 'RETAIL.XBE');
+  DiaryEditor.LoadFromFile('MEMODATA.HAK', 'RETAIL.HAK');
   DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
   i := 0;
 
@@ -554,7 +597,7 @@ begin
     DiaryEditor.SaveToFile('XBOXMEMO.HAK', 'XBOXFLG.HAK');
     DiaryEditor.LoadFromFile('XBOXMEMO.HAK', 'XBOXFLG.HAK');
 
-    WriteLn('*** END PASS ', i, ' ***');
+    WriteLn('*** END PASS ', i, ' ***', sLineBreak);
     Inc(i);
   until i = 20;
 
@@ -594,14 +637,48 @@ begin
 
     DiaryEditor.Save;
 
-    WriteLn('*** END PASS ', i, ' ***');
+    WriteLn('*** END PASS ', i, ' ***', sLineBreak);
     Inc(i);
   until i = 20;
 
   // 2nd phase
   DiaryEditor.Pages.ImportFromFile('MEMODATA.XML');
-  DiaryEditor.SaveToFile('XBOXMEMO.NEW', 'XBOXFLG.NEW');
+  DiaryEditor.Save;
 
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST8Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  i: Integer;
+
+begin
+  DiaryEditor.LoadFromFile('MEMODATA.TST', 'MEMOFLG.TST');
+  for i := 0 to 6 do begin
+    DiaryEditor.Pages[5].Messages[0].Text := 'RELOAD_TEST_' + GetRandomString(90);
+    DiaryEditor.Save;
+    DiaryEditor.Reload;
+  end;
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST9Click(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  i: Integer;
+
+begin
+  DiaryEditor.LoadFromFile('MEMODATA.TST', 'RETAIL.HAK');
+  for i := 0 to 6 do begin
+    DiaryEditor.Pages[5].Messages[0].Text := 'RELOAD_TEST_' + GetRandomString(90);
+    DiaryEditor.Save;
+    DiaryEditor.Reload;
+  end;
 {$ELSE}
 begin
 {$ENDIF}
@@ -653,6 +730,48 @@ begin
   FileModified := False;
 end;
 
+function TfrmMain.MsgBox(const Text, Title: string; Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
+end;
+
+function TfrmMain.SaveFileOnDemand(const CancelButton: Boolean): Boolean;
+var
+  CanDo: Integer;
+  MsgBtns: Integer;
+  MustSave: Boolean;
+
+begin
+  Result := True;
+  if not FileModified then Exit;
+  
+  Result := False;
+  MustSave := True;
+  
+  if not AutoSave then begin
+    // If not AutoSave, then check if we must save or not
+    MsgBtns := MB_YESNO;
+    if CancelButton then
+      MsgBtns := MB_YESNOCANCEL;
+
+    CanDo := MsgBox('The file was modified. Save changes?', 'Warning',
+      MB_ICONWARNING + MsgBtns);
+    if CanDo = IDCANCEL then Exit;
+    MustSave := (CanDo = IDYES);
+  end; // AutoSave
+
+  // We save the file
+  if MustSave then
+    miSave.Click;
+
+  Result := True;
+end;
+
+procedure TfrmMain.SetAutoSave(const Value: Boolean);
+begin
+  fAutoSave := Value;
+end;
+
 procedure TfrmMain.SetFileModified(const Value: Boolean);
 begin
   fFileModified := Value;
@@ -686,9 +805,13 @@ begin
   bGo.Enabled := DiaryEditor.Loaded;
   ePageNumber.Enabled := DiaryEditor.Loaded;
   bPrev.Enabled := (fPageNumber > 0) and DiaryEditor.Loaded;
+  miGoPreviousPage.Enabled := bPrev.Enabled;
   bNext.Enabled := (RightPageIndex < DiaryEditor.Pages.Count - 1) and DiaryEditor.Loaded;
+  miGoNextPage.Enabled := bNext.Enabled;
   bLast.Enabled := bNext.Enabled;
+  miGoLastPage.Enabled := bLast.Enabled;  
   bFirst.Enabled := bPrev.Enabled;
+  miGoFirstPage.Enabled := bFirst.Enabled;
   ePageNumber.Text := IntToStr(fPageNumber);
   eRightPageNumber.Text := IntToStr(RightPageIndex);
 end;
