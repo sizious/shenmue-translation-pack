@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, MemoEdit, Menus, ImgList, ComCtrls, ToolWin, JvExComCtrls,
-  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls, Common;
+  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls, Common, DebugLog,
+  BugsMgr;
 
 type
   TfrmMain = class(TForm)
@@ -50,8 +51,8 @@ type
     bFirst: TButton;
     bLast: TButton;
     miDEBUG_TEST2: TMenuItem;
-    sdSave: TSaveDialog;
-    odOpen: TOpenDialog;
+    sdExport: TSaveDialog;
+    odImport: TOpenDialog;
     aeMain: TApplicationEvents;
     miExport: TMenuItem;
     N2: TMenuItem;
@@ -101,6 +102,14 @@ type
     N9: TMenuItem;
     miAbout: TMenuItem;
     ToolButton3: TToolButton;
+    N10: TMenuItem;
+    miDEBUG_TEST10: TMenuItem;
+    ToolButton5: TToolButton;
+    tbImport: TToolButton;
+    tbExport: TToolButton;
+    N11: TMenuItem;
+    miDEBUG_TEST11: TMenuItem;
+    N12: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure bNextClick(Sender: TObject);
@@ -129,6 +138,20 @@ type
     procedure miDEBUG_TEST8Click(Sender: TObject);
     procedure miDEBUG_TEST9Click(Sender: TObject);
     procedure miCloseClick(Sender: TObject);
+    procedure miAutoSaveClick(Sender: TObject);
+    procedure miDebugLogClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure aeMainException(Sender: TObject; E: Exception);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure miDEBUG_TEST10Click(Sender: TObject);
+    procedure miMakeBackupClick(Sender: TObject);
+    procedure aeMainHint(Sender: TObject);
+    procedure miReloadClick(Sender: TObject);
+    procedure miDEBUG_TEST11Click(Sender: TObject);
+    procedure miImportClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure miProjectHomeClick(Sender: TObject);
+    procedure miCheckForUpdateClick(Sender: TObject);
   private
     { Déclarations privées }
     fPageNumber: Integer;
@@ -136,8 +159,21 @@ type
     fSelectedMessage: TDiaryEditorMessagesListItem;
     fSelectedFlagCodeEdit: TEdit;
     fAutoSave: Boolean;
+    fDebugLogVisible: Boolean;
+    fQuitOnFailure: Boolean;
+    fMakeBackup: Boolean;
+    procedure BugsHandlerExceptionCallBack(Sender: TObject;
+      ExceptionMessage: string);
+    procedure BugsHandlerSaveLogRequest(Sender: TObject);
+    procedure BugsHandlerQuitRequest(Sender: TObject);    
     procedure ClearEdits(PageType: TPagePosition);
+    procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
+    procedure DebugLogMainFormToFront(Sender: TObject);
+    procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);
+    procedure DebugLogWindowActivated(Sender: TObject);    
     procedure FreeModules;
+    procedure InitBugsHandler;    
+    procedure InitDebugLog;
     procedure InitModules;
     procedure InitUI;
     function GetLineEdit(Page: TPagePosition; const LineIndex: Integer;
@@ -145,18 +181,27 @@ type
     function GetOriginalTextMemo(Page: TPagePosition): TMemo;
     procedure SetPageNumber(const Value: Integer);
     function GetStatusText: string;
-    procedure SetStatusText(const Value: string);
-    procedure SetFileModified(const Value: Boolean);
     procedure SetAutoSave(const Value: Boolean);
+    procedure SetControlsStateFileOperations(State: Boolean);
+    procedure SetControlsStateSaveOperation(State: Boolean);
+    procedure SetDebugLogVisible(const Value: Boolean);
+    procedure SetFileModified(const Value: Boolean);
+    procedure SetStatusText(const Value: string);
+    procedure SetMakeBackup(const Value: Boolean);
     property SelectedFlagCodeEdit: TEdit read fSelectedFlagCodeEdit;
+    property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;    
   public
     { Déclarations publiques }
-    procedure Clear;
+    procedure Clear(const OnlyUI: Boolean); overload;
+    procedure Clear; overload;
     function LoadPage(const LeftPageIndex: Integer): Boolean;
     function MsgBox(const Text, Title: string; Flags: Integer): Integer;
     function SaveFileOnDemand(const CancelButton: Boolean): Boolean;
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
+    property DebugLogVisible: Boolean read fDebugLogVisible
+      write SetDebugLogVisible;
     property FileModified: Boolean read fFileModified write SetFileModified;
+    property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;    
     property PageNumber: Integer read fPageNumber write SetPageNumber;
     property SelectedMessage: TDiaryEditorMessagesListItem
       read fSelectedMessage;
@@ -166,13 +211,15 @@ type
 var
   frmMain: TfrmMain;
   DiaryEditor: TDiaryEditor;
-
+  DebugLog: TDebugLogHandlerInterface;
+  BugsHandler: TBugsHandlerInterface;
+  
 implementation
 
 {$R *.dfm}
 
 uses
-  UITools, SysTools, FileSel;
+  UITools, SysTools, FileSel, Config, About;
   
 procedure TfrmMain.bGoClick(Sender: TObject);
 begin
@@ -182,6 +229,35 @@ end;
 procedure TfrmMain.bPrevClick(Sender: TObject);
 begin
   PageNumber := PageNumber - 2;
+end;
+
+procedure TfrmMain.BugsHandlerExceptionCallBack(Sender: TObject;
+  ExceptionMessage: string);
+begin
+  DebugLog.AddLine(ltCritical, ExceptionMessage);
+end;
+
+procedure TfrmMain.BugsHandlerQuitRequest(Sender: TObject);
+begin
+  QuitOnFailure := True;
+  Close;
+end;
+
+procedure TfrmMain.BugsHandlerSaveLogRequest(Sender: TObject);
+begin
+  DebugLog.SaveLogFile;
+end;
+
+procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);  
+  aeMain.CancelDispatch;
+end;
+
+procedure TfrmMain.aeMainHint(Sender: TObject);
+begin
+  StatusText := Application.Hint;
+  aeMain.CancelDispatch;
 end;
 
 procedure TfrmMain.bFirstClick(Sender: TObject);
@@ -199,15 +275,24 @@ begin
   PageNumber := PageNumber + 2;
 end;
 
-procedure TfrmMain.Clear;
+procedure TfrmMain.Clear(const OnlyUI: Boolean);
 begin
-  DiaryEditor.Clear;
+  if not OnlyUI then
+    DiaryEditor.Clear;
+
   fSelectedMessage := nil;
   FileModified := False;
   StatusText := '';
   ClearEdits(ptLeft);
   ClearEdits(ptRight);
   PageNumber := 0;
+  SetControlsStateFileOperations(False);
+  SetControlsStateSaveOperation(False);  
+end;
+
+procedure TfrmMain.Clear;
+begin
+  Clear(False);
 end;
 
 procedure TfrmMain.ClearEdits(PageType: TPagePosition);
@@ -232,6 +317,29 @@ begin
     end;
   end;
   GetOriginalTextMemo(PageType).Clear;
+end;
+
+procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);
+end;
+
+procedure TfrmMain.DebugLogMainFormToFront(Sender: TObject);
+begin
+  BringToFront;  
+end;
+
+procedure TfrmMain.DebugLogVisibilityChange(Sender: TObject;
+  const Visible: Boolean);
+begin
+  fDebugLogVisible := Visible;
+  miDebugLog.Checked := Visible;
+  tbDebugLog.Down := Visible;
+end;
+
+procedure TfrmMain.DebugLogWindowActivated(Sender: TObject);
+begin
+  StatusText := '';
 end;
 
 procedure TfrmMain.eLeft0Change(Sender: TObject);
@@ -274,8 +382,10 @@ end;
 
 procedure TfrmMain.eLeftCode0Change(Sender: TObject);
 begin
-  if (DiaryEditor.Loaded) and Assigned(SelectedMessage) then
+  if (DiaryEditor.Loaded) and Assigned(SelectedMessage) then begin
+    FileModified := True;  
     SelectedMessage.FlagCode := StrToIntDef((Sender as TEdit).Text, 0);
+  end;
 end;
 
 procedure TfrmMain.ePageNumberKeyPress(Sender: TObject; var Key: Char);
@@ -286,26 +396,63 @@ begin
   end;
 end;
 
+procedure TfrmMain.FormActivate(Sender: TObject);
+begin
+  aeMain.OnException := aeMainException;
+  aeMain.Activate;
+end;
+
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if (not QuitOnFailure) and (not SaveFileOnDemand(True)) then begin
+    Action := caNone;
+    Exit;
+  end;
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+{$IFNDEF DEBUG}
+  miDEBUG_TEST.Visible := False;
+{$ENDIF}
+
   // Start Initializing...
-  InitUI;
+  aeMain.OnException := nil;
 
   // Creating Internal Modules
   InitModules;
 
-  // Clearing UI
+  // Load configuration
+  LoadConfig;
+
+  // Init the GUI
+  InitUI;
   Clear;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  // Saving configuration
+  SaveConfig;
+  
+  // Destroying application
   FreeModules;
 end;
 
 procedure TfrmMain.FreeModules;
 begin
+  // Disabling the Close button
+  miQuit.Enabled := False;
+  SetCloseWindowButtonState(Self, False);
+  
+  // Destroying the Diary Editor
   DiaryEditor.Free;
+
+  // Destroying the Debug Log
+  DebugLog.Free;
+
+  // Cleaning Bugs Handler
+  BugsHandler.Free;
 end;
 
 function TfrmMain.GetLineEdit(Page: TPagePosition;
@@ -343,8 +490,45 @@ begin
   Result := sbMain.Panels[2].Text;
 end;
 
+procedure TfrmMain.InitBugsHandler;
+begin
+  QuitOnFailure := False;
+  BugsHandler := TBugsHandlerInterface.Create;
+  try
+    BugsHandler.OnExceptionCallBack := BugsHandlerExceptionCallBack;
+    BugsHandler.OnSaveLogRequest := BugsHandlerSaveLogRequest;
+    BugsHandler.OnQuitRequest := BugsHandlerQuitRequest;
+  except
+    on E: Exception do
+      DebugLog.Report(ltWarning, 'Unable to initialize the Bugs Handler!',
+        'Reason: "' + E.Message + '"');
+  end;
+end;
+
+procedure TfrmMain.InitDebugLog;
+begin
+  DebugLog := TDebugLogHandlerInterface.Create;
+  with DebugLog do begin
+    // Setting up events
+    OnException := DebugLogExceptionEvent;
+    OnMainWindowBringToFront := DebugLogMainFormToFront;
+    OnVisibilityChange := DebugLogVisibilityChange;
+    OnWindowActivated := DebugLogWindowActivated;
+  end;
+
+  // Setting up the properties
+  DebugLog.Configuration := Configuration; // in this order!
+end;
+
 procedure TfrmMain.InitModules;
 begin
+  // Init the Bugs Handler
+  InitBugsHandler;
+  
+  // Init the Debug Log
+  InitDebugLog;
+  
+  // Init the Main Object
   DiaryEditor := TDiaryEditor.Create;
 end;
 
@@ -371,6 +555,15 @@ begin
 
   // Init Toolbar
   ToolBarInitControl(Self, tbMain);
+
+//  Constraints.MinHeight := Height;
+//  Constraints.MinWidth := Width;
+
+  // Init the About Box
+  InitAboutBox(
+    Application.Title,
+    GetApplicationVersion
+  );  
 end;
 
 function TfrmMain.LoadPage(const LeftPageIndex: Integer): Boolean;
@@ -441,12 +634,51 @@ begin
     ClearEdits(ptRight);
 end;
 
+procedure TfrmMain.miAboutClick(Sender: TObject);
+begin
+  RunAboutBox;
+end;
+
+procedure TfrmMain.miAutoSaveClick(Sender: TObject);
+begin
+  AutoSave := not AutoSave;
+end;
+
+procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
+begin
+  OpenLink('https://sourceforge.net/projects/shenmuesubs/files/');
+end;
+
 procedure TfrmMain.miCloseClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   Clear;
-(*  AddDebug(ltInformation, 'Close successfully done for "' +
-    IpacEditor.SourceFileName + '".'); *)
+  DebugLog.AddLine(ltInformation, 'Close successfully done for "' +
+    DiaryEditor.DataSourceFileName + '".');
+end;
+
+procedure TfrmMain.miDebugLogClick(Sender: TObject);
+begin
+  DebugLogVisible := not DebugLogVisible;
+end;
+
+procedure TfrmMain.miDEBUG_TEST10Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  raise EDivByZero.Create('BLAH!!!');
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST11Click(Sender: TObject);
+{$IFDEF DEBUG}
+begin
+  MakeNumericOnly(ePageNumber.Handle);
+//  ePageNumber.Enabled := True;
+{$ELSE}
+begin
+{$ENDIF}
 end;
 
 procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
@@ -686,8 +918,39 @@ end;
 
 procedure TfrmMain.miExportClick(Sender: TObject);
 begin
-  DiaryEditor.Pages.ExportToFile('MEMODATA.XML');
-  DiaryEditor.Pages.ExportToCSV('MEMODATA.CSV');
+  with sdExport do
+    if Execute then begin
+      StatusText := 'Exporting...';
+      if DiaryEditor.Pages.ExportToFile(FileName) then
+        DebugLog.AddLine(ltInformation, 'Notebook data successfully exported to "'
+          + FileName + '".')
+      else
+        DebugLog.Report(ltWarning, 'Unable to export the Notebook data.',
+          'FileName: "' + FileName + '"');
+      StatusText := '';
+    end;
+end;
+
+procedure TfrmMain.miImportClick(Sender: TObject);
+begin
+  with odImport do
+    if Execute then begin
+      StatusText := 'Importing...';
+      if DiaryEditor.Pages.ImportFromFile(FileName) then begin
+        DebugLog.AddLine(ltInformation, 'Notebook data successfully imported from "'
+          + FileName + '".');
+        PageNumber := PageNumber; // reload info...
+        FileModified := True;
+      end else
+        DebugLog.Report(ltWarning, 'Unable to import the Notebook data.',
+          'FileName: "' + FileName + '"');
+      StatusText := '';
+    end;
+end;
+
+procedure TfrmMain.miMakeBackupClick(Sender: TObject);
+begin
+  MakeBackup := not MakeBackup;
 end;
 
 procedure TfrmMain.miOpenClick(Sender: TObject);
@@ -697,16 +960,45 @@ begin
     ShowModal;
     if ModalResult = mrOK then begin
       StatusText := 'Loading Notebook data...';
-      DiaryEditor.LoadFromFile(SelectedDataFile, SelectedFlagFile);
-      PageNumber := 0;
+      Clear;
+      if DiaryEditor.LoadFromFile(SelectedDataFile, SelectedFlagFile) then begin
+        SetControlsStateFileOperations(True);      
+        PageNumber := 0;
+        DebugLog.AddLine(ltInformation, 'Load successfully done for "'
+          + DiaryEditor.DataSourceFileName + '".');
+      end;
       StatusText := '';
     end;
   end;
 end;
 
+procedure TfrmMain.miProjectHomeClick(Sender: TObject);
+begin
+  OpenLink('http://shenmuesubs.sourceforge.net/');
+end;
+
 procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmMain.miReloadClick(Sender: TObject);
+begin
+  if not SaveFileOnDemand(True) then Exit;
+
+  StatusText := 'Reloading...';
+  Clear(True);
+  if DiaryEditor.Reload then begin
+    SetControlsStateFileOperations(True);
+    PageNumber := PageNumber; // reloading...
+    DebugLog.AddLine(ltInformation, 'Successfully reloaded the file "'
+      + DiaryEditor.DataSourceFileName + '".');
+  end else
+    DebugLog.Report(ltWarning, 'Unable to reload the file from disk!',
+        'DataSource: "' + DiaryEditor.DataSourceFileName + '" '
+      + 'FlagSource: "' + DiaryEditor.FlagSourceFileName + '"');
+
+  StatusText := '';
 end;
 
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
@@ -716,7 +1008,12 @@ begin
     ShowModal;
     if ModalResult = mrOK then begin
       StatusText := 'Saving Notebook data...';
-      DiaryEditor.SaveToFile(SelectedDataFile, SelectedFlagFile);
+      if DiaryEditor.SaveToFile(SelectedDataFile, SelectedFlagFile) then
+        DebugLog.AddLine(ltInformation, 'Save successfully done to "'
+          + SelectedDataFile + '" and "' + SelectedFlagFile + '".')
+      else
+        DebugLog.Report(ltWarning, 'Unable to save the modified file!',
+          'FileName: "' + SelectedDataFile + '"');
       StatusText := '';
     end;
   end;
@@ -725,14 +1022,18 @@ end;
 procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
   StatusText := 'Saving Notebook data...';
-  DiaryEditor.Save;
+  if DiaryEditor.Save then
+    DebugLog.AddLine(ltInformation, 'Memo data successfully saved.')
+  else
+    DebugLog.Report(ltWarning, 'Unable to save the data!', 'FileName: "'
+      + DiaryEditor.DataSourceFileName + '"');
   StatusText := '';
   FileModified := False;
 end;
 
 function TfrmMain.MsgBox(const Text, Title: string; Flags: Integer): Integer;
 begin
-  Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Title), Flags);
 end;
 
 function TfrmMain.SaveFileOnDemand(const CancelButton: Boolean): Boolean;
@@ -770,6 +1071,31 @@ end;
 procedure TfrmMain.SetAutoSave(const Value: Boolean);
 begin
   fAutoSave := Value;
+  miAutoSave.Checked := Value;
+  tbAutoSave.Down := Value;
+end;
+
+procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
+begin
+  miClose.Enabled := State;
+  miImport.Enabled := State;
+  tbImport.Enabled := State;
+  miExport.Enabled := State;
+  tbExport.Enabled := State;
+  miReload.Enabled := State;
+  tbReload.Enabled := State;
+end;
+
+procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);
+begin
+  tbSave.Enabled := State;
+  miSave.Enabled := State;
+  miSaveAs.Enabled := State;
+end;
+
+procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);
+begin
+  DebugLog.Active := Value;
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);
@@ -778,7 +1104,16 @@ begin
   if Value then
     sbMain.Panels[1].Text := 'Modified'
   else
-    sbMain.Panels[1].Text := '';  
+    sbMain.Panels[1].Text := '';
+  SetControlsStateSaveOperation(fFileModified);      
+end;
+
+procedure TfrmMain.SetMakeBackup(const Value: Boolean);
+begin
+  fMakeBackup := Value;
+  miMakeBackup.Checked := fMakeBackup;
+  tbMakeBackup.Down := fMakeBackup;
+  DiaryEditor.MakeBackup := fMakeBackup;
 end;
 
 procedure TfrmMain.SetPageNumber(const Value: Integer);
