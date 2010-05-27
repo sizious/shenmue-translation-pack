@@ -1,4 +1,4 @@
-unit bugsmgr;
+unit BugsMgr;
 
 interface
 

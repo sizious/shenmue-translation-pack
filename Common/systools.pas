@@ -87,11 +87,18 @@ end;
 
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
+var
+  BackupFile: TFileName;
+
 begin
   if FileExists(DestFileName) and (not MakeBackup) then
     DeleteFile(DestFileName)
-  else
-    RenameFile(DestFileName, ChangeFileExt(DestFileName, '.BAK'));
+  else begin
+    BackupFile := ChangeFileExt(DestFileName, '.BAK');
+    if FileExists(BackupFile) then
+      DeleteFile(BackupFile); // delete old backup    
+    RenameFile(DestFileName, BackupFile);
+  end;
   Result := MoveFile(TempFileName, DestFileName);
 end;
 

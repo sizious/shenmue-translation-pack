@@ -1,0 +1,108 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                           __________________________________________________
+ __| Shenmue Notebook Editor |__________________________________________________
+
+  Cet outil a été créé dans le but de traduire et/ou modifier le carnet utilisé
+  dans le jeu.
+   
+  Les jeux supportés sont:
+    - Shenmue II (PAL) (DC)
+    - Shenmue 2X (NTSC-U/PAL) (Xbox)
+    
+  Pour Shenmue I et What's Shenmue, cet éditeur n'est pas compatible, étant 
+  donné que pour ces versions, le carnet est directement stocké dans le 
+  binaire. Pour modifier le carnet dans ce cas, utilisez l'outil Shenmue Binary 
+  Translator.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  L'utilisation diffère légèrement si vous utilisez la version Dreamcast ou 
+  Xbox. Dans les deux cas, vous devez savoir que le carnet est composé de 2
+  fichiers:
+  
+    - MEMODATA.BIN : Il contient le texte à proprement parler.
+    - MEMOFLG.BIN  : Ce fichier contient un identificateur pour chaque phrase
+                 du carnet.
+                     
+  Dans le cas de la version Xbox, le fichier MEMOFLG.BIN n'est pas disponible,
+  il faut dans ce cas sélectionner l'exécutable du jeu à la place, à savoir
+  DEFAULT.XBE. En effet dans cette version le fichier MEMOFLG.BIN a disparu et
+  est contenu directement dans l'exécutable du jeu. Le fichier MEMODATA.BIN,
+  quant à lui, est dans le dossier MISC.
+  
+  Pour la version Dreamcast, il faut savoir qu'il existe autant de MEMODATA.BIN
+  et de MEMOFLG.BIN que de langues dans le jeu. Ainsi, vous trouverez les 
+  fichiers dans les dossiers FRENCH, GERMAN et SPANISH. Pour la langue 
+  anglaise, les fichiers se trouvent dans le dossier SPRITE. A noter qu'il 
+  existe également une version de MEMODATA.BIN dans le dossier MISC, mais que 
+  celui-ci ne semble pas utilisé...
+  
+  Maintenant que vous savez où se trouvent les fichiers, voici comment modifier
+  le carnet:
+  
+    1. Ouvrez MEMODATA.BIN et MEMOFLG.BIN (ou DEFAULT.XBE pour la version Xbox)
+       dans le logiciel.
+       
+    2. Vous verrez apparaitre des phrases ou des zones blanches vides. Chaque
+       zone blanche correspond à une ligne dans le carnet, ce qui veut dire
+       que vous avez 5 lignes par page. La longueur d'une ligne et d'après mes
+       tests de 19 caractères. Les caractères accentués sont gérés mais 
+       uniquement avec leurs codes (je n'ai pas mis la traduction auto encore).
+       
+    3. Modifiez le carnet comme vous le souhaitez.
+    
+    4. En face de chaque ligne il y'a une case avec un numéro. Ce numéro est
+       l'identificateur de la ligne associée. Cet identificateur est une sorte
+       de "verrou": Si vous trouvez l'action associée à cet identificateur
+       dans le jeu, alors la phrase sera affichée, sinon, il n'y aura rien.
+       Exemple: Si vous parlez à la femme au début du jeu qui vous parle du
+       Free Stay Lodge, vous verrez la phrase avec comme identificateur 694
+       s'afficher dans le carnet. Chaque phrase portant comme identificateur 
+       694 sera alors affichée!
+       
+    5. Une fois les modifications terminées, sauvegardez, puis remplacez les 
+       fichiers originaux par les modifiés (y compris le DEFAULT.XBE si 
+       besoin).
+       
+  C'est terminé...
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône principale a été créée par Iconaholic.
+    
+  Aux gars d'AM2, franchement, pourquoi un MEMODATA.BIN dans le dossier MISC
+  sur la version Dreamcast, alors qu'il ne semble pas utilisé?
+  
+  Pour les crédits complets, rendez-vous dans la boîte de dialogue "A propos".
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.                        
+ _____________________________________________________________________[ FIN ]___
