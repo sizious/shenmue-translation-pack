@@ -259,6 +259,10 @@ end;
 
 procedure TDiaryEditor.Clear;
 begin
+  // Cleaning temp MEMOFLG.BIN file
+  if (PlatformVersion = pvXbox) and FileExists(FlagSourceFileName) then
+    DeleteFile(FlagSourceFileName);
+
   fFileLoaded := False;
   Pages.Clear;
   Dependances.Clear;
@@ -277,6 +281,7 @@ end;
 
 destructor TDiaryEditor.Destroy;
 begin
+  Clear;
   fXboxMemoFlagInfo.Free;
   fPages.Free;
   fSections.Free;
@@ -430,8 +435,8 @@ end;
 function TDiaryEditor.SaveToFile(const DataFileName,
   FlagFileName: TFileName): Boolean;
 var
-  DataTemp, FlagTemp, MEMOSectionTemp, RUBISectionTemp, MSTRSectionTemp, 
-  XBETemp: TFileName;
+  DataTemp, OutFlagTemp, OutFlagFinal, MEMOSectionTemp, RUBISectionTemp,
+  MSTRSectionTemp, XBETemp: TFileName;
   i: Integer;
   XBEStream, OriginalDataStream, OutTempDataStream,
   OutTempFlagStream: TFileStream;
@@ -496,9 +501,9 @@ begin
     MEMOSectionTemp := GetTempFileName;
     RUBISectionTemp := GetTempFileName;
     MSTRSectionTemp := GetTempFileName;
-    FlagTemp := GetTempFileName;
+    OutFlagTemp := GetTempFileName;
     WriteTempUpdatedSections(OriginalDataStream, MEMOSectionTemp, 
-      RUBISectionTemp, MSTRSectionTemp, FlagTemp);
+      RUBISectionTemp, MSTRSectionTemp, OutFlagTemp);
 
     // Update all sections
     for i := 0 to Sections.Count - 1 do
@@ -518,13 +523,14 @@ begin
     Result := MoveTempFile(DataTemp, DataFileName, MakeBackup);
 
     // Saving the MEMOFLG.BIN
+    OutFlagFinal := FlagFileName;
     if PlatformVersion = pvXbox then begin
       // Preparing temporary XBE
       XBETemp := GetTempFileName;
       CopyFile(XboxMemoFlagInfo.ExecutableFileName, XBETemp, False);
             
       // Patching the XBE with the updated MEMOFLG.BIN
-      OutTempFlagStream := TFileStream.Create(FlagTemp, fmOpenRead);
+      OutTempFlagStream := TFileStream.Create(OutFlagTemp, fmOpenRead);
       XBEStream := TFileStream.Create(XBETemp, fmOpenWrite);
       try
         XBEStream.Seek(XboxMemoFlagInfo.FlagOffset, soFromBeginning);
@@ -535,12 +541,16 @@ begin
       end;
 
       // Deleting Old Temp FlagFileName
-      MoveTempFile(FlagTemp, FlagSourceFileName, False);
-      FlagTemp := XBETemp;
+      MoveTempFile(OutFlagTemp, FlagSourceFileName, False);
+      OutFlagTemp := XBETemp;
+
+      // If the parameter FlagFileName = TempFlagFile, then we will assign the XBE
+      if SameText(FlagFileName, FlagSourceFileName) then      
+        OutFlagFinal := XboxMemoFlagInfo.ExecutableFileName;
     end;
 
     // Writing the requested updated MEMOFLG.BIN file
-    Result := Result and MoveTempFile(FlagTemp, FlagFileName, MakeBackup);
+    Result := Result and MoveTempFile(OutFlagTemp, OutFlagFinal, MakeBackup);
     
   end; // finally
 end;

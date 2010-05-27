@@ -15,6 +15,7 @@ object frmFileSelection: TfrmFileSelection
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
@@ -133,21 +134,19 @@ object frmFileSelection: TfrmFileSelection
     Top = 32
   end
   object odFlag: TOpenDialog
-    DefaultExt = 'BIN'
-    FileName = 'MEMOFLG.BIN'
     Filter = 
-      'Notebook Flag Data Files (MEMOFLG.BIN)|MEMOFLG.BIN|Xbox Executab' +
-      'le Files (*.XBE)|*.XBE|All Files (*.*)|*.*'
+      'All Supported Files (MEMOFLG.BIN;*.XBE)|MEMOFLG.BIN;*.XBE|Notebo' +
+      'ok Flag Data Files (MEMOFLG.BIN)|MEMOFLG.BIN|Xbox Executable Fil' +
+      'es (*.XBE)|*.XBE|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 264
     Top = 84
   end
   object sdFlag: TSaveDialog
-    DefaultExt = 'BIN'
-    FileName = 'MEMOFLG.BIN'
     Filter = 
-      'Notebook Flag Data Files (MEMOFLG.BIN)|MEMOFLG.BIN|Xbox Executab' +
-      'le Files (*.XBE)|*.XBE|All Files (*.*)|*.*'
+      'All Supported Files (MEMOFLG.BIN;*.XBE)|MEMOFLG.BIN;*.XBE|Notebo' +
+      'ok Flag Data Files (MEMOFLG.BIN)|MEMOFLG.BIN|Xbox Executable Fil' +
+      'es (*.XBE)|*.XBE|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Left = 232
     Top = 84

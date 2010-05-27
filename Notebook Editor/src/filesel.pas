@@ -30,6 +30,7 @@ type
     procedure btnFlagFileNameClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormDestroy(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectionMode: TFileSelectionMode;
@@ -55,6 +56,9 @@ implementation
 
 {$R *.dfm}
 
+uses
+  Config;
+  
 { TfrmFileSelection }
 
 procedure TfrmFileSelection.btnDataFileNameClick(Sender: TObject);
@@ -85,6 +89,12 @@ end;
 procedure TfrmFileSelection.FormCreate(Sender: TObject);
 begin
   SelectionMode := fsmOpen;
+  LoadConfigFileSelection;
+end;
+
+procedure TfrmFileSelection.FormDestroy(Sender: TObject);
+begin
+  SaveConfigFileSelection;
 end;
 
 procedure TfrmFileSelection.FormKeyPress(Sender: TObject; var Key: Char);
