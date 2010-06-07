@@ -18,6 +18,18 @@
 (*
   Short history:
 
+  3.4.0 (June 7, 2010 @04:21PM)
+    - The modification made in the 3.3.7 release about the UnknowValue is
+      incorrect. In fact, the modification was true for earlier versions of
+      Shenmue before Shenmue II. In this game, the CharID field is only 4 bytes,
+      it still a unknow value after the CharID field. It can be demonstrated by
+      the 00A_.PKS file of the Disc 1 HUMANS.AFS: The CharID is of course 00A_,
+      and the Unknow value is #$00 #$0F #$44 #$00. As you can see, the first
+      $#00 will be truncate the CharID if this field is set on 8 bytes, and the
+      next values, $#0F #$44 will be lost. So the UnknowValue field is back
+      again, but only really used for Shenmue II files (anyway it filled for
+      every files, to maximize compatibility!)
+
   3.3.9 (March 8, 2010 @06:02PM)
     - Fixed a little bug when reading some specials PKS from Shenmue 1.
       The function IsFileValidScnf in the scnfutil.pas was updated.
@@ -64,7 +76,7 @@
     - Removed *EVERY* references to the PatchValue CRAP. Every entry in the
       subtitle table are *RE-CALCULATED* when saving the file.
 *)
-unit scnfedit;
+unit SCNFEdit;
 
 {$DEFINE USE_DCL}
 
@@ -85,8 +97,8 @@ const
 type
   // Structure to read IPAC sections info from footer
   TSectionRawBinaryEntry = record
-    CharID: array[0..7] of Char;
-//    UnknowValue: Integer;
+    CharID: array[0..3] of Char; // Correction for Shenmue II... (FIX v3.4.0)
+    UnknowValue: Integer; // Really for Shenmue II, still unknow value... (v3.4.0)
     Name: array[0..3] of Char; // type of the footer entry ('BIN ', 'CHRM...')
     Offset: Integer;
     Size: Integer;
@@ -214,14 +226,19 @@ type
     fSize: Integer;
     fOffset: Integer;
     fCharID: string;
-//    fUnknowValue: Integer;
+    fUnknowValue: Integer;
     procedure WriteFooterEntry(var F: file);
+    function GetEditor: TSCNFEditor;
+    function GetCharID: string;
+  protected
+    property Editor: TSCNFEditor read GetEditor;
   public
     constructor Create(Owner: TSectionsList);
-    property CharID: string read fCharID;
-//    property UnknowValue: Integer read fUnknowValue;
+    property CharID: string read GetCharID; // Fixed in 3.4.0
+    property UnknowValue: Integer read fUnknowValue; // Check GetCharID method
     property Name: string read fName;
     property Offset: Integer read fOffset;
+    property Owner: TSectionsList read fOwner;
     property Size: Integer read fSize;
   end;
 
@@ -239,6 +256,7 @@ type
     destructor Destroy; override;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TSectionItem read GetItem; default;
+    property Owner: TSCNFEditor read fOwner;
   end;
 
   // Main class
@@ -333,7 +351,7 @@ implementation
 
 uses
   {$IFDEF DEBUG}TypInfo, {$ENDIF}
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, SysTools;
 
 {$IFDEF USE_DCL}
 
@@ -1621,7 +1639,7 @@ var
 begin
   Item := TSectionItem.Create(Self);
   Item.fCharID := SectionEntry.CharID;
-//  Item.fUnknowValue := SectionEntry.UnknowValue;
+  Item.fUnknowValue := SectionEntry.UnknowValue;
   Item.fName := SectionEntry.Name;
   Item.fOffset := SectionEntry.Offset;
   Item.fSize := SectionEntry.Size;
@@ -1669,17 +1687,41 @@ begin
   Self.fOwner := Owner;
 end;
 
+function TSectionItem.GetCharID: string;
+var
+  Buf: array[0..3] of Char;
+  
+begin
+  if (Editor.GameVersion = gvShenmue2) or (Editor.GameVersion = gvShenmue2X) then
+    (*  In Shenmue II, the CharID field is 4 bytes length, and the Unknow field
+        is 4 bytes too *)
+    Result := fCharID
+  else begin
+    (*  In earlier versions, the CharID field is 8 bytes length. For
+        compatibility purpose, the UnknowValue is still used, but if the
+        end-user ask for the Name field he will get the full 8 bytes length, but
+        in fact the field is splitted in two 4 bytes fields (CharID &
+        UnknowValue). *)
+    IntegerToArray(Buf, UnknowValue);
+    Result := fCharID + string(Buf);
+  end;
+end;
+
+function TSectionItem.GetEditor: TSCNFEditor;
+begin
+  Result := Owner.Owner;
+end;
+
 procedure TSectionItem.WriteFooterEntry(var F: file);
 var
   Raw: TSectionRawBinaryEntry;
 
 begin
   StrCopy(Raw.CharID, PChar(CharID));
-//  Raw.UnknowValue := UnknowValue;
+  Raw.UnknowValue := UnknowValue;
   StrCopy(Raw.Name, PChar(Name));
   Raw.Offset := Offset;
   Raw.Size := Size;
-
   BlockWrite(F, Raw, SizeOf(Raw));
 end;
 
