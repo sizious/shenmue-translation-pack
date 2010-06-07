@@ -36,9 +36,9 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.7' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.8' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'April 8, 2010 @03:13PM';
+  COMPIL_DATE_TIME = 'June 8, 2010 @01:15AM';
 
 type
   TGlobalTranslationModule = class;
@@ -537,10 +537,10 @@ implementation
 {$ENDIF}
 
 uses
-  {$IFDEF DEBUG} TypInfo, DBLzma, SysTools, {$ENDIF}
+  {$IFDEF DEBUG} TypInfo, DBLzma, {$ENDIF}
   MultiTrd, SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,
-  BugsMgr, UITools;
+  BugsMgr, UITools, SysTools;
 
 {$R *.dfm}
 

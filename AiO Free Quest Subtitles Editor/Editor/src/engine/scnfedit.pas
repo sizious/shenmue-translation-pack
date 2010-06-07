@@ -18,7 +18,7 @@
 (*
   Short history:
 
-  3.4.0 (June 8, 2010 @00:20AM)
+  3.4.0 (June 8, 2010 @01:12AM)
     - The modification made in the 3.3.7 release about the UnknowValue is
       incorrect. In fact, the modification was true for earlier versions of
       Shenmue before Shenmue II. In this game, the CharID field is only 4 bytes,
@@ -32,6 +32,8 @@
     - Fixed a little bug in exportation when writing blank lines filled by
       spaces. Spaces were removed.
     - Export RootNode changed from 's2freequestsubs' to 'freequestexport'.
+    - Correction when modifying Shenmue I PAKS, some 'BIN ' section weren't
+      written properly.
 
   3.3.9 (March 8, 2010 @06:02PM)
     - Fixed a little bug when reading some specials PKS from Shenmue 1.
@@ -95,7 +97,7 @@ uses
 
 const
   SCNF_EDITOR_ENGINE_VERSION = '3.4.0';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 8, 2010 @00:20AM';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 8, 2010 @01:12AM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -230,6 +232,7 @@ type
     fOffset: Integer;
     fCharID: string;
     fUnknowValue: Integer;
+    fSubtitlesTable: Boolean;
     procedure WriteFooterEntry(var F: file);
     function GetEditor: TSCNFEditor;
     function GetCharID: string;
@@ -243,6 +246,7 @@ type
     property Offset: Integer read fOffset;
     property Owner: TSectionsList read fOwner;
     property Size: Integer read fSize;
+    property SubtitlesTable: Boolean read fSubtitlesTable;
   end;
 
   TSectionsList = class(TObject)
@@ -1347,6 +1351,7 @@ begin
 
     // If SCNF section present in footer we will analyse it now
     if ScnfSectionFound then begin
+      Sections[ScnfSectionEntry].fSubtitlesTable := True;
       IntBuf := Sections[ScnfSectionEntry].Offset + 16; // + 16 is for PAKS size
       ParseScnfSection(F, IntBuf);  // launch parsing SCNF section to retrieve subtitles !
       fFileLoaded := True;
@@ -1536,7 +1541,7 @@ begin
     NewPos := FilePos(F_dest);
 
     // This is a SCNF section to be patched
-    if (Sections[i].Name = SCNF_FOOTER_SIGN) then begin
+    if Sections[i].SubtitlesTable then begin
 
       // Write SCNF & CharID section header
       // + 16 for PAKS header
