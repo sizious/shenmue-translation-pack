@@ -5,6 +5,27 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.8: 2010-06-08 |__________________________________________________
+
+FIXED:
+- SCNF Editor was debugged with strong test routines, on the import/export
+  section (v3.4.0):
+    + The modification made in the 3.3.7 release about the UnknowValue is
+      incorrect. In fact, the modification was true for earlier versions of
+      Shenmue before Shenmue II. In this game, the CharID field is only 4 bytes,
+      it still a unknow value after the CharID field. It can be demonstrated by
+      the 00A_.PKS file of the Disc 1 HUMANS.AFS: The CharID is of course 00A_,
+      and the Unknow value is #$00 #$0F #$44 #$00. As you can see, the first
+      $#00 will be truncate the CharID if this field is set on 8 bytes, and the
+      next values, $#0F #$44 will be lost. So the UnknowValue field is back
+      again, but only really used for Shenmue II files (anyway it filled for
+      every files, to maximize compatibility!)
+    + Fixed a little bug in exportation when writing blank lines filled by
+      spaces. Spaces were removed, it's fixed now.
+    + Export RootNode changed from 's2freequestsubs' to 'freequestexport'.
+    + Correction when modifying some Shenmue I PAKS, some 'BIN ' sections
+      weren't written properly.
+___                           __________________________________________________
 ___| Version 2.7: 2010-04-08 |__________________________________________________
 
 FIXED:
