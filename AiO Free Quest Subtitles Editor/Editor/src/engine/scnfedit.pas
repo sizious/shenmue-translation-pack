@@ -18,7 +18,7 @@
 (*
   Short history:
 
-  3.4.0 (June 7, 2010 @04:21PM)
+  3.4.0 (June 8, 2010 @00:20AM)
     - The modification made in the 3.3.7 release about the UnknowValue is
       incorrect. In fact, the modification was true for earlier versions of
       Shenmue before Shenmue II. In this game, the CharID field is only 4 bytes,
@@ -29,6 +29,9 @@
       next values, $#0F #$44 will be lost. So the UnknowValue field is back
       again, but only really used for Shenmue II files (anyway it filled for
       every files, to maximize compatibility!)
+    - Fixed a little bug in exportation when writing blank lines filled by
+      spaces. Spaces were removed.
+    - Export RootNode changed from 's2freequestsubs' to 'freequestexport'.
 
   3.3.9 (March 8, 2010 @06:02PM)
     - Fixed a little bug when reading some specials PKS from Shenmue 1.
@@ -91,8 +94,8 @@ uses
   ;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.3.9';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'March 8, 2010 @06:02PM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.4.0';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 8, 2010 @00:20AM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -479,15 +482,14 @@ begin
     try
       with XMLDoc do begin
         Options := [doNodeAutoCreate, doAttrNull];
-        ParseOptions:= [];
-        NodeIndentStr:= '  ';
         Active := True;
         Version := '1.0';
         Encoding := 'utf-8'; //'ISO-8859-1';
+        ParseOptions := [poPreserveWhiteSpace]; // fix 3.4.0
       end;
 
       // Creating the root
-      XMLDoc.DocumentElement := XMLDoc.CreateNode('s2freequestsubs');
+      XMLDoc.DocumentElement := XMLDoc.CreateNode('freequestexport'); // old: s2freequestsubs
 
       // File
       AddXMLNode(XMLDoc, 'filename', ExtractFileName(Owner.fSourceFileName));
@@ -515,11 +517,10 @@ begin
       CurrentNode := XMLDoc.CreateNode('subtitles');
       XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
       CurrentNode.Attributes['count'] := Count;
-      for i := 0 to Count - 1 do
-      begin
+      for i := 0 to Count - 1 do begin
         SubCurrentNode := XMLDoc.CreateNode('subtitle');
         SubCurrentNode.Attributes['code'] := Items[i].fCode;
-        SubCurrentNode.NodeValue := Items[i].fText;
+        SubCurrentNode.NodeValue := Items[i].fText; // don't use the Text property directly
         CurrentNode.ChildNodes.Add(SubCurrentNode);
       end;
 
@@ -606,7 +607,7 @@ var
   XMLDoc: IXMLDocument;
   i: Integer;
   CurrentNode, LoopNode: IXMLNode;
-  xmlSubCode, xmlSubtitle, xmlCharID, xmlVoiceID, xmlShortVoiceID: string;
+  S, xmlSubCode, xmlSubtitle, xmlCharID, xmlVoiceID, xmlShortVoiceID: string;
   CurrentSub: TSubEntry;
   CharsListActive: Boolean;
 
@@ -618,8 +619,7 @@ begin
   try
     with XMLDoc do begin
       Options := [doNodeAutoCreate];
-      ParseOptions:= [];
-      NodeIndentStr:= '  ';
+      ParseOptions:= [poPreserveWhiteSpace]; // Fix 3.4.0
       Active := True;
       Version := '1.0';
       Encoding := 'utf-8'; // 'ISO-8859-1';
@@ -628,7 +628,8 @@ begin
     XMLDoc.LoadFromFile(FileName);
 
     // Verifying if it's a valid XML to import
-    if XMLDoc.DocumentElement.NodeName <> 's2freequestsubs' then Exit;
+    S := XMLDoc.DocumentElement.NodeName;
+    if (S <> 's2freequestsubs') and (S <> 'freequestexport') then Exit;
 
     // File name
     CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('filename');

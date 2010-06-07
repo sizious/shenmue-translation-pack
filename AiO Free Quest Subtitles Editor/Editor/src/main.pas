@@ -804,6 +804,7 @@ begin
   SetCurrentDir(WorkDir);
 
   SCNFEditor.MakeBackup := False;
+  SCNFEditor.CharsList.Active := False;
 
   if FindFirst('*.PKS', faAnyFile, SR) = 0 then
   begin
