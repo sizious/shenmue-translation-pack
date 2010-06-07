@@ -397,10 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)
@@ -878,6 +874,10 @@ object frmMain: TfrmMain
       object miDEBUG_GenerateTestException: TMenuItem
         Caption = 'Generate Test Exception'
         OnClick = miDEBUG_GenerateTestExceptionClick
+      end
+      object miDEBUG_StrongTest: TMenuItem
+        Caption = 'STRONG Import/Export Test'
+        OnClick = miDEBUG_StrongTestClick
       end
     end
   end

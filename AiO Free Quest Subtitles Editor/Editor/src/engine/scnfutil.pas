@@ -46,8 +46,8 @@ function FindPaksFooterOffset(var F: file): Integer; overload;
 function IsFileValidScnf(const FileName: TFileName): Boolean;
 
 // Misc Utilities
-function Right(SubStr, S: string): string;
-function ExtremeRight(SubStr: string; S: string): string;
+(*function Right(SubStr, S: string): string;
+function ExtremeRight(SubStr: string; S: string): string;*)
 function GameVersionToCodeStr(GameVersion: TGameVersion): string;
 function GameVersionToFriendlyString(GameVersion: TGameVersion): string;
 function StrToGameVersion(S: string): TGameVersion;
@@ -111,21 +111,21 @@ end;
 
 //------------------------------------------------------------------------------
 
-function Right(SubStr: string ; S: string): string;
+(*function Right(SubStr: string ; S: string): string;
 begin
   if pos(substr,s)=0 then result:='' else
     result:=copy(s, pos(substr, s)+length(substr), length(s)-pos(substr, s)+length(substr));
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 
-function ExtremeRight(SubStr: string ; S: string): string;
+(*function ExtremeRight(SubStr: string ; S: string): string;
 begin
   Repeat
     S:= Right(substr,s);
   until pos(substr,s)=0;
   result:=S;
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 

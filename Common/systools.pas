@@ -22,6 +22,7 @@ procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
+function ExtremeRight(SubStr: string; S: string): string;
 function FindStr(const SubStr, S: string): Boolean;
 function GetApplicationDirectory: TFileName;
 function GetApplicationInstancesCount: Integer;
@@ -33,6 +34,7 @@ function GetTempFileName: TFileName;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
+procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
@@ -58,6 +60,20 @@ uses
 const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
+
+//------------------------------------------------------------------------------
+
+procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
+var
+  i, Shift: Integer;
+  
+begin
+  Shift := 0;
+  for i := Low(Destination) to High(Destination) do begin
+    Destination[i] := Chr(Value shr Shift);
+    Inc(Shift, 8);
+  end;
+end;
 
 //------------------------------------------------------------------------------
 
@@ -384,6 +400,16 @@ end;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 begin
   Result := Left(RightSubStr, Right(LeftSubStr, S));
+end;
+
+//------------------------------------------------------------------------------
+
+function ExtremeRight(SubStr: string ; S: string): string;
+begin
+  Repeat
+    S:= Right(substr,s);
+  until pos(substr,s)=0;
+  result:=S;
 end;
 
 //------------------------------------------------------------------------------

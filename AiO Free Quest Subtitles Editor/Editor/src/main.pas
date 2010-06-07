@@ -184,6 +184,7 @@ type
     miDEBUG_GenerateTestException: TMenuItem;
     N19: TMenuItem;
     miOriginalColumnList: TMenuItem;
+    miDEBUG_StrongTest: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -252,6 +253,7 @@ type
     procedure miDEBUG_GenerateTestExceptionClick(Sender: TObject);
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure miOriginalColumnListClick(Sender: TObject);
+    procedure miDEBUG_StrongTestClick(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -535,7 +537,7 @@ implementation
 {$ENDIF}
 
 uses
-  {$IFDEF DEBUG} TypInfo, DBLzma, {$ENDIF}
+  {$IFDEF DEBUG} TypInfo, DBLzma, SysTools, {$ENDIF}
   MultiTrd, SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,
   BugsMgr, UITools;
@@ -778,6 +780,77 @@ end;
 procedure TfrmMain.miDEBUG_InitTextDatabaseClick(Sender: TObject);
 begin
 {$IFDEF DEBUG} ShowMessage(GetTextDatabaseIndexFile(gvShenmue2)); {$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_StrongTestClick(Sender: TObject);
+{$IFDEF DEBUG}
+const
+  PAKS_DIR = 'G:\Shenmue\~paks\';
+
+var
+  SR: TSearchRec;
+  SubsFile, SavedPath: TFileName;
+  WorkDir: string;
+  i, j: Integer;
+
+begin
+  SavedPath := GetCurrentDir;
+  WorkDir := PAKS_DIR;
+  if not InputQuery('Work directory', 'Input the work directory to do ' +
+    'the Strong test', WorkDir) then Exit;
+  WorkDir := IncludeTrailingPathDelimiter(WorkDir);
+  if not DirectoryExists(WorkDir) then Exit;
+  
+  SetCurrentDir(WorkDir);
+
+  SCNFEditor.MakeBackup := False;
+
+  if FindFirst('*.PKS', faAnyFile, SR) = 0 then
+  begin
+    // Scanning the whole directory
+    repeat
+
+      Write('Loading "', SR.Name, '"...');
+
+      if SCNFEditor.LoadFromFile(SR.Name) then begin
+        WriteLn('OK');
+
+        // Exporting original subs
+        SubsFile := ChangeFileExt(SR.Name, '_original.xml');
+        SCNFEditor.Subtitles.ExportToFile(SubsFile);
+
+        // Saving old file
+        CopyFile(SR.Name, ChangeFileExt(SR.Name, '.OLD'), False);
+
+        // Modifing subs
+        for j := 0 to 5 do begin
+
+          WriteLn('  Pass ', j + 1, ' of 6...');
+
+          for i := 0 to SCNFEditor.Subtitles.Count - 1 do
+            SCNFEditor.Subtitles[i].Text :=  GetRandomString(90);
+
+          SCNFEditor.Save;
+
+        end;
+
+        // Restoring subtitles
+        Write('Undo changes for "', SR.Name, '"...');
+        WriteLn('Import: ', SCNFEditor.Subtitles.ImportFromFile(SubsFile), '.');
+        SCNFEditor.Save;
+        DeleteFile(SubsFile);
+
+      end else // LoadFromFile
+        WriteLn('FAIL');
+
+    until (FindNext(SR) <> 0);
+    FindClose(SR); // Must free up resources used by these successful finds
+  end;
+
+  SetCurrentDir(SavedPath);
+{$ELSE}
+begin
+{$ENDIF}
 end;
 
 procedure TfrmMain.miDEBUG_DumpMultiTranslationCacheListClick(Sender: TObject);
