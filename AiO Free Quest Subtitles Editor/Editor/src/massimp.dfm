@@ -118,15 +118,15 @@ object frmMassImport: TfrmMassImport
       Height = 17
       TabOrder = 1
     end
-  end
-  object lProgBar: TPanel
-    Left = 300
-    Top = 200
-    Width = 59
-    Height = 21
-    BevelOuter = bvLowered
-    Caption = '100,00%'
-    TabOrder = 4
+    object lProgBar: TPanel
+      Left = 294
+      Top = 114
+      Width = 59
+      Height = 21
+      BevelOuter = bvLowered
+      Caption = '100,00%'
+      TabOrder = 2
+    end
   end
   object JvBrowseForFolderDialog: TJvBrowseForFolderDialog
     Title = 'Please select the input directory:'

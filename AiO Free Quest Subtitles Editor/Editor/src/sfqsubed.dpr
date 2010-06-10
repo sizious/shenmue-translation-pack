@@ -49,7 +49,10 @@ uses
   uitools in '..\..\..\Common\uitools.pas',
   oldskool_font_mapper in '..\..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas',
   oldskool_font_vcl in '..\..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
-  viewer in '..\..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview};
+  viewer in '..\..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
+  hashidx in '..\..\..\Common\hashidx.pas',
+  srfdb in 'engine\srfdb.pas',
+  srfscript in 'srfscript.pas' {frmCinematicsScript};
 
 {$R *.res}
 
@@ -72,6 +75,7 @@ begin
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);
   Application.CreateForm(TfrmFileInfo, frmFileInfo);
+  Application.CreateForm(TfrmCinematicsScript, frmCinematicsScript);
   {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

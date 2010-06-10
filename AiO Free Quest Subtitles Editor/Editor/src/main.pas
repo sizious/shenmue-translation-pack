@@ -36,7 +36,7 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.8' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.X9' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
   COMPIL_DATE_TIME = 'June 8, 2010 @01:15AM';
 
@@ -185,6 +185,14 @@ type
     N19: TMenuItem;
     miOriginalColumnList: TMenuItem;
     miDEBUG_StrongTest: TMenuItem;
+    miExportToCinematicScript: TMenuItem;
+    N20: TMenuItem;
+    N21: TMenuItem;
+    miExportToCinematicScript2: TMenuItem;
+    N22: TMenuItem;
+    miDEBUG_TestSRFDB: TMenuItem;
+    N23: TMenuItem;
+    miBatchSRF: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -254,6 +262,9 @@ type
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure miOriginalColumnListClick(Sender: TObject);
     procedure miDEBUG_StrongTestClick(Sender: TObject);
+    procedure miExportToCinematicScriptClick(Sender: TObject);
+    procedure miDEBUG_TestSRFDBClick(Sender: TObject);
+    procedure miBatchSRFClick(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -537,10 +548,10 @@ implementation
 {$ENDIF}
 
 uses
-  {$IFDEF DEBUG} TypInfo, DBLzma, {$ENDIF}
+  {$IFDEF DEBUG} TypInfo, SRFDB, DBLzma, {$ENDIF}
   MultiTrd, SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,
-  BugsMgr, UITools, SysTools;
+  BugsMgr, UITools, SysTools, srfscript;
 
 {$R *.dfm}
 
@@ -629,6 +640,22 @@ begin
       MultiTranslation.Prepare(True);*)
   finally
     frmMassImport.Free;
+  end;
+end;
+
+procedure TfrmMain.miBatchSRFClick(Sender: TObject);
+begin
+  with frmCinematicsScript do begin
+    Mode := cmBatch;
+    FileName := IncludeTrailingPathDelimiter(GetCurrentDir);
+    if Execute then begin
+      SetStatus('Exporting to Cinematic Script...');
+      if SCNFEditor.Subtitles.ExportToCinematicScript(FileName, DiscNumber) then
+        AddDebug('Subtitles batch exported successfully to the Cinematic (SRF) Scripts.')
+      else
+        AddDebug('Failed when batch exporting to the Cinematic (SRF) Scripts!!');
+      SetStatusReady;
+    end;
   end;
 end;
 
@@ -971,6 +998,23 @@ begin
   end;
 end;
 
+procedure TfrmMain.miExportToCinematicScriptClick(Sender: TObject);
+begin
+  with frmCinematicsScript do begin
+    Mode := cmSingle;
+    FileName := IncludeTrailingPathDelimiter(GetCurrentDir)
+      + SCNFEditor.VoiceShortID + '_srf.xml';
+    if Execute then begin
+      SetStatus('Exporting to Cinematic Script...');
+      if SCNFEditor.Subtitles.ExportToCinematicScript(FileName, DiscNumber) then
+        AddDebug('Subtitles exported successfully to the Cinematic (SRF) Script.')
+      else
+        AddDebug('Failed when exporting to the Cinematic (SRF) Script!!');
+      SetStatusReady;
+    end;
+  end;
+end;
+
 procedure TfrmMain.miImportSubsClick(Sender: TObject);
 begin
   odMain.Title := 'Import subtitles from';
@@ -1093,6 +1137,7 @@ begin
   miFileProperties.Hint := miFileProperties2.Hint;
   miClearFilesList2.Hint := miClearFilesList.Hint;
   miReloadDir.Hint := miReloadDir2.Hint;
+  miExportToCinematicScript2.Hint := miExportToCinematicScript.Hint;
 
   // Constraints for the form
   Height := WIN_MIN_HEIGHT;
@@ -1191,6 +1236,9 @@ begin
   // Reloading directory at startup
   if ReloadDirectoryAtStartup then
     ScanDirectory(SelectedDirectory);
+
+  // Initializing SRF Scripts Generator
+  SCNFEditor.CinematicsScriptGenerator.LoadFromFile(GetCinematicsScriptDatabase);
 end;
 
 procedure TfrmMain.FreeApplication;
@@ -2171,6 +2219,8 @@ begin
   miExportSubs3.Enabled := State;
   miFileProperties.Enabled := State;
   miFileProperties2.Enabled := State;
+  miExportToCinematicScript.Enabled := State;
+  miExportToCinematicScript2.Enabled := State;
   if State then
     lvSubsSelect.PopupMenu := pmSubsSelect
   else
@@ -2234,6 +2284,30 @@ end;
 procedure TfrmMain.miShowOriginalTextClick(Sender: TObject);
 begin
   EnableOriginalSubtitlesFieldView := not EnableOriginalSubtitlesFieldView;
+end;
+
+procedure TfrmMain.miDEBUG_TestSRFDBClick(Sender: TObject);
+{$IFDEF DEBUG}
+var
+  SRFDB: TCinematicsScriptDatabase;
+
+begin
+  SRFDB := TCinematicsScriptDatabase.Create;
+  try
+
+    SRFDB.LoadFromFile('data\srfscript.xml');
+
+    WriteLn('F1000A001=', SRFDB.IndexOf('F1000', 'A001'));
+    WriteLn('F1000B021=', SRFDB.IndexOf('F1000', 'B021'));
+    WriteLn('F1000A021=', SRFDB.IndexOf('F1000', 'A021'));
+
+  finally
+    SRFDB.Free;
+  end;
+
+{$ELSE}
+begin
+{$ENDIF}
 end;
 
 procedure TfrmMain.miDEBUG_TextDatabaseCorrectorClick(Sender: TObject);

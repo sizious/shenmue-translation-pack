@@ -18,6 +18,10 @@
 (*
   Short history:
 
+  3.4.1 (June 9, 2010 @05:12PM)
+    - Added the ExportToCinematicScript method (HUMANS -> FREE converter).
+    - Some code clean-up.
+    
   3.4.0 (June 8, 2010 @01:12AM)
     - The modification made in the 3.3.7 release about the UnknowValue is
       incorrect. In fact, the modification was true for earlier versions of
@@ -91,13 +95,14 @@ unit SCNFEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes, Common, CharsLst, NPCInfo, ScnfUtil
+  Windows, SysUtils, Classes, Common, CharsLst, NPCInfo, ScnfUtil,
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, SRFDB
   {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF}
   ;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.4.0';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 8, 2010 @01:12AM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.4.1';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 9, 2010 @05:12PM';
 
 type
   // Structure to read IPAC sections info from footer
@@ -116,8 +121,11 @@ type
     SubCode: array[0..3] of Char;
     UnknowCrap: Integer;
   end;
-  
+
   TSCNFEditor = class;
+
+  TSCNFCharsDecodeTable = class;
+
   TSubList = class;
 
   // contains a sub entry
@@ -126,7 +134,7 @@ type
     fEditorOwner: TSCNFEditor;
     fOwner: TSubList;
     fIndex: Integer;
-    
+
     fStartSubtitleEntry: string;                  // string before each subtitle text
     fStartSubtitleEntryLength: Integer;           // bytes count of that string
 
@@ -146,9 +154,7 @@ type
     function GetText: string;
   public
     constructor Create(Owner: TSubList);
-
     function IsTextEquals(const CompareText: string): Boolean;
-
     property CharID: string read fCharID;
     property Code: string read fCode;
     property CodeOffset: Integer read fSubCodeOffset;
@@ -160,8 +166,73 @@ type
     property VoiceID: string read fVoiceID;
   end;
 
-  TSCNFCharsDecodeTable = class;
+  TCinematicsScriptListItem = class(TObject)
+  private
+    fSubtitleVoiceID: string;
+    fCharID: string;
+    fSubtitle: string;
+    fInformation: TCinematicsScriptDatabaseItem;
+  public
+    property SubtitleVoiceID: string read fSubtitleVoiceID;
+    property CharID: string read fCharID;
+    property Subtitle: string read fSubtitle;
+    property Information: TCinematicsScriptDatabaseItem read fInformation; 
+  end;
   
+  TCinematicsScriptGenerator = class(TObject)
+  private
+    fSRFDatabase: TCinematicsScriptDatabase;
+    fVoiceOrderedList: TList;
+    fOwner: TSCNFEditor;
+    function GetCount: Integer;
+    function GetItem(Index: Integer): TCinematicsScriptListItem;
+    property SRFDatabase: TCinematicsScriptDatabase read fSRFDatabase;
+    property VoiceOrderedList: TList read fVoiceOrderedList;
+  public
+    constructor Create(AOwner: TSCNFEditor);
+    destructor Destroy; override;
+    procedure Clear;
+    procedure Execute;
+    procedure LoadFromFile(const ZippedScriptDatabase: TFileName);
+    property Count: Integer read GetCount;
+    property Items[Index: Integer]: TCinematicsScriptListItem read GetItem; default;
+    property Owner: TSCNFEditor read fOwner;
+  end;
+  
+  // contains all subtitles
+  TSubList = class(TObject)
+  private
+{$IFDEF USE_DCL}
+    fOptimizationHashMap: IStrMap;
+{$ENDIF}  
+    fOwner: TSCNFEditor;
+    fList: TList;
+    fCharsDecodeTable: TSCNFCharsDecodeTable;
+    function GetItem(Index: Integer): TSubEntry;
+    function GetCount: Integer;
+    procedure WriteSubtitlesTable(var F: file);
+    procedure AddXMLNode(var XMLDoc: IXMLDocument; const Key, Value: string);
+      overload;
+    procedure AddXMLNode(var XMLDoc: IXMLDocument; const Key: string;
+      const Value: Integer); overload;
+  protected
+    procedure AddEntry(SubEntry: TSubRawBinaryEntry);  
+    procedure Clear;
+  public
+    constructor Create(Owner: TSCNFEditor);
+    destructor Destroy; override;
+    function ExportToCinematicScript(const FileName: TFileName;
+      DiscNumber: Integer): Boolean;    
+    function ExportToFile(const FileName: TFileName): Boolean;
+    function ImportFromFile(const FileName: TFileName): Boolean;
+    function IndexOfSubtitleByCode(const Code: string): Integer;
+    function FindSubtitleByCode(const Code: string): TSubEntry;
+    property CharsIdDecodeTable: TSCNFCharsDecodeTable read fCharsDecodeTable;
+    property Items[Index: Integer]: TSubEntry read GetItem; default;
+    property Count: Integer read GetCount;
+    property Owner: TSCNFEditor read fOwner;
+  end;
+    
   // Enable to translate letters "A", "B" to "RYO_", ...
   TSCNFCharsDecodeTableItem = class(TObject)
   private
@@ -191,34 +262,6 @@ type
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TSCNFCharsDecodeTableItem read GetItem; default;
     property Owner: TSubList read fOwner;
-  end;
-
-  // contains all subtitles
-  TSubList = class(TObject)
-  private
-{$IFDEF USE_DCL}
-    fOptimizationHashMap: IStrMap;
-{$ENDIF}  
-    fOwner: TSCNFEditor;
-    fList: TList;
-    fCharsDecodeTable: TSCNFCharsDecodeTable;
-    function GetItem(Index: Integer): TSubEntry;
-    function GetCount: Integer;
-    procedure WriteSubtitlesTable(var F: file);
-  protected
-    procedure AddEntry(SubEntry: TSubRawBinaryEntry);  
-    procedure Clear;
-  public
-    constructor Create(Owner: TSCNFEditor);
-    destructor Destroy; override;
-    function ExportToFile(const FileName: TFileName): Boolean;
-    function ImportFromFile(const FileName: TFileName): Boolean;
-    function IndexOfSubtitleByCode(const Code: string): Integer;
-    function FindSubtitleByCode(const Code: string): TSubEntry;
-    property CharsIdDecodeTable: TSCNFCharsDecodeTable read fCharsDecodeTable;
-    property Items[Index: Integer]: TSubEntry read GetItem; default;
-    property Count: Integer read GetCount;
-    property Owner: TSCNFEditor read fOwner;
   end;
 
   // Footer IPAC sections
@@ -298,6 +341,7 @@ type
     fNPCInfo: TNPCInfosTable;
     fGender: TGenderType;
     fAgeType: TAgeType;
+    fCinematicsScriptGenerator: TCinematicsScriptGenerator;
     function GetSubList: TSubList;
     function GetGameVersion: TGameVersion;
     function GetCharacterID: string;
@@ -343,6 +387,10 @@ type
     property Gender: TGenderType read fGender;
     property AgeType: TAgeType read fAgeType;
     property NPCInfos: TNPCInfosTable read fNPCInfo;
+
+    // HUMANS -> FREE converter
+    property CinematicsScriptGenerator: TCinematicsScriptGenerator read
+      fCinematicsScriptGenerator;    
   end;
 
 {$IFDEF DEBUG}
@@ -358,7 +406,7 @@ implementation
 
 uses
   {$IFDEF DEBUG}TypInfo, {$ENDIF}
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, SysTools;
+  SysTools, LzmaDec;
 
 {$IFDEF USE_DCL}
 
@@ -373,496 +421,6 @@ type
   end;
 
 {$ENDIF}
-
-//------------------------------------------------------------------------------
-// TSubEntry
-//------------------------------------------------------------------------------
-
-procedure TSubList.AddEntry(SubEntry: TSubRawBinaryEntry);
-var
-  Item: TSubEntry;
-{$IFDEF USE_DCL}
-  Index: Integer;
-  HashItem: TSCNFEditorIndexHashItem;
-{$ENDIF}
-
-begin
-  Item := TSubEntry.Create(Self);
-  Item.fIndex := fList.Count;
-
-  // Values read in the Subtitle Header Table
-  Item.fSubTextOffset := SubEntry.SubTextOffset;      // offset of the text subtitle
-  Item.fSubCodeOffset := SubEntry.SubCodeOffset;      // offset of the subtitle code before text subtitle (like "F2468A001"...)
-  Item.fCode := SubEntry.SubCode;                     // subtitle code  
-  Item.fUnknowValue := SubEntry.UnknowCrap;           // dunno what's it... may be it's a time flag or other...
-
-  // Values read in the Subtitle Body Table
-  Item.fText := '';                                   // subtitle text: not yet (read after adding this entry)
-  Item.fVoiceID := '';                                // subtitle VoiceID
-
-  // Values computed
-  Item.fCharID := CharsIdDecodeTable.GetCharIdFromCode(Item.Code[1]);
-
-{$IFDEF USE_DCL}
-  Index := fList.Add(Item);
-
-  // Adding in the HashMap
-  HashItem := TSCNFEditorIndexHashItem.Create;
-  HashItem.SubCode := Item.Code;
-  HashItem.ItemIndex := Index;
-  
-  fOptimizationHashMap.PutValue(Item.Code, HashItem);
-{$ELSE}
-  // Adding normal
-  fList.Add(Item);
-{$ENDIF}
-end;
-
-//------------------------------------------------------------------------------
-
-procedure TSubList.Clear;
-var
-  i: Integer;
-
-begin
-  for i := 0 to fList.Count - 1 do
-    TSubEntry(fList[i]).Free;
-  fList.Clear;
-  CharsIdDecodeTable.Clear;
-{$IFDEF USE_DCL}
-  fOptimizationHashMap.Clear;
-{$ENDIF}
-end;
-
-//------------------------------------------------------------------------------
-
-constructor TSubList.Create(Owner: TSCNFEditor);
-begin
-  fList := TList.Create;
-  Self.fOwner := Owner;
-  Self.fCharsDecodeTable := TSCNFCharsDecodeTable.Create(Self);
-{$IFDEF USE_DCL}
-  fOptimizationHashMap := TStrHashMap.Create;
-{$ENDIF}
-end;
-
-//------------------------------------------------------------------------------
-
-destructor TSubList.Destroy;
-begin
-  fCharsDecodeTable.Free;
-  Clear;
-  fList.Free;
-  inherited;
-end;
-
-//------------------------------------------------------------------------------
-
-function TSubList.ExportToFile(const FileName: TFileName): Boolean;
-var
-  XMLDoc: IXMLDocument;
-  i: Integer;
-  CurrentNode, SubCurrentNode: IXMLNode;
-
-  procedure AddXMLNode(var XML: IXMLDocument; const Key, Value: string); overload;
-  var
-    CurrentNode: IXMLNode;
-    
-  begin
-    CurrentNode := XMLDoc.CreateNode(Key);
-    CurrentNode.NodeValue := Value;
-    XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
-  end;
-
-  procedure AddXMLNode(var XML: IXMLDocument; const Key: string; const Value: Integer); overload;
-  begin
-    AddXMLNode(XML, Key, IntToStr(Value));
-  end;
-  
-begin
-  Result := False;
-  XMLDoc := TXMLDocument.Create(nil);
-  try
-    try
-      with XMLDoc do begin
-        Options := [doNodeAutoCreate, doAttrNull];
-        Active := True;
-        Version := '1.0';
-        Encoding := 'utf-8'; //'ISO-8859-1';
-        ParseOptions := [poPreserveWhiteSpace]; // fix 3.4.0
-      end;
-
-      // Creating the root
-      XMLDoc.DocumentElement := XMLDoc.CreateNode('freequestexport'); // old: s2freequestsubs
-
-      // File
-      AddXMLNode(XMLDoc, 'filename', ExtractFileName(Owner.fSourceFileName));
-
-      // Game version
-      case Owner.GameVersion of
-        gvWhatsShenmue: AddXMLNode(XMLDoc, 'gameversion', 'WSM_JAP_DC');
-        gvShenmueJ    : AddXMLNode(XMLDoc, 'gameversion', 'SM1_JAP_DC');
-        gvShenmue     : AddXMLNode(XMLDoc, 'gameversion', 'SM1_PAL_DC');
-        gvShenmue2J   : AddXMLNode(XMLDoc, 'gameversion', 'SM2_JAP_DC');
-        gvShenmue2    : AddXMLNode(XMLDoc, 'gameversion', 'SM2_PAL_DC');
-        gvShenmue2X   : AddXMLNode(XMLDoc, 'gameversion', 'SM2_PAL_XB');
-      end;
-
-      // CharID
-      AddXMLNode(XMLDoc, 'charid', Owner.fCharacterID);
-
-      // VoiceID
-      AddXMLNode(XMLDoc, 'voiceid', Owner.fVoiceFullID);
-
-      // Short VoiceID
-      AddXMLNode(XMLDoc, 'shortvoiceid', Owner.fVoiceShortID);
-
-      // Subtitles
-      CurrentNode := XMLDoc.CreateNode('subtitles');
-      XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
-      CurrentNode.Attributes['count'] := Count;
-      for i := 0 to Count - 1 do begin
-        SubCurrentNode := XMLDoc.CreateNode('subtitle');
-        SubCurrentNode.Attributes['code'] := Items[i].fCode;
-        SubCurrentNode.NodeValue := Items[i].fText; // don't use the Text property directly
-        CurrentNode.ChildNodes.Add(SubCurrentNode);
-      end;
-
-      XMLDoc.SaveToFile(FileName);
-      Result := FileExists(FileName);
-    except
-      on E:Exception do
-      {$IFDEF DEBUG}
-        WriteLn('ExportToFile: Exception - ', E.Message);
-      {$ENDIF}
-    end;
-  finally
-    XMLDoc.Active := False;
-    XMLDoc := nil;
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-function TSubList.FindSubtitleByCode(const Code: string): TSubEntry;
-var
-  i: Integer;
-
-begin
-  Result := nil;
-  
-  i := IndexOfSubtitleByCode(Code);
-  if i <> -1 then
-    Result := Items[i];
-end;
-
-//------------------------------------------------------------------------------
-
-function TSubList.IndexOfSubtitleByCode(const Code: string): Integer;
-var
-{$IFDEF USE_DCL}
-  HashIndex: TSCNFEditorIndexHashItem;
-{$ELSE}
-  Found: Boolean;
-{$ENDIF}
-
-begin
-  Result := -1;
-  if Count = 0 then Exit;
-
-{$IFDEF USE_DCL}
-
-  HashIndex := TSCNFEditorIndexHashItem(fOptimizationHashMap.GetValue(Code));
-  if Assigned(HashIndex) then
-    Result := HashIndex.ItemIndex;
-
-{$ELSE}
-
-  Found := False;
-    
-  while ((not Found) and (Result < Count)) do begin
-    Inc(Result);
-    Found := SameText(Items[Result].Code, Code);
-//    WriteLn(Items[Result].Code, ' -- ', Result, ' -- ', Code, ' -- ', Found);
-  end;
-  if Result = Count then Result := -1;
-
-{$ENDIF}
-end;
-
-//------------------------------------------------------------------------------
-
-function TSubList.GetCount: Integer;
-begin
-  Result := fList.Count;
-end;
-
-//------------------------------------------------------------------------------
-
-function TSubList.GetItem(Index: Integer): TSubEntry;
-begin
-  Result := TSubEntry(fList[Index]);  
-end;
-
-//------------------------------------------------------------------------------
-
-function TSubList.ImportFromFile(const FileName: TFileName): Boolean;
-var
-  XMLDoc: IXMLDocument;
-  i: Integer;
-  CurrentNode, LoopNode: IXMLNode;
-  S, xmlSubCode, xmlSubtitle, xmlCharID, xmlVoiceID, xmlShortVoiceID: string;
-  CurrentSub: TSubEntry;
-  CharsListActive: Boolean;
-
-begin
-  Result := False;
-  if not FileExists(FileName) then Exit;
-
-  XMLDoc := TXMLDocument.Create(nil);
-  try
-    with XMLDoc do begin
-      Options := [doNodeAutoCreate];
-      ParseOptions:= [poPreserveWhiteSpace]; // Fix 3.4.0
-      Active := True;
-      Version := '1.0';
-      Encoding := 'utf-8'; // 'ISO-8859-1';
-    end;
-
-    XMLDoc.LoadFromFile(FileName);
-
-    // Verifying if it's a valid XML to import
-    S := XMLDoc.DocumentElement.NodeName;
-    if (S <> 's2freequestsubs') and (S <> 'freequestexport') then Exit;
-
-    // File name
-    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('filename');
-
-    // Game version
-    {CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('gameversion');
-    if CurrentNode.NodeValue = 'dc' then
-    Self.fGameVersion := CurrentNode.NodeValue;}
-
-    // CharID
-    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('charid');
-    xmlCharID := CurrentNode.NodeValue;
-
-    // VoiceID
-    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('voiceid');
-    xmlVoiceID := CurrentNode.NodeValue;
-
-    // Short VoiceID
-    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('shortvoiceid');
-    xmlShortVoiceID := CurrentNode.NodeValue;
-
-    if Trim(xmlCharID) <> Trim(Owner.fCharacterID) then begin
-      Exit;
-    end
-{    else if Trim(xmlVoiceID) <> Trim(Owner.fVoiceFullID) then begin
-      Exit;
-    end   }
-    else if Trim(xmlShortVoiceID) <> Trim(Owner.fVoiceShortID) then begin
-      Exit;
-    end;
-
-    // Disabling CharsList...
-    CharsListActive := Owner.CharsList.Active;
-    Owner.CharsList.Active := False;
-    
-    // Subtitles
-    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('subtitles');
-    if CurrentNode.Attributes['count'] <> Count then begin
-      {$IFDEF DEBUG} WriteLn('XML Subs Count <> File Subs Count...'); {$ENDIF}
-      Exit;
-    end;
-
-    for i := 0 to CurrentNode.Attributes['count'] - 1 do
-    begin
-      LoopNode := CurrentNode.ChildNodes.Nodes[i];
-      if Assigned(LoopNode) then
-      begin
-        try
-          xmlSubCode := LoopNode.Attributes['code'];
-        except
-          xmlSubCode := '';
-        end;
-        try
-          xmlSubtitle := '';
-          if not VarIsNull(LoopNode.NodeValue) then
-            xmlSubtitle := LoopNode.NodeValue;
-        except
-          xmlSubtitle := '';
-        end;
-        
-        CurrentSub := Items[i];
-        CurrentSub.fCode := xmlSubCode;
-        CurrentSub.Text := xmlSubtitle;
-      end;
-    end;
-
-    Result := True;
-    Owner.CharsList.Active := CharsListActive;
-  finally
-    XMLDoc.Active := False;
-    XMLDoc := nil;
-  end;
-end;
-
-procedure TSubList.WriteSubtitlesTable(var F: file);
-var
-  TempSubsStrFile: TFileName;
-  i, ScnfBodyRelativeOffset, NewCodeOffset: Integer;
-  F_sub: file;
-  _null: Char;
-  
-begin
-  // Creating temporary file to write subtitles text (this to optimize the double for-loop...)
-  TempSubsStrFile := Owner.GetTempFileName;
-  AssignFile(F_sub, TempSubsStrFile);
-  FileMode := fmOpenWrite;
-  {$I-}ReWrite(F_sub, 1);{$I+}
-  if IOResult <> 0 then Exit;
-
-  // This is the offset where will be stored the subs table (-16 for PAKS header)
-  // This value is "relative" to CharID header and will be put in the subtitle
-  // table header. It will be read by the game.
-  ScnfBodyRelativeOffset := Owner.fScnfCharIdHeaderSize
-    + (Owner.fScnfStrTableBodyOffset - Owner.fScnfStrTableHeaderOffset) - 16;
-                  
-  // Getting all subtitles from this PAKS file...
-  _null := #$00;
-  for i := 0 to Count - 1 do begin
-    // Writing VoiceID subtitle
-    NewCodeOffset := ScnfBodyRelativeOffset + FilePos(F_sub);
-    BlockWrite(F_sub, Pointer(Items[i].VoiceID)^, Length(Items[i].VoiceID));
-    BlockWrite(F_sub, _null, 1);
-
-    // Writing subtitle text to a temp file to be merged after...
-    Items[i].fSubTextOffset := ScnfBodyRelativeOffset + FilePos(F_sub);
-    Items[i].fSubCodeOffset := NewCodeOffset; // updating values ...
-    Items[i].WriteTextEntry(F_sub);
-
-    // Writing subtitle header table directly to the dest file
-    Items[i].WriteHeaderEntry(F);
-  end;
-
-  // Writing subtitles string table to the final dest file
-  Self.fOwner.CopyFileBlock(F_sub, F, 0, FileSize(F_sub));
-
-  CloseFile(F_sub);
-
-  // Delete the temporary string table file
-  try
-    DeleteFile(TempSubsStrFile);
-  except // ignore if failed to delete temp file...
-  end;
-end;
-
-//------------------------------------------------------------------------------
-// TSubEntry
-//------------------------------------------------------------------------------
-
-constructor TSubEntry.Create(Owner: TSubList);
-begin
-  fOwner := Owner;
-  fEditorOwner := Owner.Owner;
-//  fPatchValue := 0;
-end;
-             
-//------------------------------------------------------------------------------
-
-// METHODE A AMELIORER SANS DOUTE...
-procedure TSubEntry.FillSubtitleTextFromRaw(var RawSubtitleText: array of Char);
-var
-  StartTextPos, EndTextPos: Integer;
-  StartBufSize: Integer;
-
-begin
-  StartTextPos := Pos(TABLE_STR_ENTRY_BEGIN, RawSubtitleText); // 2 for chars code
-  Self.fText := Copy(RawSubtitleText, StartTextPos + 2, Length(RawSubtitleText));
-  EndTextPos := Pos(TABLE_STR_ENTRY_END, Self.fText); // -1 for chars code
-  Self.fText := Copy(Self.fText, 1, EndTextPos - 1);
-//  fOriginalTextLength := Length(fText); // to calculate PatchValue
-
-  fStartSubtitleEntry := Copy(RawSubtitleText, 1, StartTextPos - 1);
-  StartBufSize := Length(fStartSubtitleEntry);
-  fStartSubtitleEntryLength := StartBufSize;
-
-  // WriteLn(fStartSubtitleEntry, ' ', fStartSubtitleEntryLength);
-  // WriteLn('RawSubtitleText: ', RawSubtitleText, ', StartTextPos: ', StartTextPos, ', EndTextPos: ', EndTextPos);
-end;
-
-function TSubEntry.GetText: string;
-begin
-  // Using CharsList to decode subtitle
-  Result := EditorOwner.CharsList.DecodeSubtitle(fText);
-end;
-
-function TSubEntry.IsTextEquals(const CompareText: string): Boolean;
-var
-  CText: string;
-
-begin
-  CText := EditorOwner.CharsList.EncodeSubtitle(CompareText);
-  Result := SameText(RawText, CText);
-end;
-
-procedure TSubEntry.SetText(const Value: string);
-begin
-  if fText <> Value then // begin
-    fText := EditorOwner.CharsList.EncodeSubtitle(Value); // using charlist to encode subtitle
-//    fPatchValue := (Length(fText) - Self.fOriginalTextLength);
-//  end;
-
-(*  {$IFDEF DEBUG}
-  WriteLn(
-    'Code: ', Code,
-//    ' - PatchValue: ', fPatchValue,
-    ' - TextOffset: ', fSubTextOffset,
-    ' - CodeOffset: ', fSubCodeOffset
-  );
-  {$ENDIF} *)
-end;
-
-procedure TSubEntry.WriteHeaderEntry(var F: file);
-var
-  SubEntry: TSubRawBinaryEntry;
-  
-begin
-  // retrieving subtitle header entry
-  SubEntry.SubTextOffset := fSubTextOffset;
-  SubEntry.SubCodeOffset := fSubCodeOffset;
-  StrCopy(SubEntry.SubCode, PChar(Code));
-  SubEntry.UnknowCrap := fUnknowValue;
-  BlockWrite(F, SubEntry, SizeOf(SubEntry));
-end;
-
-procedure TSubEntry.WriteTextEntry(var F: file);
-const
-  TABLE_SUB_START_TAG: string = #$A1#$D6;
-  TABLE_SUB_END_TAG: string = #$A1#$D7#$00;   // end string
-
-var
-  _tmp: string;
-//  _null: Char;
-
-begin
-  // Writing VoiceID
-(*  BlockWrite(F, Pointer(VoiceID)^, Length(VoiceID));
-  _null := #$00;
-  BlockWrite(F, _null, 1); *)
-
-  // Writing code and string init chars
-  BlockWrite(F, Pointer(fStartSubtitleEntry)^, Length(fStartSubtitleEntry));
-
-  // Modifying subtitle text
-  // Encode subtitle with CharsList
-  _tmp := TABLE_SUB_START_TAG + Owner.Owner.CharsList.EncodeSubtitle(Text) + TABLE_SUB_END_TAG;
-  //_tmp := TABLE_SUB_START_TAG + Text + TABLE_SUB_END_TAG;
-
-  // Writing subtitle text imself
-  BlockWrite(F, Pointer(_tmp)^, Length(_tmp));
-end;
 
 //------------------------------------------------------------------------------
 // TSCNFEditor
@@ -895,7 +453,7 @@ begin
   fSectionsList := TSectionsList.Create(Self);
   fCharsList := TSubsCharsList.Create;
   fNPCInfo := TNPCInfosTable.Create;
-  
+  fCinematicsScriptGenerator := TCinematicsScriptGenerator.Create(Self);
   fFileLoaded := False;
 end;
 
@@ -907,7 +465,7 @@ begin
   fSectionsList.Free;
   fCharsList.Free;
   fNPCInfo.Free;
-  
+  fCinematicsScriptGenerator.Free;
   inherited;
 end;
 
@@ -1797,9 +1355,669 @@ begin
   fOwner := Owner;
 end;
 
+//------------------------------------------------------------------------------
+// TSubEntry
+//------------------------------------------------------------------------------
+
+procedure TSubList.AddEntry(SubEntry: TSubRawBinaryEntry);
+var
+  Item: TSubEntry;
+{$IFDEF USE_DCL}
+  Index: Integer;
+  HashItem: TSCNFEditorIndexHashItem;
+{$ENDIF}
+
+begin
+  Item := TSubEntry.Create(Self);
+  Item.fIndex := fList.Count;
+
+  // Values read in the Subtitle Header Table
+  Item.fSubTextOffset := SubEntry.SubTextOffset;      // offset of the text subtitle
+  Item.fSubCodeOffset := SubEntry.SubCodeOffset;      // offset of the subtitle code before text subtitle (like "F2468A001"...)
+  Item.fCode := SubEntry.SubCode;                     // subtitle code
+  Item.fUnknowValue := SubEntry.UnknowCrap;           // dunno what's it... may be it's a time flag or other...
+
+  // Values read in the Subtitle Body Table
+  Item.fText := '';                                   // subtitle text: not yet (read after adding this entry)
+  Item.fVoiceID := '';                                // subtitle VoiceID
+
+  // Values computed
+  Item.fCharID := CharsIdDecodeTable.GetCharIdFromCode(Item.Code[1]);
+
+{$IFDEF USE_DCL}
+  Index := fList.Add(Item);
+
+  // Adding in the HashMap
+  HashItem := TSCNFEditorIndexHashItem.Create;
+  HashItem.SubCode := Item.Code;
+  HashItem.ItemIndex := Index;
+  
+  fOptimizationHashMap.PutValue(Item.Code, HashItem);
+{$ELSE}
+  // Adding normal
+  fList.Add(Item);
+{$ENDIF}
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TSubList.Clear;
+var
+  i: Integer;
+
+begin
+  for i := 0 to fList.Count - 1 do
+    TSubEntry(fList[i]).Free;
+  fList.Clear;
+  CharsIdDecodeTable.Clear;
+{$IFDEF USE_DCL}
+  fOptimizationHashMap.Clear;
+{$ENDIF}
+end;
+
+//------------------------------------------------------------------------------
+
+constructor TSubList.Create(Owner: TSCNFEditor);
+begin
+  fList := TList.Create;
+  Self.fOwner := Owner;
+  Self.fCharsDecodeTable := TSCNFCharsDecodeTable.Create(Self);
+{$IFDEF USE_DCL}
+  fOptimizationHashMap := TStrHashMap.Create;
+{$ENDIF}
+end;
+
+//------------------------------------------------------------------------------
+
+destructor TSubList.Destroy;
+begin
+  fCharsDecodeTable.Free;
+  Clear;
+  fList.Free;
+  inherited;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TSubList.AddXMLNode(var XMLDoc: IXMLDocument;
+  const Key, Value: string);
+var
+  CurrentNode: IXMLNode;
+
+begin
+  CurrentNode := XMLDoc.CreateNode(Key);
+  CurrentNode.NodeValue := Value;
+  XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TSubList.AddXMLNode(var XMLDoc: IXMLDocument; const Key: string;
+  const Value: Integer);
+begin
+  AddXMLNode(XMLDoc, Key, IntToStr(Value));
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.ExportToCinematicScript(const FileName: TFileName;
+  DiscNumber: Integer): Boolean;
+var
+  XMLDoc: IXMLDocument;
+  i, SubsCount: Integer;
+  RootNode, SubCurrentNode: IXMLNode;
+  Item: TCinematicsScriptListItem;
+  
+begin
+  Result := False;
+  XMLDoc := TXMLDocument.Create(nil);
+  try
+    try
+      with XMLDoc do begin
+        Options := [doNodeAutoCreate, doAttrNull];
+        Active := True;
+        Version := '1.0';
+        Encoding := 'utf-8';
+        ParseOptions := [poPreserveWhiteSpace];
+      end;
+
+      // Creating the root
+      XMLDoc.DocumentElement := XMLDoc.CreateNode('subseditor');
+
+      // File
+      AddXMLNode(XMLDoc, 'file', Owner.VoiceShortID + '.SRF');
+
+      // Subtitles count
+      AddXMLNode(XMLDoc, 'total', 0);
+
+      // Initializing Subtitles SRF order
+      Owner.CinematicsScriptGenerator.Execute;
+
+      // Writing subtitles to the XML
+      RootNode := XMLDoc.CreateNode('list');
+      XMLDoc.DocumentElement.ChildNodes.Add(RootNode);
+      SubsCount := 0;
+      
+      for i := 0 to Owner.CinematicsScriptGenerator.Count - 1 do begin
+        Item := Owner.CinematicsScriptGenerator[i];
+        if Item.Information.DiscNumbers[DiscNumber] then begin
+          // Creating the node
+          SubCurrentNode := XMLDoc.CreateNode('sub');
+          with SubCurrentNode do begin
+            Attributes['num'] := SubsCount;
+            Attributes['charid'] := Item.CharID;
+            NodeValue := Item.Subtitle;
+          end;
+          RootNode.ChildNodes.Add(SubCurrentNode);
+          Inc(SubsCount);
+
+          WriteLn(Item.SubtitleVoiceID);
+
+        end; // DiscNumbers
+      end; // for
+
+      // Count
+      RootNode.Attributes['count'] := SubsCount;
+      RootNode := XMLDoc.DocumentElement.ChildNodes.FindNode('total');
+      if Assigned(RootNode) then
+        RootNode.NodeValue := SubsCount;
+
+      XMLDoc.SaveToFile(FileName);
+      Result := FileExists(FileName);
+    except
+      on E:Exception do
+      {$IFDEF DEBUG}
+        WriteLn('ExportToCinematicScript: Exception - ', E.Message);
+      {$ENDIF}
+    end;
+  finally
+    XMLDoc.Active := False;
+    XMLDoc := nil;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.ExportToFile(const FileName: TFileName): Boolean;
+var
+  XMLDoc: IXMLDocument;
+  i: Integer;
+  CurrentNode, SubCurrentNode: IXMLNode;
+
+begin
+  Result := False;
+  XMLDoc := TXMLDocument.Create(nil);
+  try
+    try
+      with XMLDoc do begin
+        Options := [doNodeAutoCreate, doAttrNull];
+        Active := True;
+        Version := '1.0';
+        Encoding := 'utf-8'; //'ISO-8859-1';
+        ParseOptions := [poPreserveWhiteSpace]; // fix 3.4.0
+      end;
+
+      // Creating the root
+      XMLDoc.DocumentElement := XMLDoc.CreateNode('freequestexport'); // old: s2freequestsubs
+
+      // File
+      AddXMLNode(XMLDoc, 'filename', ExtractFileName(Owner.fSourceFileName));
+
+      // Game version
+      case Owner.GameVersion of
+        gvWhatsShenmue: AddXMLNode(XMLDoc, 'gameversion', 'WSM_JAP_DC');
+        gvShenmueJ    : AddXMLNode(XMLDoc, 'gameversion', 'SM1_JAP_DC');
+        gvShenmue     : AddXMLNode(XMLDoc, 'gameversion', 'SM1_PAL_DC');
+        gvShenmue2J   : AddXMLNode(XMLDoc, 'gameversion', 'SM2_JAP_DC');
+        gvShenmue2    : AddXMLNode(XMLDoc, 'gameversion', 'SM2_PAL_DC');
+        gvShenmue2X   : AddXMLNode(XMLDoc, 'gameversion', 'SM2_PAL_XB');
+      end;
+
+      // CharID
+      AddXMLNode(XMLDoc, 'charid', Owner.fCharacterID);
+
+      // VoiceID
+      AddXMLNode(XMLDoc, 'voiceid', Owner.fVoiceFullID);
+
+      // Short VoiceID
+      AddXMLNode(XMLDoc, 'shortvoiceid', Owner.fVoiceShortID);
+
+      // Subtitles
+      CurrentNode := XMLDoc.CreateNode('subtitles');
+      XMLDoc.DocumentElement.ChildNodes.Add(CurrentNode);
+      CurrentNode.Attributes['count'] := Count;
+      for i := 0 to Count - 1 do begin
+        SubCurrentNode := XMLDoc.CreateNode('subtitle');
+        SubCurrentNode.Attributes['code'] := Items[i].fCode;
+        SubCurrentNode.NodeValue := Items[i].fText; // don't use the Text property directly
+        CurrentNode.ChildNodes.Add(SubCurrentNode);
+      end;
+
+      XMLDoc.SaveToFile(FileName);
+      Result := FileExists(FileName);
+    except
+      on E:Exception do
+      {$IFDEF DEBUG}
+        WriteLn('ExportToFile: Exception - ', E.Message);
+      {$ENDIF}
+    end;
+  finally
+    XMLDoc.Active := False;
+    XMLDoc := nil;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.FindSubtitleByCode(const Code: string): TSubEntry;
+var
+  i: Integer;
+
+begin
+  Result := nil;
+  
+  i := IndexOfSubtitleByCode(Code);
+  if i <> -1 then
+    Result := Items[i];
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.IndexOfSubtitleByCode(const Code: string): Integer;
+var
+{$IFDEF USE_DCL}
+  HashIndex: TSCNFEditorIndexHashItem;
+{$ELSE}
+  Found: Boolean;
+{$ENDIF}
+
+begin
+  Result := -1;
+  if Count = 0 then Exit;
+
+{$IFDEF USE_DCL}
+
+  HashIndex := TSCNFEditorIndexHashItem(fOptimizationHashMap.GetValue(Code));
+  if Assigned(HashIndex) then
+    Result := HashIndex.ItemIndex;
+
+{$ELSE}
+
+  Found := False;
+    
+  while ((not Found) and (Result < Count)) do begin
+    Inc(Result);
+    Found := SameText(Items[Result].Code, Code);
+//    WriteLn(Items[Result].Code, ' -- ', Result, ' -- ', Code, ' -- ', Found);
+  end;
+  if Result = Count then Result := -1;
+
+{$ENDIF}
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.GetCount: Integer;
+begin
+  Result := fList.Count;
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.GetItem(Index: Integer): TSubEntry;
+begin
+  Result := TSubEntry(fList[Index]);  
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.ImportFromFile(const FileName: TFileName): Boolean;
+var
+  XMLDoc: IXMLDocument;
+  i: Integer;
+  CurrentNode, LoopNode: IXMLNode;
+  S, xmlSubCode, xmlSubtitle, xmlCharID, xmlVoiceID, xmlShortVoiceID: string;
+  CurrentSub: TSubEntry;
+  CharsListActive: Boolean;
+
+begin
+  Result := False;
+  if not FileExists(FileName) then Exit;
+
+  XMLDoc := TXMLDocument.Create(nil);
+  try
+    with XMLDoc do begin
+      Options := [doNodeAutoCreate];
+      ParseOptions:= [poPreserveWhiteSpace]; // Fix 3.4.0
+      Active := True;
+      Version := '1.0';
+      Encoding := 'utf-8'; // 'ISO-8859-1';
+    end;
+
+    XMLDoc.LoadFromFile(FileName);
+
+    // Verifying if it's a valid XML to import
+    S := XMLDoc.DocumentElement.NodeName;
+    if (S <> 's2freequestsubs') and (S <> 'freequestexport') then Exit;
+
+    // File name
+    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('filename');
+
+    // Game version
+    {CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('gameversion');
+    if CurrentNode.NodeValue = 'dc' then
+    Self.fGameVersion := CurrentNode.NodeValue;}
+
+    // CharID
+    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('charid');
+    xmlCharID := CurrentNode.NodeValue;
+
+    // VoiceID
+    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('voiceid');
+    xmlVoiceID := CurrentNode.NodeValue;
+
+    // Short VoiceID
+    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('shortvoiceid');
+    xmlShortVoiceID := CurrentNode.NodeValue;
+
+    if Trim(xmlCharID) <> Trim(Owner.fCharacterID) then begin
+      Exit;
+    end
+{    else if Trim(xmlVoiceID) <> Trim(Owner.fVoiceFullID) then begin
+      Exit;
+    end   }
+    else if Trim(xmlShortVoiceID) <> Trim(Owner.fVoiceShortID) then begin
+      Exit;
+    end;
+
+    // Disabling CharsList...
+    CharsListActive := Owner.CharsList.Active;
+    Owner.CharsList.Active := False;
+    
+    // Subtitles
+    CurrentNode := XMLDoc.DocumentElement.ChildNodes.FindNode('subtitles');
+    if CurrentNode.Attributes['count'] <> Count then begin
+      {$IFDEF DEBUG} WriteLn('XML Subs Count <> File Subs Count...'); {$ENDIF}
+      Exit;
+    end;
+
+    for i := 0 to CurrentNode.Attributes['count'] - 1 do
+    begin
+      LoopNode := CurrentNode.ChildNodes.Nodes[i];
+      if Assigned(LoopNode) then
+      begin
+        try
+          xmlSubCode := LoopNode.Attributes['code'];
+        except
+          xmlSubCode := '';
+        end;
+        try
+          xmlSubtitle := '';
+          if not VarIsNull(LoopNode.NodeValue) then
+            xmlSubtitle := LoopNode.NodeValue;
+        except
+          xmlSubtitle := '';
+        end;
+        
+        CurrentSub := Items[i];
+        CurrentSub.fCode := xmlSubCode;
+        CurrentSub.Text := xmlSubtitle;
+      end;
+    end;
+
+    Result := True;
+    Owner.CharsList.Active := CharsListActive;
+  finally
+    XMLDoc.Active := False;
+    XMLDoc := nil;
+  end;
+end;
+
+procedure TSubList.WriteSubtitlesTable(var F: file);
+var
+  TempSubsStrFile: TFileName;
+  i, ScnfBodyRelativeOffset, NewCodeOffset: Integer;
+  F_sub: file;
+  _null: Char;
+  
+begin
+  // Creating temporary file to write subtitles text (this to optimize the double for-loop...)
+  TempSubsStrFile := Owner.GetTempFileName;
+  AssignFile(F_sub, TempSubsStrFile);
+  FileMode := fmOpenWrite;
+  {$I-}ReWrite(F_sub, 1);{$I+}
+  if IOResult <> 0 then Exit;
+
+  // This is the offset where will be stored the subs table (-16 for PAKS header)
+  // This value is "relative" to CharID header and will be put in the subtitle
+  // table header. It will be read by the game.
+  ScnfBodyRelativeOffset := Owner.fScnfCharIdHeaderSize
+    + (Owner.fScnfStrTableBodyOffset - Owner.fScnfStrTableHeaderOffset) - 16;
+                  
+  // Getting all subtitles from this PAKS file...
+  _null := #$00;
+  for i := 0 to Count - 1 do begin
+    // Writing VoiceID subtitle
+    NewCodeOffset := ScnfBodyRelativeOffset + FilePos(F_sub);
+    BlockWrite(F_sub, Pointer(Items[i].VoiceID)^, Length(Items[i].VoiceID));
+    BlockWrite(F_sub, _null, 1);
+
+    // Writing subtitle text to a temp file to be merged after...
+    Items[i].fSubTextOffset := ScnfBodyRelativeOffset + FilePos(F_sub);
+    Items[i].fSubCodeOffset := NewCodeOffset; // updating values ...
+    Items[i].WriteTextEntry(F_sub);
+
+    // Writing subtitle header table directly to the dest file
+    Items[i].WriteHeaderEntry(F);
+  end;
+
+  // Writing subtitles string table to the final dest file
+  Self.fOwner.CopyFileBlock(F_sub, F, 0, FileSize(F_sub));
+
+  CloseFile(F_sub);
+
+  // Delete the temporary string table file
+  try
+    DeleteFile(TempSubsStrFile);
+  except // ignore if failed to delete temp file...
+  end;
+end;
+
+//==============================================================================
+// TSubEntry
+//==============================================================================
+
+constructor TSubEntry.Create(Owner: TSubList);
+begin
+  fOwner := Owner;
+  fEditorOwner := Owner.Owner;
+//  fPatchValue := 0;
+end;
+             
+//------------------------------------------------------------------------------
+
+// METHODE A AMELIORER SANS DOUTE...
+procedure TSubEntry.FillSubtitleTextFromRaw(var RawSubtitleText: array of Char);
+var
+  StartTextPos, EndTextPos: Integer;
+  StartBufSize: Integer;
+
+begin
+  StartTextPos := Pos(TABLE_STR_ENTRY_BEGIN, RawSubtitleText); // 2 for chars code
+  Self.fText := Copy(RawSubtitleText, StartTextPos + 2, Length(RawSubtitleText));
+  EndTextPos := Pos(TABLE_STR_ENTRY_END, Self.fText); // -1 for chars code
+  Self.fText := Copy(Self.fText, 1, EndTextPos - 1);
+//  fOriginalTextLength := Length(fText); // to calculate PatchValue
+
+  fStartSubtitleEntry := Copy(RawSubtitleText, 1, StartTextPos - 1);
+  StartBufSize := Length(fStartSubtitleEntry);
+  fStartSubtitleEntryLength := StartBufSize;
+
+  // WriteLn(fStartSubtitleEntry, ' ', fStartSubtitleEntryLength);
+  // WriteLn('RawSubtitleText: ', RawSubtitleText, ', StartTextPos: ', StartTextPos, ', EndTextPos: ', EndTextPos);
+end;
+
+function TSubEntry.GetText: string;
+begin
+  // Using CharsList to decode subtitle
+  Result := EditorOwner.CharsList.DecodeSubtitle(fText);
+end;
+
+function TSubEntry.IsTextEquals(const CompareText: string): Boolean;
+var
+  CText: string;
+
+begin
+  CText := EditorOwner.CharsList.EncodeSubtitle(CompareText);
+  Result := SameText(RawText, CText);
+end;
+
+procedure TSubEntry.SetText(const Value: string);
+begin
+  if fText <> Value then // begin
+    fText := EditorOwner.CharsList.EncodeSubtitle(Value); // using charlist to encode subtitle
+//    fPatchValue := (Length(fText) - Self.fOriginalTextLength);
+//  end;
+
+(*  {$IFDEF DEBUG}
+  WriteLn(
+    'Code: ', Code,
+//    ' - PatchValue: ', fPatchValue,
+    ' - TextOffset: ', fSubTextOffset,
+    ' - CodeOffset: ', fSubCodeOffset
+  );
+  {$ENDIF} *)
+end;
+
+procedure TSubEntry.WriteHeaderEntry(var F: file);
+var
+  SubEntry: TSubRawBinaryEntry;
+  
+begin
+  // retrieving subtitle header entry
+  SubEntry.SubTextOffset := fSubTextOffset;
+  SubEntry.SubCodeOffset := fSubCodeOffset;
+  StrCopy(SubEntry.SubCode, PChar(Code));
+  SubEntry.UnknowCrap := fUnknowValue;
+  BlockWrite(F, SubEntry, SizeOf(SubEntry));
+end;
+
+procedure TSubEntry.WriteTextEntry(var F: file);
+const
+  TABLE_SUB_START_TAG: string = #$A1#$D6;
+  TABLE_SUB_END_TAG: string = #$A1#$D7#$00;   // end string
+
+var
+  _tmp: string;
+//  _null: Char;
+
+begin
+  // Writing VoiceID
+(*  BlockWrite(F, Pointer(VoiceID)^, Length(VoiceID));
+  _null := #$00;
+  BlockWrite(F, _null, 1); *)
+
+  // Writing code and string init chars
+  BlockWrite(F, Pointer(fStartSubtitleEntry)^, Length(fStartSubtitleEntry));
+
+  // Modifying subtitle text
+  // Encode subtitle with CharsList
+  _tmp := TABLE_SUB_START_TAG + Owner.Owner.CharsList.EncodeSubtitle(Text) + TABLE_SUB_END_TAG;
+  //_tmp := TABLE_SUB_START_TAG + Text + TABLE_SUB_END_TAG;
+
+  // Writing subtitle text imself
+  BlockWrite(F, Pointer(_tmp)^, Length(_tmp));
+end;
+
+//==============================================================================
+// TCinematicsScriptGenerator
+//==============================================================================
+
+// Thanks Zarko Gajic for the tutorial
+// http://delphi.about.com/od/adptips2003/a/bltip1103_3.htm
+
+function CompareID(Item1, Item2: Pointer): Integer;
+begin
+  Result := CompareText(TCinematicsScriptListItem(Item1).SubtitleVoiceID,
+                        TCinematicsScriptListItem(Item2).SubtitleVoiceID);
+end;
+
+procedure TCinematicsScriptGenerator.Clear;
+var
+  i: Integer;
+
+begin
+  for i := 0 to Count - 1 do
+    Items[i].Free;
+  VoiceOrderedList.Clear;
+end;
+
+constructor TCinematicsScriptGenerator.Create(AOwner: TSCNFEditor);
+begin
+  fSRFDatabase := TCinematicsScriptDatabase.Create;
+  fVoiceOrderedList := TList.Create;
+  fOwner := AOwner;
+end;
+
+destructor TCinematicsScriptGenerator.Destroy;
+begin
+  Clear;
+  VoiceOrderedList.Free;
+  SRFDatabase.Free;
+  inherited;
+end;
+
+function TCinematicsScriptGenerator.GetCount: Integer;
+begin
+  Result := fVoiceOrderedList.Count;
+end;
+
+function TCinematicsScriptGenerator.GetItem(
+  Index: Integer): TCinematicsScriptListItem;
+begin
+  Result := TCinematicsScriptListItem(fVoiceOrderedList[Index]);
+end;
+
+procedure TCinematicsScriptGenerator.Execute;
+var
+  i: Integer;
+  VoiceItem: TCinematicsScriptListItem;
+
+begin
+  Clear;
+  with Owner do
+    for i := 0 to Subtitles.Count - 1 do begin
+      VoiceItem := TCinematicsScriptListItem.Create;
+      with VoiceItem do begin
+        fSubtitleVoiceID := Subtitles[i].VoiceID; // Subtitle VoiceID = 'F1000A001'...
+        fCharID := Subtitles[i].CharID;
+        fSubtitle := Subtitles[i].RawText;  // don't use the Text property directly
+        SRFDatabase.Find(VoiceShortID, Subtitles[i].Code, fInformation);
+      end;
+      VoiceOrderedList.Add(VoiceItem);
+    end;
+  VoiceOrderedList.Sort(@CompareID);
+end;
+
+procedure TCinematicsScriptGenerator.LoadFromFile(
+  const ZippedScriptDatabase: TFileName);
+var
+  Database: TFileName;
+
+begin
+  Database := GetTempDir + ExtractFileName(ChangeFileExt(ZippedScriptDatabase, '.xml'));
+  SevenZipExtract(ZippedScriptDatabase, GetTempDir);
+  if FileExists(Database) then begin
+    SRFDatabase.LoadFromFile(Database);
+    DeleteFile(Database);
+  end;
+end;
+
+//==============================================================================
+
 initialization
   Randomize;
 
-//------------------------------------------------------------------------------
+//==============================================================================
 
 end.
