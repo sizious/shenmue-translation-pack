@@ -397,10 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)
@@ -690,6 +686,17 @@ object frmMain: TfrmMain
       object N2: TMenuItem
         Caption = '-'
       end
+      object miExportToCinematicScript: TMenuItem
+        Caption = 'Export to Cinema&tic script...'
+        Hint = 
+          'Export to the SRF import script format for the Cinematics Subtit' +
+          'les Editor.'
+        ShortCut = 16468
+        OnClick = miExportToCinematicScriptClick
+      end
+      object N20: TMenuItem
+        Caption = '-'
+      end
       object miFileProperties2: TMenuItem
         Caption = '&Properties...'
         Hint = 'Show the advanced file properties dialog.'
@@ -795,6 +802,14 @@ object frmMain: TfrmMain
         ShortCut = 49221
         OnClick = miBatchExportSubsClick
       end
+      object N23: TMenuItem
+        Caption = '-'
+      end
+      object miBatchSRF: TMenuItem
+        Caption = 'Batch Cinematics script...'
+        ShortCut = 49236
+        OnClick = miBatchSRFClick
+      end
       object N16: TMenuItem
         Caption = '-'
       end
@@ -882,6 +897,13 @@ object frmMain: TfrmMain
       object miDEBUG_StrongTest: TMenuItem
         Caption = 'STRONG Import/Export Test'
         OnClick = miDEBUG_StrongTestClick
+      end
+      object N22: TMenuItem
+        Caption = '-'
+      end
+      object miDEBUG_TestSRFDB: TMenuItem
+        Caption = 'SRF Database Test'
+        OnClick = miDEBUG_TestSRFDBClick
       end
     end
   end
@@ -977,6 +999,15 @@ object frmMain: TfrmMain
       OnClick = miExportSubsClick
     end
     object N13: TMenuItem
+      Caption = '-'
+    end
+    object miExportToCinematicScript2: TMenuItem
+      Caption = 'Export to Cinema&tic script...'
+      Hint = '(generated)'
+      ShortCut = 16468
+      OnClick = miExportToCinematicScriptClick
+    end
+    object N21: TMenuItem
       Caption = '-'
     end
     object miClearFilesList2: TMenuItem

@@ -38,6 +38,7 @@ const
   ORIGINAL_TEXT_NOT_AVAILABLE   = '~~ Not available... ~~';
 
 function GetBitmapFontDatasDirectory: TFileName;
+function GetCinematicsScriptDatabase: TFileName;
 function GetCorrectCharsList(const GameVersion: TGameVersion): TFileName;
 function GetDatasDirectory: TFileName;
 function GetFacesImagesDirectory(GameVersion: TGameVersion): TFileName;
@@ -60,6 +61,7 @@ const
   NPC_INFO_FILE               = 'npc_info.csv';
   CHR_LIST_1                  = 'chrlist1.csv'; // for Shenmue, US Shenmue, What's Shenmue
   CHR_LIST_2                  = 'chrlist2.csv'; // for Shenmue II
+  SRF_DB                      = 'srfscript.db';
 
   FACES_ROOT_DIR              = 'faces';
   FACES_SYSTEM_ROOT_DIR       = 'system';
@@ -78,6 +80,13 @@ const
   
 var
   DatasDirectory: TFileName;
+
+//------------------------------------------------------------------------------
+
+function GetCinematicsScriptDatabase: TFileName;
+begin
+  Result := GetDatasDirectory + SRF_DB;
+end;
 
 //------------------------------------------------------------------------------
 
