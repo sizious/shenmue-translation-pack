@@ -184,6 +184,7 @@ type
     fSRFDatabase: TCinematicsScriptDatabase;
     fVoiceOrderedList: TList;
     fOwner: TSCNFEditor;
+    fLoaded: Boolean;
     function GetCount: Integer;
     function GetItem(Index: Integer): TCinematicsScriptListItem;
     property SRFDatabase: TCinematicsScriptDatabase read fSRFDatabase;
@@ -196,6 +197,7 @@ type
     procedure LoadFromFile(const ZippedScriptDatabase: TFileName);
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TCinematicsScriptListItem read GetItem; default;
+    property Loaded: Boolean read fLoaded;
     property Owner: TSCNFEditor read fOwner;
   end;
   
@@ -1490,6 +1492,9 @@ begin
       // Subtitles count
       AddXMLNode(XMLDoc, 'total', 0);
 
+      // Disc Number
+      AddXMLNode(XMLDoc, 'discnumber', DiscNumber);
+
       // Initializing Subtitles SRF order
       Owner.CinematicsScriptGenerator.Execute;
 
@@ -1511,7 +1516,7 @@ begin
           RootNode.ChildNodes.Add(SubCurrentNode);
           Inc(SubsCount);
 
-          WriteLn(Item.SubtitleVoiceID);
+//          WriteLn(Item.SubtitleVoiceID);
 
         end; // DiscNumbers
       end; // for
@@ -1954,6 +1959,7 @@ end;
 
 constructor TCinematicsScriptGenerator.Create(AOwner: TSCNFEditor);
 begin
+  fLoaded := False;
   fSRFDatabase := TCinematicsScriptDatabase.Create;
   fVoiceOrderedList := TList.Create;
   fOwner := AOwner;
@@ -2008,7 +2014,7 @@ begin
   Database := GetTempDir + ExtractFileName(ChangeFileExt(ZippedScriptDatabase, '.xml'));
   SevenZipExtract(ZippedScriptDatabase, GetTempDir);
   if FileExists(Database) then begin
-    SRFDatabase.LoadFromFile(Database);
+    fLoaded := SRFDatabase.LoadFromFile(Database);
     DeleteFile(Database);
   end;
 end;
