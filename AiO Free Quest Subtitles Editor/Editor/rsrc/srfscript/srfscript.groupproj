@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{7558f0a9-3fc9-45c4-99eb-95c8d86c3a9c}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="makedb\makedb.dproj" />
+    <Projects Include="sortfree\sortfree.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="makedb">
+    <MSBuild Projects="makedb\makedb.dproj" Targets="" />
+  </Target>
+  <Target Name="makedb:Clean">
+    <MSBuild Projects="makedb\makedb.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="makedb:Make">
+    <MSBuild Projects="makedb\makedb.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sortfree">
+    <MSBuild Projects="sortfree\sortfree.dproj" Targets="" />
+  </Target>
+  <Target Name="sortfree:Clean">
+    <MSBuild Projects="sortfree\sortfree.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sortfree:Make">
+    <MSBuild Projects="sortfree\sortfree.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="makedb;sortfree" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="makedb:Clean;sortfree:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="makedb:Make;sortfree:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
