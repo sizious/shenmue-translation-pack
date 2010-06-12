@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Shenmue AiO Free Quest Subtitles Editor.  If not, see <http://www.gnu.org/licenses/>.
 
-unit main;
+unit Main;
 
 // Uncomment this if you want to debug the Global-Translation selection node
 // {$DEFINE GLOBAL_TRANSLATION_NODE_DEBUG}
@@ -36,7 +36,7 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.X9' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.9' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
   COMPIL_DATE_TIME = 'June 8, 2010 @01:15AM';
 
@@ -318,6 +318,7 @@ type
     procedure Clear;
     function GetTargetDirectory: string;
     function GetTargetFileName: TFileName;
+    procedure InitCinematicsGenerator;    
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
     procedure LoadSubtitleFile(const FileName: TFileName);
     procedure ReloadFileEditor;
@@ -648,14 +649,7 @@ begin
   with frmCinematicsScript do begin
     Mode := cmBatch;
     FileName := IncludeTrailingPathDelimiter(GetCurrentDir);
-    if Execute then begin
-      SetStatus('Exporting to Cinematic Script...');
-      if SCNFEditor.Subtitles.ExportToCinematicScript(FileName, DiscNumber) then
-        AddDebug('Subtitles batch exported successfully to the Cinematic (SRF) Scripts.')
-      else
-        AddDebug('Failed when batch exporting to the Cinematic (SRF) Scripts!!');
-      SetStatusReady;
-    end;
+    Execute;
   end;
 end;
 
@@ -785,6 +779,13 @@ procedure TfrmMain.InitApplicationReleaseType;
 begin
   miMultiTranslate.Caption := 'Multi-translation...';
   miMultiTranslate.Hint := 'Open the Multi-translation module.';
+end;
+
+procedure TfrmMain.InitCinematicsGenerator;
+begin
+  // Initializing SRF Scripts Generator
+  if not SCNFEditor.CinematicsScriptGenerator.Loaded then
+    SCNFEditor.CinematicsScriptGenerator.LoadFromFile(GetCinematicsScriptDatabase);
 end;
 
 procedure TfrmMain.InitOriginalSubtitlesColumn;
@@ -1002,10 +1003,10 @@ procedure TfrmMain.miExportToCinematicScriptClick(Sender: TObject);
 begin
   with frmCinematicsScript do begin
     Mode := cmSingle;
-    FileName := IncludeTrailingPathDelimiter(GetCurrentDir)
-      + SCNFEditor.VoiceShortID + '_srf.xml';
+    FileName := GetDefaultFileName;
     if Execute then begin
       SetStatus('Exporting to Cinematic Script...');
+      InitCinematicsGenerator;
       if SCNFEditor.Subtitles.ExportToCinematicScript(FileName, DiscNumber) then
         AddDebug('Subtitles exported successfully to the Cinematic (SRF) Script.')
       else
@@ -1236,9 +1237,6 @@ begin
   // Reloading directory at startup
   if ReloadDirectoryAtStartup then
     ScanDirectory(SelectedDirectory);
-
-  // Initializing SRF Scripts Generator
-  SCNFEditor.CinematicsScriptGenerator.LoadFromFile(GetCinematicsScriptDatabase);
 end;
 
 procedure TfrmMain.FreeApplication;
@@ -1866,6 +1864,8 @@ begin
   miClearFilesList2.Enabled := False;
   miBatchImportSubs.Enabled := False;
   miBatchExportSubs.Enabled := False;
+  miBatchSRF.Enabled := False;
+
   if SubsViewerVisible then
     Previewer.Clear();
 end;
@@ -2124,6 +2124,7 @@ begin
   miClearFilesList2.Enabled := True;
   miBatchImportSubs.Enabled := True;
   miBatchExportSubs.Enabled := True;
+  miBatchSRF.Enabled := True;
 end;
 
 procedure TfrmMain.miScanDirectoryClick(Sender: TObject);

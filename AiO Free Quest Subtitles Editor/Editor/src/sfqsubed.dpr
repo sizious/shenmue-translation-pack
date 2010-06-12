@@ -52,7 +52,8 @@ uses
   viewer in '..\..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
   hashidx in '..\..\..\Common\hashidx.pas',
   srfdb in 'engine\srfdb.pas',
-  srfscript in 'srfscript.pas' {frmCinematicsScript};
+  srfscript in 'srfscript.pas' {frmCinematicsScript},
+  batchsrf in 'engine\batch\batchsrf.pas';
 
 {$R *.res}
 
