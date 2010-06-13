@@ -397,10 +397,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         339)
@@ -811,6 +807,7 @@ object frmMain: TfrmMain
       end
       object miBatchSRF: TMenuItem
         Caption = 'Batch Cinematics script...'
+        Hint = 'Export to Cinematics SRF scripts in mass.'
         ShortCut = 49236
         OnClick = miBatchSRFClick
       end

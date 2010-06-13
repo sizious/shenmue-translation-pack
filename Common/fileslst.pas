@@ -1,4 +1,4 @@
-unit fileslst;
+unit FilesLst;
 
 interface
 
@@ -30,7 +30,8 @@ type
     function GetCount: Integer;
   public
     procedure Add(const FileName: TFileName);
-    procedure Assign(Source: TFilesList);
+    procedure Assign(Source: TFilesList); overload;
+    procedure Assign(Directory: TFileName; Source: TStrings); overload;
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
@@ -58,6 +59,16 @@ var
 begin
   for i := 0 to Source.Count - 1 do
     Add(Source[i].FileName);
+end;
+
+procedure TFilesList.Assign(Directory: TFileName; Source: TStrings);
+var
+  i: Integer;
+
+begin
+  Directory := IncludeTrailingPathDelimiter(Directory);
+  for i := 0 to Source.Count - 1 do
+    Add(Directory + Source[i]);
 end;
 
 procedure TFilesList.Clear;
