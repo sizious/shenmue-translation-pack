@@ -17,7 +17,6 @@ uses
   charslst in 'engine\charslst.pas',
   multiscan in 'engine\multitrd\multiscan.pas',
   fileinfo in 'fileinfo.pas' {frmFileInfo},
-  fileslst in 'engine\fileslst.pas',
   massimp in 'massimp.pas' {frmMassImport},
   subsexp in 'engine\batch\subsexp.pas',
   subsimp in 'engine\batch\subsimp.pas',
@@ -53,7 +52,8 @@ uses
   hashidx in '..\..\..\Common\hashidx.pas',
   srfdb in 'engine\srfdb.pas',
   srfscript in 'srfscript.pas' {frmCinematicsScript},
-  batchsrf in 'engine\batch\batchsrf.pas';
+  batchsrf in 'engine\batch\batchsrf.pas',
+  fileslst in '..\..\..\Common\fileslst.pas';
 
 {$R *.res}
 

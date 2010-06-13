@@ -105,6 +105,9 @@ const
   SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 9, 2010 @05:12PM';
 
 type
+  ESCNFEditor = class(Exception);
+  ECinematicsScriptGenerator = class(ESCNFEditor);
+
   // Structure to read IPAC sections info from footer
   TSectionRawBinaryEntry = record
     CharID: array[0..3] of Char; // Correction for Shenmue II... (FIX v3.4.0)
@@ -172,10 +175,12 @@ type
     fCharID: string;
     fSubtitle: string;
     fInformation: TCinematicsScriptDatabaseItem;
+    fHasInformation: Boolean;
   public
     property SubtitleVoiceID: string read fSubtitleVoiceID;
     property CharID: string read fCharID;
     property Subtitle: string read fSubtitle;
+    property HasInformation: Boolean read fHasInformation;
     property Information: TCinematicsScriptDatabaseItem read fInformation; 
   end;
   
@@ -1505,7 +1510,7 @@ begin
       
       for i := 0 to Owner.CinematicsScriptGenerator.Count - 1 do begin
         Item := Owner.CinematicsScriptGenerator[i];
-        if Item.Information.DiscNumbers[DiscNumber] then begin
+        if Item.HasInformation and Item.Information.DiscNumbers[DiscNumber] then begin
           // Creating the node
           SubCurrentNode := XMLDoc.CreateNode('sub');
           with SubCurrentNode do begin
@@ -1528,7 +1533,7 @@ begin
         RootNode.NodeValue := SubsCount;
 
       XMLDoc.SaveToFile(FileName);
-      Result := FileExists(FileName);
+      Result := FileExists(FileName); // and (SubsCount > 0);
     except
       on E:Exception do
       {$IFDEF DEBUG}
@@ -1990,6 +1995,9 @@ var
   VoiceItem: TCinematicsScriptListItem;
 
 begin
+  if not Loaded then
+    raise ECinematicsScriptGenerator.Create('The SRF Script Database is not loaded!');
+
   Clear;
   with Owner do
     for i := 0 to Subtitles.Count - 1 do begin
@@ -1998,7 +2006,7 @@ begin
         fSubtitleVoiceID := Subtitles[i].VoiceID; // Subtitle VoiceID = 'F1000A001'...
         fCharID := Subtitles[i].CharID;
         fSubtitle := Subtitles[i].RawText;  // don't use the Text property directly
-        SRFDatabase.Find(VoiceShortID, Subtitles[i].Code, fInformation);
+        fHasInformation := SRFDatabase.Find(VoiceShortID, Subtitles[i].Code, fInformation);
       end;
       VoiceOrderedList.Add(VoiceItem);
     end;
