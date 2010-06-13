@@ -11,9 +11,12 @@ object frmCinematicsScript: TfrmCinematicsScript
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
+  OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   DesignSize = (
     374
@@ -26,17 +29,20 @@ object frmCinematicsScript: TfrmCinematicsScript
     Width = 362
     Height = 39
     Caption = 
-      'The Cinematic Script Generator is a tool made for Shenmue I. In ' +
-      'this game, NPC characters dialogs are in FREExx archives, in fac' +
-      't, subtitles in the HUMANS archive aren'#39't used by the game. '
+      'This is a tool designed for Shenmue I. In this game, NPC charact' +
+      'ers dialogs are in FREE archives. The dialogs inside the HUMANS ' +
+      'archive aren'#39't used by the game, but translating dialogs with it' +
+      ' is easier.'
     WordWrap = True
   end
   object Label2: TLabel
     Left = 4
     Top = 53
-    Width = 299
+    Width = 339
     Height = 13
-    Caption = 'This tool is here to generate SRF scripts from HUMANS scripts.'
+    Caption = 
+      'This module is here to export the HUMANS content into FREE archi' +
+      'ves.'
     WordWrap = True
   end
   object Bevel1: TBevel

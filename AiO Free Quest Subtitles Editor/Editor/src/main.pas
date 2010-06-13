@@ -38,7 +38,7 @@ const
   APP_VERSION =
     '2.9' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'June 13, 2010 @05:03PM';
+  COMPIL_DATE_TIME = 'June 13, 2010 @05:23PM';
 
 type
   TGlobalTranslationModule = class;
@@ -307,6 +307,7 @@ type
     procedure CheckIfSubLengthIsCorrect(const Value: Integer; Field: TEdit);
     procedure FreeApplication;
     procedure InitApplicationReleaseType;
+    procedure InitCinematicsGenerator;        
     procedure InitOriginalSubtitlesColumn;
     procedure PreviewWindowClosedEvent(Sender: TObject);
     procedure SetModifiedIndicator(State: Boolean);
@@ -318,7 +319,6 @@ type
     procedure Clear;
     function GetTargetDirectory: string;
     function GetTargetFileName: TFileName;
-    procedure InitCinematicsGenerator;    
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
     procedure LoadSubtitleFile(const FileName: TFileName);
     procedure ReloadFileEditor;
@@ -648,7 +648,6 @@ procedure TfrmMain.miBatchSRFClick(Sender: TObject);
 begin
   with frmCinematicsScript do begin
     Mode := cmBatch;
-    FileName := IncludeTrailingPathDelimiter(GetCurrentDir);
     Execute;
   end;
 end;
