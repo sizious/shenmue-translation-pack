@@ -30,6 +30,8 @@ type
     procedure bGenerateClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure bBrowseClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormCreate(Sender: TObject);
   private
     { Déclarations privées }
     fMode: TCinematicsMode;
@@ -43,6 +45,7 @@ type
     procedure BatchCompleted(Sender: TObject; ErrornousFiles,
       TotalFiles: Integer; Canceled: Boolean);
     procedure Clear;
+    procedure ChangeControlsState(State: Boolean);
   protected
     BatchThread: TCinematicsBatchThread;
   public
@@ -77,7 +80,7 @@ begin
       'Batch SRF script result',
       MB_ICONINFORMATION
     );
-  bGenerate.Enabled := True;
+  ChangeControlsState(True);
 end;
 
 procedure TfrmCinematicsScript.BatchFileProceed(Sender: TObject;
@@ -127,11 +130,10 @@ end;
 procedure TfrmCinematicsScript.bGenerateClick(Sender: TObject);
 begin
   if Mode = cmBatch then begin
-    // Init engine database if needed
-    frmMain.InitCinematicsGenerator;
+    // Init the UI
+    ChangeControlsState(False);
 
     // Do the batch export
-    bGenerate.Enabled := False;
     BatchThread := TCinematicsBatchThread.Create;
     with BatchThread do begin
       FreeOnTerminate := True;
@@ -144,6 +146,14 @@ begin
       Resume;
     end;
   end;
+end;
+
+procedure TfrmCinematicsScript.ChangeControlsState(State: Boolean);
+begin
+  bGenerate.Enabled := State;
+  rgDiscNumber.Enabled := State;
+  eTarget.Enabled := State;
+  bBrowse.Enabled := State;
 end;
 
 procedure TfrmCinematicsScript.Clear;
@@ -173,6 +183,19 @@ begin
         BatchThread.Terminate;
       BatchThread.Resume;
     end;
+end;
+
+procedure TfrmCinematicsScript.FormCreate(Sender: TObject);
+begin
+  FileName := EmptyStr;
+end;
+
+procedure TfrmCinematicsScript.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
 end;
 
 procedure TfrmCinematicsScript.FormShow(Sender: TObject);
@@ -233,7 +256,9 @@ begin
         gbBatchResult.Visible := True;
         gbTarget.Caption := ' Select the target directory : ';
         Height := 390;
-        bGenerate.ModalResult := mrNone;        
+        bGenerate.ModalResult := mrNone;
+        if FileName = EmptyStr then
+          FileName := IncludeTrailingPathDelimiter(GetCurrentDir);       
       end;
   end;
 end;
