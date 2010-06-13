@@ -5,6 +5,28 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.9: 2010-06-13 |__________________________________________________
+
+ADDED:
+- Cinematics Script Generator feature. This tool was made for translating 
+  Shenmue I. To explain the stuff simply, the dialogs in the HUMANS archive 
+  (where you can find the NPC characters) are NOT used in the game. Dialogs are
+  read from the FREExx.AFS archive, in SRF files instead (one SRF for one 
+  VoiceID, for example F1239.SRF for the HRSK's voice, it's Nozomi.)
+
+  Too bad, because dialogs in the HUMANS archive are in the real order shown 
+  in-game. This tool is here to help you translating SRF files with more ease,
+  in exporting HUMANS content in XML format, which can be imported by the SRF
+  Editor later.
+
+  When Exporting to the SRF script format, you must set the target Disc number.
+  The F1239.SRF are different if you took it in the FREE01.AFS, FREE02.AFS or
+  FREE03.AFS archives.
+
+  This option can be used one by file (right-click or using the File menu, 
+  Ctrl+T hotkey) or by batch process (Tools > Batch Cinematics script, 
+  Ctrl+Alt+T).
+___                           __________________________________________________
 ___| Version 2.8: 2010-06-08 |__________________________________________________
 
 FIXED:
