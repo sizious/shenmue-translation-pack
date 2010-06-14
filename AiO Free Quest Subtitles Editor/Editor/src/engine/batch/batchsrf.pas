@@ -37,6 +37,9 @@ implementation
 uses
   SCNFEdit, ActiveX, Common;
 
+var
+  BatchSCNF: TSCNFEditor;
+  
 { Important : les méthodes et propriétés des objets de la VCL peuvent uniquement
   être utilisés dans une méthode appelée en utilisant Synchronize, comme :
 
@@ -48,6 +51,20 @@ uses
     begin
       Form1.Caption := 'Mis à jour dans un thread';
     end; }
+
+procedure InitEngine;
+begin
+  CoInitialize(nil);
+
+  if not Assigned(BatchSCNF) then begin
+
+    // Creating the object
+    BatchSCNF := TSCNFEditor.Create;
+
+    // Loading the SRF Script Database
+    BatchSCNF.CinematicsScriptGenerator.LoadFromFile(GetCinematicsScriptDatabase);
+  end;
+end;
 
 { TCinematicsBatchThread }
 
@@ -65,7 +82,7 @@ end;
 
 procedure TCinematicsBatchThread.Execute;
 var
-  BatchSCNF: TSCNFEditor;
+//  BatchSCNF: TSCNFEditor;
 //  SearchRec: TSearchRec;
   WorkFile: TFileName;
   i, FailedFiles: Integer;
@@ -73,13 +90,11 @@ var
 
 begin
   inherited;
-  CoInitialize(nil);
-  
+
+  // Initialize the engine
+  InitEngine;
+
 //  SourceDirectory := IncludeTrailingPathDelimiter(SourceDirectory);
-  BatchSCNF := TSCNFEditor.Create;
-  try
-    // Loading the SRF Script Database
-    BatchSCNF.CinematicsScriptGenerator.LoadFromFile(GetCinematicsScriptDatabase);
 
     // Searching the selected directory
     (*if FindFirst(SourceDirectory + '*.*', faAnyFile, SearchRec) = 0 then begin
@@ -122,9 +137,12 @@ begin
     if Assigned(OnCompleted) then
       OnCompleted(Self, FailedFiles, FilesList.Count, Terminated);
 
-  finally
-    BatchSCNF.Free;
-  end;
 end;
+
+initialization
+  BatchSCNF := nil;
+  
+finalization
+  BatchSCNF.Free;
 
 end.

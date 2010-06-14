@@ -24,9 +24,9 @@ object frmMain: TfrmMain
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 492
+    Top = 490
     Width = 561
-    Height = 17
+    Height = 19
     Panels = <
       item
         Alignment = taCenter
@@ -231,14 +231,14 @@ object frmMain: TfrmMain
       Columns = <
         item
           Caption = '#'
-          Width = 40
+          Width = 30
         end
         item
           Caption = 'CharID'
         end
         item
-          AutoSize = True
           Caption = 'Text'
+          Width = 188
         end>
       ColumnClick = False
       ReadOnly = True
@@ -272,15 +272,16 @@ object frmMain: TfrmMain
     Left = 24
     Top = 32
     object File1: TMenuItem
-      Caption = 'File'
-      object Openfiles1: TMenuItem
-        Caption = 'Open files...'
-        ShortCut = 16463
-        OnClick = Openfiles1Click
-      end
+      Caption = '&File'
       object Opendirectory1: TMenuItem
         Caption = 'Open directory...'
+        ShortCut = 16463
         OnClick = Opendirectory1Click
+      end
+      object Openfiles1: TMenuItem
+        Caption = 'Open files...'
+        ShortCut = 49231
+        OnClick = Openfiles1Click
       end
       object N1: TMenuItem
         Caption = '-'
@@ -308,6 +309,19 @@ object frmMain: TfrmMain
       object N2: TMenuItem
         Caption = '-'
       end
+      object Importsubtitles1: TMenuItem
+        Caption = '&Import subtitles...'
+        ShortCut = 16457
+        OnClick = Importsubtitles1Click
+      end
+      object Selectedfile1: TMenuItem
+        Caption = '&Export subtitles...'
+        ShortCut = 16453
+        OnClick = Selectedfile1Click
+      end
+      object N6: TMenuItem
+        Caption = '-'
+      end
       object Exit1: TMenuItem
         Caption = '&Quit'
         ShortCut = 16465
@@ -325,7 +339,7 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object Enablecharactersmodification1: TMenuItem
-        Caption = 'Characters modification'
+        Caption = 'Decode subtitles'
         object ShenmueI1: TMenuItem
           Caption = 'Shenmue I'
           OnClick = ShenmueI1Click
@@ -337,25 +351,19 @@ object frmMain: TfrmMain
       end
     end
     object Tools1: TMenuItem
-      Caption = 'Tools'
-      object Exportsubtitles1: TMenuItem
-        Caption = 'Export subtitles'
-        object Selectedfile1: TMenuItem
-          Caption = 'Selected file...'
-          OnClick = Selectedfile1Click
-        end
-        object Massexportation1: TMenuItem
-          Caption = 'Mass exportation...'
-          OnClick = Massexportation1Click
-        end
+      Caption = '&Tools'
+      object Batchimport1: TMenuItem
+        Caption = 'Batch import...'
+        ShortCut = 49225
       end
-      object Importsubtitles1: TMenuItem
-        Caption = 'Import subtitles...'
-        OnClick = Importsubtitles1Click
+      object Massexportation1: TMenuItem
+        Caption = 'Batch export...'
+        ShortCut = 49221
+        OnClick = Massexportation1Click
       end
     end
     object Help1: TMenuItem
-      Caption = 'Help'
+      Caption = '&Help'
       object ProjectHome1: TMenuItem
         Caption = '&Project Home...'
         ShortCut = 112
