@@ -20,7 +20,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, ComCtrls, StdCtrls, ExtCtrls, USrfStructAiO, JvBaseDlg,
-  JvBrowseFolder, Viewer_Intf, ShellApi;
+  JvBrowseFolder, Viewer, ShellApi;
 
 const
   COMPIL_DATE_TIME = 'March 4, 2010 @06:45PM';
@@ -47,7 +47,6 @@ type
     lblFileCnt: TLabel;
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
-    Exportsubtitles1: TMenuItem;
     Importsubtitles1: TMenuItem;
     N3: TMenuItem;
     Enablecharactersmodification1: TMenuItem;
@@ -82,6 +81,8 @@ type
     mOldSub: TMemo;
     Label1: TLabel;
     Checkforupdate1: TMenuItem;
+    N6: TMenuItem;
+    Batchimport1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
@@ -141,7 +142,7 @@ type
 
 var
   frmMain: TfrmMain;
-  Previewer: TSubtitlesPreviewWindow;
+  Previewer: TSubtitlesPreviewer;
   
 implementation
 uses charsutils, subutils, about, UITools, SysTools;
@@ -623,7 +624,7 @@ begin
   Caption := Application.Title + ' v' + GetApplicationVersion(LANG_ENGLISH, SUBLANG_ENGLISH_CAN);
 //  Application.Title := Caption;
 
-  Previewer := TSubtitlesPreviewWindow.Create(DataDir + 'bmpfont\');
+  Previewer := TSubtitlesPreviewer.Create(DataDir + 'bmpfont\');
   Previewer.OnWindowClosed := PreviewerWindowCloseEvent;
 
   Constraints.MinHeight := Height;
