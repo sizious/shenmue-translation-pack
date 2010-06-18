@@ -48,6 +48,7 @@ function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
 function ParseStr(SubStr, S: string; n: Integer): string;
+function PlateformVersionToString(PlateformVersion: TPlatformVersion): string;
 function StringArrayBinarySearch(SortedSource: array of string;
   SearchValue: string): Integer;
 function StringArraySequentialSearch(Source: array of string;
@@ -561,6 +562,20 @@ begin
   Result := '';
   for x := 0 to Random(StringMaxLength) do begin
     Result := Result + ALPHA_CHARS[Random(Length(ALPHA_CHARS)) + 1];
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function PlateformVersionToString(PlateformVersion: TPlatformVersion): string;
+begin
+  case PlateformVersion of
+    pvUnknow:
+      Result := '(Unknow)';
+    pvDreamcast:
+      Result := 'Dreamcast';
+    pvXbox:
+      Result := 'Xbox';
   end;
 end;
 

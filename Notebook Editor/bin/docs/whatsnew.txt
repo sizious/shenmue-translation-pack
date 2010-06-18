@@ -5,6 +5,21 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           _________________________________________________
+___| Version 1.1: 2010-??-?? |_________________________________________________
+    
+ADDED:
+- Support of the USA Xbox executable (XBE) version (Thx Li Shaoran)
+- File properties details window.
+
+FIXED:
+- Some menu items Alt-key shortcuts.
+- Default filename is set in the open/save dialog when clicking the 
+  corresponding Browse button (cosmetic fix).
+- When a Notebook line is focused and you press the ENTER key, the next line 
+  is now focused.
+- When Refreshing, the page number is kept at the same number (before it was
+  reset at 0).
+___                           _________________________________________________
 ___| Version 1.0: 2010-05-28 |_________________________________________________
     
 - First release.
