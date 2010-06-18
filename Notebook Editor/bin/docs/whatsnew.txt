@@ -5,7 +5,7 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           _________________________________________________
-___| Version 1.1: 2010-??-?? |_________________________________________________
+___| Version 1.1: 2010-05-19 |_________________________________________________
     
 ADDED:
 - Support of the USA Xbox executable (XBE) version (Thx Li Shaoran)
@@ -19,6 +19,7 @@ FIXED:
   is now focused.
 - When Refreshing, the page number is kept at the same number (before it was
   reset at 0).
+- Some code clean-up.
 ___                           _________________________________________________
 ___| Version 1.0: 2010-05-28 |_________________________________________________
     
