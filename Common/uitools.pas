@@ -3,7 +3,7 @@ unit UITools;
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, ComCtrls, StdCtrls, JvToolbar;
+  Windows, SysUtils, Classes, Forms, Messages, ComCtrls, StdCtrls, JvToolbar;
 
 type
   EUserInterface = class(Exception);
@@ -11,6 +11,7 @@ type
 
 function BR(const Text: string): string;
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
+procedure EditSetCaretEndPosition(const EditHandle: THandle);
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion: string; overload;
 function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
@@ -269,6 +270,13 @@ begin
     Value := MF_ENABLED;
   HandleMenu := GetSystemMenu(Form.Handle, False);
   Result := EnableMenuItem(HandleMenu, SC_CLOSE, Value);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure EditSetCaretEndPosition(const EditHandle: THandle);
+begin
+      SendMessage(EditHandle, EM_SETSEL, -1, 0);
 end;
 
 //------------------------------------------------------------------------------

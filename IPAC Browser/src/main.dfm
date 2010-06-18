@@ -50,10 +50,10 @@ object frmMain: TfrmMain
       end>
     ColumnClick = False
     GridLines = True
+    LargeImages = ilIpacContent
     ReadOnly = True
     RowSelect = True
     PopupMenu = pmIpacContent
-    SmallImages = ilIpacContent
     TabOrder = 0
     ViewStyle = vsReport
     OnColumnClick = lvIpacContentColumnClick

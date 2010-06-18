@@ -138,9 +138,11 @@ begin
   TempDialog := OpenDialog;
   if SelectionMode = fsmSave then
     TempDialog := SaveDialog;
-  with TempDialog do
+  with TempDialog do begin
+    FileName := DefaultFileName;
     if Execute then
       Result := FileName;
+  end;
 end;
 
 procedure TfrmFileSelection.SetSelectionMode(const Value: TFileSelectionMode);

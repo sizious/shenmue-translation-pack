@@ -5,10 +5,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, MemoEdit, Menus, ImgList, ComCtrls, ToolWin, JvExComCtrls,
-  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls, Common, DebugLog,
-  BugsMgr;
+  JvToolBar, JvEdit, JvExStdCtrls, AppEvnts, ExtCtrls, DebugLog, BugsMgr;
 
-type
+type 
   TfrmMain = class(TForm)
     bPrev: TButton;
     bNext: TButton;
@@ -110,6 +109,9 @@ type
     N11: TMenuItem;
     miDEBUG_TEST11: TMenuItem;
     N12: TMenuItem;
+    N13: TMenuItem;
+    miProperties: TMenuItem;
+    tbProperties: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure bNextClick(Sender: TObject);
@@ -152,6 +154,8 @@ type
     procedure miAboutClick(Sender: TObject);
     procedure miProjectHomeClick(Sender: TObject);
     procedure miCheckForUpdateClick(Sender: TObject);
+    procedure miPropertiesClick(Sender: TObject);
+    procedure eLeft0KeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }
     fPageNumber: Integer;
@@ -162,6 +166,10 @@ type
     fDebugLogVisible: Boolean;
     fQuitOnFailure: Boolean;
     fMakeBackup: Boolean;
+    fFilePropertiesVisible: Boolean;
+    fSelectedLineIndex: Integer;
+    fSelectedPageIndex: Integer;
+    fSelectedPagePosition: TPagePosition;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -177,10 +185,15 @@ type
     procedure InitModules;
     procedure InitUI;
     function GetLineEdit(Page: TPagePosition; const LineIndex: Integer;
-      var LineEditCtrl, TimeCodeEditCtrl: TEdit): Boolean;
+      var LineEditCtrl, TimeCodeEditCtrl: TEdit): Boolean; overload;
+    function GetLineEdit(Page: TPagePosition; const LineIndex: Integer;
+      var LineEditCtrl: TEdit): Boolean; overload;
     function GetOriginalTextMemo(Page: TPagePosition): TMemo;
     procedure SetPageNumber(const Value: Integer);
     function GetStatusText: string;
+    procedure RetrieveSelectedLineInfo(Sender: TEdit;
+      var LineIndex, PageIndex: Integer; var PagePosition: TPagePosition;
+      var FlagCodeEdit: TEdit);    
     procedure SetAutoSave(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
@@ -188,6 +201,7 @@ type
     procedure SetFileModified(const Value: Boolean);
     procedure SetStatusText(const Value: string);
     procedure SetMakeBackup(const Value: Boolean);
+    procedure SetFilePropertiesVisible(const Value: Boolean);
     property SelectedFlagCodeEdit: TEdit read fSelectedFlagCodeEdit;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;    
   public
@@ -201,10 +215,15 @@ type
     property DebugLogVisible: Boolean read fDebugLogVisible
       write SetDebugLogVisible;
     property FileModified: Boolean read fFileModified write SetFileModified;
+    property FilePropertiesVisible: Boolean read fFilePropertiesVisible
+      write SetFilePropertiesVisible;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;    
     property PageNumber: Integer read fPageNumber write SetPageNumber;
     property SelectedMessage: TDiaryEditorMessagesListItem
       read fSelectedMessage;
+    property SelectedPageIndex: Integer read fSelectedPageIndex;
+    property SelectedLineIndex: Integer read fSelectedLineIndex;
+    property SelectedPagePosition: TPagePosition read fSelectedPagePosition;
     property StatusText: string read GetStatusText write SetStatusText;    
   end;
 
@@ -219,7 +238,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UITools, SysTools, FileSel, Config, About;
+  UITools, SysTools, FileSel, Config, About, FileProp;
   
 procedure TfrmMain.bGoClick(Sender: TObject);
 begin
@@ -283,11 +302,13 @@ begin
   fSelectedMessage := nil;
   FileModified := False;
   StatusText := '';
-  ClearEdits(ptLeft);
-  ClearEdits(ptRight);
+  ClearEdits(ppLeft);
+  ClearEdits(ppRight);
   PageNumber := 0;
   SetControlsStateFileOperations(False);
-  SetControlsStateSaveOperation(False);  
+  SetControlsStateSaveOperation(False);
+  if Assigned(frmProperties) then  
+    frmProperties.Clear;
 end;
 
 procedure TfrmMain.Clear;
@@ -355,29 +376,57 @@ begin
 end;
 
 procedure TfrmMain.eLeft0Enter(Sender: TObject);
-var
-  LineIndex, PageIndex: Integer;
-  RightPage: Boolean;
-  FlagCodeEditName: string;
-
 begin
   fSelectedMessage := nil;
   if DiaryEditor.Loaded then begin
     // Getting UI infos
-    LineIndex := (Sender as TEdit).Tag;
-    PageIndex := PageNumber; // PageNumber is the GUI value
-    RightPage := FindStr('Right', (Sender as TEdit).Name);
-    FlagCodeEditName := 'Left';
-    if RightPage then begin
-      Inc(PageIndex);
-      FlagCodeEditName := 'Right';
-    end;
-    FlagCodeEditName := 'e' + FlagCodeEditName + 'Code' + IntToStr(LineIndex);
+    RetrieveSelectedLineInfo(Sender as TEdit, fSelectedLineIndex,
+      fSelectedPageIndex, fSelectedPagePosition, fSelectedFlagCodeEdit);
 
     // Setting the Form properties
-    fSelectedMessage := DiaryEditor.Pages[PageIndex].Messages[LineIndex];
-    fSelectedFlagCodeEdit := FindComponent(FlagCodeEditName) as TEdit;
+    fSelectedMessage :=
+      DiaryEditor.Pages[SelectedPageIndex].Messages[SelectedLineIndex];
   end;
+end;
+
+procedure TfrmMain.eLeft0KeyPress(Sender: TObject; var Key: Char);
+var
+  NextLineCtrl: TEdit;
+  OK, LineFocused: Boolean;
+  NextLineIndex: Integer;
+  WorkPage: TPagePosition;
+  
+begin
+  if Key = Chr(VK_RETURN) then begin
+    Key := #0;
+
+    // Calculate the next Line field
+    WorkPage := SelectedPagePosition;
+    NextLineIndex := SelectedLineIndex;
+    LineFocused := False;
+    
+    repeat
+      Inc(NextLineIndex);
+    
+      // Setting the page if needed
+      if (NextLineIndex > 4) then begin
+        NextLineIndex := 0;
+        case WorkPage of
+          ppLeft:   WorkPage := ppRight;
+          ppRight:  WorkPage := ppLeft;
+        end;
+      end;               
+                
+      // Focusing the Line edit requested
+      OK := GetLineEdit(WorkPage, NextLineIndex, NextLineCtrl);
+      if OK and NextLineCtrl.Enabled then begin
+        NextLineCtrl.SetFocus;
+        EditSetCaretEndPosition(NextLineCtrl.Handle);
+        LineFocused := True;
+      end;      
+    until LineFocused;
+    
+  end; // VK_RETURN
 end;
 
 procedure TfrmMain.eLeftCode0Change(Sender: TObject);
@@ -458,30 +507,41 @@ end;
 function TfrmMain.GetLineEdit(Page: TPagePosition;
   const LineIndex: Integer; var LineEditCtrl, TimeCodeEditCtrl: TEdit): Boolean;
 var
-  PagePos, LineEditName, TimeCodeEditName: string;
+  TimeCodeEditName: string;
+  LineEditOk: Boolean;
+  
+begin
+  // Retrieve the Line Edit
+  LineEditOk := GetLineEdit(Page, LineIndex, LineEditCtrl);
+
+  // Search the TimeCode Edit on the Form
+  TimeCodeEditName := 'e' + PagePositionToString(Page) + 'Code' + IntToStr(LineIndex);
+  TimeCodeEditCtrl := FindComponent(TimeCodeEditName) as TEdit;
+
+  Result := LineEditOk and Assigned(TimeCodeEditCtrl);
+end;
+
+function TfrmMain.GetLineEdit(Page: TPagePosition; const LineIndex: Integer;
+  var LineEditCtrl: TEdit): Boolean;
+var
+  LineEditName: string;
 
 begin
   // Build the TEdit.Name
-  case Page of
-    ptLeft  : PagePos := 'eLeft';
-    ptRight : PagePos := 'eRight';
-  end;
-  LineEditName := PagePos + IntToStr(LineIndex);
-  TimeCodeEditName := PagePos + 'Code' + IntToStr(LineIndex);
+  LineEditName := 'e' + PagePositionToString(Page) + IntToStr(LineIndex);
 
   // Search the Edits on the Form
   LineEditCtrl := FindComponent(LineEditName) as TEdit;
-  TimeCodeEditCtrl := FindComponent(TimeCodeEditName) as TEdit;
-  
-  Result := Assigned(LineEditCtrl) and Assigned(TimeCodeEditCtrl);
+
+  Result := Assigned(LineEditCtrl);
 end;
 
 function TfrmMain.GetOriginalTextMemo(Page: TPagePosition): TMemo;
 begin
   Result := nil;
   case Page of
-    ptLeft: Result := mOriginalLeft;
-    ptRight: Result := mOriginalRight;
+    ppLeft: Result := mOriginalLeft;
+    ppRight: Result := mOriginalRight;
   end;
 end;
 
@@ -550,8 +610,8 @@ begin
   MakeNumericOnly(ePageNumber.Handle);
 
   // Init TimeCode edits
-  InitTimeCodeEdits(ptLeft);
-  InitTimeCodeEdits(ptRight);
+  InitTimeCodeEdits(ppLeft);
+  InitTimeCodeEdits(ppRight);
 
   // Init Toolbar
   ToolBarInitControl(Self, tbMain);
@@ -623,15 +683,15 @@ var
 
 begin
   // Left page
-  Result := LoadSinglePage(LeftPageIndex, ptLeft);
+  Result := LoadSinglePage(LeftPageIndex, ppLeft);
 
   // Right page
   RightPageIndex := LeftPageIndex + 1;
 
   if (RightPageIndex < DiaryEditor.Pages.Count) then
-    Result := Result and LoadSinglePage(RightPageIndex, ptRight)
+    Result := Result and LoadSinglePage(RightPageIndex, ppRight)
   else
-    ClearEdits(ptRight);
+    ClearEdits(ppRight);
 end;
 
 procedure TfrmMain.miAboutClick(Sender: TObject);
@@ -962,6 +1022,7 @@ begin
       StatusText := 'Loading Notebook data...';
       Clear;
       if DiaryEditor.LoadFromFile(SelectedDataFile, SelectedFlagFile) then begin
+        frmProperties.RefreshInfos;
         SetControlsStateFileOperations(True);      
         PageNumber := 0;
         DebugLog.AddLine(ltInformation, 'Load successfully done for "'
@@ -977,22 +1038,32 @@ begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
+procedure TfrmMain.miPropertiesClick(Sender: TObject);
+begin
+  FilePropertiesVisible := not FilePropertiesVisible;
+end;
+
 procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
 end;
 
 procedure TfrmMain.miReloadClick(Sender: TObject);
+var
+  OldPageNumber: Integer;
+  
 begin
   if not SaveFileOnDemand(True) then Exit;
 
+  OldPageNumber := PageNumber;
   StatusText := 'Reloading...';
   Clear(True);
   if DiaryEditor.Reload then begin
     SetControlsStateFileOperations(True);
-    PageNumber := PageNumber; // reloading...
+    PageNumber := OldPageNumber; // reloading...
     DebugLog.AddLine(ltInformation, 'Successfully reloaded the file "'
       + DiaryEditor.DataSourceFileName + '".');
+    frmProperties.RefreshInfos;
   end else
     DebugLog.Report(ltWarning, 'Unable to reload the file from disk!',
         'DataSource: "' + DiaryEditor.DataSourceFileName + '" '
@@ -1015,6 +1086,7 @@ begin
         DebugLog.Report(ltWarning, 'Unable to save the modified file!',
           'FileName: "' + SelectedDataFile + '"');
       StatusText := '';
+      frmProperties.RefreshInfos;        
     end;
   end;
 end;
@@ -1029,11 +1101,35 @@ begin
       + DiaryEditor.DataSourceFileName + '"');
   StatusText := '';
   FileModified := False;
+  frmProperties.RefreshInfos;  
 end;
 
 function TfrmMain.MsgBox(const Text, Title: string; Flags: Integer): Integer;
 begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Title), Flags);
+end;
+
+procedure TfrmMain.RetrieveSelectedLineInfo(Sender: TEdit;
+  var LineIndex, PageIndex: Integer; var PagePosition: TPagePosition;
+  var FlagCodeEdit: TEdit);
+var
+  FlagCodeEditName: string;
+
+begin
+  LineIndex := (Sender as TEdit).Tag;
+  PageIndex := PageNumber; // PageNumber is the GUI value
+
+  PagePosition := ppLeft;
+  FlagCodeEditName := 'Left';
+
+  if FindStr('Right', (Sender as TEdit).Name) then begin
+    PagePosition := ppRight;
+    Inc(PageIndex);
+    FlagCodeEditName := 'Right';
+  end;
+
+  FlagCodeEditName := 'e' + FlagCodeEditName + 'Code' + IntToStr(LineIndex);
+  FlagCodeEdit := FindComponent(FlagCodeEditName) as TEdit;
 end;
 
 function TfrmMain.SaveFileOnDemand(const CancelButton: Boolean): Boolean;
@@ -1106,6 +1202,21 @@ begin
   else
     sbMain.Panels[1].Text := '';
   SetControlsStateSaveOperation(fFileModified);      
+end;
+
+procedure TfrmMain.SetFilePropertiesVisible(const Value: Boolean);
+begin
+  if fFilePropertiesVisible <> Value then begin
+    fFilePropertiesVisible := Value;
+    miProperties.Checked := Value;
+    tbProperties.Down := Value;
+    
+    if Value then
+      frmProperties.Show
+    else
+      if frmProperties.Visible then
+        frmProperties.Close;
+  end;
 end;
 
 procedure TfrmMain.SetMakeBackup(const Value: Boolean);

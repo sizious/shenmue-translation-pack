@@ -12,14 +12,14 @@ uses
   uitools in '..\..\Common\uitools.pas',
   systools in '..\..\Common\systools.pas',
   chrutils in '..\..\Common\SubsUtil\chrutils.pas',
-  common in 'common.pas',
   hashidx in '..\..\Common\hashidx.pas',
   filesel in 'filesel.pas' {frmFileSelection},
   debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
   bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
   xmlconf in '..\..\Common\xmlconf.pas',
   about in '..\..\Common\About\about.pas' {frmAbout},
-  config in 'config.pas';
+  config in 'config.pas',
+  fileprop in 'fileprop.pas' {frmProperties};
 
 {$R *.res}
 
@@ -43,6 +43,7 @@ begin
   InitConfiguration;
 
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmProperties, frmProperties);
   Application.CreateForm(TfrmFileSelection, frmFileSelection);
   Application.CreateForm(TfrmAbout, frmAbout);
   {$IFDEF DEBUG}

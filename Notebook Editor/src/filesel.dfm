@@ -114,8 +114,7 @@ object frmFileSelection: TfrmFileSelection
     OnClick = btnOKClick
   end
   object odData: TOpenDialog
-    DefaultExt = 'BIN'
-    FileName = 'MEMODATA.BIN'
+    FileName = 'MEMODATA'
     Filter = 
       'Notebook Data Files (MEMODATA.BIN)|MEMODATA.BIN|Generic Binary F' +
       'iles (*.BIN)|*.BIN|All Files (*.*)|*.*'
@@ -124,8 +123,7 @@ object frmFileSelection: TfrmFileSelection
     Top = 32
   end
   object sdData: TSaveDialog
-    DefaultExt = 'BIN'
-    FileName = 'MEMODATA.BIN'
+    FileName = 'MEMODATA'
     Filter = 
       'Notebook Data Files (MEMODATA.BIN)|MEMODATA.BIN|Generic Binary F' +
       'iles (*.BIN)|*.BIN|All Files (*.*)|*.*'

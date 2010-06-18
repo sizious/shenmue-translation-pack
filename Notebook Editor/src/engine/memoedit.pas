@@ -14,6 +14,8 @@ type
   EDiaryEditor = class(Exception);
   EMessageTextNotEditable = class(EDiaryEditor);
 
+  TPagePosition = (ppLeft, ppRight);
+    
   TDiaryEditor = class;
 
   TDiaryEditorMessagesList = class;
@@ -105,7 +107,8 @@ type
   end;
 
   // Manage the MEMOFLG.BIN for the Xbox version
-  TXboxExecutableVersion = (xevNotApplicable, xevTrial, xevRetail);
+  TXboxExecutableVersion = (xevNotApplicable, xevTrial, xevRetailPalUk,
+    xevRetailUsa);
   
   TXboxMemoFlagInfo = class(TObject)
   private
@@ -177,6 +180,9 @@ type
     property XboxMemoFlagInfo: TXboxMemoFlagInfo read fXboxMemoFlagInfo;
   end;
 
+function ExecutableVersionToString(EV: TXboxExecutableVersion): string;
+function PagePositionToString(PagePosition: TPagePosition): string;
+
 implementation
 
 uses
@@ -197,7 +203,30 @@ const
   MEMO_PADDING_SIZE = 4;
 
   MEMOFLG_SIZE = 2700;
-  
+
+function ExecutableVersionToString(EV: TXboxExecutableVersion): string;
+begin
+  case EV of
+    xevNotApplicable:
+      Result := '(Not applicable)';
+    xevTrial:
+      Result := 'Trial';
+    xevRetailPalUk:
+      Result := 'Retail (PAL UK)';
+    xevRetailUsa:
+      Result := 'Retail (USA)';
+  end;
+end;
+
+function PagePositionToString(PagePosition: TPagePosition): string;
+begin
+  Result := '';
+  case PagePosition of
+    ppLeft  : Result := 'Left';
+    ppRight : Result := 'Right';
+  end;
+end;
+
 { TDiaryEditor }
 
 procedure TDiaryEditor.AddEntry(var Input: TFileStream; const StrPointerOffset,
@@ -1059,20 +1088,28 @@ end;
 function TXboxMemoFlagInfo.IsXboxExecutable(var InFlagStream: TFileStream;
   var ExecutableVersionResult: TXboxExecutableVersion;
   var FlagOffsetResult: LongWord): Boolean;
+type
+  TXbeDetectorEntry = record
+    Version: TXboxExecutableVersion;
+    Offset: LongWord;
+    Signature: PChar;
+  end;
+  
 const
   XBE_SIGN                = 'XBEH';
+  XBE_CHECK_OFFSET        = $182;
 
-  XBE_FLAG_OFFSET_RETAIL  = $4EE128;
-  XBE_FLAG_OFFSET_TRIAL   = $4E5138;
-
-  XBE_CHECK_OFFSET        = $19A;
-  XBE_RETAIL_SIGN         = #$20#$00#$49#$00#$49#$00#$00#$00#$00#$00;
-  XBE_TRIAL_SIGN          = #$54#$00#$72#$00#$69#$00#$61#$00#$6C#$00;
+  XBE_DETECTION: array[0..2] of TXbeDetectorEntry = (
+    (Version: xevRetailPalUk; Offset: $4EE128; Signature: #$00#$00#$3C#$65#$DB#$3D#$32#$00#$53#$4D),
+    (Version: xevRetailUsa;   Offset: $4E5124; Signature: #$53#$4D#$53#$00#$68#$00#$65#$00#$6E#$00),
+    (Version: xevTrial;       Offset: $4E5138; Signature: #$4D#$49#$53#$00#$68#$00#$65#$00#$6E#$00)
+  );
 
 var
   FileHeader: array[0..3] of Char;
   Buffer: array[0..9] of Char;
   SavedPos: Int64;
+  i: Integer;
 
 begin
   Result := False;
@@ -1092,19 +1129,16 @@ begin
     InFlagStream.Read(Buffer, SizeOf(Buffer));
 
     // Check the XBE type
-    Result := True;
-    if StrComp(Buffer, XBE_RETAIL_SIGN) = 0 then begin
-      // The XBE is Retail
-      ExecutableVersionResult := xevRetail;
-      FlagOffsetResult := XBE_FLAG_OFFSET_RETAIL;
-    end else if StrComp(Buffer, XBE_TRIAL_SIGN) = 0 then begin
-      // The XBE is Trial
-      ExecutableVersionResult := xevTrial;
-      FlagOffsetResult := XBE_FLAG_OFFSET_TRIAL;
-    end else
-      Result := False;
+    Result := False;
+    for i := Low(XBE_DETECTION) to High(XBE_DETECTION) do begin
+      if StrComp(Buffer, XBE_DETECTION[i].Signature) = 0 then begin
+        ExecutableVersionResult := XBE_DETECTION[i].Version;
+        FlagOffsetResult := XBE_DETECTION[i].Offset;
+        Result := True;
+      end; // StrComp
+    end; // for
 
-  end;
+  end; // FileHeader
 
   InFlagStream.Seek(SavedPos, soFromBeginning);
 end;
