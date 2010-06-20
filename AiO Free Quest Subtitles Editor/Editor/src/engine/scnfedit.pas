@@ -18,6 +18,11 @@
 (*
   Short history:
 
+  3.4.2 (June 20, 2010 @04:58PM)
+    - Added the GetIdealXmlEncoding method for setting euc-jp charset when
+      exporting XML files. Japanese charset is now generated when exporting
+      XML files.
+
   3.4.1 (June 9, 2010 @05:12PM)
     - Added the ExportToCinematicScript method (HUMANS -> FREE converter).
     - Some code clean-up.
@@ -101,8 +106,8 @@ uses
   ;
 
 const
-  SCNF_EDITOR_ENGINE_VERSION = '3.4.1';
-  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 9, 2010 @05:12PM';
+  SCNF_EDITOR_ENGINE_VERSION = '3.4.2';
+  SCNF_EDITOR_ENGINE_COMPIL_DATE_TIME = 'June 20, 2010 @04:58PM';
 
 type
   ESCNFEditor = class(Exception);
@@ -223,8 +228,12 @@ type
     procedure AddXMLNode(var XMLDoc: IXMLDocument; const Key: string;
       const Value: Integer); overload;
   protected
-    procedure AddEntry(SubEntry: TSubRawBinaryEntry);  
+    procedure AddEntry(SubEntry: TSubRawBinaryEntry);
+    procedure ChangeXmlJapaneseEncoding(const FileName: TFileName);
     procedure Clear;
+    function GetIdealXmlEncoding(var IsJapanese: Boolean;
+      ReturnEUCJP: Boolean): string; overload;
+    function GetIdealXmlEncoding(var IsJapanese: Boolean): string; overload;
   public
     constructor Create(Owner: TSCNFEditor);
     destructor Destroy; override;
@@ -1408,6 +1417,23 @@ end;
 
 //------------------------------------------------------------------------------
 
+procedure TSubList.ChangeXmlJapaneseEncoding(const FileName: TFileName);
+var
+  SL: TStringList;
+
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    SL[0] := '<?xml version=''1.0'' encoding=''euc-jp''?>'; // méthode de bourrin...
+    SL.SaveToFile(FileName);
+  finally
+    SL.Free;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
 procedure TSubList.Clear;
 var
   i: Integer;
@@ -1474,6 +1500,7 @@ var
   i, SubsCount: Integer;
   RootNode, SubCurrentNode: IXMLNode;
   Item: TCinematicsScriptListItem;
+  IsJapanese: Boolean;
   
 begin
   Result := False;
@@ -1484,7 +1511,7 @@ begin
         Options := [doNodeAutoCreate, doAttrNull];
         Active := True;
         Version := '1.0';
-        Encoding := 'utf-8';
+        Encoding := GetIdealXmlEncoding(IsJapanese);
         ParseOptions := [poPreserveWhiteSpace];
       end;
 
@@ -1532,7 +1559,13 @@ begin
       if Assigned(RootNode) then
         RootNode.NodeValue := SubsCount;
 
+      // Saving the XML file
       XMLDoc.SaveToFile(FileName);
+
+      // Converting the charset if needed
+      if IsJapanese then
+        ChangeXmlJapaneseEncoding(FileName);
+
       Result := FileExists(FileName); // and (SubsCount > 0);
     except
       on E:Exception do
@@ -1553,6 +1586,7 @@ var
   XMLDoc: IXMLDocument;
   i: Integer;
   CurrentNode, SubCurrentNode: IXMLNode;
+  IsJapanese: Boolean;
 
 begin
   Result := False;
@@ -1563,7 +1597,7 @@ begin
         Options := [doNodeAutoCreate, doAttrNull];
         Active := True;
         Version := '1.0';
-        Encoding := 'utf-8'; //'ISO-8859-1';
+        Encoding := GetIdealXmlEncoding(IsJapanese); //'ISO-8859-1';
         ParseOptions := [poPreserveWhiteSpace]; // fix 3.4.0
       end;
 
@@ -1599,11 +1633,16 @@ begin
       for i := 0 to Count - 1 do begin
         SubCurrentNode := XMLDoc.CreateNode('subtitle');
         SubCurrentNode.Attributes['code'] := Items[i].fCode;
-        SubCurrentNode.NodeValue := Items[i].fText; // don't use the Text property directly
+        SubCurrentNode.NodeValue := Items[i].RawText; // don't use the Text property directly
         CurrentNode.ChildNodes.Add(SubCurrentNode);
       end;
 
       XMLDoc.SaveToFile(FileName);
+
+      // Changing the encoding if needed
+      if IsJapanese then
+        ChangeXmlJapaneseEncoding(FileName);
+        
       Result := FileExists(FileName);
     except
       on E:Exception do
@@ -1674,6 +1713,28 @@ end;
 
 //------------------------------------------------------------------------------
 
+function TSubList.GetIdealXmlEncoding(var IsJapanese: Boolean; ReturnEUCJP: Boolean): string;
+begin
+  Result := 'utf-8';
+  if (Owner.GameVersion = gvWhatsShenmue) or (Owner.GameVersion = gvShenmueJ)
+    or (Owner.GameVersion = gvShenmue2J) then begin
+      if ReturnEUCJP then
+        Result := 'euc-jp' // for the import function
+      else
+        Result := 'iso-8859-1'; // euc-jp is impossible when writing a XML... (check the ChangeXmlEncoding...)
+      IsJapanese := True;
+    end;
+end;
+
+//------------------------------------------------------------------------------
+
+function TSubList.GetIdealXmlEncoding(var IsJapanese: Boolean): string;
+begin
+  Result := GetIdealXmlEncoding(IsJapanese, False);
+end;
+
+//------------------------------------------------------------------------------
+
 function TSubList.GetItem(Index: Integer): TSubEntry;
 begin
   Result := TSubEntry(fList[Index]);  
@@ -1689,7 +1750,8 @@ var
   S, xmlSubCode, xmlSubtitle, xmlCharID, xmlVoiceID, xmlShortVoiceID: string;
   CurrentSub: TSubEntry;
   CharsListActive: Boolean;
-
+  IsJapanese: Boolean;
+  
 begin
   Result := False;
   if not FileExists(FileName) then Exit;
@@ -1701,7 +1763,7 @@ begin
       ParseOptions:= [poPreserveWhiteSpace]; // Fix 3.4.0
       Active := True;
       Version := '1.0';
-      Encoding := 'utf-8'; // 'ISO-8859-1';
+      Encoding := GetIdealXmlEncoding(IsJapanese, True); // 'ISO-8859-1';
     end;
 
     XMLDoc.LoadFromFile(FileName);
