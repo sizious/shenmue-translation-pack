@@ -5,11 +5,13 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
-___| Version X.Y: 2010-??-?? |__________________________________________________
+___| Version 2.10: 2010-06-20 |_________________________________________________
 
 FIXED:
 - The Cinematics Script Generator feature in batch mode was optimized. The 
   process is more faster now.
+- When exporting to the XML format (normal feature or Cinematics SRF Script),
+  the Japanese charset is properly set if needed.
 ___                           __________________________________________________
 ___| Version 2.9: 2010-06-13 |__________________________________________________
 
