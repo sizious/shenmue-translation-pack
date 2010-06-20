@@ -22,7 +22,6 @@ uses
   subsimp in 'engine\batch\subsimp.pas',
   common in 'engine\common.pas',
   warning in 'warning.pas' {frmWarning},
-  vistaui in 'vistaui.pas',
   textdata in 'engine\multitrd\textdata.pas',
   about in 'about.pas' {frmAbout},
   viewupd in 'engine\multitrd\ui\viewupd.pas',
@@ -53,7 +52,8 @@ uses
   srfdb in 'engine\srfdb.pas',
   srfscript in 'srfscript.pas' {frmCinematicsScript},
   batchsrf in 'engine\batch\batchsrf.pas',
-  fileslst in '..\..\..\Common\fileslst.pas';
+  fileslst in '..\..\..\Common\fileslst.pas',
+  batchexe in '..\..\..\Common\batchexe.pas';
 
 {$R *.res}
 

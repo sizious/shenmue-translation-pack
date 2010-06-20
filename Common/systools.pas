@@ -15,14 +15,6 @@ type
 
   TPlatformVersion = (pvUnknow, pvDreamcast, pvXbox);
 
-  // Batch thread events
-  TBatchThreadInitializeEvent = procedure(Sender: TObject; MaxValue: Integer)
-    of object;
-  TBatchThreadFileProceed = procedure(Sender: TObject; FileName: TFileName;
-    Result: Boolean) of object;
-  TBatchThreadCompletedEvent = procedure(Sender: TObject;
-    ErrornousFiles, TotalFiles: Integer; Canceled: Boolean) of object;
-
 // Functions
 function CopyFile(SourceFileName, DestFileName: TFileName;
   FailIfExists: Boolean): Boolean;

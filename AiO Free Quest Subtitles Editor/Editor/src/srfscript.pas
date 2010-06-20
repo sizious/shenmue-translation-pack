@@ -137,7 +137,7 @@ begin
     BatchThread := TCinematicsBatchThread.Create;
     with BatchThread do begin
       FreeOnTerminate := True;
-      FilesList.Assign(frmMain.SelectedDirectory, frmMain.lbFilesList.Items);
+      SourceFilesList.Assign(frmMain.SelectedDirectory, frmMain.lbFilesList.Items);
       TargetDirectory := IncludeTrailingPathDelimiter(FileName);
       TargetDiscNumber := DiscNumber;
       OnInitialize := BatchInitialize;

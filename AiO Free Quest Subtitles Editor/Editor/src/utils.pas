@@ -14,14 +14,14 @@ function GetWorkingTempDirectory: TFileName;
 procedure SaveConfig;
 function LoadConfig: Boolean;
 
-function WrapStr: string;
+
 
 //------------------------------------------------------------------------------
 implementation
 //------------------------------------------------------------------------------
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main, Warning, VistaUI,
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, Main, Warning,
   SysTools;
 
 const
@@ -30,7 +30,6 @@ const
 var
   ConfigFileName: TFileName;
   PreviousSelectedPathFileName: TFileName;
-  sWrapStr: string; // used for MsgBox
   sWorkingTempDirectory: TFileName;
 
 //------------------------------------------------------------------------------
@@ -201,26 +200,10 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure InitWrapStr;
-begin
-  sWrapStr := sLineBreak; // WrapStr for Windows XP
-  if IsWindowsVista then sWrapStr := ' ';
-end;
-
-//------------------------------------------------------------------------------
-
-function WrapStr: string;
-begin
-  Result := sWrapStr;
-end;
-
-//------------------------------------------------------------------------------
-
 initialization
   sWorkingTempDirectory := ''; // see GetWorkingTempDirectory
   ConfigFileName := GetApplicationDirectory + 'config.xml';
   PreviousSelectedPathFileName := GetApplicationDirectory + 'selpath.ini';
-  InitWrapStr;
 
 //------------------------------------------------------------------------------
 

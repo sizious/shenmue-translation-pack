@@ -31,7 +31,7 @@ type
   public
     procedure Add(const FileName: TFileName);
     procedure Assign(Source: TFilesList); overload;
-    procedure Assign(Directory: TFileName; Source: TStrings); overload;
+    procedure Assign(Directory: TFileName; SourceFileNames: TStrings); overload;
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
@@ -61,14 +61,14 @@ begin
     Add(Source[i].FileName);
 end;
 
-procedure TFilesList.Assign(Directory: TFileName; Source: TStrings);
+procedure TFilesList.Assign(Directory: TFileName; SourceFileNames: TStrings);
 var
   i: Integer;
 
 begin
   Directory := IncludeTrailingPathDelimiter(Directory);
-  for i := 0 to Source.Count - 1 do
-    Add(Directory + Source[i]);
+  for i := 0 to SourceFileNames.Count - 1 do
+    Add(Directory + SourceFileNames[i]);
 end;
 
 procedure TFilesList.Clear;

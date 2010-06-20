@@ -551,7 +551,7 @@ implementation
 uses
   {$IFDEF DEBUG} TypInfo, SRFDB, DBLzma, {$ENDIF}
   MultiTrd, SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
-  Common, NPCInfo, VistaUI, About, FacesExt, IconsUI,
+  Common, NPCInfo, About, FacesExt, IconsUI,
   BugsMgr, UITools, SysTools, srfscript;
 
 {$R *.dfm}

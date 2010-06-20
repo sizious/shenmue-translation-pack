@@ -17,6 +17,7 @@ function GetApplicationVersion: string; overload;
 function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
 function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
+function IsWindowsVista: Boolean;   
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 procedure MakeNumericOnly(Handle: THandle);
 function OpenLink(const LinkURL: string): Boolean;
@@ -24,11 +25,16 @@ function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 procedure ToolBarCustomDraw(Toolbar: TToolBar);
 procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
+function WrapStr: string;
 
 implementation
 
 uses
   Themes, Menus, ShellApi, Graphics;
+
+var
+  sWrapStr: string; // used for MsgBox
+  
 //------------------------------------------------------------------------------
 
 // Thanks How To Do Things
@@ -276,8 +282,42 @@ end;
 
 procedure EditSetCaretEndPosition(const EditHandle: THandle);
 begin
-      SendMessage(EditHandle, EM_SETSEL, -1, 0);
+  SendMessage(EditHandle, EM_SETSEL, -1, 0);
 end;
+
+//------------------------------------------------------------------------------
+
+function IsWindowsVista: Boolean;
+var
+  VerInfo: TOSVersioninfo;
+  
+begin
+  VerInfo.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
+  GetVersionEx(VerInfo);        
+  Result := VerInfo.dwMajorVersion >= 6;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure InitWrapStr;
+begin
+  sWrapStr := sLineBreak; // WrapStr for Windows XP
+  if IsWindowsVista then
+    sWrapStr := ' ';
+end;
+
+//------------------------------------------------------------------------------
+
+// used for MsgBox
+function WrapStr: string;
+begin
+  Result := sWrapStr;
+end;
+
+//------------------------------------------------------------------------------
+
+initialization
+  InitWrapStr;
 
 //------------------------------------------------------------------------------
 
