@@ -1489,22 +1489,16 @@ object frmMain: TfrmMain
       C0FF8001C003FE07FFFFFFFFC007FFFF}
   end
   object odOpen: TOpenDialog
-    DefaultExt = 'BIN'
-    FileName = 'MAPINFO.BIN'
-    Filter = 
-      'NBIK Sequence File (MAPINFO.BIN)|MAPINFO.BIN|Generic Binary File' +
-      's (*.BIN)|*.BIN|All Files (*.*)|*.*'
+    DefaultExt = 'SRF'
+    Filter = 'Cinematic Files (*.SRF)|*.SRF|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 12
     Top = 86
   end
   object sdSave: TSaveDialog
-    DefaultExt = 'BIN'
-    FileName = 'MAPINFO.BIN'
-    Filter = 
-      'NBIK Sequence File (MAPINFO.BIN)|MAPINFO.BIN|Generic Binary File' +
-      's (*.BIN)|*.BIN|All Files (*.*)|*.*'
+    DefaultExt = 'SRF'
+    Filter = 'Cinematic Files (*.SRF)|*.SRF|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Export the current entry to...'
     Left = 46

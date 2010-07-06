@@ -5,6 +5,7 @@
   <ItemGroup />
   <ItemGroup>
     <Projects Include="AFS Utils\src\afsutils.dproj" />
+    <Projects Include="AiO Cinematics Subtitles Editor\src\scinsube.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
@@ -14,7 +15,6 @@
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
     <Projects Include="IPAC Browser\src\ipacedit.dproj" />
     <Projects Include="Models Textures Editor\src\mteditor.dproj" />
-    <Projects Include="New SRF Editor\src\scinsube.dproj" />
     <Projects Include="Notebook Editor\src\notebked.dproj" />
     <Projects Include="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" />
     <Projects Include="SPR Utils\src\sprutils.dproj" />
@@ -153,13 +153,13 @@
     <MSBuild Projects="Notebook Editor\src\notebked.dproj" Targets="Make" />
   </Target>
   <Target Name="scinsube">
-    <MSBuild Projects="New SRF Editor\src\scinsube.dproj" Targets="" />
+    <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="" />
   </Target>
   <Target Name="scinsube:Clean">
-    <MSBuild Projects="New SRF Editor\src\scinsube.dproj" Targets="Clean" />
+    <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Clean" />
   </Target>
   <Target Name="scinsube:Make">
-    <MSBuild Projects="New SRF Editor\src\scinsube.dproj" Targets="Make" />
+    <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
   <Target Name="Build">
     <CallTarget Targets="idxwrite;idxmaker;sfqsubed;mteditor;convert;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;preview;hdissect;fontutil;notebked;scinsube" />
