@@ -10,7 +10,7 @@
 
   Extracted from Shenmue II Subtitles Editor v4.2
   Original code is (C) Manic
-  Extended class code is (C) [big_fury]SiZiOUS
+  Extended remake class code is (C) [big_fury]SiZiOUS
 
   The main class to use is "TShenmueCharsetCodec".
 *)

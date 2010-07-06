@@ -8,6 +8,7 @@ uses
 const
   UINT16_SIZE = 2;
   UINT32_SIZE = 4;
+  GAME_BLOCK_SIZE = 2048;
 
 type
   ESystemTools = class(Exception);
@@ -15,7 +16,14 @@ type
 
   TPlatformVersion = (pvUnknow, pvDreamcast, pvXbox);
 
+  // Standard section header (used by many units, like FSParser)
+  TSectionEntry = record
+    Name: array[0..3] of Char;
+    Size: LongWord;
+  end;
+
 // Functions
+//function ByteToStr(T: array of Byte): string; overload;
 function CopyFile(SourceFileName, DestFileName: TFileName;
   FailIfExists: Boolean): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
@@ -24,6 +32,7 @@ procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
+function EOFS(var F: TFileStream): Boolean; overload;
 function FindStr(const SubStr, S: string): Boolean;
 function GetApplicationDirectory: TFileName;
 function GetApplicationInstancesCount: Integer;
@@ -41,6 +50,10 @@ function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
 function ParseStr(SubStr, S: string; n: Integer): string;
 function PlateformVersionToString(PlateformVersion: TPlatformVersion): string;
+function ReadNullTerminatedString(var F: TFileStream): string; overload;
+function ReadNullTerminatedString(var F: TFileStream;
+  const StrSize: LongWord): string; overload;
+function StrEquals(S1, S2: string): Boolean;  
 function StringArrayBinarySearch(SortedSource: array of string;
   SearchValue: string): Integer;
 function StringArraySequentialSearch(Source: array of string;
@@ -48,8 +61,14 @@ function StringArraySequentialSearch(Source: array of string;
 function Left(SubStr: string; S: string): string;
 function Right(SubStr: string; S: string): string;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
+function VariantToString(V: Variant): string;
 procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
+procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
+  const WriteNullEndChar: Boolean = True);
 
+const
+  SECTIONENTRY_SIZE = SizeOf(TSectionEntry);
+  
 //==============================================================================
 implementation
 //==============================================================================
@@ -57,11 +76,108 @@ implementation
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  TlHelp32, Forms, Math;
-  
+  TlHelp32, Forms, Math, Variants;
+
 const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
+  NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+(*function ByteToStr(T: array of Byte): string;
+const
+  Digits: array[0..15] of Char =
+          ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
+
+var
+  I: integer;
+begin
+  Result := '';
+  for I := Low(T) to High(T) do
+    Result := Result + Digits[(T[I] shr 4) and $0f] + Digits[T[I] and $0f];
+end;*)
+
+//------------------------------------------------------------------------------
+
+function VariantToString(V: Variant): string;
+begin
+  Result := '';
+  if not VarIsNull(V) then
+    Result := V;
+end;
+
+//------------------------------------------------------------------------------
+
+function EOFS(var F: TFileStream): Boolean;
+begin
+  Result := F.Position >= F.Size
+end;
+
+//------------------------------------------------------------------------------
+
+function StrEquals(S1, S2: string): Boolean;
+begin
+  Result := StrComp(PChar(S1), PChar(S2)) = 0; 
+end;
+
+//------------------------------------------------------------------------------
+
+function ReadNullTerminatedString(var F: TFileStream): string;
+var
+  Done: Boolean;
+  c: Char;
+
+begin
+  Result := '';
+  Done := False;
+
+  // Reading the string
+  while not Done do begin  
+    F.Read(c, 1);
+    if c <> #0 then
+      Result := Result + c
+    else
+      Done := True;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+function ReadNullTerminatedString(var F: TFileStream;
+  const StrSize: LongWord): string;
+var
+  Buf: array[0..NULL_BUFFER_SIZE - 1] of Char;
+
+begin
+  F.Read(Buf, StrSize);
+  Result := StrPas(Buf);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
+  const WriteNullEndChar: Boolean);
+var
+  pStr: PChar;
+  wStr: Word;
+  _NullCharLength: LongWord;
+
+begin
+  wStr := Length(S);
+  if wStr = 0 then Exit; // nothing to write
+
+  _NullCharLength := 0;
+  if WriteNullEndChar then
+    _NullCharLength := 1;
+
+  pStr := StrAlloc(wStr + 1);
+  StrPLCopy(pStr, S, wStr);
+
+  F.Write(pStr^, wStr + _NullCharLength);
+
+  StrDispose(pStr);
+end;
 
 //------------------------------------------------------------------------------
 
@@ -526,6 +642,8 @@ var
   MissingBlocks, BlockSize: LongWord;
 
 begin
+  if Size = 0 then Exit; // nothing to write
+  
   MissingBlocks := Size;
   ZeroMemory(@Buffer, SizeOf(Buffer));
 

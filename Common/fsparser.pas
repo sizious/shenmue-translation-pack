@@ -7,14 +7,10 @@ unit FSParser;
 interface
 
 uses
-  Windows, SysUtils, Classes {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF};
+  Windows, SysUtils, Classes, SysTools
+  {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF};
   
 type
-  TSectionEntry = record
-    Name: array[0..3] of Char;
-    Size: LongWord;
-  end;
-
   TFileSectionsList = class;
 
   // Item of TFileSectionsList
