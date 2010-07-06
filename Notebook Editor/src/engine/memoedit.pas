@@ -186,8 +186,7 @@ function PagePositionToString(PagePosition: TPagePosition): string;
 implementation
 
 uses
-  ChrUtils, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX,
-  Variants
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants
 {$IFDEF DEBUG}
   , TypInfo
 {$ENDIF};

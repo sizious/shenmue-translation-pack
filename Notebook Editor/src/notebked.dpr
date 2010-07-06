@@ -11,7 +11,6 @@ uses
   strdeps in 'engine\strdeps.pas',
   uitools in '..\..\Common\uitools.pas',
   systools in '..\..\Common\systools.pas',
-  chrutils in '..\..\Common\SubsUtil\chrutils.pas',
   hashidx in '..\..\Common\hashidx.pas',
   filesel in 'filesel.pas' {frmFileSelection},
   debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
