@@ -185,6 +185,9 @@ implementation
 uses
   Config, UITools, SysTools, ChrCount, About;
 
+const
+  SUBTITLES_COLUMN_INDEX = 1;
+  
 (*var
   SubtitlesTextManager: TSubtitlesTextManager;*)
 
@@ -429,7 +432,7 @@ begin
   InitAboutBox(
     Application.Title,
     GetApplicationVersion,
-    'NBIK Editor'
+    'SRF Editor'
   );  
 end;
 
@@ -595,7 +598,7 @@ begin
           repeat
             ListItem.SubItems.Add('');
             Inc(j);
-          until j = 2;
+          until j = 3;
         end;
 
         // Updating the current item with the new values
@@ -603,7 +606,8 @@ begin
           with SRFEditor.Subtitles[i] do begin
             Data := Pointer(i);
             Caption := IntToStr(i);
-            SubItems[0] := BR(SRFEditor.Subtitles[i].Text);
+            SubItems[0] := CharID;
+            SubItems[SUBTITLES_COLUMN_INDEX] := BR(SRFEditor.Subtitles[i].Text);
 (*            SubItems[1] := BR(SRFEditor.Charset.Decode(
               SubtitlesTextManager.Subtitles[i].InitialText)); *)
           end;
@@ -838,20 +842,19 @@ begin
   miCharset.Checked := fDecodeSubtitles;
 
   // Update the SequenceEditor
-//  SRFEditor.Subtitles.DecodeText := fDecodeSubtitles;
+  SRFEditor.Subtitles.DecodeText := fDecodeSubtitles;
 
   // Update the GUI: ListView
   for i := 0 to lvSubs.Items.Count - 1 do begin
     ListItem := lvSubs.FindData(0, Pointer(i), True, False);
     if Assigned(ListItem) then begin
-      ListItem.SubItems[0] := BR(SRFEditor.Subtitles[i].Text);
-//      ListItem.SubItems[1] := BR(SRFEditor.Subtitles.TransformText(SubtitlesTextManager.Subtitles[i].InitialText));
+      ListItem.SubItems[SUBTITLES_COLUMN_INDEX] := BR(SRFEditor.Subtitles[i].Text);
     end;
   end;
 
   // Update the GUI: Memos
-(*  mOldSub.Text := SRFEditor.Subtitles.TransformText(mOldSub.Text);
-  mNewSub.Text := SRFEditor.Subtitles.TransformText(mNewSub.Text); *)
+  mOldSub.Text := SRFEditor.Subtitles.TransformText(mOldSub.Text);
+  mNewSub.Text := SRFEditor.Subtitles.TransformText(mNewSub.Text);
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);
@@ -908,7 +911,7 @@ end;
 procedure TfrmMain.SetSelectedSubtitle(const Value: string);
 begin
   if IsSubtitleSelected then begin
-    fSelectedSubtitleUI.SubItems[0] := BR(Value);
+    fSelectedSubtitleUI.SubItems[SUBTITLES_COLUMN_INDEX] := BR(Value);
     fSelectedSubtitle.Text := Value;
   end;
 end;

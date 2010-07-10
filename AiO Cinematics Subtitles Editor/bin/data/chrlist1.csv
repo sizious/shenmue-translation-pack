@@ -15,7 +15,8 @@
 ' Note: if you want to translate the quote character ("), you must write it in 
 ' double: "#$00...#$FF";""""
 
-' This charset was updated for The Nozomi and the Motorcycle Editor
+' This charset was updated for the SRF Editor
+' The <CR> code is different as the NBIK Editor !
 
 "#$A8";"ä"
 "#$B2";"Ä"
@@ -61,6 +62,6 @@
 "#$86";"¿"
 "#$85";"¡"
 "#$3D#$40";"..."
-"#$81#$95";"#$0D#$0A"
+"#$A1#$F5";"#$0D#$0A"
 
 

@@ -150,6 +150,7 @@ var
   Buf: array[0..NULL_BUFFER_SIZE - 1] of Char;
 
 begin
+  ZeroMemory(@Buf, SizeOf(Buf));
   F.Read(Buf, StrSize);
   Result := StrPas(Buf);
 end;

@@ -168,21 +168,21 @@ object frmMain: TfrmMain
   end
   object lvSubs: TJvListView
     Left = 4
-    Top = 28
+    Top = 32
     Width = 484
-    Height = 187
+    Height = 179
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
         Caption = '#'
-        Width = 20
+        Width = 25
+      end
+      item
+        Caption = 'CharID'
       end
       item
         Caption = 'Subtitle'
-        Width = 200
-      end
-      item
-        Caption = 'Original'
+        Width = 300
       end>
     ColumnClick = False
     ReadOnly = True
@@ -190,7 +190,7 @@ object frmMain: TfrmMain
     TabOrder = 2
     ViewStyle = vsReport
     OnSelectItem = lvSubsSelectItem
-    ColumnsOrder = '0=20,1=200,2=50'
+    ColumnsOrder = '0=25,1=50,2=300'
     Groups = <>
     ExtendedColumns = <
       item
