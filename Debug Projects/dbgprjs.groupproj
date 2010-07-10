@@ -1,0 +1,54 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{448eda61-e94c-4651-a368-9f414afdc775}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="ChrCodec\src\dbgcodec.dproj" />
+    <Projects Include="SRF\src\srfdebug.dproj" />
+    <Projects Include="Viewer\src\preview.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="dbgcodec">
+    <MSBuild Projects="ChrCodec\src\dbgcodec.dproj" Targets="" />
+  </Target>
+  <Target Name="dbgcodec:Clean">
+    <MSBuild Projects="ChrCodec\src\dbgcodec.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="dbgcodec:Make">
+    <MSBuild Projects="ChrCodec\src\dbgcodec.dproj" Targets="Make" />
+  </Target>
+  <Target Name="srfdebug">
+    <MSBuild Projects="SRF\src\srfdebug.dproj" Targets="" />
+  </Target>
+  <Target Name="srfdebug:Clean">
+    <MSBuild Projects="SRF\src\srfdebug.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="srfdebug:Make">
+    <MSBuild Projects="SRF\src\srfdebug.dproj" Targets="Make" />
+  </Target>
+  <Target Name="preview">
+    <MSBuild Projects="Viewer\src\preview.dproj" Targets="" />
+  </Target>
+  <Target Name="preview:Clean">
+    <MSBuild Projects="Viewer\src\preview.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="preview:Make">
+    <MSBuild Projects="Viewer\src\preview.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="dbgcodec;srfdebug;preview" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

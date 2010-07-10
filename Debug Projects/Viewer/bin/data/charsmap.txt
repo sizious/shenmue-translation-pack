@@ -1,0 +1,15 @@
+# Subtitles Previewer Dev CharsMap 
+#
+# Use the "*" wildcard to tag a hole (blank) in the charsmap string.
+# Please note, each line must be EXACLTY the same length.
+# Lines starting with the wildcard "#" or empty are ignored by the parser.
+#
+# Don't forget to update the bitmap font itself by editing the font.bmp file.
+# The bmp font must be the same thing as the charsmap set here.
+
+*ABCDEFGHIJKLMNOPQRSTUVWXYZ
+1234567890é,äÁÍëÈöÓüÑß¿¡'.*
+abcdefghijklmnopqrstuvwxyzñ
+ÄâÂáÀàïÏîÎíËêÊéÉèÖôÔÜûÛùÙçÇ
+«»?!:@=;()*****************
+
