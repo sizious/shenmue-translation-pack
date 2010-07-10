@@ -349,7 +349,10 @@ destructor TCharsetList.Destroy;
 begin
   Clear;
   fList.Free;
-  // we don't need to free HashMaps...
+{$IFDEF USE_DCL}
+  fShenmueCodeFastHashMap.Free;
+  fWindowsCodeFastHashMap.Free;
+{$ENDIF}
   inherited;
 end;
 
