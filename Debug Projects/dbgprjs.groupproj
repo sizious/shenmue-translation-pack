@@ -5,6 +5,7 @@
   <ItemGroup />
   <ItemGroup>
     <Projects Include="ChrCodec\src\dbgcodec.dproj" />
+    <Projects Include="DirScan\src\dbgscan.dproj" />
     <Projects Include="SRF\src\srfdebug.dproj" />
     <Projects Include="Viewer\src\preview.dproj" />
   </ItemGroup>
@@ -12,7 +13,7 @@
     <Borland.Personality>Default.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Target Name="dbgcodec">
     <MSBuild Projects="ChrCodec\src\dbgcodec.dproj" Targets="" />
@@ -41,14 +42,23 @@
   <Target Name="preview:Make">
     <MSBuild Projects="Viewer\src\preview.dproj" Targets="Make" />
   </Target>
+  <Target Name="dbgscan">
+    <MSBuild Projects="DirScan\src\dbgscan.dproj" Targets="" />
+  </Target>
+  <Target Name="dbgscan:Clean">
+    <MSBuild Projects="DirScan\src\dbgscan.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="dbgscan:Make">
+    <MSBuild Projects="DirScan\src\dbgscan.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="dbgcodec;srfdebug;preview" />
+    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean" />
+    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make" />
+    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

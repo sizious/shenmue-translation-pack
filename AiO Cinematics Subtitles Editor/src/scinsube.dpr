@@ -20,7 +20,8 @@ uses
   about in '..\..\Common\About\about.pas' {frmAbout},
   chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
   chrcount in '..\..\Common\SubsUtil\chrcount.pas',
-  srfedit in 'engine\srfedit.pas';
+  srfedit in 'engine\srfedit.pas',
+  hashidx in '..\..\Common\hashidx.pas';
 
 {$R *.res}
 
