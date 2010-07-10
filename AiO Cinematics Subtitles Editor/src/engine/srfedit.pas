@@ -51,6 +51,7 @@ type
   private
     fInternalSubtitlesList: TList;
     fOwner: TSRFEditor;
+    fDecodeText: Boolean;
     function GetCount: Integer;
     function GetItem(Index: Integer): TSRFSubtitlesListItem;
     function GetJapaneseCharset: Boolean;
@@ -63,7 +64,9 @@ type
     destructor Destroy; override;
     function ExportToFile(const FileName: TFileName): Boolean;
     function ImportFromFile(const FileName: TFileName): Boolean;
+    function TransformText(const Subtitle: string): string;
     property Count: Integer read GetCount;
+    property DecodeText: Boolean read fDecodeText write fDecodeText;
     property Items[Index: Integer]: TSRFSubtitlesListItem read GetItem; default;
     property JapaneseCharset: Boolean read GetJapaneseCharset;
     property Owner: TSRFEditor read fOwner;
@@ -80,11 +83,11 @@ type
   protected
     function DetectGameVersion(var InStream: TFileStream): TSRFGameVersion;
     procedure ParseShenmueFormat(var InStream: TFileStream);
-    procedure ParseShenmue2Format(var InStream: TFileStream);    
+    procedure ParseShenmue2Format(var InStream: TFileStream);
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Clear;    
+    procedure Clear;
     function LoadFromFile(const FileName: TFileName): Boolean;
     function Save: Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
@@ -101,8 +104,9 @@ function DataBlockToString(D: TSRFDataBlock; ADataSize: LongWord): string;
 implementation
 
 uses
+  {$IFDEF DEBUG}TypInfo, {$ENDIF}
   XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants;
-  
+
 const
   SHENMUE_SIGN                = #$08#$00#$00#$00;
   SHENMUE2_SIGN               = 'CHID';
@@ -155,7 +159,7 @@ end;
 
 function TSRFSubtitlesListItem.GetExtraDataSize: LongWord;
 begin
-  Result := ExtraDataStream.Size;
+  Result := LongWord(ExtraDataStream.Size);
 end;
 
 function TSRFSubtitlesListItem.GetOwnerEditor: TSRFEditor;
@@ -183,7 +187,10 @@ end;
 
 function TSRFSubtitlesListItem.GetText: string;
 begin
-  Result := Editor.Charset.Decode(fText);
+  if Owner.DecodeText then
+    Result := Owner.TransformText(fText)
+  else
+    Result := fText;
 end;
 
 function TSRFSubtitlesListItem.GetTextPaddingSize: LongWord;
@@ -195,7 +202,10 @@ end;
 
 procedure TSRFSubtitlesListItem.SetText(const Value: string);
 begin
-  fText := Editor.Charset.Encode(Value);
+  if Owner.DecodeText then
+    fText := Editor.Charset.Encode(Value)
+  else
+    fText := Value;
 end;
 
 procedure TSRFSubtitlesListItem.WriteShenmue2Entry(var F: TFileStream);
@@ -232,7 +242,7 @@ end;
 procedure TSRFSubtitlesListItem.WriteShenmueEntry(var F: TFileStream);
 var
   Header: TShenmueSubtitleHeader;
-  ExtraDataSize: LongWord;
+  DataSize: LongWord;
 
 begin
   // Writing header
@@ -251,8 +261,8 @@ begin
   end;
 
   // Writing extra data
-  ExtraDataSize := ExtraDataSize + UINT32_SIZE;
-  F.Write(ExtraDataSize, UINT32_SIZE);
+  DataSize := ExtraDataSize + UINT32_SIZE;
+  F.Write(DataSize, UINT32_SIZE);
   F.CopyFrom(ExtraDataStream, 0);
 end;
 
@@ -360,15 +370,10 @@ begin
 end;
 
 function TSRFSubtitlesList.GetJapaneseCharset: Boolean;
-var
-  C: Char;
-
 begin
   Result := False;
-  if Count = 0 then Exit;
-  
-  C := Items[0].RawText[1];
-  Result := not (C in ['A'..'Z']) or (C in ['a'..'z']);
+  if (Count > 0) then
+    Result := IsJapaneseString(Items[0].RawText);
 end;
 
 function TSRFSubtitlesList.ImportFromFile(const FileName: TFileName): Boolean;
@@ -440,6 +445,21 @@ begin
   end;
 end;
 
+function TSRFSubtitlesList.TransformText(const Subtitle: string): string;
+type
+  TCharsetFunc = function(S: string): string of object;
+
+var
+  CharsetFunc: TCharsetFunc;
+  
+begin
+  if DecodeText then
+    CharsetFunc := Owner.Charset.Decode
+  else
+    CharsetFunc := Owner.Charset.Encode;
+  Result := CharsetFunc(Subtitle);
+end;
+
 { TSRFEditor }
 
 procedure TSRFEditor.Clear;
@@ -454,6 +474,7 @@ constructor TSRFEditor.Create;
 begin
   fSRFSubtitlesList := TSRFSubtitlesList.Create(Self);
   fCharset := TShenmueCharsetCodec.Create;
+  Subtitles.DecodeText := True;
   Clear;
 end;
 
@@ -489,8 +510,9 @@ begin
   Result := False;
   if not FileExists(FileName) then Exit;
 
-  // Clear the object
-  Clear;
+{$IFDEF DEBUG}
+  WriteLn(sLineBreak, '*** LOADING FILE ***', sLineBreak);
+{$ENDIF}
 
   // Loading the file
   InStream := TFileStream.Create(FileName, fmOpenRead);
@@ -607,21 +629,35 @@ begin
 end;
 
 procedure TSRFEditor.ParseShenmueFormat(var InStream: TFileStream);
+const
+  SPECIAL_GAME_BLOCK_SIZE = 2012;
+
+type
+  TPaddingSeekDemand = (psdNoPadding, psdNormalPadding, psdExtraPadding);
+  
 var
   Header: TShenmueSubtitleHeader;
-  PaddingSize, BlockCount, BlockOffset, SubDataSize: LongWord;
+// BlockOffset
+  PaddingSize, BlockCount, SubDataSize, LastEntryOffset, LastBlockCount: LongWord;
   StrBuf: string;
   CurrentItem: TSRFSubtitlesListItem;
+  PaddingSeekDemand: TPaddingSeekDemand;
+  ReadHalted: Boolean;
 
 begin
+  PaddingSize := 0;
   BlockCount := 1;
-
+  LastBlockCount := BlockCount;  
+  PaddingSeekDemand := psdNoPadding;
+  ReadHalted := False;
+  LastEntryOffset := 0;
+  
   repeat
-    BlockOffset := InStream.Position;
+//    BlockOffset := InStream.Position;
     InStream.Read(Header, SizeOf(TShenmueSubtitleHeader));
 
     if StrEquals(Header.Name, SHENMUE_SIGN) then begin
-
+      PaddingSeekDemand := psdNoPadding;
       StrBuf := ReadNullTerminatedString(InStream, Header.SubtitleLength - 4);
 
 {$IFDEF DEBUG}
@@ -647,24 +683,47 @@ begin
         CopyFrom(InStream, SubDataSize);
       end;
 
+      LastEntryOffset := InStream.Position;
+      LastBlockCount  := BlockCount;
+
 {$IFDEF DEBUG}
       WriteLn('  DataSize: ', SubDataSize, ', Subtitle Size: ', Header.SubtitleLength);
 {$ENDIF}
 
     end else begin
+
       // Compute the padding to find the next subtitle entry
-      PaddingSize := (BlockCount * GAME_BLOCK_SIZE) - BlockOffset;
-      InStream.Seek(BlockOffset + PaddingSize, soFromBeginning);
+      if PaddingSeekDemand = psdNoPadding then begin
+        PaddingSize := GAME_BLOCK_SIZE;
+        PaddingSeekDemand := psdNormalPadding;
+      end else if PaddingSeekDemand = psdNormalPadding then begin
+        // This case only happened with ONE old SRF file... the first intro A0100.SRF.
+        // The padding is 2012 bytes, not 2048... very strange...
+        PaddingSize := SPECIAL_GAME_BLOCK_SIZE;
+        PaddingSeekDemand := psdExtraPadding;
+      end else
+        // Unable to find the next subtitle, we stop to read now
+        ReadHalted := True;
+
+      // Seeking to the new location
+      PaddingSize := (LastBlockCount * PaddingSize) - LastEntryOffset;
+      InStream.Seek(LastEntryOffset + PaddingSize, soFromBeginning);
+      
 {$IFDEF DEBUG}
-      WriteLn(' * Block Padding: ', PaddingSize);
+      WriteLn(
+        ' * Block Padding: ', PaddingSize, sLineBreak,
+        '   PaddingType  : ', Ord(PaddingSeekDemand), sLineBreak,
+        '   ReadHalted   : ', ReadHalted
+      );
 {$ENDIF}
     end;
 
     // Another complete block was read
-    if (InStream.Position mod GAME_BLOCK_SIZE) = 0 then
+//    if (PaddingSeekDemand <> psdExtraPadding) // only if the ExtraPadding wasn't detected
+    if (InStream.Position mod GAME_BLOCK_SIZE = 0) then
       Inc(BlockCount);
 
-  until EOFS(InStream);
+  until EOFS(InStream) or ReadHalted;
 
 end;
 
@@ -683,6 +742,10 @@ var
 begin
   Result := False;
   if not Loaded then Exit;
+
+{$IFDEF DEBUG}
+  WriteLn(sLineBreak, '*** SAVING FILE ***', sLineBreak);
+{$ENDIF}
 
   OutFileName := GetTempFileName;
   OutStream := TFileStream.Create(OutFileName, fmCreate);

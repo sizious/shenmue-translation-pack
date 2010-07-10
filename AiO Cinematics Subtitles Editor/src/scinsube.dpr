@@ -38,7 +38,7 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
-  Application.Title := 'Shenmue AiO Cinematics Subtitles Editor';
+  Application.Title := 'Shenmue Cinematics Subtitles Editor';
   InitConfiguration;
 
   Application.CreateForm(TfrmMain, frmMain);

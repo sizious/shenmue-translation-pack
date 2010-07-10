@@ -24,7 +24,7 @@ unit ChrCodec;
 interface
 
 uses
-  Windows, SysUtils, Classes {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF};
+  Windows, SysUtils, Classes {$IFDEF USE_DCL}, HashIdx {$ENDIF};
 
 type
   TCharsetListItem = class(TObject)
@@ -41,8 +41,8 @@ type
   TCharsetList = class(TObject)
   private
 {$IFDEF USE_DCL}
-    fShenmueCodeFastHashMap: IStrMap;
-    fWindowsCodeFastHashMap: IStrMap;
+    fShenmueCodeFastHashMap: THashIndexOptimizer;
+    fWindowsCodeFastHashMap: THashIndexOptimizer;
 {$ENDIF}
     fList: TList;
     fWindowsCodeMaxLength: Integer;
@@ -84,6 +84,8 @@ type
     property SourceFileName: TFileName read fLoadedFileName; 
   end;
 
+function IsJapaneseString(const S: string): Boolean;
+
 implementation
 
 uses
@@ -91,6 +93,7 @@ uses
 
 {$IFDEF USE_DCL}
 
+(*
 type
   TCodeIndexHashItem = class(TObject)
   private
@@ -100,8 +103,20 @@ type
     property Code: string read fCode write fCode;
     property ItemIndex: Integer read fItemIndex write fItemIndex;
   end;
+*)
 
 {$ENDIF}
+
+function IsJapaneseString(const S: string): Boolean;
+var
+  i: Integer;
+  
+begin
+  Result := False;
+  if S <> '' then
+    for i := 1 to Length(S) do
+      Result := Result or (S[i] in [#$A4, #$B6, #$A5, #$BB]);
+end;
 
 { TShenmueCharsetCodec }
 
@@ -193,7 +208,7 @@ var
   CodeLength: Integer;
 {$IFDEF USE_DCL}
   Index: Integer;
-  HashItem: TCodeIndexHashItem;
+//  HashItem: TCodeIndexHashItem;
 {$ENDIF}
 
 begin
@@ -210,20 +225,22 @@ begin
 
 {$IFDEF USE_DCL}
   // Adding the ShenmueCode in the HashMap
-  HashItem := TCodeIndexHashItem.Create;
+(*  HashItem := TCodeIndexHashItem.Create;
   with HashItem do begin
     Code := Item.WindowsCode;
     ItemIndex := Index;
   end;
-  fWindowsCodeFastHashMap.PutValue(Item.WindowsCode, HashItem);
+  fWindowsCodeFastHashMap.PutValue(Item.WindowsCode, HashItem); *)
+  fWindowsCodeFastHashMap.Add(Item.WindowsCode, Index);
 
   // Adding the WindowsCode in the HashMap
-  HashItem := TCodeIndexHashItem.Create;
+(*  HashItem := TCodeIndexHashItem.Create;
   with HashItem do begin
     Code := Item.ShenmueCode;
     ItemIndex := Index;
   end;
-  fShenmueCodeFastHashMap.PutValue(Item.ShenmueCode, HashItem);
+  fShenmueCodeFastHashMap.PutValue(Item.ShenmueCode, HashItem);*)
+  fShenmueCodeFastHashMap.Add(Item.ShenmueCode, Index);
 {$ENDIF}
 
   // Calculating the ShenmueCode Max Length
@@ -259,8 +276,8 @@ begin
   fList := TList.Create;
   
 {$IFDEF USE_DCL}
-  fShenmueCodeFastHashMap := TStrHashMap.Create;
-  fWindowsCodeFastHashMap := TStrHashMap.Create;
+  fShenmueCodeFastHashMap := THashIndexOptimizer.Create;
+  fWindowsCodeFastHashMap := THashIndexOptimizer.Create;
 {$ENDIF}  
 end;
 
@@ -269,8 +286,8 @@ function TCharsetList.TranslateChar(Operation: TTranslateOperation;
 var
   ItemIndex: Integer;
 {$IFDEF USE_DCL}
-  HashIndex: TCodeIndexHashItem;
-  FastHashMap: IStrMap;
+//  HashIndex: TCodeIndexHashItem;
+  FastHashMap: THashIndexOptimizer;
 {$ELSE}
   ReadEncodedChar: string;
   MaxIndex: Integer;
@@ -279,13 +296,12 @@ var
 begin
   Result := False;
   DecodedChar := '';
-  ItemIndex := 0;  
   if Count = 0 then Exit;
 
 {$IFDEF USE_DCL}
 
   // Using the Optimization HashMap
-
+  FastHashMap := nil;
   case Operation of
     toEncode:
       FastHashMap := fWindowsCodeFastHashMap;
@@ -293,11 +309,13 @@ begin
       FastHashMap := fShenmueCodeFastHashMap;
   end;
 
-  HashIndex := TCodeIndexHashItem(FastHashMap.GetValue(EncodedChar));
+(*  HashIndex := TCodeIndexHashItem(FastHashMap.GetValue(EncodedChar));
   if Assigned(HashIndex) then begin
     ItemIndex := HashIndex.ItemIndex;
     Result := True;
-  end;
+  end;*)
+  ItemIndex := FastHashMap.IndexOf(EncodedChar);
+  Result := ItemIndex <> -1;
 
 {$ELSE}
 
