@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, Menus, ImgList, ToolWin, JvExComCtrls,
-  JvToolBar, DebugLog, AppEvnts, BugsMgr, Viewer, JvListView, SRFEdit;
+  JvToolBar, DebugLog, AppEvnts, BugsMgr, Viewer, JvListView, SRFEdit, ExtCtrls;
 
 type
   TfrmMain = class(TForm)
@@ -24,7 +24,7 @@ type
     ilToolBar: TImageList;
     tbPreview: TToolButton;
     ToolButton2: TToolButton;
-    miOpen: TMenuItem;
+    miOpenFiles: TMenuItem;
     miView: TMenuItem;
     miHelp: TMenuItem;
     miDEBUG: TMenuItem;
@@ -56,8 +56,14 @@ type
     N7: TMenuItem;
     Checkforupdate1: TMenuItem;
     miDEBUG_TEST3: TMenuItem;
-    lvSubs: TJvListView;
     miDEBUG_TEST4: TMenuItem;
+    GroupBox1: TGroupBox;
+    gbFilesList: TGroupBox;
+    lbFilesList: TListBox;
+    Panel2: TPanel;
+    Label9: TLabel;
+    eFilesCount: TEdit;
+    lvSubs: TJvListView;
     lOldSub: TLabel;
     mOldSub: TMemo;
     lblText: TLabel;
@@ -68,11 +74,12 @@ type
     eSecondLineLength: TEdit;
     Label8: TLabel;
     eSubCount: TEdit;
+    miOpen: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
       var DefaultDraw: Boolean);
-    procedure miOpenClick(Sender: TObject);
+    procedure miOpenFilesClick(Sender: TObject);
     procedure miDEBUG_TEST1Click(Sender: TObject);
     procedure miSaveClick(Sender: TObject);
     procedure mNewSubChange(Sender: TObject);
@@ -140,6 +147,7 @@ type
     procedure RefreshOldTextField;
     procedure RefreshSubtitleSelection;
     procedure UpdateFileModifiedState;
+    procedure ScanDirectory;
     procedure SetPreviewerVisible(const Value: Boolean);
     procedure SetDecodeSubtitles(const Value: Boolean);
     procedure SetOriginalSubtitleField(const Value: Boolean);
@@ -683,7 +691,7 @@ begin
 {$ENDIF}
 end;
 
-procedure TfrmMain.miOpenClick(Sender: TObject);
+procedure TfrmMain.miOpenFilesClick(Sender: TObject);
 begin
   with odOpen do
     if Execute then
@@ -804,6 +812,14 @@ begin
     miSave.Click;
 
   Result := True;
+end;
+
+procedure TfrmMain.ScanDirectory;
+begin
+  TCustomDirectoryScanner = class(TDirectoryScanner)
+  protected
+    function IsValidFile(const FileName: TFileName): Boolean; override;
+  end;  
 end;
 
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);

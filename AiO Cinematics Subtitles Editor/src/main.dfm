@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Dynamic Title > // SRF Editor'
-  ClientHeight = 376
-  ClientWidth = 492
+  ClientHeight = 496
+  ClientWidth = 572
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,55 +18,12 @@ object frmMain: TfrmMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  DesignSize = (
-    492
-    376)
   PixelsPerInch = 96
   TextHeight = 13
-  object lOldSub: TLabel
-    Left = 4
-    Top = 217
-    Width = 43
-    Height = 13
-    Anchors = [akLeft, akBottom]
-    Caption = 'Old text:'
-  end
-  object lblText: TLabel
-    Left = 4
-    Top = 272
-    Width = 48
-    Height = 13
-    Anchors = [akLeft, akBottom]
-    Caption = 'New text:'
-  end
-  object Label3: TLabel
-    Left = 4
-    Top = 333
-    Width = 77
-    Height = 13
-    Anchors = [akLeft, akBottom]
-    Caption = 'First line length:'
-  end
-  object Label4: TLabel
-    Left = 142
-    Top = 333
-    Width = 91
-    Height = 13
-    Anchors = [akLeft, akBottom]
-    Caption = 'Second line length:'
-  end
-  object Label8: TLabel
-    Left = 372
-    Top = 333
-    Width = 75
-    Height = 13
-    Anchors = [akRight, akBottom]
-    Caption = 'Subtitles count:'
-  end
   object sbMain: TStatusBar
     Left = 0
-    Top = 357
-    Width = 492
+    Top = 477
+    Width = 572
     Height = 19
     Panels = <
       item
@@ -81,11 +38,12 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
+    ExplicitTop = 480
   end
   object tbMain: TJvToolBar
     Left = 0
     Top = 0
-    Width = 492
+    Width = 572
     Height = 26
     DisabledImages = ilToolBarDisabled
     EdgeBorders = [ebTop]
@@ -94,6 +52,7 @@ object frmMain: TfrmMain
     TabOrder = 1
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
+    ExplicitWidth = 492
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -166,113 +125,247 @@ object frmMain: TfrmMain
       ImageIndex = 11
     end
   end
-  object lvSubs: TJvListView
-    Left = 4
-    Top = 32
-    Width = 484
-    Height = 179
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Columns = <
-      item
-        Caption = '#'
-        Width = 25
-      end
-      item
-        Caption = 'CharID'
-      end
-      item
-        Caption = 'Subtitle'
-        Width = 300
-      end>
-    ColumnClick = False
-    ReadOnly = True
-    RowSelect = True
+  object GroupBox1: TGroupBox
+    AlignWithMargins = True
+    Left = 155
+    Top = 29
+    Width = 414
+    Height = 445
+    Margins.Left = 4
+    Align = alClient
+    Caption = ' Editor : '
     TabOrder = 2
-    ViewStyle = vsReport
-    OnSelectItem = lvSubsSelectItem
-    ColumnsOrder = '0=25,1=50,2=300'
-    Groups = <>
-    ExtendedColumns = <
-      item
-      end
-      item
-      end
-      item
-      end>
+    ExplicitLeft = 204
+    ExplicitTop = 26
+    ExplicitWidth = 642
+    ExplicitHeight = 491
+    DesignSize = (
+      414
+      445)
+    object lOldSub: TLabel
+      Left = 11
+      Top = 340
+      Width = 43
+      Height = 13
+      Anchors = [akLeft, akBottom]
+      Caption = 'Old text:'
+      ExplicitTop = 386
+    end
+    object lblText: TLabel
+      Left = 11
+      Top = 383
+      Width = 48
+      Height = 13
+      Anchors = [akLeft, akBottom]
+      Caption = 'New text:'
+      ExplicitTop = 429
+    end
+    object Label3: TLabel
+      Left = 13
+      Top = 414
+      Width = 77
+      Height = 13
+      Anchors = [akLeft, akBottom]
+      Caption = 'First line length:'
+      ExplicitTop = 460
+    end
+    object Label4: TLabel
+      Left = 142
+      Top = 421
+      Width = 91
+      Height = 13
+      Anchors = [akLeft, akBottom]
+      Caption = 'Second line length:'
+      ExplicitTop = 467
+    end
+    object Label8: TLabel
+      Left = 288
+      Top = 418
+      Width = 75
+      Height = 13
+      Anchors = [akRight, akBottom]
+      Caption = 'Subtitles count:'
+      ExplicitLeft = 516
+      ExplicitTop = 464
+    end
+    object lvSubs: TJvListView
+      Left = 11
+      Top = 17
+      Width = 394
+      Height = 302
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      Columns = <
+        item
+          Caption = '#'
+          Width = 25
+        end
+        item
+          Caption = 'CharID'
+        end
+        item
+          Caption = 'Subtitle'
+          Width = 300
+        end>
+      ColumnClick = False
+      ReadOnly = True
+      RowSelect = True
+      TabOrder = 0
+      ViewStyle = vsReport
+      OnSelectItem = lvSubsSelectItem
+      ColumnsOrder = '0=25,1=50,2=300'
+      Groups = <>
+      ExtendedColumns = <
+        item
+        end
+        item
+        end
+        item
+        end>
+      ExplicitWidth = 622
+      ExplicitHeight = 348
+    end
+    object mOldSub: TMemo
+      Left = 96
+      Top = 325
+      Width = 309
+      Height = 38
+      Anchors = [akLeft, akRight, akBottom]
+      Color = clBtnFace
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      Lines.Strings = (
+        '## LINE_1 ##'
+        '## LINE_2 ##')
+      MaxLength = 90
+      ParentFont = False
+      ReadOnly = True
+      TabOrder = 1
+      WordWrap = False
+      ExplicitTop = 371
+      ExplicitWidth = 537
+    end
+    object mNewSub: TMemo
+      Left = 96
+      Top = 369
+      Width = 309
+      Height = 39
+      Anchors = [akLeft, akRight, akBottom]
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      Lines.Strings = (
+        '## LINE_1 ##'
+        '## LINE_2 ##')
+      MaxLength = 90
+      ParentFont = False
+      TabOrder = 2
+      WordWrap = False
+      OnChange = mNewSubChange
+      ExplicitTop = 415
+      ExplicitWidth = 537
+    end
+    object eFirstLineLength: TEdit
+      Left = 96
+      Top = 414
+      Width = 30
+      Height = 21
+      Anchors = [akLeft, akBottom]
+      Color = clBtnFace
+      ReadOnly = True
+      TabOrder = 3
+      Text = '(nb)'
+      ExplicitTop = 460
+    end
+    object eSecondLineLength: TEdit
+      Left = 239
+      Top = 414
+      Width = 30
+      Height = 21
+      Anchors = [akLeft, akBottom]
+      Color = clBtnFace
+      ReadOnly = True
+      TabOrder = 4
+      Text = '(nb)'
+      ExplicitTop = 460
+    end
+    object eSubCount: TEdit
+      Left = 369
+      Top = 414
+      Width = 36
+      Height = 21
+      Anchors = [akRight, akBottom]
+      Color = clBtnFace
+      ReadOnly = True
+      TabOrder = 5
+      Text = '(nb)'
+      ExplicitLeft = 597
+      ExplicitTop = 460
+    end
   end
-  object mOldSub: TMemo
-    Left = 4
-    Top = 232
-    Width = 484
-    Height = 38
-    Anchors = [akLeft, akRight, akBottom]
-    Color = clBtnFace
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    Lines.Strings = (
-      '## LINE_1 ##'
-      '## LINE_2 ##')
-    MaxLength = 90
-    ParentFont = False
-    ReadOnly = True
+  object gbFilesList: TGroupBox
+    AlignWithMargins = True
+    Left = 3
+    Top = 29
+    Width = 148
+    Height = 445
+    Margins.Right = 0
+    Align = alLeft
+    Caption = ' Files list: '
+    Padding.Left = 2
+    Padding.Top = 2
+    Padding.Right = 2
+    Padding.Bottom = 2
     TabOrder = 3
-    WordWrap = False
-  end
-  object mNewSub: TMemo
-    Left = 4
-    Top = 287
-    Width = 484
-    Height = 39
-    Anchors = [akLeft, akRight, akBottom]
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    Lines.Strings = (
-      '## LINE_1 ##'
-      '## LINE_2 ##')
-    MaxLength = 90
-    ParentFont = False
-    TabOrder = 4
-    WordWrap = False
-    OnChange = mNewSubChange
-  end
-  object eFirstLineLength: TEdit
-    Left = 100
-    Top = 329
-    Width = 30
-    Height = 21
-    Anchors = [akLeft, akBottom]
-    Color = clBtnFace
-    ReadOnly = True
-    TabOrder = 5
-    Text = '(nb)'
-  end
-  object eSecondLineLength: TEdit
-    Left = 242
-    Top = 329
-    Width = 30
-    Height = 21
-    Anchors = [akLeft, akBottom]
-    Color = clBtnFace
-    ReadOnly = True
-    TabOrder = 6
-    Text = '(nb)'
-  end
-  object eSubCount: TEdit
-    Left = 452
-    Top = 330
-    Width = 36
-    Height = 21
-    Anchors = [akRight, akBottom]
-    Color = clBtnFace
-    ReadOnly = True
-    TabOrder = 7
-    Text = '(nb)'
+    ExplicitHeight = 503
+    object lbFilesList: TListBox
+      Left = 4
+      Top = 17
+      Width = 140
+      Height = 397
+      Align = alClient
+      ItemHeight = 13
+      TabOrder = 0
+      ExplicitHeight = 319
+    end
+    object Panel2: TPanel
+      Left = 4
+      Top = 414
+      Width = 140
+      Height = 27
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 1
+      ExplicitLeft = -36
+      ExplicitTop = 244
+      ExplicitWidth = 190
+      DesignSize = (
+        140
+        27)
+      object Label9: TLabel
+        Left = 5
+        Top = 7
+        Width = 58
+        Height = 13
+        Anchors = [akRight, akBottom]
+        Caption = 'Files count :'
+      end
+      object eFilesCount: TEdit
+        Left = 68
+        Top = 4
+        Width = 72
+        Height = 21
+        Anchors = [akRight, akBottom]
+        Color = clBtnFace
+        ReadOnly = True
+        TabOrder = 0
+        Text = '100'
+      end
+    end
   end
   object mmMain: TMainMenu
     Left = 12
@@ -280,10 +373,12 @@ object frmMain: TfrmMain
     object miFile: TMenuItem
       Caption = '&File'
       object miOpen: TMenuItem
-        Caption = '&Open...'
-        Hint = 'Open the Nozomi and the Motorcycle sequence file.'
-        ShortCut = 16463
-        OnClick = miOpenClick
+        Caption = '&Open directory...'
+      end
+      object miOpenFiles: TMenuItem
+        Caption = '&Open files...'
+        ShortCut = 49231
+        OnClick = miOpenFilesClick
       end
       object miReload: TMenuItem
         Caption = '&Reload...'
@@ -413,7 +508,7 @@ object frmMain: TfrmMain
     end
   end
   object ilToolBarDisabled: TImageList
-    Left = 318
+    Left = 494
     Top = 65532
     Bitmap = {
       494C01010C000E00040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
@@ -951,7 +1046,7 @@ object frmMain: TfrmMain
       C0FF8001C003FE07FFFFFFFFC007FFFF}
   end
   object ilToolBar: TImageList
-    Left = 288
+    Left = 460
     Top = 65532
     Bitmap = {
       494C01010C000E00040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
