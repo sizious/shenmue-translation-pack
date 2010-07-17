@@ -22,7 +22,9 @@ type
       gFormatCode: Integer;
       gWidth: Word;
       gHeight: Word;
+    fIndex: Integer;
     public
+      property Index: Integer read fIndex;
       property TextureName: String read gTextureName write gTextureName;
       property Offset: Integer read gOffset write gOffset;
       property Size: Integer read gSize write gSize;
@@ -96,7 +98,7 @@ end;
 
 procedure TSprStruct.Add(var SprEntry: TSprEntry);
 begin
-  fList.Add(SprEntry);
+  SprEntry.fIndex := fList.Add(SprEntry);
 end;
 
 procedure TSprStruct.LoadFromFile(FileName: TFileName);

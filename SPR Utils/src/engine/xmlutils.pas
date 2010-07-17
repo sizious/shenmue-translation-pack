@@ -14,11 +14,43 @@ uses
 procedure SaveQueueToXML(const FileName: TFileName; var SPRStruct: TSprStruct;
                           var IndexList: TIntList);
 
+function GenerateTextureFileName(Entry: TSprEntry): TFileName;
+
 implementation
+
+function GenerateTextureFileName(Entry: TSprEntry): TFileName;
+var
+  i: Integer;
+  
+begin
+  Result := '';
+
+  if Entry.TextureName = '' then
+    Result := 'noname'
+  else
+    for i := 1 to Length(Entry.TextureName) do begin
+      if Entry.TextureName[i] in ['A'..'Z', 'a'..'z', '0'..'9'] then
+        Result := Result + Entry.TextureName[i]
+      else
+        Result := Result + '_';
+    end;
+
+  Result := Result + '_#' + IntToStr(Entry.Index);
+
+  if Entry.Format = 'DDS' then begin
+    Result := Result + '.dds';
+  end
+  else if Entry.Format = 'PVR' then begin
+    Result := Result + '.pvr';
+  end
+  else begin
+    Result := Result + '.bin';
+  end;
+end;
 
 procedure SaveQueueToXML(const FileName: TFileName; var SPRStruct: TSprStruct; var IndexList: TIntList);
 var
-  i, j, noNameCnt: Integer;
+  i, j: Integer; //, noNameCnt: Integer;
   fName: String;
   CurrentEntry: TSprEntry;
   XMLDoc: TXMLDocument;
@@ -38,7 +70,7 @@ var
     AddXMLNode(XMLDoc, Key, Value);
   end;
 begin
-  noNameCnt := 0;
+//  noNameCnt := 0;
 
   //Saving SPRStruct entry to XML, according to IndexList
   XMLDoc := TXMLDocument.Create(nil);
@@ -68,23 +100,7 @@ begin
       LoopNode := XMLDoc.CreateNode('file');
       LoopNode.Attributes['texn'] := CurrentEntry.TextureName;
 
-      if CurrentEntry.TextureName = '' then begin
-        fName := 'noname'+IntToStr(noNameCnt);
-        Inc(noNameCnt);
-      end
-      else begin
-        fName := CurrentEntry.TextureName;
-      end;
-
-      if CurrentEntry.Format = 'DDS' then begin
-        fName := fName + '.dds';
-      end
-      else if CurrentEntry.Format = 'PVR' then begin
-        fName := fName + '.pvr';
-      end
-      else begin
-        fName := fName + '.bin';
-      end;
+      fName := GenerateTextureFileName(CurrentEntry);
 
       LoopNode.NodeValue := fName;
       MainNode.ChildNodes.Add(LoopNode);
