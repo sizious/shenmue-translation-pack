@@ -1,0 +1,20 @@
+                              SPR Utils
+              ______ __                                  
+             |      |  |--.---.-.-----.-----.-----.-----.
+             |   ---|     |  _  |     |  _  |  -__|__ --|
+             |______|__|__|___._|__|__|___  |_____|_____|
+                                      |_____| What's new?
+___                            ________________________________________________
+___| Version 2.02: 2010-07-17 |________________________________________________
+
+FIXED:
+- When exporting a texture to a file, invalid characters are replaced by 
+  underscores ("_").
+- When right-click on a list, the item is now selected.
+- Some menu items ("New...") were re-organized.
+- New program icon (the same used in IPAC Browser SPR entries...).
+___                            ________________________________________________
+___| Version 2.01: 2008-07-23 |________________________________________________
+        
+- Lastest Manic release.
+

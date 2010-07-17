@@ -23,8 +23,8 @@ uses
   Math, UIntList, xmldom, XMLIntf, msxmldom, XMLDoc;
 
 const
-  APP_VERSION = '2.01';
-  COMPIL_DATE_TIME = 'July 23, 2008 @02:00 PM';
+  APP_VERSION = '2.02';
+  COMPIL_DATE_TIME = 'July 17, 2010 @05:36PM';
 
 type
   TfrmMain = class(TForm)
@@ -90,6 +90,10 @@ type
     procedure Massextraction1Click(Sender: TObject);
     procedure SPRCreator1Click(Sender: TObject);
     procedure Savexmllist1Click(Sender: TObject);
+    procedure sprListBoxContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure currSprListContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
   private
     { Déclarations privées }
     procedure ClearWindow;
@@ -358,7 +362,7 @@ end;
 
 procedure TfrmMain.About1Click(Sender: TObject);
 begin
-  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
+  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+'Updated by [big_fury]SiZiOUS'+#13#10+COMPIL_DATE_TIME, 'Information', MB_ICONINFORMATION);
 end;
 
 procedure TfrmMain.Savexmllist1Click(Sender: TObject);
@@ -409,6 +413,19 @@ begin
       FillSingleSPR(ItemIndex);
     end;
   end;
+end;
+
+procedure TfrmMain.currSprListContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+var
+  Point : TPoint;
+
+begin
+  // enable right-click selection
+  GetCursorPos(Point);
+  Mouse_Event(MOUSEEVENTF_LEFTDOWN, Point.X, Point.Y, 0, 0);
+  Mouse_Event(MOUSEEVENTF_LEFTUP, Point.X, Point.Y, 0, 0);
+  Application.ProcessMessages;
 end;
 
 procedure TfrmMain.Exit1Click(Sender: TObject);
@@ -518,6 +535,19 @@ begin
       LoadSPRInfos(ItemIndex);
     end;
   end;
+end;
+
+procedure TfrmMain.sprListBoxContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+var
+  Point : TPoint;
+
+begin
+  // enable right-click selection
+  GetCursorPos(Point);
+  Mouse_Event(MOUSEEVENTF_LEFTDOWN, Point.X, Point.Y, 0, 0);
+  Mouse_Event(MOUSEEVENTF_LEFTUP, Point.X, Point.Y, 0, 0);
+  Application.ProcessMessages;
 end;
 
 end.

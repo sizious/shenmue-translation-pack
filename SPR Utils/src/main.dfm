@@ -49,6 +49,7 @@ object frmMain: TfrmMain
       PopupMenu = PopupMenu1
       TabOrder = 0
       OnClick = sprListBoxClick
+      OnContextPopup = sprListBoxContextPopup
     end
     object editListCnt: TEdit
       Left = 69
@@ -189,6 +190,7 @@ object frmMain: TfrmMain
       PopupMenu = PopupMenu2
       TabOrder = 5
       OnClick = currSprListClick
+      OnContextPopup = currSprListContextPopup
     end
   end
   object MainMenu1: TMainMenu

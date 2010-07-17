@@ -57,11 +57,11 @@ end;
 procedure TSprExtraction.Execute;
 var
   F_spr, F_out: File;
-  i, j, noNameCnt: Integer;
-  fOutName, fFormat: String;
+  i, j: Integer; //, noNameCnt: Integer;
+  fOutName: string; //, fFormat: String;
 begin
   CoInitialize(nil);
-  noNameCnt := 0;
+//  noNameCnt := 0;
 
   //Opening SPR for reading
   AssignFile(F_spr, fSrcFileName);
@@ -79,12 +79,12 @@ begin
     if not Terminated then begin
       j := fQueue[i];
 
-      if SPRStruct.Items[j].TextureName = '' then begin
+      (*if SPRStruct.Items[j].TextureName = '' then begin
         fOutName := 'noname'+IntToStr(noNameCnt);
         Inc(noNameCnt);
       end
       else begin
-        fOutName := SPRStruct.Items[j].TextureName;
+        fOutName := CorrectTextureFileName(SPRStruct.Items[j].TextureName);
       end;
 
       fFormat := SPRStruct.Items[j].Format;
@@ -96,7 +96,9 @@ begin
       end
       else begin
         fOutName := fOutName + '.bin';
-      end;
+      end;*)
+
+      fOutName := GenerateTextureFileName(SPRStruct.Items[j]);
 
       //Assigning output file
       AssignFile(F_out, fOutDir + fOutName);
