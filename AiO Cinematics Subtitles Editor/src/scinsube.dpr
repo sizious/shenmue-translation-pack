@@ -21,7 +21,9 @@ uses
   chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
   chrcount in '..\..\Common\SubsUtil\chrcount.pas',
   srfedit in 'engine\srfedit.pas',
-  hashidx in '..\..\Common\hashidx.pas';
+  hashidx in '..\..\Common\hashidx.pas',
+  dirscan in '..\..\Common\DirScan\dirscan.pas' {DirectoryScannerInterface},
+  fileslst in '..\..\Common\fileslst.pas';
 
 {$R *.res}
 
