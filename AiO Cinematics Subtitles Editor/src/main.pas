@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, Menus, ImgList, ToolWin, JvExComCtrls,
-  JvToolBar, DebugLog, AppEvnts, BugsMgr, Viewer, JvListView, SRFEdit, ExtCtrls;
+  JvToolBar, DebugLog, AppEvnts, BugsMgr, Viewer, JvListView, SRFEdit, ExtCtrls,
+  FilesLst;
 
 type
   TfrmMain = class(TForm)
@@ -28,7 +29,6 @@ type
     miView: TMenuItem;
     miHelp: TMenuItem;
     miDEBUG: TMenuItem;
-    miDEBUG_TEST1: TMenuItem;
     miSave: TMenuItem;
     odOpen: TOpenDialog;
     sdSave: TSaveDialog;
@@ -46,23 +46,14 @@ type
     aeMain: TApplicationEvents;
     miDEBUG_TEST2: TMenuItem;
     miCharset: TMenuItem;
-    N5: TMenuItem;
-    miOriginal: TMenuItem;
-    miOriginalColumn: TMenuItem;
     N6: TMenuItem;
     tbCharset: TToolButton;
-    tbOriginal: TToolButton;
     ProjectHome1: TMenuItem;
     N7: TMenuItem;
     Checkforupdate1: TMenuItem;
-    miDEBUG_TEST3: TMenuItem;
-    miDEBUG_TEST4: TMenuItem;
     GroupBox1: TGroupBox;
     gbFilesList: TGroupBox;
     lbFilesList: TListBox;
-    Panel2: TPanel;
-    Label9: TLabel;
-    eFilesCount: TEdit;
     lvSubs: TJvListView;
     lOldSub: TLabel;
     mOldSub: TMemo;
@@ -75,12 +66,16 @@ type
     Label8: TLabel;
     eSubCount: TEdit;
     miOpen: TMenuItem;
+    Panel2: TPanel;
+    Label9: TLabel;
+    eFilesCount: TEdit;
+    Label1: TLabel;
+    eSelectedDirectory: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
       var DefaultDraw: Boolean);
     procedure miOpenFilesClick(Sender: TObject);
-    procedure miDEBUG_TEST1Click(Sender: TObject);
     procedure miSaveClick(Sender: TObject);
     procedure mNewSubChange(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
@@ -100,10 +95,12 @@ type
     procedure ProjectHome1Click(Sender: TObject);
     procedure Checkforupdate1Click(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
-    procedure miOriginalClick(Sender: TObject);
-    procedure miOriginalColumnClick(Sender: TObject);
-    procedure miDEBUG_TEST3Click(Sender: TObject);
-    procedure miDEBUG_TEST4Click(Sender: TObject);
+    procedure miOpenClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure lbFilesListKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure lbFilesListMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     { DÈclarations privÈes }  
     fSelectedSubtitleUI: TListItem;
@@ -114,10 +111,12 @@ type
     fQuitOnFailure: Boolean;
     fPreviewerVisible: Boolean;
     fDecodeSubtitles: Boolean;
-    fOriginalSubtitleField: Boolean;
+(*    fOriginalSubtitleField: Boolean;
     fOriginalSubtitleColumn: Boolean;
     fOriginalSubtitlesColumnObject: TListColumn;
     fOriginalSubtitlesColumnObjectWidth: Integer;
+*)    fWorkingFilesList: TFilesList;
+    fSelectedFileIndex: Integer;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -128,6 +127,11 @@ type
     procedure DebugLogMainFormToFront(Sender: TObject);
     procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);
     procedure DebugLogWindowActivated(Sender: TObject);
+    procedure DirectoryScannerCompleted(Sender: TObject; Canceled: Boolean;
+      ValidFiles, TotalFiles: Integer);
+    procedure DirectoryScannerFileProceed(Sender: TObject; FileName: TFileName;
+      Result: Boolean);
+    procedure DirectoryScannerInitialize(Sender: TObject; MaxValue: Integer);
     procedure ModulesFree;
     procedure ModulesInit;
     function GetSelectedSubtitle: string;
@@ -136,6 +140,7 @@ type
     procedure InitDebugLog;
     procedure InitPreviewer;
     procedure LoadFile(FileName: TFileName);
+    procedure LoadSelectedFile;
     procedure PreviewerWindowClosed(Sender: TObject);
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetSelectedSubtitle(const Value: string);
@@ -144,18 +149,22 @@ type
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
     procedure SetFileModified(const Value: Boolean);
-    procedure RefreshOldTextField;
+(*    procedure RefreshOldTextField;*)
     procedure RefreshSubtitleSelection;
-    procedure UpdateFileModifiedState;
-    procedure ScanDirectory;
+    procedure FilesListAdd(const FileName: TFileName);    
+    procedure FilesListReset;
+(*    procedure UpdateFileModifiedState; *)
     procedure SetPreviewerVisible(const Value: Boolean);
     procedure SetDecodeSubtitles(const Value: Boolean);
-    procedure SetOriginalSubtitleField(const Value: Boolean);
-    procedure SetOriginalSubtitleColumn(const Value: Boolean);
-    property OriginalSubtitlesColumnObject: TListColumn
+(*    procedure SetOriginalSubtitleField(const Value: Boolean);
+    procedure SetOriginalSubtitleColumn(const Value: Boolean);*)
+    function GetSelectedDirectory: TFileName;
+    procedure SetSelectedDirectory(const Value: TFileName);
+(*    property OriginalSubtitlesColumnObject: TListColumn
       read fOriginalSubtitlesColumnObject write fOriginalSubtitlesColumnObject;
     property OriginalSubtitlesColumnObjectWidth: Integer
-      read fOriginalSubtitlesColumnObjectWidth write fOriginalSubtitlesColumnObjectWidth;
+      read fOriginalSubtitlesColumnObjectWidth
+      write fOriginalSubtitlesColumnObjectWidth;*)
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { DÈclarations publiques }
@@ -166,17 +175,24 @@ type
     property DecodeSubtitles: Boolean read fDecodeSubtitles
       write SetDecodeSubtitles;
     property FileModified: Boolean read fFileModified write SetFileModified;
-    property OriginalSubtitleField: Boolean read fOriginalSubtitleField
+(*    property OriginalSubtitleField: Boolean read fOriginalSubtitleField
       write SetOriginalSubtitleField;
     property OriginalSubtitlesColumn: Boolean read fOriginalSubtitleColumn
       write SetOriginalSubtitleColumn;
+*)
     property PreviewerVisible: Boolean read fPreviewerVisible
       write SetPreviewerVisible;
+    property SelectedDirectory: TFileName read GetSelectedDirectory write
+      SetSelectedDirectory;
+    property SelectedFileIndex: Integer read fSelectedFileIndex
+      write fSelectedFileIndex;
     property SelectedSubtitle: string read GetSelectedSubtitle
       write SetSelectedSubtitle;
 (*    property SelectedSubtitlePrevInfo: TSubtitlesTextManagerListItem read
       fSelectedSubtitlePrevInfo; *)
     property StatusText: string read GetStatusText write SetStatusText;
+    property WorkingFilesList: TFilesList read fWorkingFilesList
+      write fWorkingFilesList;
   end;
 
 var
@@ -191,10 +207,26 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, ChrCount, About;
+  Config, UITools, SysTools, ChrCount, About, DirScan;
 
 const
   SUBTITLES_COLUMN_INDEX = 1;
+
+type
+  TSRFDirectoryScanner = class(TDirectoryScanner)
+  private
+    fSRFEditorEngine: TSRFEditor;
+    property SRFEditorEngine: TSRFEditor read fSRFEditorEngine
+      write fSRFEditorEngine;
+  protected
+    function IsValidFile(const FileName: TFileName): Boolean; override;
+  public
+    constructor Create; overload;
+    destructor Destroy; override;
+  end;
+
+var
+  SRFDirectoryScanner: TSRFDirectoryScanner;
   
 (*var
   SubtitlesTextManager: TSubtitlesTextManager;*)
@@ -219,6 +251,7 @@ begin
 
   StatusText := '';
   FileModified := False;
+//  FilesListReset;
 end;
 
 procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
@@ -229,7 +262,8 @@ end;
 
 procedure TfrmMain.aeMainHint(Sender: TObject);
 begin
-  StatusText := Application.Hint;
+  if (Application.Hint = '') or (Application.Hint <> SelectedDirectory) then
+    StatusText := Application.Hint;
   aeMain.CancelDispatch;
 end;
 
@@ -283,50 +317,43 @@ begin
   StatusText := '';
 end;
 
+procedure TfrmMain.DirectoryScannerCompleted(Sender: TObject; Canceled: Boolean;
+  ValidFiles, TotalFiles: Integer);
+begin
+  if Canceled then
+    DebugLog.AddLine(ltInformation, 'Directory scanning canceled!')
+  else begin
+    DebugLog.AddLine(ltInformation, 'Directory scanning completed. ' +
+      IntToStr(ValidFiles) + ' valid file(s) on ' + IntToStr(TotalFiles) +
+      ' retrieved.');
+    VerticalScrollControl(lbFilesList.Handle, sdTop);
+  end;
+  StatusText := '';
+end;
+
+procedure TfrmMain.DirectoryScannerFileProceed(Sender: TObject;
+  FileName: TFileName; Result: Boolean);
+begin
+  if Result then begin
+    FilesListAdd(FileName);
+    VerticalScrollControl(lbFilesList.Handle, sdBottom);
+  end;
+end;
+
+procedure TfrmMain.DirectoryScannerInitialize(Sender: TObject;
+  MaxValue: Integer);
+begin
+  Clear;
+  FilesListReset;
+  StatusText := 'Scanning directory... please wait.';
+  SelectedDirectory := SRFDirectoryScanner.SourceDirectory;
+  DebugLog.AddLine(ltInformation, 'Scanning directory "'
+    + SelectedDirectory + '"...');
+end;
+
 procedure TfrmMain.miDEBUG_TEST2Click(Sender: TObject);
 begin
 {$IFDEF DEBUG}  raise Exception.Create('TEST EXCEPTION'); {$ENDIF}
-end;
-
-procedure TfrmMain.miDEBUG_TEST3Click(Sender: TObject);
-begin
-{$IFDEF DEBUG}
-//  WriteLn(SRFEditor.Subtitles.TransformText('If you will always be by my side,ÈÈ'));
-{$ENDIF}
-end;
-
-procedure TfrmMain.miDEBUG_TEST4Click(Sender: TObject);
-{$IFDEF DEBUG}
-var
-  i, j: Integer;
-
-begin
-
-  SRFEditor.LoadFromFile('USA_DISC4.BIN');
-
-  try
-//    i := -1;
-//    j := -1;
-
-    for i := 1 to 20 do begin
-
-      for j := 0 to SRFEditor.Subtitles.Count - 1 do
-        SRFEditor.Subtitles[j].Text := GetRandomString(90);
-
-      SRFEditor.Save;
-      Application.ProcessMessages;
-    end;
-
-  except
-    on E:Exception do begin
-//      E.Message := 'TEST: "' + E.Message + '". i = ' + IntToStr(i) + ', j = ' + IntToStr(j);
-      raise;
-    end;
-  end;
-
-{$ELSE}
-begin
-{$ENDIF}
 end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
@@ -358,9 +385,9 @@ begin
   Constraints.MinWidth := Width;
 
   // 'Original' column
-  fOriginalSubtitlesColumnObject := lvSubs.Columns[2];
+(*  fOriginalSubtitlesColumnObject := lvSubs.Columns[2];
   OriginalSubtitlesColumnObjectWidth := lvSubs.Columns[2].Width;
-  OriginalSubtitlesColumn := True;
+  OriginalSubtitlesColumn := True; *)
   
   // Init Modules
   ModulesInit;
@@ -381,11 +408,22 @@ begin
   ModulesFree;
 end;
 
+procedure TfrmMain.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
+end;
+
 procedure TfrmMain.ModulesFree;
 begin
   // Disabling the Close button
   miQuit.Enabled := False;
   SetCloseWindowButtonState(Self, False);
+
+  // Destroying the SRF Directory Scanner
+  SRFDirectoryScanner.Free;
 
   // Destroying the Previewer
   Previewer.Free;
@@ -393,6 +431,9 @@ begin
   // Destroying NBIK Sequence Editor
   SRFEditor.Free;
 
+  // Destroying the Files List
+  WorkingFilesList.Free;
+  
   // Destroying Debug Log
   DebugLog.Free;
 
@@ -413,6 +454,9 @@ begin
 
   // Init Debug Log
   InitDebugLog;
+
+  // Create the Files List
+  fWorkingFilesList := TFilesList.Create;
 
   // Init NBIK Sequence Editor
   SRFEditor := TSRFEditor.Create;
@@ -441,7 +485,21 @@ begin
     Application.Title,
     GetApplicationVersion,
     'SRF Editor'
-  );  
+  );
+
+  // Init the SRF Directory Scanner Module
+  FilesListReset;
+  SRFDirectoryScanner := TSRFDirectoryScanner.Create;
+  with SRFDirectoryScanner do begin
+//    ProgressProperties.ShowDialog := False; {DEBUG}
+    QueryProperties.MRUDirectoriesDatabase :=
+      GetApplicationDataDirectory + 'dirscan.mru';
+    OnCompleted := DirectoryScannerCompleted;
+    OnInitialize := DirectoryScannerInitialize;
+    OnFileProceed := DirectoryScannerFileProceed;
+  end;
+  
+  SelectedDirectory := '';
 end;
 
 function TfrmMain.MsgBox(Text, Caption: string; Flags: Integer): Integer;
@@ -459,24 +517,44 @@ begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
-procedure TfrmMain.RefreshOldTextField;
+(*procedure TfrmMain.RefreshOldTextField;
 begin
   if OriginalSubtitleField then begin
     lOldSub.Caption := 'Original text:';
     mOldSub.Text := '';
-(*    if Assigned(SelectedSubtitlePrevInfo) then
+    if Assigned(SelectedSubtitlePrevInfo) then
       mOldSub.Text := SRFEditor.Subtitles.TransformText(
-        SelectedSubtitlePrevInfo.InitialText); *)
+        SelectedSubtitlePrevInfo.InitialText);
   end else begin
     lOldSub.Caption := 'Old text:';
     mOldSub.Text := SelectedSubtitle;
   end;
-end;
+end; *)
 
 procedure TfrmMain.RefreshSubtitleSelection;
 begin
   if IsSubtitleSelected then
     lvSubsSelectItem(Self, fSelectedSubtitleUI, True);
+end;
+
+procedure TfrmMain.FilesListAdd(const FileName: TFileName);
+begin
+  WorkingFilesList.Add(FileName);
+  lbFilesList.Items.Add(ExtractFileName(FileName));
+  eFilesCount.Text := IntToStr(WorkingFilesList.Count);
+end;
+
+procedure TfrmMain.FilesListReset;
+begin
+  SelectedFileIndex := -1;
+  lbFilesList.Clear;
+  WorkingFilesList.Clear;
+  eFilesCount.Text := '0';
+end;
+
+function TfrmMain.GetSelectedDirectory: TFileName;
+begin
+  Result := eSelectedDirectory.Text;
 end;
 
 function TfrmMain.GetSelectedSubtitle: string;
@@ -532,6 +610,18 @@ begin
   Result := Assigned(fSelectedSubtitle);
 end;
 
+procedure TfrmMain.lbFilesListKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  LoadSelectedFile;
+end;
+
+procedure TfrmMain.lbFilesListMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  LoadSelectedFile;
+end;
+
 procedure TfrmMain.lvSubsSelectItem(Sender: TObject; Item: TListItem;
   Selected: Boolean);
 var
@@ -546,7 +636,8 @@ begin
 //    fSelectedSubtitlePrevInfo := SubtitlesTextManager.Subtitles[Index];
 
     // Refresh the view
-    RefreshOldTextField;
+//    RefreshOldTextField;
+    mOldSub.Text := SelectedSubtitle;
     mNewSub.Text := SelectedSubtitle;
 
     // Updating the Previewer if possible
@@ -645,6 +736,21 @@ begin
   StatusText := '';
 end;
 
+procedure TfrmMain.LoadSelectedFile;
+var
+  i: Integer;
+
+begin
+  i := lbFilesList.ItemIndex;
+  if (i <> -1) and (SelectedFileIndex <> i) then begin
+    SelectedFileIndex := i;  
+    Sleep(10);
+    Application.ProcessMessages;
+    SaveFileOnDemand(False);
+    LoadFile(WorkingFilesList[i].FileName);
+  end;
+end;
+
 procedure TfrmMain.miAboutClick(Sender: TObject);
 begin
   RunAboutBox;
@@ -666,29 +772,9 @@ begin
   DebugLogVisible := not DebugLogVisible;
 end;
 
-procedure TfrmMain.miDEBUG_TEST1Click(Sender: TObject);
-{$IFDEF DEBUG}
-var
-  i: Integer;
-
+procedure TfrmMain.miOpenClick(Sender: TObject);
 begin
-  SRFEditor.LoadFromFile('PAL_DISC3.bin');
-(*  SequenceEditor.Subtitles[0].Text := 'Like a dream I once saw,Åïit passes by as it touches my cheek.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!';
-  SequenceEditor.Subtitles[1].Text := 'BLAH!<br>MOTHA FUCKA!!!!';
-  SequenceEditor.Subtitles[2].Text := 'Èa!';
-  SequenceEditor.Subtitles[3].Text := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ........<br>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ........';
-  SequenceEditor.Subtitles[5].Text := 'MAPINFO HACKED HUH?! SEE?';
-  SequenceEditor.Subtitles[7].Text := 'Woohoo! This''s the lastest SiZiOUS hack.<br>Enjoy this GREAT exploit!';
-  SequenceEditor.Subtitles[8].Text := 'Woohoo! This''s the lastest SiZiOUS hack.<br>Enjoy this GREAT exploit!'; *)
-
-  for i := 0 to SRFEditor.Subtitles.Count - 1 do
-    SRFEditor.Subtitles[i].Text :=
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr<br>abcdefghijklmnopqrABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-  SRFEditor.SaveToFile('PAL_DISC3.HAK');
-{$ELSE}
-begin
-{$ENDIF}
+  SRFDirectoryScanner.Execute(True);
 end;
 
 procedure TfrmMain.miOpenFilesClick(Sender: TObject);
@@ -696,16 +782,6 @@ begin
   with odOpen do
     if Execute then
       LoadFile(FileName);
-end;
-
-procedure TfrmMain.miOriginalClick(Sender: TObject);
-begin
-  OriginalSubtitleField := not OriginalSubtitleField;
-end;
-
-procedure TfrmMain.miOriginalColumnClick(Sender: TObject);
-begin
-  OriginalSubtitlesColumn := not OriginalSubtitlesColumn;
 end;
 
 procedure TfrmMain.miPreviewClick(Sender: TObject);
@@ -773,17 +849,20 @@ end;
 
 procedure TfrmMain.mNewSubChange(Sender: TObject);
 begin
-  // Update the subtitle
-  SelectedSubtitle := mNewSub.Text;
+  if SelectedSubtitle <> mNewSub.Text then begin  
+    // Update the subtitle
+    SelectedSubtitle := mNewSub.Text;
 
-  // Update the modified state
-  UpdateFileModifiedState;
+    // Update the modified state
+    FileModified := True;
+//    UpdateFileModifiedState;
 
-  // Update Previewer
-  Previewer.Update(SelectedSubtitle);
+    // Update Previewer
+    Previewer.Update(SelectedSubtitle);
 
-  // Update the subtitle length count
-  UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);
+    // Update the subtitle length count
+    UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);
+  end;
 end;
 
 function TfrmMain.SaveFileOnDemand(CancelButton: Boolean): Boolean;
@@ -812,14 +891,6 @@ begin
     miSave.Click;
 
   Result := True;
-end;
-
-procedure TfrmMain.ScanDirectory;
-begin
-  TCustomDirectoryScanner = class(TDirectoryScanner)
-  protected
-    function IsValidFile(const FileName: TFileName): Boolean; override;
-  end;  
 end;
 
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
@@ -883,7 +954,7 @@ begin
   SetControlsStateSaveOperation(fFileModified);
 end;
 
-procedure TfrmMain.SetOriginalSubtitleColumn(const Value: Boolean);
+(*procedure TfrmMain.SetOriginalSubtitleColumn(const Value: Boolean);
 begin
   fOriginalSubtitleColumn := Value;
   miOriginalColumn.Checked := Value;
@@ -909,7 +980,7 @@ begin
   miOriginal.Checked := Value;
   tbOriginal.Down := Value;
   RefreshOldTextField;
-end;
+end;*)
 
 procedure TfrmMain.SetPreviewerVisible(const Value: Boolean);
 begin
@@ -924,11 +995,22 @@ begin
     Previewer.Hide;
 end;
 
+procedure TfrmMain.SetSelectedDirectory(const Value: TFileName);
+begin
+  with eSelectedDirectory do begin
+    Text := Value;
+    Hint := Value;
+  end;
+end;
+
 procedure TfrmMain.SetSelectedSubtitle(const Value: string);
 begin
-  if IsSubtitleSelected then begin
-    fSelectedSubtitleUI.SubItems[SUBTITLES_COLUMN_INDEX] := BR(Value);
-    fSelectedSubtitle.Text := Value;
+  try
+    if IsSubtitleSelected then begin
+      fSelectedSubtitleUI.SubItems[SUBTITLES_COLUMN_INDEX] := BR(Value);
+      fSelectedSubtitle.Text := Value;
+    end;
+  except
   end;
 end;
 
@@ -947,7 +1029,7 @@ begin
   ToolBarCustomDraw(Sender);
 end;
 
-procedure TfrmMain.UpdateFileModifiedState;
+(*procedure TfrmMain.UpdateFileModifiedState;
 var
   i: Integer;
   Modified: Boolean;
@@ -956,14 +1038,30 @@ var
 begin
   Modified := False;
   for i := 0 to SRFEditor.Subtitles.Count - 1 do begin
-//    OldSubtitle := SubtitlesTextManager.Subtitles[i].OriginalText;
+    OldSubtitle := SubtitlesTextManager.Subtitles[i].OriginalText;
     NewSubtitle := SRFEditor.Subtitles[i].RawText;
-(*{$IFDEF DEBUG}
-    WriteLn(i, ' Old: "', OldSubtitle, '"', sLineBreak, i, ' New: "', NewSubtitle, '"');
-{$ENDIF}*)
     Modified := Modified or (OldSubtitle <> NewSubtitle);
   end;
   FileModified := Modified;
+end;*)
+
+{ TSRFDirectoryScanner }
+
+constructor TSRFDirectoryScanner.Create;
+begin
+  inherited Create;
+  fSRFEditorEngine := TSRFEditor.Create;
+end;
+
+destructor TSRFDirectoryScanner.Destroy;
+begin
+  SRFEditorEngine.Free;
+  inherited Destroy;
+end;
+
+function TSRFDirectoryScanner.IsValidFile(const FileName: TFileName): Boolean;
+begin
+  Result := SRFEditorEngine.LoadFromFile(FileName);
 end;
 
 end.

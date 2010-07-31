@@ -40,6 +40,7 @@ type
     iSub1: TImage;
     iSub2: TImage;
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }
   public
@@ -251,6 +252,14 @@ begin
     Height := 30;
   end;
   
+end;
+
+procedure TfrmSubsPreview.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
 end;
 
 end.

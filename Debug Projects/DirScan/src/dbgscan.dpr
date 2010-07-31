@@ -2,10 +2,13 @@ program dbgscan;
 
 {$APPTYPE CONSOLE}
 
-uses windows,
+uses
+  windows,
   SysUtils,
-  dirscan in '..\..\..\Common\DirScan\dirscan.pas' {DirectoryScannerInterface},
-  systools in '..\..\..\Common\systools.pas';
+  dirscan in '..\..\..\Common\DirScan\dirscan.pas' {DirectoryScannerQueryWindow},
+  systools in '..\..\..\Common\systools.pas',
+  progress in '..\..\..\Common\Progress\progress.pas' {ProgressWindow},
+  uitools in '..\..\..\Common\uitools.pas';
 
 type
   TDirectoryScannerClient = class(TObject)
@@ -13,20 +16,20 @@ type
     procedure DirectoryScannerFileProceed(Sender: TObject; FileName: TFileName; Result: Boolean);
   end;
 
-  TCustomDirectoryScanner = class(TDirectoryScanner)
+  TScanner = class(TDirectoryScanner)
   protected
     function IsValidFile(const FileName: TFileName): Boolean; override;
   end;
 
 var
-  Scanner: TCustomDirectoryScanner;
+  Scanner: TScanner;
   Client: TDirectoryScannerClient;
 
 { TCustomDirectoryScanner }
 
-function TCustomDirectoryScanner.IsValidFile(const FileName: TFileName): Boolean;
+function TScanner.IsValidFile(const FileName: TFileName): Boolean;
 begin
-  Result := ExtractFileExt(FileName) = '.exe';
+  Result := ExtractFileExt(FileName) = '.JPG';
 end;
 
 { TDirectoryScannerClient }
@@ -34,7 +37,7 @@ end;
 procedure TDirectoryScannerClient.DirectoryScannerFileProceed(Sender: TObject;
   FileName: TFileName; Result: Boolean);
 begin
- WriteLn(' Found "', FileName, '": ', Result);
+ WriteLn(' Found "', ExtractFileName(FileName), '": ', Result);
 end;
 
 { Main }
@@ -43,13 +46,16 @@ begin
   ReportMemoryLeaksOnShutdown := True;
 
   Client := TDirectoryScannerClient.Create;
-  Scanner := TCustomDirectoryScanner.Create;
+  Scanner := TScanner.Create;
   try
 
     try
       Scanner.OnFileProceed := Client.DirectoryScannerFileProceed;
       Scanner.QueryProperties.Caption := 'Custom title...';
+//      Scanner.QueryProperties.MRUDirectoriesDatabase := 'BLOH.BIN';
       Scanner.QueryProperties.Title := 'Woh';
+//      Scanner.ProgressProperties.ShowDialog := False;
+      
 //      Scanner.SourceDirectory := '.\';
 
 //      Scanner.Filter := '*.exe';

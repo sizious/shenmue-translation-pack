@@ -6,7 +6,7 @@ uses
   Windows,
   SysUtils,
   Classes,
-  progress in '..\..\Common\Progress\progress.pas' {ProgressInterface},
+  progress in '..\..\Common\Progress\progress.pas' {ProgressWindow},
   uitools in '..\..\Common\uitools.pas';
 
 type
@@ -77,8 +77,10 @@ begin
       TestThread := TTestThread.Create(True);
       TestThread.ClientDialog := ProgressDialog;
       TestThread.Resume;
-      
-      WriteLn('RESULT = ', ProgressDialog.Execute(100));
+
+      ProgressDialog.Initialize(100);
+      WriteLn('RESULT = ', ProgressDialog.Execute);
+
       MessageBox(0, 'Main thread continues', 'Finished...', 0);
     finally
       ProgressDialog.Free;
