@@ -1,3 +1,6 @@
+(*
+  Implements a Progress Window
+*)
 unit Progress;
 
 interface
@@ -7,22 +10,25 @@ uses
   Dialogs, ExtCtrls, ComCtrls, StdCtrls;
 
 type
-  TProgressInterface = class;
+  TProgressWindow = class;
   TProgressionDialogCancelResult =
     procedure(Sender: TObject; Canceled: Boolean) of object;
-    
+
   TProgressionDialog = class(TObject)
   private
     fCancelRequest: TNotifyEvent;
-    fWindow: TProgressInterface;
+    fWindow: TProgressWindow;
     fCancelResult: TProgressionDialogCancelResult;
+    fTerminated: Boolean;
     function GetTitle: TCaption;
     procedure SetTitle(const Value: TCaption);
-    property Window: TProgressInterface read fWindow write fWindow;
+    property Terminated: Boolean read fTerminated write fTerminated;
+    property Window: TProgressWindow read fWindow write fWindow;
   public
     constructor Create;
     destructor Destroy; override;
-    function Execute(const MaxValue: Integer): Boolean;
+    function Execute: Boolean;
+    procedure Initialize(const MaxValue: Integer);
     procedure Update(const ATextInfo: TCaption);
     procedure Terminate;
     property OnCancelRequest: TNotifyEvent read fCancelRequest
@@ -32,7 +38,7 @@ type
     property Title: TCaption read GetTitle write SetTitle;
   end;
 
-  TProgressInterface = class(TForm)
+  TProgressWindow = class(TForm)
     lInfos: TLabel;
     pbar: TProgressBar;
     btnCancel: TButton;
@@ -41,12 +47,15 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
+    { Déclarations privées }  
     fOwner: TProgressionDialog;
-    { Déclarations privées }
     function MsgBox(const Text, Title: string; Flags: Integer): Integer;
-    procedure Reset(const MaxValue: Integer);
+    procedure Initialize(const MaxValue: Integer);
     function GetTextInfo: TCaption;
+    procedure Reset;
     procedure SetTextInfo(const Value: TCaption);
     procedure UpdateStep(const ATextInfo: TCaption);
     procedure ChangeCancelButtonsState(const State: Boolean);
@@ -67,9 +76,10 @@ uses
 
 constructor TProgressionDialog.Create;
 begin
-  fWindow := TProgressInterface.Create(nil);
-  Window.ModalResult := mrNone;
+  fWindow := TProgressWindow.Create(nil);
+  Terminated := False;
   Window.fOwner := Self;
+  Title := 'Operation in progress... please wait.';
 end;
 
 destructor TProgressionDialog.Destroy;
@@ -78,15 +88,24 @@ begin
   inherited;
 end;
 
-function TProgressionDialog.Execute(const MaxValue: Integer): Boolean;
+function TProgressionDialog.Execute: Boolean;
 begin
-  Window.Reset(MaxValue);
-  Result := (Window.ShowModal = mrOK);
+  Terminated := False;
+  Window.ShowModal;
+{$IFDEF DEBUG}
+  WriteLn('[Progress] Execute: End');
+{$ENDIF}
+  Result := Terminated;
 end;
 
 function TProgressionDialog.GetTitle: TCaption;
 begin
   Result := Window.Caption;
+end;
+
+procedure TProgressionDialog.Initialize(const MaxValue: Integer);
+begin
+  Window.Initialize(MaxValue);
 end;
 
 procedure TProgressionDialog.SetTitle(const Value: TCaption);
@@ -96,9 +115,15 @@ end;
 
 procedure TProgressionDialog.Terminate;
 begin
-  Window.ChangeCancelButtonsState(False);
-  Window.ModalResult := mrOK;
-//  Window.Close;
+{$IFDEF DEBUG}
+  WriteLn('[Progress] Terminate');
+{$ENDIF}
+  Terminated := True;
+  with Window do begin
+    ModalResult := mrOK;
+    ChangeCancelButtonsState(False);
+    Close;
+  end;
 end;
 
 procedure TProgressionDialog.Update(const ATextInfo: TCaption);
@@ -106,40 +131,64 @@ begin
   Window.UpdateStep(ATextInfo);
 end;
 
-procedure TProgressInterface.btnCancelClick(Sender: TObject);
+{ TProgressWindow }
+
+procedure TProgressWindow.btnCancelClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TProgressInterface.ChangeCancelButtonsState(const State: Boolean);
+procedure TProgressWindow.ChangeCancelButtonsState(const State: Boolean);
 begin
   SetCloseWindowButtonState(Self, State);
   btnCancel.Enabled := State;
 end;
 
-procedure TProgressInterface.FormClose(Sender: TObject;
+procedure TProgressWindow.FormClose(Sender: TObject;
   var Action: TCloseAction);
 var
   CanContinue: Integer;
 
 begin
-  if (ModalResult <> mrOK) then begin
-    // The form will be closed by the Terminate function if needed
-    Action := caNone;
-    
-    // Notify that we want to ask the cancel question
-    if Assigned(Owner.OnCancelRequest) then
-      Owner.OnCancelRequest(Self);
+{$IFDEF DEBUG}
+  WriteLn('[Progress] Close: Begin');
+{$ENDIF}
 
-    // Ask the cancel question
-    CanContinue := MsgBox('Cancel the current operation ?', 'Question',
-      MB_ICONQUESTION + MB_DEFBUTTON2 + MB_OKCANCEL);
-    if Assigned(Owner.OnCancelResult) then
-      Owner.OnCancelResult(Self, CanContinue = IDOK);
+  with Owner do begin
+
+    if not Terminated then begin
+{$IFDEF DEBUG}
+      WriteLn('[Progress] Close: Not Terminated');
+{$ENDIF}
+      // The form will be closed by the Terminate function if needed
+      Action := caNone;
+
+      // Notify that we want to ask the cancel question
+      if Assigned(OnCancelRequest) then
+        OnCancelRequest(Self);
+
+      // Ask the cancel question
+      CanContinue := MsgBox('Cancel the current operation ?', 'Question',
+        MB_ICONQUESTION + MB_DEFBUTTON2 + MB_OKCANCEL);
+
+      Terminated := CanContinue = IDOK;
+      if Assigned(OnCancelResult) then
+        OnCancelResult(Self, Terminated);
+    end;
+    
   end;
+  
+{$IFDEF DEBUG}
+  WriteLn('[Progress] Close: End');
+{$ENDIF}
 end;
 
-procedure TProgressInterface.FormKeyPress(Sender: TObject; var Key: Char);
+procedure TProgressWindow.FormCreate(Sender: TObject);
+begin
+  DoubleBuffered := True;
+end;
+
+procedure TProgressWindow.FormKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = Chr(VK_ESCAPE) then begin
     Key := #0;
@@ -147,37 +196,52 @@ begin
   end;
 end;
 
-function TProgressInterface.GetTextInfo: TCaption;
+procedure TProgressWindow.FormShow(Sender: TObject);
+begin
+  Reset;
+end;
+
+function TProgressWindow.GetTextInfo: TCaption;
 begin
   Result := lInfos.Caption;
 end;
 
-function TProgressInterface.MsgBox(const Text, Title: string;
+function TProgressWindow.MsgBox(const Text, Title: string;
   Flags: Integer): Integer;
 begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Title), Flags);
 end;
 
-procedure TProgressInterface.Reset(const MaxValue: Integer);
+procedure TProgressWindow.Reset;
 begin
-  pbar.Max := MaxValue;
+  ChangeCancelButtonsState(True);
   pbar.Position := 0;
   pbar.Step := 1;
   lProgBar.Caption := '0.00%';
   TextInfo := '';
 end;
 
-procedure TProgressInterface.SetTextInfo(const Value: TCaption);
+procedure TProgressWindow.Initialize(const MaxValue: Integer);
 begin
-  lInfos.Caption := Value;
+  pbar.Max := MaxValue;
 end;
 
-procedure TProgressInterface.UpdateStep(const ATextInfo: TCaption);
+procedure TProgressWindow.SetTextInfo(const Value: TCaption);
+begin
+  lInfos.Caption := Value;
+  Application.ProcessMessages;
+end;
+
+procedure TProgressWindow.UpdateStep(const ATextInfo: TCaption);
 begin
   TextInfo := ATextInfo;
   pbar.StepIt;
-  lProgBar.Caption :=
-    FormatFloat('0.00', SimpleRoundTo((100 * pbar.Position) / pbar.Max, -2)) + '%';
+  try
+    lProgBar.Caption :=
+      FormatFloat('0.00', SimpleRoundTo((100 * pbar.Position) / pbar.Max, -2)) + '%';
+  except
+    lProgBar.Caption := '0.00%';
+  end;
 end;
 
 end.

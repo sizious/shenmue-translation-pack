@@ -149,6 +149,7 @@ type
     procedure miAutoScrollClick(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }
     fOwnerHandler: TDebugLogHandlerInterface;
@@ -281,6 +282,14 @@ end;
 procedure TfrmDebugLog.FormDeactivate(Sender: TObject);
 begin
   ResetStatus;
+end;
+
+procedure TfrmDebugLog.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -523,6 +532,9 @@ end;
 //------------------------------------------------------------------------------
 
 constructor TDebugLogHandlerInterface.Create;
+var
+  L, T: Integer;
+  
 begin
 {$IFDEF DEBUG}
   if Assigned(DebugLogWindow) then
@@ -539,6 +551,14 @@ begin
 
   fFormDebugLog := TfrmDebugLog.Create(nil);
   DebugLogWindow.fOwnerHandler := Self;
+
+  // Thread Freeze Bug Fix (FUCK!!!)
+  with DebugLogWindow do begin
+    L := Left; T := Top;
+    Left := -9999; Top := -9999;
+    Show; Hide;
+    Left := L; Top := T;
+  end;
 end;
 
 //------------------------------------------------------------------------------

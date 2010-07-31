@@ -1,4 +1,4 @@
-object DirectoryScannerInterface: TDirectoryScannerInterface
+object DirectoryScannerQueryWindow: TDirectoryScannerQueryWindow
   Left = 0
   Top = 0
   BorderStyle = bsDialog
@@ -53,7 +53,7 @@ object DirectoryScannerInterface: TDirectoryScannerInterface
       Top = 16
       Width = 267
       Height = 21
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
     end
   end

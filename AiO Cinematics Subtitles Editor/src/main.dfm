@@ -10,6 +10,7 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Menu = mmMain
   OldCreateOrder = False
   Position = poScreenCenter
@@ -18,6 +19,7 @@ object frmMain: TfrmMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
   object sbMain: TStatusBar
@@ -38,7 +40,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 480
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -52,7 +53,6 @@ object frmMain: TfrmMain
     TabOrder = 1
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
-    ExplicitWidth = 492
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -98,20 +98,14 @@ object frmMain: TfrmMain
       Caption = 'tbPreview'
       ImageIndex = 8
     end
-    object tbOriginal: TToolButton
-      Left = 131
-      Top = 0
-      Caption = 'tbOriginal'
-      ImageIndex = 9
-    end
     object tbCharset: TToolButton
-      Left = 154
+      Left = 131
       Top = 0
       Caption = 'tbCharset'
       ImageIndex = 10
     end
     object ToolButton2: TToolButton
-      Left = 177
+      Left = 154
       Top = 0
       Width = 8
       Caption = 'ToolButton2'
@@ -119,7 +113,7 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object tbAbout: TToolButton
-      Left = 185
+      Left = 162
       Top = 0
       Caption = 'tbAbout'
       ImageIndex = 11
@@ -135,10 +129,6 @@ object frmMain: TfrmMain
     Align = alClient
     Caption = ' Editor : '
     TabOrder = 2
-    ExplicitLeft = 204
-    ExplicitTop = 26
-    ExplicitWidth = 642
-    ExplicitHeight = 491
     DesignSize = (
       414
       445)
@@ -244,8 +234,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       WordWrap = False
-      ExplicitTop = 371
-      ExplicitWidth = 537
     end
     object mNewSub: TMemo
       Left = 96
@@ -266,8 +254,6 @@ object frmMain: TfrmMain
       TabOrder = 2
       WordWrap = False
       OnChange = mNewSubChange
-      ExplicitTop = 415
-      ExplicitWidth = 537
     end
     object eFirstLineLength: TEdit
       Left = 96
@@ -279,7 +265,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 3
       Text = '(nb)'
-      ExplicitTop = 460
     end
     object eSecondLineLength: TEdit
       Left = 239
@@ -291,7 +276,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 4
       Text = '(nb)'
-      ExplicitTop = 460
     end
     object eSubCount: TEdit
       Left = 369
@@ -303,8 +287,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 5
       Text = '(nb)'
-      ExplicitLeft = 597
-      ExplicitTop = 460
     end
   end
   object gbFilesList: TGroupBox
@@ -321,49 +303,67 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 3
-    ExplicitHeight = 503
     object lbFilesList: TListBox
       Left = 4
       Top = 17
       Width = 140
-      Height = 397
+      Height = 371
       Align = alClient
       ItemHeight = 13
       TabOrder = 0
-      ExplicitHeight = 319
+      OnKeyUp = lbFilesListKeyUp
+      OnMouseUp = lbFilesListMouseUp
     end
     object Panel2: TPanel
       Left = 4
-      Top = 414
+      Top = 388
       Width = 140
-      Height = 27
+      Height = 53
       Align = alBottom
       BevelOuter = bvNone
+      ParentBackground = False
       TabOrder = 1
-      ExplicitLeft = -36
-      ExplicitTop = 244
-      ExplicitWidth = 190
       DesignSize = (
         140
-        27)
+        53)
       object Label9: TLabel
         Left = 5
-        Top = 7
+        Top = 33
         Width = 58
         Height = 13
         Anchors = [akRight, akBottom]
         Caption = 'Files count :'
+        ExplicitTop = 7
+      end
+      object Label1: TLabel
+        Left = 5
+        Top = 9
+        Width = 51
+        Height = 13
+        Anchors = [akRight, akBottom]
+        Caption = 'Directory :'
       end
       object eFilesCount: TEdit
-        Left = 68
-        Top = 4
-        Width = 72
+        Left = 69
+        Top = 30
+        Width = 68
         Height = 21
         Anchors = [akRight, akBottom]
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 0
-        Text = '100'
+        Text = '<COUNT>'
+      end
+      object eSelectedDirectory: TEdit
+        Left = 69
+        Top = 6
+        Width = 68
+        Height = 21
+        Anchors = [akRight, akBottom]
+        Color = clBtnFace
+        ReadOnly = True
+        TabOrder = 1
+        Text = '<DIR>'
       end
     end
   end
@@ -374,6 +374,8 @@ object frmMain: TfrmMain
       Caption = '&File'
       object miOpen: TMenuItem
         Caption = '&Open directory...'
+        ShortCut = 16463
+        OnClick = miOpenClick
       end
       object miOpenFiles: TMenuItem
         Caption = '&Open files...'
@@ -435,25 +437,6 @@ object frmMain: TfrmMain
         ShortCut = 16452
         OnClick = miDebugLogClick
       end
-      object N5: TMenuItem
-        Caption = '-'
-      end
-      object miOriginal: TMenuItem
-        Caption = 'Original text in field'
-        Hint = 
-          'Show untouched subtitles extracted from the game in the old text' +
-          ' field.'
-        ShortCut = 122
-        OnClick = miOriginalClick
-      end
-      object miOriginalColumn: TMenuItem
-        Caption = 'Original column in list'
-        Hint = 
-          'Show an additional column with the untouched subtitle text in th' +
-          'e view.'
-        ShortCut = 16506
-        OnClick = miOriginalColumnClick
-      end
       object N6: TMenuItem
         Caption = '-'
       end
@@ -489,21 +472,9 @@ object frmMain: TfrmMain
     end
     object miDEBUG: TMenuItem
       Caption = 'DEBUG'
-      object miDEBUG_TEST1: TMenuItem
-        Caption = 'SequenceEditor'
-        OnClick = miDEBUG_TEST1Click
-      end
       object miDEBUG_TEST2: TMenuItem
         Caption = 'Exception'
         OnClick = miDEBUG_TEST2Click
-      end
-      object miDEBUG_TEST3: TMenuItem
-        Caption = 'Charset'
-        OnClick = miDEBUG_TEST3Click
-      end
-      object miDEBUG_TEST4: TMenuItem
-        Caption = 'Strong Test SeqEdit'
-        OnClick = miDEBUG_TEST4Click
       end
     end
   end

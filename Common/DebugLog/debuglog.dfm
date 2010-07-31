@@ -91,6 +91,7 @@ object frmDebugLog: TfrmDebugLog
     00000000000000000000000000000000000000000000F8030000000300000003
     0000000300000003000000030000000300000003000000030000000300000003
     0000001F0000001F0000003F0000007F0000FFFF0000}
+  KeyPreview = True
   Menu = mmDebug
   OldCreateOrder = False
   ShowHint = True
@@ -98,6 +99,7 @@ object frmDebugLog: TfrmDebugLog
   OnClose = FormClose
   OnCreate = FormCreate
   OnDeactivate = FormDeactivate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13

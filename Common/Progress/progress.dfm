@@ -1,4 +1,4 @@
-object ProgressInterface: TProgressInterface
+object ProgressWindow: TProgressWindow
   Left = 0
   Top = 0
   BorderStyle = bsDialog
@@ -15,7 +15,9 @@ object ProgressInterface: TProgressInterface
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
+  OnCreate = FormCreate
   OnKeyPress = FormKeyPress
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object lInfos: TLabel
@@ -45,6 +47,7 @@ object ProgressInterface: TProgressInterface
     Width = 93
     Height = 25
     Caption = '&Cancel'
+    Default = True
     TabOrder = 1
     OnClick = btnCancelClick
   end

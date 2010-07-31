@@ -30,8 +30,8 @@ type
     function GetOwnerEditor: TSRFEditor;
     function GetTextPaddingSize: LongWord;
   protected
-    procedure WriteShenmueEntry(var F: TFileStream);
-    procedure WriteShenmue2Entry(var F: TFileStream);
+    procedure WriteShenmueEntry(F: TFileStream);
+    procedure WriteShenmue2Entry(F: TFileStream);
     property Editor: TSRFEditor read GetOwnerEditor;
     property ExtraDataStream: TMemoryStream read fExtraDataStream;
     property TextPaddingSize: LongWord read GetTextPaddingSize;
@@ -208,7 +208,7 @@ begin
     fText := Value;
 end;
 
-procedure TSRFSubtitlesListItem.WriteShenmue2Entry(var F: TFileStream);
+procedure TSRFSubtitlesListItem.WriteShenmue2Entry(F: TFileStream);
 var
   Header: TShenmue2SubtitleHeader;
   SectionHeader: TSectionEntry;
@@ -239,7 +239,7 @@ begin
   F.Write(SectionHeader, SizeOf(TSectionEntry));
 end;
 
-procedure TSRFSubtitlesListItem.WriteShenmueEntry(var F: TFileStream);
+procedure TSRFSubtitlesListItem.WriteShenmueEntry(F: TFileStream);
 var
   Header: TShenmueSubtitleHeader;
   DataSize: LongWord;
@@ -517,34 +517,40 @@ begin
   // Loading the file
   InStream := TFileStream.Create(FileName, fmOpenRead);
   try
-    // Reading the first entry header to detect the file version
-    CurrentGameVersion := DetectGameVersion(InStream);
+    try
 
-    // The file is valid so we can continue
-    if CurrentGameVersion <> sgvUndef then begin
-      // Clearing the object
-      Clear;
+      // Reading the first entry header to detect the file version
+      CurrentGameVersion := DetectGameVersion(InStream);
 
-      // Setting the new GameVersion
-      fGameVersion := CurrentGameVersion;
+      // The file is valid so we can continue
+      if CurrentGameVersion <> sgvUndef then begin
+        // Clearing the object
+        Clear;
 
-      // Reading the subtitles table
-      case GameVersion of
+        // Setting the new GameVersion
+        fGameVersion := CurrentGameVersion;
 
-        // Shenmue I
-        sgvShenmue:
-          ParseShenmueFormat(InStream);
+        // Reading the subtitles table
+        case GameVersion of
 
-        // Shenmue II
-        sgvShenmue2:
-          ParseShenmue2Format(InStream);
+          // Shenmue I
+          sgvShenmue:
+            ParseShenmueFormat(InStream);
 
+          // Shenmue II
+          sgvShenmue2:
+            ParseShenmue2Format(InStream);
+
+        end;
+
+        // The file is loaded and the result is OK
+        fFileLoaded := True;
+        Result := True;
+        fSourceFileName := FileName;
       end;
-
-      // The file is loaded and the result is OK
-      fFileLoaded := True;
-      Result := True;
-      fSourceFileName := FileName;
+      
+    except
+      Result := False;
     end;
 
   finally
@@ -764,18 +770,15 @@ begin
       // Manage the padding if necessary
       NextBlockSize := BlockSize + Subtitles[i].RecordSize;
       if NextBlockSize > GAME_BLOCK_SIZE then begin
-
-{$IFDEF DEBUG}
-        Write('  *** PADDING #', i, ': BlockSize: ', BlockSize, ', ');
-{$ENDIF}
         PaddingSize := GAME_BLOCK_SIZE - BlockSize;
-{$IFDEF DEBUG}
-        WriteLn('PaddingSize: ', PaddingSize);
-{$ENDIF}
         WriteNullBlock(OutStream, PaddingSize);
         BlockSize := 0;
+{$IFDEF DEBUG}
+        Write('  *** PADDING #', i, ': BlockSize: ', BlockSize,
+          ', PaddingSize: ', PaddingSize);
+{$ENDIF}
       end;
-      
+
       // Write the subtitle
       case GameVersion of
         sgvShenmue:

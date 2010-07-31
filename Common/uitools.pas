@@ -8,7 +8,8 @@ uses
 type
   EUserInterface = class(Exception);
   EInvalidToolBarButton = class(EUserInterface);
-
+  TScrollDirection = (sdTop, sdBottom);
+  
 function BR(const Text: string): string;
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
 procedure EditSetCaretEndPosition(const EditHandle: THandle);
@@ -25,6 +26,7 @@ function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 procedure ToolBarCustomDraw(Toolbar: TToolBar);
 procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
+procedure VerticalScrollControl(Handle: THandle; Direction: TScrollDirection);
 function WrapStr: string;
 
 implementation
@@ -34,7 +36,22 @@ uses
 
 var
   sWrapStr: string; // used for MsgBox
-  
+
+//------------------------------------------------------------------------------
+
+procedure VerticalScrollControl(Handle: THandle; Direction: TScrollDirection);
+var
+  DirIndex: Integer;
+
+begin
+  DirIndex := 0;
+  case Direction of
+    sdTop: DirIndex := SB_TOP;
+    sdBottom: DirIndex := SB_BOTTOM;
+  end;
+  PostMessage(Handle, WM_VSCROLL, DirIndex, 0);
+end;
+
 //------------------------------------------------------------------------------
 
 // Thanks How To Do Things

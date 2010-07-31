@@ -1,4 +1,4 @@
-// {$DEFINE INTERACTIVE}
+{$DEFINE INTERACTIVE}
 
 program srfdebug;
 

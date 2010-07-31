@@ -11,6 +11,7 @@ type
   TFileEntry = class(TObject)
   private
     fFileName: TFileName;
+    fIndex: Integer;
   public
     constructor Create(const FileName: TFileName);
     function Exists: Boolean;
@@ -19,6 +20,7 @@ type
     function ExtractedFileName(NewExtension: string): TFileName; overload;
     function ExtractedFileName(NewExtension: string; AppendNewExtension: Boolean): TFileName; overload;
     function HasExtension: Boolean;
+    property Index: Integer read fIndex;
     property FileName: TFileName read fFileName write fFileName;
   end;
 
@@ -29,7 +31,7 @@ type
     procedure SetItem(Index: Integer; const Value: TFileEntry);
     function GetCount: Integer;
   public
-    procedure Add(const FileName: TFileName);
+    function Add(const FileName: TFileName): Integer;
     procedure Assign(Source: TFilesList); overload;
     procedure Assign(Directory: TFileName; SourceFileNames: TStrings); overload;
     constructor Create;
@@ -43,13 +45,14 @@ implementation
 
 { TFilesList }
 
-procedure TFilesList.Add(const FileName: TFileName);
+function TFilesList.Add(const FileName: TFileName): Integer;
 var
   Item: TFileEntry;
 
 begin
   Item := TFileEntry.Create(FileName);
-  fList.Add(Item)
+  Result := fList.Add(Item);
+  Item.fIndex := Result;
 end;
 
 procedure TFilesList.Assign(Source: TFilesList);
