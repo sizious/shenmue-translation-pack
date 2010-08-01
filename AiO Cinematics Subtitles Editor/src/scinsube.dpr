@@ -24,7 +24,9 @@ uses
   hashidx in '..\..\Common\hashidx.pas',
   dirscan in '..\..\Common\DirScan\dirscan.pas' {DirectoryScannerInterface},
   fileslst in '..\..\Common\fileslst.pas',
-  progress in '..\..\Common\Progress\progress.pas' {ProgressWindow};
+  progress in '..\..\Common\Progress\progress.pas' {ProgressWindow},
+  batchexe in '..\..\Common\batchexe.pas',
+  subsexp in 'engine\subsexp.pas';
 
 {$R *.res}
 

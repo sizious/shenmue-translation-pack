@@ -1,9 +1,24 @@
-                Shenmue AiO Cinematics Subtitles Editor
+                Shenmue Cinematics Subtitles Editor
               ______ __                                  
              |      |  |--.---.-.-----.-----.-----.-----.
              |   ---|     |  _  |     |  _  |  -__|__ --|
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
+___                           __________________________________________________
+___| Version 2.0: 2010-08-?? |__________________________________________________
+
+ADDED:
+- The directory scanner function is now powerful and shared with other tools.
+- A Directory field showing you what is the current selected directory was 
+  added.
+- Added a powerful mass import/export subtitles function.
+
+FIXED:
+- The application was written at 100%. The hacking algorithm is now properly
+  implemented (everything is managed, like padding blocks, and more).
+- The Debug Log can be closed now by hitting the Escape Key. Same for the 
+  Previewer.
+- The "AiO" (All-in-One) mention was removed from application title.
 ___                           __________________________________________________
 ___| Version 1.4a: 2010-03-04 |_________________________________________________
 

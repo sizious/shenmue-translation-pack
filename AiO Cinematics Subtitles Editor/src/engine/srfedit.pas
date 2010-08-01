@@ -396,29 +396,38 @@ begin
   // Loading the imported file
   XMLRoot := TXMLDocument.Create(nil);
   try
-    with XMLRoot do begin
-      Options := [doNodeAutoCreate, doAttrNull];
-      ParseOptions := [poPreserveWhiteSpace];
-      Active := True;
-      Version := '1.0';
-      Encoding := GetInputFileEncoding;
+    try
+
+      with XMLRoot do begin
+        Options := [doNodeAutoCreate, doAttrNull];
+        ParseOptions := [poPreserveWhiteSpace];
+        Active := True;
+        Version := '1.0';
+        Encoding := GetInputFileEncoding;
+      end;
+
+      // Loading the file
+      XMLRoot.LoadFromFile(FileName);
+
+      // Reading the root
+      if XMLRoot.DocumentElement.NodeName = 'srfeditor' then begin
+        // Subtitle list
+        RootNode := XMLRoot.DocumentElement.ChildNodes.FindNode('subtitles');
+        Result := RootNode.Attributes['count'] = Count; // Check count
+        if Result then
+          for i := 0 to Count - 1 do begin
+            Node := RootNode.ChildNodes.Nodes[i];
+            Owner.Subtitles[i].fText := VariantToString(Node.NodeValue);
+            RootNode.ChildNodes.Add(Node);
+          end; // for
+      end; // srfeditor
+
+    except
+{$IFDEF DEBUG}
+      on E:Exception do
+        WriteLn('ImportFromFile / Exception: ', E.Message);
+{$ENDIF}
     end;
-
-    // Loading the file
-    XMLRoot.LoadFromFile(FileName);
-
-    // Reading the root
-    if XMLRoot.DocumentElement.NodeName = 'srfeditor' then begin
-      // Subtitle list
-      RootNode := XMLRoot.DocumentElement.ChildNodes.FindNode('subtitles');
-      Result := RootNode.Attributes['count'] = Count; // Check count
-      if Result then
-        for i := 0 to Count - 1 do begin
-          Node := RootNode.ChildNodes.Nodes[i];
-          Owner.Subtitles[i].fText := VariantToString(Node.NodeValue);
-          RootNode.ChildNodes.Add(Node);
-        end; // for
-    end; // srfeditor
 
   finally
     // Destroying the XML file
