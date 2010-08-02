@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, Menus, ImgList, ToolWin, JvExComCtrls,
   JvToolBar, DebugLog, AppEvnts, BugsMgr, Viewer, JvListView, SRFEdit, ExtCtrls,
-  FilesLst;
+  FilesLst, JvBaseDlg, JvBrowseFolder;
 
 type
   TfrmMain = class(TForm)
@@ -89,6 +89,12 @@ type
     pmFilesList: TPopupMenu;
     miImportSubtitles2: TMenuItem;
     miExportSubtitles2: TMenuItem;
+    miClose2: TMenuItem;
+    N8: TMenuItem;
+    N9: TMenuItem;
+    miAutoSave: TMenuItem;
+    miMakeBackup: TMenuItem;
+    bfdBatchExport: TJvBrowseForFolderDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -134,6 +140,7 @@ type
     fDecodeSubtitles: Boolean;
     fWorkingFilesList: TFilesList;
     fSelectedFileIndex: Integer;
+    fBatchExportPreviousSelectedDirectory: TFileName;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -179,6 +186,9 @@ type
     { Déclarations publiques }
     function IsSubtitleSelected: Boolean;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    property BatchExportPreviousSelectedDirectory: TFileName
+      read fBatchExportPreviousSelectedDirectory
+      write fBatchExportPreviousSelectedDirectory;    
     property DebugLogVisible: Boolean read fDebugLogVisible
       write SetDebugLogVisible;
     property DecodeSubtitles: Boolean read fDecodeSubtitles
@@ -423,12 +433,20 @@ begin
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
 
+  // Init Menu Items
+  CopyMenuItem(miImportSubtitles, miImportSubtitles2);
+  CopyMenuItem(miExportSubtitles, miExportSubtitles2);
+  CopyMenuItem(miClose, miClose2);
+
   // Init Modules
   ModulesInit;
 
   // Initialize the application
   Clear;
 
+  SelectedDirectory := '';
+  BatchExportPreviousSelectedDirectory := GetApplicationDirectory;
+    
   // Load configuration
   LoadConfig;
 end;
@@ -528,8 +546,6 @@ begin
     OnInitialize := DirectoryScannerInitialize;
     OnFileProceed := DirectoryScannerFileProceed;
   end;
-  
-  SelectedDirectory := '';
 
   // Creating the Batch Subtitles Exporter
   BatchExporter := TBatchSubtitlesExporter.Create;
@@ -775,7 +791,13 @@ end;
 
 procedure TfrmMain.miBatchExportSubtitlesClick(Sender: TObject);
 begin
-  BatchExporter.Execute('G:\SHENMUE\TEST\');
+  with bfdBatchExport do begin
+    Directory := BatchExportPreviousSelectedDirectory;
+    if Execute then begin
+      BatchExportPreviousSelectedDirectory := Directory;
+      BatchExporter.Execute(Directory);
+    end;
+  end;
 end;
 
 procedure TfrmMain.miCharsetClick(Sender: TObject);
