@@ -13,6 +13,7 @@ const
 type
   ESystemTools = class(Exception);
   EDataDirectoryNotFound = class(ESystemTools);
+  EFourCCNotSameLengthAsString = class(ESystemTools);
 
   TPlatformVersion = (pvUnknow, pvDreamcast, pvXbox);
 
@@ -53,7 +54,8 @@ function PlateformVersionToString(PlateformVersion: TPlatformVersion): string;
 function ReadNullTerminatedString(var F: TFileStream): string; overload;
 function ReadNullTerminatedString(var F: TFileStream;
   const StrSize: LongWord): string; overload;
-function StrEquals(S1, S2: string): Boolean;  
+function StrEquals(S1, S2: string): Boolean;
+procedure StrToFourCC(var FourCC: array of Char; S: string);
 function StringArrayBinarySearch(SortedSource: array of string;
   SearchValue: string): Integer;
 function StringArraySequentialSearch(Source: array of string;
@@ -82,6 +84,29 @@ const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
   NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+// This replace the StrCopy function because it's big shit (it hang the app)
+procedure StrToFourCC(var FourCC: array of Char; S: string);
+var
+  i: Integer;
+
+begin
+  if S = '' then
+    // Only a empty zone
+    ZeroMemory(@FourCC, SizeOf(FourCC))
+  else begin
+    // Check entry parameter
+    if (Length(S) - 1) <> High(FourCC) then
+      raise EFourCCNotSameLengthAsString.Create('StrToFourCC: Check the Length ' +
+        'of your FourCC and S string!');
+
+    // Filling the FourCC
+    for i := 1 to Length(S) do
+      FourCC[i - 1] := S[i];  // it sucks but the StrCopy don't works properly!
+  end;
+end;
 
 //------------------------------------------------------------------------------
 
