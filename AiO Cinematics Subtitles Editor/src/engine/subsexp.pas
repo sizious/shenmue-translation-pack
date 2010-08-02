@@ -163,7 +163,8 @@ begin
       TargetDirectory := Directory;
 
       // Adding an entry to the Debug
-      Debug.AddLine(ltInformation, 'Starting to batch exports subtitles...');
+      Debug.AddLine(ltInformation, 'Starting to batch exports subtitles to "'
+        + TargetDirectory + '"...');
       frmMain.StatusText := 'Batch exporting...';
       
       // Running the thread

@@ -54,19 +54,24 @@ end;
 //------------------------------------------------------------------------------
 
 procedure LoadConfig;
+var
+  S: string;
+
 begin
   with Configuration do begin
-    if not FirstConfiguration then begin
-      frmMain.Position := poDesigned;
-      ReadFormAttributes(frmMain);
-    end;
-    frmMain.lvSubs.ColumnsOrder := ReadString('main', 'columns', frmMain.lvSubs.ColumnsOrder);
-    frmMain.DecodeSubtitles := ReadBool('main', 'decodesubs', frmMain.DecodeSubtitles);
-    frmMain.PreviewerVisible := ReadBool('main', 'preview', frmMain.PreviewerVisible);
-(*    frmMain.OriginalSubtitleField := ReadBool('main', 'originalsubsfield', frmMain.OriginalSubtitleField);
-    frmMain.OriginalSubtitlesColumn := ReadBool('main', 'originalsubscolumn', frmMain.OriginalSubtitlesColumn);
-*)
-  end;
+    with frmMain do begin
+      if not FirstConfiguration then begin
+        Position := poDesigned;
+        ReadFormAttributes(frmMain);
+      end;
+      lvSubs.ColumnsOrder := ReadString('main', 'columns', lvSubs.ColumnsOrder);
+      DecodeSubtitles := ReadBool('main', 'decodesubs', DecodeSubtitles);
+      PreviewerVisible := ReadBool('main', 'preview', PreviewerVisible);
+      S := ReadString('main', 'batchexportdir', BatchExportPreviousSelectedDirectory);
+      if DirectoryExists(S) then
+        BatchExportPreviousSelectedDirectory := S;        
+    end; // frmMain
+  end; // Configuration
 end;
 
 //------------------------------------------------------------------------------
@@ -75,12 +80,12 @@ procedure SaveConfig;
 begin
   with Configuration do begin
     WriteFormAttributes(frmMain);
-    WriteString('main', 'columns', frmMain.lvSubs.ColumnsOrder);
-    WriteBool('main', 'decodesubs', frmMain.DecodeSubtitles);
-    WriteBool('main', 'preview', frmMain.PreviewerVisible);
-(*    WriteBool('main', 'originalsubsfield', frmMain.OriginalSubtitleField);
-    WriteBool('main', 'originalsubscolumn', frmMain.OriginalSubtitlesColumn);
-*)
+    with frmMain do begin
+      WriteString('main', 'columns', lvSubs.ColumnsOrder);
+      WriteBool('main', 'decodesubs', DecodeSubtitles);
+      WriteBool('main', 'preview', PreviewerVisible);
+      WriteString('main', 'batchexportdir', BatchExportPreviousSelectedDirectory);
+    end;
   end;
 end;
 

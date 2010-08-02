@@ -3,7 +3,8 @@ unit UITools;
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, Messages, ComCtrls, StdCtrls, JvToolbar;
+  Windows, SysUtils, Classes, Forms, Menus, Messages, ComCtrls, StdCtrls,
+  JvToolbar;
 
 type
   EUserInterface = class(Exception);
@@ -12,6 +13,7 @@ type
   
 function BR(const Text: string): string;
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
+procedure CopyMenuItem(SourceItem, DestinationItem: TMenuItem);
 procedure EditSetCaretEndPosition(const EditHandle: THandle);
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion: string; overload;
@@ -32,10 +34,21 @@ function WrapStr: string;
 implementation
 
 uses
-  Themes, Menus, ShellApi, Graphics;
+  Themes, ShellApi, Graphics;
 
 var
   sWrapStr: string; // used for MsgBox
+
+//------------------------------------------------------------------------------
+
+procedure CopyMenuItem(SourceItem, DestinationItem: TMenuItem);
+begin
+  with DestinationItem do begin
+    Caption := SourceItem.Caption;
+    Hint := SourceItem.Hint;
+    OnClick := SourceItem.OnClick;
+  end;
+end;
 
 //------------------------------------------------------------------------------
 
