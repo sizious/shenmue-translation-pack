@@ -215,14 +215,16 @@ var
 
 begin
   // Writing header
-  StrCopy(Header.Name, SHENMUE2_SIGN);
+  StrToFourCC(Header.Name, SHENMUE2_SIGN);
   Header.Size := SizeOf(TShenmue2SubtitleHeader);
-  StrCopy(Header.CharID, PChar(CharID));
+// FUCK!! This StrCopy hang the main func, the BlockSize var was resetted to 0... (?)
+// StrCopy(Header.CharID, PChar(CharID));
+  StrToFourCC(Header.CharID, CharID);
   F.Write(Header, Header.Size);
 
   // Writing text
   if RawText <> '' then begin
-    StrCopy(SectionHeader.Name, SHENMUE2_SUBTITLE_DATA);
+    StrToFourCC(SectionHeader.Name, SHENMUE2_SUBTITLE_DATA);
     SectionHeader.Size := SizeOf(TSectionEntry) + LongWord(Length(RawText))
       + TextPaddingSize;
     F.Write(SectionHeader, SizeOf(TSectionEntry));
@@ -234,7 +236,7 @@ begin
   F.CopyFrom(ExtraDataStream, 0);
 
   // Writing ENDC
-  StrCopy(SectionHeader.Name, SHENMUE2_SUBTITLE_ENTRYEND);
+  StrToFourCC(SectionHeader.Name, SHENMUE2_SUBTITLE_ENTRYEND);
   SectionHeader.Size := 0;
   F.Write(SectionHeader, SizeOf(TSectionEntry));
 end;
@@ -247,8 +249,9 @@ var
 begin
   // Writing header
   ZeroMemory(@Header.Name, SizeOf(Header.Name));
+//  StrToFourCC(Header.Name, SHENMUE_SIGN);
   StrCopy(Header.Name, SHENMUE_SIGN);
-  StrCopy(Header.CharID, PChar(CharID));
+  StrToFourCC(Header.CharID, CharID);
   Header.SubtitleLength := UINT32_SIZE;
   if RawText <> '' then
     Inc(Header.SubtitleLength, LongWord(Length(RawText)) + TextPaddingSize);
@@ -767,6 +770,7 @@ begin
   try
 
     BlockSize := 0;
+
     for i := 0 to Subtitles.Count - 1 do begin
 
 {$IFDEF DEBUG}
@@ -783,7 +787,7 @@ begin
         WriteNullBlock(OutStream, PaddingSize);
         BlockSize := 0;
 {$IFDEF DEBUG}
-        Write('  *** PADDING #', i, ': BlockSize: ', BlockSize,
+        WriteLn('  *** PADDING #', i, ': BlockSize: ', BlockSize,
           ', PaddingSize: ', PaddingSize);
 {$ENDIF}
       end;
