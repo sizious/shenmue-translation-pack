@@ -26,7 +26,9 @@ uses
   fileslst in '..\..\Common\fileslst.pas',
   progress in '..\..\Common\Progress\progress.pas' {ProgressWindow},
   batchexe in '..\..\Common\batchexe.pas',
-  subsexp in 'engine\subsexp.pas';
+  subsexp in 'engine\subsexp.pas',
+  massimp in 'massimp.pas' {frmMassImport},
+  subsimp in 'engine\subsimp.pas';
 
 {$R *.res}
 
@@ -48,7 +50,6 @@ begin
   InitConfiguration;
 
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmAbout, frmAbout);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...

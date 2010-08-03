@@ -69,7 +69,9 @@ begin
       PreviewerVisible := ReadBool('main', 'preview', PreviewerVisible);
       S := ReadString('main', 'batchexportdir', BatchExportPreviousSelectedDirectory);
       if DirectoryExists(S) then
-        BatchExportPreviousSelectedDirectory := S;        
+        BatchExportPreviousSelectedDirectory := S;
+      AutoSave := ReadBool('main', 'autosave', AutoSave);
+      MakeBackup := ReadBool('main', 'makebackup', MakeBackup);
     end; // frmMain
   end; // Configuration
 end;
@@ -85,6 +87,8 @@ begin
       WriteBool('main', 'decodesubs', DecodeSubtitles);
       WriteBool('main', 'preview', PreviewerVisible);
       WriteString('main', 'batchexportdir', BatchExportPreviousSelectedDirectory);
+      WriteBool('main', 'autosave', AutoSave);
+      WriteBool('main', 'makebackup', MakeBackup);
     end;
   end;
 end;
