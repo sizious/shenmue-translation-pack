@@ -374,6 +374,7 @@ end;
 
 function TSRFSubtitlesList.GetJapaneseCharset: Boolean;
 begin
+// !!! THIS IS BIG SHIT I NEED TO FIX THIS !!!
   Result := False;
   if (Count > 0) then
     Result := IsJapaneseString(Items[0].RawText);
