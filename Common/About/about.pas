@@ -28,9 +28,6 @@ type
     { Déclarations publiques }
   end;
 
-var
-  frmAbout: TfrmAbout;
-
 procedure InitAboutBox(const AppTitle, AppVersion: string; ShortAppTitle: string = '');
 procedure RunAboutBox;
 
@@ -47,6 +44,7 @@ const
   CREDITS_RESOURCE_NAME = 'CREDITS';
                                                       
 var
+  frmAbout: TfrmAbout;
   sLongAppTitle,
   sShortAppTitle,
   sAppVersion: string;

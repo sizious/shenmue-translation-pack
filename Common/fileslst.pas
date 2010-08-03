@@ -12,6 +12,7 @@ type
   private
     fFileName: TFileName;
     fIndex: Integer;
+    function GetExtension: string;
   public
     constructor Create(const FileName: TFileName);
     function Exists: Boolean;
@@ -21,6 +22,7 @@ type
     function ExtractedFileName(NewExtension: string; AppendNewExtension: Boolean): TFileName; overload;
     function HasExtension: Boolean;
     property Index: Integer read fIndex;
+    property Extension: string read GetExtension;
     property FileName: TFileName read fFileName write fFileName;
   end;
 
@@ -147,9 +149,14 @@ begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(FileName));
 end;
 
+function TFileEntry.GetExtension: string;
+begin
+  Result := ExtractFileExt(FileName);
+end;
+
 function TFileEntry.HasExtension: Boolean;
 begin
-  Result := ExtractFileExt(FileName) <> '';
+  Result := Extension <> '';
 end;
 
 end.

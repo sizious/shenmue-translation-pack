@@ -22,12 +22,13 @@ type
     fInitialize: TBatchThreadInitializeEvent;
     fSourceFilesList: TFilesList;
     fTargetDirectory: TFileName;
+    procedure SetTargetDirectory(const Value: TFileName);
   public
     constructor Create; overload;
     destructor Destroy; override;
     property SourceFilesList: TFilesList read fSourceFilesList;
     property TargetDirectory: TFileName read fTargetDirectory
-      write fTargetDirectory;
+      write SetTargetDirectory;
     property OnInitialize: TBatchThreadInitializeEvent
       read fInitialize write fInitialize;
     property OnFileProceed: TBatchThreadFileProceed read fFileProceed
@@ -55,6 +56,11 @@ destructor TBatchThread.Destroy;
 begin
   fSourceFilesList.Free;
   inherited;
+end;
+
+procedure TBatchThread.SetTargetDirectory(const Value: TFileName);
+begin
+  fTargetDirectory := IncludeTrailingPathDelimiter(Value);
 end;
 
 //------------------------------------------------------------------------------

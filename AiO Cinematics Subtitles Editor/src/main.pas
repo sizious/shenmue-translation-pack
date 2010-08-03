@@ -95,6 +95,9 @@ type
     miAutoSave: TMenuItem;
     miMakeBackup: TMenuItem;
     bfdBatchExport: TJvBrowseForFolderDialog;
+    tbAutoSave: TToolButton;
+    ToolButton6: TToolButton;
+    tbMakeBackup: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -129,6 +132,9 @@ type
     procedure miImportSubtitlesClick(Sender: TObject);
     procedure miExportSubtitlesClick(Sender: TObject);
     procedure miBatchExportSubtitlesClick(Sender: TObject);
+    procedure miAutoSaveClick(Sender: TObject);
+    procedure miMakeBackupClick(Sender: TObject);
+    procedure miBatchImportSubtitlesClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -141,6 +147,8 @@ type
     fWorkingFilesList: TFilesList;
     fSelectedFileIndex: Integer;
     fBatchExportPreviousSelectedDirectory: TFileName;
+    fAutoSave: Boolean;
+    fMakeBackup: Boolean;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -181,11 +189,14 @@ type
     procedure SetDecodeSubtitles(const Value: Boolean);
     function GetSelectedDirectory: TFileName;
     procedure SetSelectedDirectory(const Value: TFileName);
+    procedure SetAutoSave(const Value: Boolean);
+    procedure SetMakeBackup(const Value: Boolean);
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
     function IsSubtitleSelected: Boolean;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    property AutoSave: Boolean read fAutoSave write SetAutoSave;
     property BatchExportPreviousSelectedDirectory: TFileName
       read fBatchExportPreviousSelectedDirectory
       write fBatchExportPreviousSelectedDirectory;    
@@ -194,6 +205,7 @@ type
     property DecodeSubtitles: Boolean read fDecodeSubtitles
       write SetDecodeSubtitles;
     property FileModified: Boolean read fFileModified write SetFileModified;
+    property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
     property PreviewerVisible: Boolean read fPreviewerVisible
       write SetPreviewerVisible;
     property SelectedDirectory: TFileName read GetSelectedDirectory write
@@ -221,7 +233,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, ChrCount, About, DirScan, SubsExp;
+  Config, UITools, SysTools, ChrCount, About, DirScan, SubsExp, MassImp;
 
 const
   SUBTITLES_COLUMN_INDEX = 1;
@@ -403,6 +415,11 @@ begin
       LoadFile;
       StatusText := '';
     end;
+end;
+
+procedure TfrmMain.miMakeBackupClick(Sender: TObject);
+begin
+  MakeBackup := not MakeBackup;
 end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
@@ -789,6 +806,11 @@ begin
   RunAboutBox;
 end;
 
+procedure TfrmMain.miAutoSaveClick(Sender: TObject);
+begin
+  AutoSave := not AutoSave;
+end;
+
 procedure TfrmMain.miBatchExportSubtitlesClick(Sender: TObject);
 begin
   with bfdBatchExport do begin
@@ -798,6 +820,16 @@ begin
       BatchExporter.Execute(Directory);
     end;
   end;
+end;
+
+procedure TfrmMain.miBatchImportSubtitlesClick(Sender: TObject);
+begin
+  with TfrmMassImport.Create(Application) do
+    try
+      ShowModal;
+    finally
+      Free;  
+    end;
 end;
 
 procedure TfrmMain.miCharsetClick(Sender: TObject);
@@ -928,23 +960,34 @@ var
 begin
   Result := True;
   if not FileModified then Exit;
-
+  
   Result := False;
+  MustSave := True;
+  
+  if not AutoSave then begin
+    // If not AutoSave, then check if we must save or not
+    MsgBtns := MB_YESNO;
+    if CancelButton then
+      MsgBtns := MB_YESNOCANCEL;
 
-  MsgBtns := MB_YESNO;
-  if CancelButton then
-    MsgBtns := MB_YESNOCANCEL;
-
-  CanDo := MsgBox('The file was modified. Save changes?', 'Warning',
-    MB_ICONWARNING + MsgBtns);
-  if CanDo = IDCANCEL then Exit;
-  MustSave := (CanDo = IDYES);
+    CanDo := MsgBox('The file was modified. Save changes?', 'Warning',
+      MB_ICONWARNING + MsgBtns);
+    if CanDo = IDCANCEL then Exit;
+    MustSave := (CanDo = IDYES);
+  end; // AutoSave
 
   // We save the file
   if MustSave then
     miSave.Click;
 
   Result := True;
+end;
+
+procedure TfrmMain.SetAutoSave(const Value: Boolean);
+begin
+  fAutoSave := Value;
+  tbAutoSave.Down := Value;
+  miAutoSave.Checked := Value;
 end;
 
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
@@ -1006,6 +1049,14 @@ begin
   else
     sbMain.Panels[1].Text := '';
   SetControlsStateSaveOperation(fFileModified);
+end;
+
+procedure TfrmMain.SetMakeBackup(const Value: Boolean);
+begin
+  fMakeBackup := Value;
+  miMakeBackup.Checked := Value;
+  tbMakeBackup.Down := Value;
+  SRFEditor.MakeBackup := Value;
 end;
 
 procedure TfrmMain.SetPreviewerVisible(const Value: Boolean);
