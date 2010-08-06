@@ -54,7 +54,7 @@ uses
 type
   TfrmDebugLog = class;
 
-  TLineType = (ltInformation, ltWarning, ltCritical);
+  TDebugLineType = (ltInformation, ltWarning, ltCritical);
 
   TDebugLogVisibilityChangeEvent =
     procedure(Sender: TObject; const Visible: Boolean) of object;
@@ -79,9 +79,10 @@ type
     destructor Destroy; override;
 
     // Methods
-    procedure AddLine(LineType: TLineType; const Text: string);
+    procedure AddLine(LineType: TDebugLineType; const Text: string);
     procedure SaveLogFile;
-    procedure Report(LineType: TLineType; MsgText, AdditionalDebugText: string);
+    procedure Report(LineType: TDebugLineType; MsgText, AdditionalDebugText: string); overload;
+    procedure Report(LineType: TDebugLineType; MsgText: string); overload;
 
     // Properties
     property Configuration: TXMLConfigurationFile
@@ -161,13 +162,13 @@ type
   protected
     { Déclarations protégées }
     function GenerateDebugLogFileName: TFileName;
-    function LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
-    function LineTypeToTextLabel(LineType: TLineType): string;
+    function LineTypeToAttributes(LineType: TDebugLineType): TDebugAttributes;
+    function LineTypeToTextLabel(LineType: TDebugLineType): string;
   public
     { Déclarations publiques }
-    procedure AddLine(LineType: TLineType; const Text: string);
+    procedure AddLine(LineType: TDebugLineType; const Text: string);
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
-    procedure Report(LineType: TLineType; MsgText, AdditionalDebugText: string);
+    procedure Report(LineType: TDebugLineType; MsgText, AdditionalDebugText: string);
     procedure LoadConfig;
     procedure SaveConfig;
     procedure SaveLogFile;
@@ -195,7 +196,7 @@ uses
 // TfrmDebugLog
 //------------------------------------------------------------------------------
 
-procedure TfrmDebugLog.AddLine(LineType: TLineType; const Text: string);
+procedure TfrmDebugLog.AddLine(LineType: TDebugLineType; const Text: string);
 var
   Attr: TDebugAttributes;
   Timestamp: TDateTime;
@@ -322,7 +323,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-function TfrmDebugLog.LineTypeToAttributes(LineType: TLineType): TDebugAttributes;
+function TfrmDebugLog.LineTypeToAttributes(LineType: TDebugLineType): TDebugAttributes;
 begin
   Result.Color := clGray;
   Result.Style := [];
@@ -340,7 +341,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-function TfrmDebugLog.LineTypeToTextLabel(LineType: TLineType): string;
+function TfrmDebugLog.LineTypeToTextLabel(LineType: TDebugLineType): string;
 begin
   Result := '';
   case LineType of
@@ -481,7 +482,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure TfrmDebugLog.Report(LineType: TLineType; MsgText,
+procedure TfrmDebugLog.Report(LineType: TDebugLineType; MsgText,
   AdditionalDebugText: string);
 var
   MsgIcon: Integer;
@@ -523,7 +524,7 @@ end;
 // TDebugLogHandlerInterface
 //------------------------------------------------------------------------------
 
-procedure TDebugLogHandlerInterface.AddLine(LineType: TLineType;
+procedure TDebugLogHandlerInterface.AddLine(LineType: TDebugLineType;
   const Text: string);
 begin
   DebugLogWindow.AddLine(LineType, Text);
@@ -581,7 +582,13 @@ begin
   Result := DebugLogWindow.Configuration;
 end;
 
-procedure TDebugLogHandlerInterface.Report(LineType: TLineType; MsgText,
+procedure TDebugLogHandlerInterface.Report(LineType: TDebugLineType;
+  MsgText: string);
+begin
+  DebugLogWindow.Report(LineType, MsgText, '');
+end;
+
+procedure TDebugLogHandlerInterface.Report(LineType: TDebugLineType; MsgText,
   AdditionalDebugText: string);
 begin
   DebugLogWindow.Report(LineType, MsgText, AdditionalDebugText);

@@ -14,6 +14,7 @@ object frmMassImport: TfrmMassImport
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress

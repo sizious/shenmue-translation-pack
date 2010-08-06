@@ -44,7 +44,6 @@ begin
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProperties, frmProperties);
   Application.CreateForm(TfrmFileSelection, frmFileSelection);
-  Application.CreateForm(TfrmAbout, frmAbout);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...

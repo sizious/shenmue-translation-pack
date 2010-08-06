@@ -115,9 +115,15 @@ end;
 
 procedure TProgressionDialog.Terminate;
 begin
+
 {$IFDEF DEBUG}
-  WriteLn('[Progress] Terminate');
+  try
+    WriteLn('[Progress] Terminate');
+  except
+    raise Exception.Create('WriteLn function failed, application is closing!');
+  end;
 {$ENDIF}
+
   Terminated := True;
   with Window do begin
     ModalResult := mrOK;

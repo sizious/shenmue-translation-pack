@@ -8,11 +8,14 @@ uses
   Windows, SysUtils, Classes;
 
 type
+  TFilesList = class;
+  
   TFileEntry = class(TObject)
   private
+    fOwner: TFilesList;
     fFileName: TFileName;
-    fIndex: Integer;
     function GetExtension: string;
+    function GetIndex: Integer;
   public
     constructor Create(const FileName: TFileName);
     function Exists: Boolean;
@@ -21,9 +24,11 @@ type
     function ExtractedFileName(NewExtension: string): TFileName; overload;
     function ExtractedFileName(NewExtension: string; AppendNewExtension: Boolean): TFileName; overload;
     function HasExtension: Boolean;
-    property Index: Integer read fIndex;
+    function Remove: Boolean;
     property Extension: string read GetExtension;
     property FileName: TFileName read fFileName write fFileName;
+    property Index: Integer read GetIndex;
+    property Owner: TFilesList read fOwner;
   end;
 
   TFilesList = class(TObject)
@@ -39,6 +44,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
+    function Remove(Index: Integer): Boolean;
     property Count: Integer read GetCount;
     property Files[Index: Integer]: TFileEntry read GetItem write SetItem; default;
   end;
@@ -54,7 +60,7 @@ var
 begin
   Item := TFileEntry.Create(FileName);
   Result := fList.Add(Item);
-  Item.fIndex := Result;
+  Item.fOwner := Self;
 end;
 
 procedure TFilesList.Assign(Source: TFilesList);
@@ -108,6 +114,13 @@ begin
   Result := TFileEntry(fList[Index]);
 end;
 
+function TFilesList.Remove(Index: Integer): Boolean;
+begin
+  Result := False;
+  if (Index >= 0) and (Index < Count) then
+    Result := Files[Index].Remove;
+end;
+
 procedure TFilesList.SetItem(Index: Integer; const Value: TFileEntry);
 begin
   fList[Index] := TFileEntry(Value);
@@ -117,6 +130,7 @@ end;
 
 constructor TFileEntry.Create(const FileName: TFileName);
 begin
+  fOwner := nil;
   fFileName := FileName;
 end;
 
@@ -154,9 +168,27 @@ begin
   Result := ExtractFileExt(FileName);
 end;
 
+function TFileEntry.GetIndex: Integer;
+begin
+  Result := -1;
+  if Assigned(Owner) then
+    Result := Owner.fList.IndexOf(Self);
+end;
+
 function TFileEntry.HasExtension: Boolean;
 begin
   Result := Extension <> '';
+end;
+
+function TFileEntry.Remove: Boolean;
+begin
+  Result := True;
+  try
+    Owner.fList.Delete(Index);
+    Free;
+  except
+    Result := False;
+  end;
 end;
 
 end.

@@ -164,8 +164,10 @@ type
     procedure DirectoryScannerFileProceed(Sender: TObject; FileName: TFileName;
       Result: Boolean);
     procedure DirectoryScannerInitialize(Sender: TObject; MaxValue: Integer);
-    procedure ModulesFree;
-    procedure ModulesInit;
+    procedure FilesListAdd(const FileName: TFileName);    
+    procedure FilesListClear;
+    procedure FilesListRemove(const ItemIndex: Integer);
+    function GetSelectedDirectory: TFileName;
     function GetSelectedSubtitle: string;
     function GetStatusText: string;
     procedure InitBugsHandler;
@@ -174,30 +176,30 @@ type
     procedure LoadFile; overload;
     procedure LoadFile(FileName: TFileName); overload;
     procedure LoadSelectedFile;
+    procedure ModulesFree;
+    procedure ModulesInit;    
     procedure PreviewerWindowClosed(Sender: TObject);
+    procedure RefreshSubtitleSelection;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
-    procedure SetSelectedSubtitle(const Value: string);
-    procedure SetStatusText(const Value: string);
-    procedure SetDebugLogVisible(const Value: Boolean);
+    procedure SetAutoSave(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
-    procedure SetFileModified(const Value: Boolean);
-    procedure RefreshSubtitleSelection;
-    procedure FilesListAdd(const FileName: TFileName);    
-    procedure FilesListClear;
-    procedure SetPreviewerVisible(const Value: Boolean);
+    procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetDecodeSubtitles(const Value: Boolean);
-    function GetSelectedDirectory: TFileName;
+    procedure SetFileModified(const Value: Boolean);
+    procedure SetMakeBackup(const Value: Boolean);    
+    procedure SetPreviewerVisible(const Value: Boolean);
+    procedure SetSelectedSubtitle(const Value: string);
     procedure SetSelectedDirectory(const Value: TFileName);
-    procedure SetAutoSave(const Value: Boolean);
-    procedure SetMakeBackup(const Value: Boolean);
+    procedure SetStatusText(const Value: string);
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
     function IsSubtitleSelected: Boolean;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
+    procedure ReloadFile;
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
-    property BatchExportPreviousSelectedDirectory: TFileName
+    property BatchPreviousSelectedDirectory: TFileName
       read fBatchExportPreviousSelectedDirectory
       write fBatchExportPreviousSelectedDirectory;    
     property DebugLogVisible: Boolean read fDebugLogVisible
@@ -254,7 +256,7 @@ type
 var
   SRFDirectoryScanner: TSRFDirectoryScanner;
   BatchExporter: TBatchSubtitlesExporter;
-  
+
 //==============================================================================
 
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
@@ -462,7 +464,7 @@ begin
   Clear;
 
   SelectedDirectory := '';
-  BatchExportPreviousSelectedDirectory := GetApplicationDirectory;
+  BatchPreviousSelectedDirectory := GetApplicationDirectory;
     
   // Load configuration
   LoadConfig;
@@ -589,6 +591,15 @@ begin
     lvSubsSelectItem(Self, fSelectedSubtitleUI, True);
 end;
 
+procedure TfrmMain.ReloadFile;
+begin
+  if SRFEditor.Loaded then begin
+    LoadFile(SRFEditor.SourceFileName);
+    Debug.AddLine(ltInformation, 'Successfully reloaded the file "'
+      + SRFEditor.SourceFileName + '".');
+  end;
+end;
+
 procedure TfrmMain.FilesListAdd(const FileName: TFileName);
 begin
   WorkingFilesList.Add(FileName);
@@ -603,6 +614,15 @@ begin
   WorkingFilesList.Clear;
   eFilesCount.Text := '0';
   SelectedDirectory := '';
+end;
+
+procedure TfrmMain.FilesListRemove(const ItemIndex: Integer);
+begin
+  // Delete from Files list
+  WorkingFilesList[SelectedFileIndex].Remove;
+
+  // Delete from UI
+  lbFilesList.Items.Delete(SelectedFileIndex);
 end;
 
 function TfrmMain.GetSelectedDirectory: TFileName;
@@ -693,6 +713,9 @@ begin
 
     // Updating the Previewer if possible
     Previewer.Update(SelectedSubtitle);
+
+    // Update the subtitle length count
+    UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);
   end;
 end;
 
@@ -813,23 +836,26 @@ end;
 
 procedure TfrmMain.miBatchExportSubtitlesClick(Sender: TObject);
 begin
-  with bfdBatchExport do begin
-    Directory := BatchExportPreviousSelectedDirectory;
-    if Execute then begin
-      BatchExportPreviousSelectedDirectory := Directory;
-      BatchExporter.Execute(Directory);
+  if SaveFileOnDemand(True) then
+    with bfdBatchExport do begin
+      Directory := BatchPreviousSelectedDirectory;
+      if Execute then begin
+        BatchPreviousSelectedDirectory := Directory;
+        BatchExporter.Execute(Directory);
+      end;
     end;
-  end;
 end;
 
 procedure TfrmMain.miBatchImportSubtitlesClick(Sender: TObject);
 begin
-  with TfrmMassImport.Create(Application) do
-    try
-      ShowModal;
-    finally
-      Free;  
-    end;
+  if SaveFileOnDemand(True) then
+    with TfrmMassImport.Create(Application) do
+      try
+        SourceDirectory := BatchPreviousSelectedDirectory;
+        ShowModal;
+      finally
+        Free;
+      end;
 end;
 
 procedure TfrmMain.miCharsetClick(Sender: TObject);
@@ -850,7 +876,7 @@ procedure TfrmMain.miCloseClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   Clear;
-  lbFilesList.Items.Delete(SelectedFileIndex);
+  FilesListRemove(SelectedFileIndex);
   SelectedFileIndex := -1;
 end;
 
@@ -884,9 +910,7 @@ end;
 procedure TfrmMain.miReloadClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
-  LoadFile(SRFEditor.SourceFileName);
-  Debug.AddLine(ltInformation, 'Successfully reloaded the file "'
-    + SRFEditor.SourceFileName + '".');
+  ReloadFile;
 end;
 
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
@@ -1082,12 +1106,9 @@ end;
 
 procedure TfrmMain.SetSelectedSubtitle(const Value: string);
 begin
-  try
-    if IsSubtitleSelected then begin
-      fSelectedSubtitleUI.SubItems[SUBTITLES_COLUMN_INDEX] := BR(Value);
-      fSelectedSubtitle.Text := Value;
-    end;
-  except
+  if IsSubtitleSelected then begin
+    fSelectedSubtitleUI.SubItems[SUBTITLES_COLUMN_INDEX] := BR(Value);
+    fSelectedSubtitle.Text := Value;
   end;
 end;
 

@@ -27,39 +27,41 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
-//    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Déclarations privées }
-//    fBatchSubsImporter: TSubsMassImporterThread;
-    fImporting: Boolean;
-    fAborted: Boolean;
-    fSuccess: Boolean;
-//    fFilesAmbigous: Boolean;
-    procedure BatchImportSubtitles(const InputDirectory: TFileName);
-(*    procedure FileImportedEvent(Sender: TObject;
-      TargetFileName, SubsFileName: TFileName; ImportResult: TImportResult);*)
-    procedure ImportFinishedEvent(Sender: TObject; FilesImported,
-      FilesFailure: Integer);
+    fActive: Boolean;
+    fBatchThread: TBatchSubtitlesImporterThread;
     procedure ResetForm;
+    procedure ResetProgress;
     procedure ChangeControlsState(const State: Boolean);
-  protected
-    property Aborted: Boolean read fAborted write fAborted;
-//    property HasFilesAmbigous: Boolean read fFilesAmbigous write fFilesAmbigous;
-    property Importing: Boolean read fImporting write fImporting;
+    procedure ChangeCancelState(const State: Boolean);
+    procedure ThreadCompleted(Sender: TObject; ErrornousFiles,
+      TotalFiles: Integer; Canceled: Boolean);
+    procedure ThreadFileProceed(Sender: TObject; FileName: TFileName;
+      Result: TBatchThreadImportedResult);
+    procedure UpdateProgressBar;
+    procedure SetSourceDirectory(const Value: TFileName);
+    function GetSourceDirectory: TFileName;
+    property Active: Boolean read fActive write fActive;
+    property BatchThread: TBatchSubtitlesImporterThread read fBatchThread
+      write fBatchThread;
   public
     { Déclarations publiques }
     function MsgBox(const Text, Caption: string; Flags: Integer): Integer;
-    procedure UpdateProgressBar;
-    property Success: Boolean read fSuccess;
+    property SourceDirectory: TFileName read GetSourceDirectory
+      write SetSourceDirectory;
   end;
 
+//==============================================================================
 implementation
+//==============================================================================
 
-uses
-  Main, Math, FilesLst, UITools;
-  
 {$R *.dfm}
 
+uses
+  Main, Math, FilesLst, UITools, DebugLog;
+  
 //------------------------------------------------------------------------------
 
 function TfrmMassImport.MsgBox(const Text, Caption: string; Flags: Integer): Integer;
@@ -69,33 +71,54 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure TfrmMassImport.BatchImportSubtitles(const InputDirectory: TFileName);
-begin
-
-end;
-
-//------------------------------------------------------------------------------
-
 procedure TfrmMassImport.btnBrowseClick(Sender: TObject);
 begin
-  with JvBrowseForFolderDialog do
-    if Execute then eDirectory.Text := Directory;
+  with JvBrowseForFolderDialog do begin
+    Directory := SourceDirectory;
+    if Execute then
+      SourceDirectory := Directory;
+  end;
 end;
 
 //------------------------------------------------------------------------------
 
 procedure TfrmMassImport.btnImportClick(Sender: TObject);
 begin
-(*  if not DirectoryExists(eDirectory.Text) then begin
-    MsgBox('Please select the subtitles directory.', 'Warning', MB_ICONWARNING);
-    Exit;
-  end;
-
+  // Initialize UI
   ResetForm;
-  ChangeControlsState(False);
-  Importing := True;
-  Aborted := False;
-  BatchImportSubtitles(eDirectory.Text);  *)
+  btnImport.Enabled := False;
+  Active := True;
+  pBar.Max := frmMain.WorkingFilesList.Count;
+  lvFiles.SetFocus;
+
+  // Adding an entry to the Debug Log
+  Debug.AddLine(ltInformation, 'Starting batch importation for '
+    + IntToStr(pBar.Max) + ' file(s)...');
+  frmMain.StatusText := 'Batch importing...';
+  
+  // Running the thread
+  BatchThread := TBatchSubtitlesImporterThread.Create;
+  with BatchThread do begin
+    // Properties
+    FreeOnTerminate := True;
+    TargetDirectory := SourceDirectory;
+    SourceFilesList.Assign(frmMain.WorkingFilesList);
+
+    // Events
+    OnFileProceed := ThreadFileProceed;
+    OnCompleted := ThreadCompleted;
+
+    // Run !
+    Resume;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TfrmMassImport.ChangeCancelState(const State: Boolean);
+begin
+  btnCancel.Enabled := State;
+  SetCloseWindowButtonState(Self, State);
 end;
 
 //------------------------------------------------------------------------------
@@ -111,56 +134,47 @@ end;
 
 procedure TfrmMassImport.btnCancelClick(Sender: TObject);
 begin
-  btnCancel.Enabled := False;
+  ChangeCancelState(False);
   Close;
 end;
 
 //------------------------------------------------------------------------------
 
-(*procedure TfrmMassImport.FileImportedEvent(Sender: TObject;
-  TargetFileName, SubsFileName: TFileName; ImportResult: TImportResult);
+procedure TfrmMassImport.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  with lvFiles.Items.Add do begin
-    Caption := ExtractFileName(TargetFileName);
-    case ImportResult of
-      irSuccess           : SubItems.Add('OK');
-      irFailed            : SubItems.Add('FAILED');
-      irSubsFileNotFound  : SubItems.Add('NOT FOUND');
-      irSubsFileAmbiguous : //begin
-                              SubItems.Add('AMBIGUOUS');
-                              //HasFilesAmbigous := True;
-                            //end;
-    end;
-  end;
-  ListViewSelectItem(lvFiles, lvFiles.Items.Count - 1);
-end;  *)
-
-//------------------------------------------------------------------------------
+  // Refresh the view
+  frmMain.ReloadFile;
+end;
 
 procedure TfrmMassImport.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  CanDo: Integer;
+
 begin
-  if Importing then begin
-    Aborted := True;
-//    if Assigned(fBatchSubsImporter) then begin
-//      fBatchSubsImporter.Terminate;
-//    end;
-    ChangeControlsState(True);
+  if Active then begin
+    BatchThread.Suspend;
     CanClose := False;
-    ResetForm;
+
+    CanDo := MsgBox('Cancel the import operation ?', 'Question', MB_ICONQUESTION
+      + MB_OKCANCEL + MB_DEFBUTTON2);
+
+    ChangeCancelState(True);
+    BatchThread.Resume;
+    
+    if CanDo = IDOK then
+      BatchThread.Terminate;
   end;
 end;
-  
+
 //------------------------------------------------------------------------------
 
 procedure TfrmMassImport.FormCreate(Sender: TObject);
 begin
   DoubleBuffered := True;
   ResetForm;
-  if DirectoryExists(frmMain.SelectedDirectory) then begin
-    eDirectory.Text := frmMain.SelectedDirectory;
-    JvBrowseForFolderDialog.Directory := eDirectory.Text;
-  end;
 end;
+
+//------------------------------------------------------------------------------
 
 procedure TfrmMassImport.FormKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -170,72 +184,105 @@ begin
   end;
 end;
 
-(*procedure TfrmMassImport.FormShow(Sender: TObject);
-begin
-  ResetForm;
-end;*)
-
 //------------------------------------------------------------------------------
 
-procedure TfrmMassImport.ImportFinishedEvent(Sender: TObject; FilesImported,
-  FilesFailure: Integer);
-var
-  Icon: Integer;
-//  AmbigousMsg: string;
-
+function TfrmMassImport.GetSourceDirectory: TFileName;
 begin
-  if Aborted then
-    pBar.Position := 0;
-
-  (*AmbigousMsg := '';
-  if HasFilesAmbigous then
-    AmbigousMsg :=
-      WrapStr + 'You have ambigous XML files in your input folder.' + WrapStr
-       + 'Ambigous is for example for the <TEST.PKS> file, you have both' + WrapStr
-       + '<TEST.XML> and <TEST.PKS.XML> in your input folder.';*)
-    
-  Importing := False;
-  ChangeControlsState(True);
-
-  if not Aborted then begin
-
-    if FilesImported > 0 then begin
-      if (FilesFailure = 0) then
-        Icon := MB_ICONINFORMATION
-      else
-        Icon := MB_ICONWARNING;
-      MsgBox(IntToStr(FilesImported) + ' file(s) successfully imported. '
-        + IntToStr(FilesFailure) + ' errornous file(s).', 'Batch Import Results', Icon);
-      fSuccess := True;
-
-      if (FilesFailure = 0) then
-        Close;
-    end else
-      MsgBox('No files successfully imported. Check your input folder.',
-      'Batch Import Results', MB_ICONWARNING);
-  end;
+  Result := eDirectory.Text;
 end;
- 
+
 //------------------------------------------------------------------------------
 
 procedure TfrmMassImport.ResetForm;
 begin
-  // Aborted := False;
-  Importing := False; // cheminement normal
-  lProgBar.Caption := '...';
-  pBar.Position := 0;
+  ResetProgress;
   lvFiles.Clear;
   ChangeControlsState(True);
-  btnCancel.Enabled := True;
-//  HasFilesAmbigous := False;
+  ChangeCancelState(True);
+  Active := False;
 end;
+
+//------------------------------------------------------------------------------
+
+procedure TfrmMassImport.ResetProgress;
+begin
+  lProgBar.Caption := '...';
+  pBar.Position := 0;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TfrmMassImport.SetSourceDirectory(const Value: TFileName);
+begin
+  eDirectory.Text := IncludeTrailingPathDelimiter(Value);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TfrmMassImport.ThreadCompleted(Sender: TObject; ErrornousFiles,
+  TotalFiles: Integer; Canceled: Boolean);
+var
+  FilesImported, Icon: Integer;
+  S: string;
+  DebugType: TDebugLineType;
   
+begin
+  Active := False;
+  ChangeControlsState(True);
+
+  frmMain.StatusText := 'Batch importing done!';
+
+  if not Canceled then begin
+    FilesImported := TotalFiles - ErrornousFiles;
+
+    if FilesImported > 0 then begin
+
+      if (ErrornousFiles = 0) then begin
+        Icon := MB_ICONINFORMATION;
+        DebugType := ltInformation;
+      end else begin
+        Icon := MB_ICONWARNING;
+        DebugType := ltWarning;
+      end;
+
+      S := IntToStr(FilesImported) + ' file(s) successfully imported. '
+        + IntToStr(ErrornousFiles) + ' errornous file(s).';
+      MsgBox(S, 'Batch Import Results', Icon);
+      Debug.AddLine(DebugType, S);
+
+      if (ErrornousFiles = 0) then
+        Close;
+
+    end else
+      Debug.Report(ltWarning,
+        'No files successfully imported. Check your input folder.', '');
+
+  end else
+    ResetProgress;
+
+  frmMain.StatusText := '';
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TfrmMassImport.ThreadFileProceed(Sender: TObject; FileName: TFileName;
+  Result: TBatchThreadImportedResult);
+begin
+  with lvFiles.Items.Add do begin
+    Caption := ExtractFileName(FileName);
+    SubItems.Add(ImportResultToString(Result));
+  end;
+  ListViewSelectItem(lvFiles, lvFiles.Items.Count - 1);
+  UpdateProgressBar;
+end;
+
 //------------------------------------------------------------------------------
 
 procedure TfrmMassImport.UpdateProgressBar;
 begin
   pbar.Position := pbar.Position + 1;
-  lProgBar.Caption := FormatFloat('0.00', SimpleRoundTo((100 * pbar.Position) / pbar.Max, -2)) + '%';
+  lProgBar.Caption := FormatFloat('0.00',
+    SimpleRoundTo((100 * pbar.Position) / pbar.Max, -2)) + '%';
   Application.ProcessMessages;
 end;
    

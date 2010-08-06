@@ -67,9 +67,9 @@ begin
       lvSubs.ColumnsOrder := ReadString('main', 'columns', lvSubs.ColumnsOrder);
       DecodeSubtitles := ReadBool('main', 'decodesubs', DecodeSubtitles);
       PreviewerVisible := ReadBool('main', 'preview', PreviewerVisible);
-      S := ReadString('main', 'batchexportdir', BatchExportPreviousSelectedDirectory);
+      S := ReadString('main', 'batchexportdir', BatchPreviousSelectedDirectory);
       if DirectoryExists(S) then
-        BatchExportPreviousSelectedDirectory := S;
+        BatchPreviousSelectedDirectory := S;
       AutoSave := ReadBool('main', 'autosave', AutoSave);
       MakeBackup := ReadBool('main', 'makebackup', MakeBackup);
     end; // frmMain
@@ -86,7 +86,7 @@ begin
       WriteString('main', 'columns', lvSubs.ColumnsOrder);
       WriteBool('main', 'decodesubs', DecodeSubtitles);
       WriteBool('main', 'preview', PreviewerVisible);
-      WriteString('main', 'batchexportdir', BatchExportPreviousSelectedDirectory);
+      WriteString('main', 'batchexportdir', BatchPreviousSelectedDirectory);
       WriteBool('main', 'autosave', AutoSave);
       WriteBool('main', 'makebackup', MakeBackup);
     end;
