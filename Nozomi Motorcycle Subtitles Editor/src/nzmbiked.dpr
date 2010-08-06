@@ -22,7 +22,8 @@ uses
   viewer in '..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
   about in '..\..\Common\About\about.pas' {frmAbout},
   chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
-  chrcount in '..\..\Common\SubsUtil\chrcount.pas';
+  chrcount in '..\..\Common\SubsUtil\chrcount.pas',
+  hashidx in '..\..\Common\hashidx.pas';
 
 {$R *.res}
 
@@ -46,7 +47,6 @@ begin
   InitConfiguration;
 
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmAbout, frmAbout);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...

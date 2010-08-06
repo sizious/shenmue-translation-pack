@@ -170,11 +170,11 @@ type
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
-    procedure AddDebug(LineType: TLineType; Text: string);
+    procedure AddDebug(LineType: TDebugLineType; Text: string);
     function MsgBox(Text: string): Integer; overload;
     function MsgBox(Text, Caption: string; Flags: Integer): Integer; overload;
     procedure ReportFailure(Text, AdditionalDebugText, Caption: string;
-      FailureType: TLineType);
+      FailureType: TDebugLineType);
     procedure LoadFile(FileName: TFileName);
 
     property AutoSave: Boolean read fAutoSave write SetAutoSave;
@@ -223,7 +223,7 @@ begin
     frmProperties.Clear;
 end;
 
-procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
+procedure TfrmMain.AddDebug(LineType: TDebugLineType; Text: string);
 begin
   DebugLog.AddLine(LineType, Text);
 end;
@@ -1062,7 +1062,7 @@ begin
 end;
 
 procedure TfrmMain.ReportFailure(Text, AdditionalDebugText, Caption: string;
-  FailureType: TLineType);
+  FailureType: TDebugLineType);
 var
   MsgIcon: Integer;
   

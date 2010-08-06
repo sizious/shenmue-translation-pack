@@ -131,7 +131,7 @@ type
     procedure InitDebugLog;
     procedure LoadConfig;
     procedure ReportFailure(Text, AdditionalDebugText, Caption: string;
-      FailureType: TLineType);
+      FailureType: TDebugLineType);
     procedure SaveConfig;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetControlsStateFileOperations(State: Boolean);
@@ -144,7 +144,7 @@ type
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;        
   public
     { Déclarations publiques }
-    procedure AddDebug(LineType: TLineType; Text: string);
+    procedure AddDebug(LineType: TDebugLineType; Text: string);
     function MsgBox(Text, Caption: string; Flags: Integer): Integer;
     procedure LoadFile(FileName: TFileName);    
     property DebugLogVisible: Boolean read fDebugLogVisible
@@ -173,7 +173,7 @@ implementation
 uses
   Themes, Preview, UITools, Utils, About;
   
-procedure TfrmMain.AddDebug(LineType: TLineType; Text: string);
+procedure TfrmMain.AddDebug(LineType: TDebugLineType; Text: string);
 begin
   DebugLog.AddLine(LineType, Text);
 end;
@@ -694,7 +694,7 @@ begin
 end;
 
 procedure TfrmMain.ReportFailure(Text, AdditionalDebugText, Caption: string;
-  FailureType: TLineType);
+  FailureType: TDebugLineType);
 var
   MsgIcon: Integer;
 

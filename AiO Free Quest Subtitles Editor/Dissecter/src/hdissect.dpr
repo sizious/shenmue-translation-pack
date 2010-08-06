@@ -16,7 +16,9 @@ uses
   lzmadec in '..\..\..\Common\lzmadec.pas',
   npclist in '..\..\Editor\src\engine\npc\npclist.pas',
   imgtools in '..\..\..\Common\imgtools.pas',
-  scnfutil in '..\..\Editor\src\engine\scnfutil.pas';
+  scnfutil in '..\..\Editor\src\engine\scnfutil.pas',
+  srfdb in '..\..\Editor\src\engine\srfdb.pas',
+  hashidx in '..\..\..\Common\hashidx.pas';
 
 {$R *.res}
 
@@ -35,7 +37,7 @@ begin
   Application.Initialize;
   Application.Title := 'HUMANS Dissecter';
   Application.CreateForm(TForm1, Form1);
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
 {$ENDIF}
