@@ -1,11 +1,13 @@
 unit FilesLst;
 
+{$DEFINE USE_DCL}
+
 interface
 
 // implémente la liste des fichiers traités par le log
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes {$IFDEF USE_DCL}, HashIdx {$ENDIF};
 
 type
   TFilesList = class;
@@ -33,10 +35,16 @@ type
 
   TFilesList = class(TObject)
   private
+{$IFDEF USE_DCL}
+    fHashMap: THashIndexOptimizer;
+{$ENDIF}
     fList: TList;
     function GetItem(Index: Integer): TFileEntry;
     procedure SetItem(Index: Integer; const Value: TFileEntry);
     function GetCount: Integer;
+{$IFDEF USE_DCL}
+    property HashMap: THashIndexOptimizer read fHashMap write fHashMap;
+{$ENDIF}
   public
     function Add(const FileName: TFileName): Integer;
     procedure Assign(Source: TFilesList); overload;
@@ -44,6 +52,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
+    function IndexOf(const FileName: TFileName): Integer;
     function Remove(Index: Integer): Boolean;
     property Count: Integer read GetCount;
     property Files[Index: Integer]: TFileEntry read GetItem write SetItem; default;
@@ -58,9 +67,16 @@ var
   Item: TFileEntry;
 
 begin
-  Item := TFileEntry.Create(FileName);
-  Result := fList.Add(Item);
-  Item.fOwner := Self;
+  Result := IndexOf(FileName);
+  if Result = -1 then begin
+    // Add the new filename to the list.
+    Item := TFileEntry.Create(FileName);
+    Result := fList.Add(Item);
+    Item.fOwner := Self;
+{$IFDEF USE_DCL}
+    HashMap.Add(FileName, Result);
+{$ENDIF}
+  end;
 end;
 
 procedure TFilesList.Assign(Source: TFilesList);
@@ -90,17 +106,26 @@ begin
   for i := 0 to Count - 1 do
     TFilesList(fList[i]).Free;
   fList.Clear;
+{$IFDEF USE_DCL}
+  HashMap.Clear;
+{$ENDIF}
 end;
 
 constructor TFilesList.Create;
 begin
   fList := TList.Create;
+{$IFDEF USE_DCL}
+  fHashMap := THashIndexOptimizer.Create;
+{$ENDIF}
 end;
 
 destructor TFilesList.Destroy;
 begin
   Clear;
   fList.Free;
+{$IFDEF USE_DCL}
+  HashMap.Free;
+{$ENDIF}
   inherited Create;
 end;
 
@@ -112,6 +137,37 @@ end;
 function TFilesList.GetItem(Index: Integer): TFileEntry;
 begin
   Result := TFileEntry(fList[Index]);
+end;
+
+function TFilesList.IndexOf(const FileName: TFileName): Integer;
+{$IFNDEF USE_DCL}
+var
+  MaxIndex: Integer;
+  Found: Boolean;
+{$ENDIF}
+
+begin
+{$IFDEF USE_DCL}
+
+  // Use optimization HashMap
+
+  Result := HashMap.IndexOf(FileName);
+
+{$ELSE}
+
+  // Classical loop (non-optimized)
+  Found := False;
+  Result := -1;
+  MaxIndex := Count - 1;
+  while not (Found or (Result = MaxIndex)) do begin
+    Inc(Result);
+    Found := (Files[Result].FileName = FileName);
+  end;
+
+  if not Found then
+    Result := -1;
+  
+{$ENDIF}
 end;
 
 function TFilesList.Remove(Index: Integer): Boolean;
@@ -185,6 +241,9 @@ begin
   Result := True;
   try
     Owner.fList.Delete(Index);
+{$IFDEF USE_DCL}
+    Owner.HashMap.Delete(FileName);
+{$ENDIF}
     Free;
   except
     Result := False;

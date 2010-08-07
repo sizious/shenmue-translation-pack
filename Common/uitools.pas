@@ -14,16 +14,19 @@ type
 function BR(const Text: string): string;
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
 procedure CopyMenuItem(SourceItem, DestinationItem: TMenuItem);
+procedure DoRightClickSelection;
 procedure EditSetCaretEndPosition(const EditHandle: THandle);
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
 function GetApplicationVersion: string; overload;
 function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
 function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
-function IsWindowsVista: Boolean;   
+function IsWindowsVista: Boolean;
+procedure LocateFileOnDisk(const FileName: TFileName);
 procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 procedure MakeNumericOnly(Handle: THandle);
 function OpenLink(const LinkURL: string): Boolean;
+procedure OpenWindowsExplorer(const Directory: TFileName);
 function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 procedure ToolBarCustomDraw(Toolbar: TToolBar);
@@ -38,6 +41,38 @@ uses
 
 var
   sWrapStr: string; // used for MsgBox
+
+//------------------------------------------------------------------------------
+
+procedure OpenWindowsExplorer(const Directory: TFileName);
+begin
+  if DirectoryExists(Directory) then  
+    ShellExecute(Application.Handle, 'open', 'explorer',
+      PChar(Directory), '', SW_SHOWNORMAL);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure LocateFileOnDisk(const FileName: TFileName);
+begin
+  if FileExists(FileName) then
+    ShellExecute(Application.Handle, 'open', 'explorer',
+      PChar('/e,/select,' + FileName), '', SW_SHOWNORMAL);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure DoRightClickSelection;
+var
+  Point: TPoint;
+  
+begin
+  // enable right-click selection
+  GetCursorPos(Point);
+  Mouse_Event(MOUSEEVENTF_LEFTDOWN, Point.X, Point.Y, 0, 0);
+  Mouse_Event(MOUSEEVENTF_LEFTUP, Point.X, Point.Y, 0, 0);
+  Application.ProcessMessages;
+end;
 
 //------------------------------------------------------------------------------
 
