@@ -1602,7 +1602,7 @@ var
 
 begin
   FName := SCNFEditor.GetLoadedFileName;
-  ShellExecute(Handle, 'open', 'explorer', PChar('/e,/select,' + FName), '', SW_SHOWNORMAL);
+  LocateFileOnDisk(FName);
 end;
 
 procedure TfrmMain.lvSubsSelectClick(Sender: TObject);
@@ -1749,7 +1749,7 @@ end;
 
 procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', 'explorer', PChar(SelectedDirectory), '', SW_SHOWNORMAL);
+  OpenWindowsExplorer(SelectedDirectory);
 end;
 
 procedure TfrmMain.miOpenSingleFileClick(Sender: TObject);

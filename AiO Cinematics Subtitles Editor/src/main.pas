@@ -98,6 +98,11 @@ type
     tbAutoSave: TToolButton;
     ToolButton6: TToolButton;
     tbMakeBackup: TToolButton;
+    N10: TMenuItem;
+    miBrowseDirectory: TMenuItem;
+    miLocateOnDisk: TMenuItem;
+    N11: TMenuItem;
+    miFileProperties: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -135,6 +140,11 @@ type
     procedure miAutoSaveClick(Sender: TObject);
     procedure miMakeBackupClick(Sender: TObject);
     procedure miBatchImportSubtitlesClick(Sender: TObject);
+    procedure lbFilesListContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure miBrowseDirectoryClick(Sender: TObject);
+    procedure miLocateOnDiskClick(Sender: TObject);
+    procedure miFilePropertiesClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -182,6 +192,7 @@ type
     procedure RefreshSubtitleSelection;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetAutoSave(const Value: Boolean);
+    procedure SetControlsStateDirectoryOperations(State: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
     procedure SetDebugLogVisible(const Value: Boolean);
@@ -192,6 +203,7 @@ type
     procedure SetSelectedSubtitle(const Value: string);
     procedure SetSelectedDirectory(const Value: TFileName);
     procedure SetStatusText(const Value: string);
+    function GetSelectedFileName: TFileName;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
@@ -212,6 +224,7 @@ type
       write SetPreviewerVisible;
     property SelectedDirectory: TFileName read GetSelectedDirectory write
       SetSelectedDirectory;
+    property SelectedFileName: TFileName read GetSelectedFileName;
     property SelectedFileIndex: Integer read fSelectedFileIndex
       write fSelectedFileIndex;
     property SelectedSubtitle: string read GetSelectedSubtitle
@@ -345,6 +358,7 @@ end;
 procedure TfrmMain.DirectoryScannerCompleted(Sender: TObject; Canceled: Boolean;
   ValidFiles, TotalFiles: Integer);
 begin
+  SetControlsStateDirectoryOperations(True);
   if Canceled then
     Debug.AddLine(ltInformation, 'Directory scanning canceled!')
   else begin
@@ -369,7 +383,9 @@ begin
   Clear;
   FilesListClear;
   StatusText := 'Scanning directory... please wait.';
+
   SelectedDirectory := SRFDirectoryScanner.SourceDirectory;
+  
   Debug.AddLine(ltInformation, 'Scanning directory "'
     + SelectedDirectory + '"...');
 end;
@@ -399,6 +415,11 @@ begin
     end;
 end;
 
+procedure TfrmMain.miFilePropertiesClick(Sender: TObject);
+begin
+  ShellOpenPropertiesDialog(SelectedFileName);
+end;
+
 procedure TfrmMain.miImportSubtitlesClick(Sender: TObject);
 var
   Buf: string;
@@ -417,6 +438,12 @@ begin
       LoadFile;
       StatusText := '';
     end;
+end;
+
+procedure TfrmMain.miLocateOnDiskClick(Sender: TObject);
+begin
+  if SelectedFileName <> '' then
+    LocateFileOnDisk(SelectedFileName);
 end;
 
 procedure TfrmMain.miMakeBackupClick(Sender: TObject);
@@ -462,6 +489,7 @@ begin
 
   // Initialize the application
   Clear;
+  SetControlsStateDirectoryOperations(False);
 
   SelectedDirectory := '';
   BatchPreviousSelectedDirectory := GetApplicationDirectory;
@@ -618,16 +646,25 @@ end;
 
 procedure TfrmMain.FilesListRemove(const ItemIndex: Integer);
 begin
-  // Delete from Files list
-  WorkingFilesList[SelectedFileIndex].Remove;
+  if (ItemIndex >= 0) and (ItemIndex < WorkingFilesList.Count)  then begin
+    // Delete from Files list
+    WorkingFilesList[SelectedFileIndex].Remove;
 
-  // Delete from UI
-  lbFilesList.Items.Delete(SelectedFileIndex);
+    // Delete from UI
+    lbFilesList.Items.Delete(SelectedFileIndex);
+  end;
 end;
 
 function TfrmMain.GetSelectedDirectory: TFileName;
 begin
   Result := eSelectedDirectory.Text;
+end;
+
+function TfrmMain.GetSelectedFileName: TFileName;
+begin
+  Result := '';
+  if SelectedFileIndex <> -1 then
+    Result := WorkingFilesList[SelectedFileIndex].FileName;
 end;
 
 function TfrmMain.GetSelectedSubtitle: string;
@@ -681,6 +718,13 @@ end;
 function TfrmMain.IsSubtitleSelected: Boolean;
 begin
   Result := Assigned(fSelectedSubtitle);
+end;
+
+procedure TfrmMain.lbFilesListContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  // Enable right-click selection
+  DoRightClickSelection;
 end;
 
 procedure TfrmMain.lbFilesListKeyUp(Sender: TObject; var Key: Word;
@@ -768,7 +812,7 @@ begin
           repeat
             ListItem.SubItems.Add('');
             Inc(j);
-          until j = 3;
+          until j = 2;
         end;
 
         // Updating the current item with the new values
@@ -820,7 +864,7 @@ begin
     Sleep(10);
     Application.ProcessMessages;
     SaveFileOnDemand(False);
-    LoadFile(WorkingFilesList[i].FileName);
+    LoadFile(SelectedFileName);
   end;
 end;
 
@@ -858,6 +902,11 @@ begin
       end;
 end;
 
+procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
+begin
+  OpenWindowsExplorer(SelectedDirectory);
+end;
+
 procedure TfrmMain.miCharsetClick(Sender: TObject);
 begin
   DecodeSubtitles := not DecodeSubtitles;
@@ -869,6 +918,7 @@ begin
     Clear;
     FilesListClear;
     Debug.AddLine(ltInformation, 'All files were closed.');
+    SetControlsStateDirectoryOperations(False);
   end;
 end;
 
@@ -876,6 +926,8 @@ procedure TfrmMain.miCloseClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   Clear;
+  Debug.AddLine(ltInformation, 'File "' + SelectedFileName
+    + '" successfully closed.');
   FilesListRemove(SelectedFileIndex);
   SelectedFileIndex := -1;
 end;
@@ -891,10 +943,24 @@ begin
 end;
 
 procedure TfrmMain.miOpenFilesClick(Sender: TObject);
+var
+  i: Integer;
+  Dir: TFileName;
+
 begin
   with odOpen do
-    if Execute then
-      LoadFile(FileName);
+    if Execute then begin
+      Clear;
+      FilesListClear;
+      Dir := '';
+      for i := 0 to Files.Count - 1 do
+        FilesListAdd(Files[i]);
+      if WorkingFilesList.Count > 0 then begin
+        SelectedDirectory := WorkingFilesList[0].ExtractedPath;
+        SetControlsStateDirectoryOperations(True);
+        Debug.AddLine(ltInformation, 'Files sucessfully opened from the directory.');
+      end;
+    end;
 end;
 
 procedure TfrmMain.miPreviewClick(Sender: TObject);
@@ -1014,9 +1080,24 @@ begin
   miAutoSave.Checked := Value;
 end;
 
+procedure TfrmMain.SetControlsStateDirectoryOperations(State: Boolean);
+var
+  CanEnable: Boolean;
+
+begin
+  CanEnable := State and (WorkingFilesList.Count > 0);
+  miCloseAll.Enabled := CanEnable;
+  miBatchImportSubtitles.Enabled := CanEnable;
+  tbBatchImportSubtitles.Enabled := CanEnable;
+  miBatchExportSubtitles.Enabled := CanEnable;
+  tbBatchExportSubtitles.Enabled := CanEnable;
+  miBrowseDirectory.Enabled := State;
+end;
+
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
 begin
   miClose.Enabled := State;
+  miClose2.Enabled := State;
   miImportSubtitles.Enabled := State;
   miImportSubtitles2.Enabled := State;
   tbImportSubtitles.Enabled := State;
@@ -1025,6 +1106,8 @@ begin
   tbExportSubtitles.Enabled := State;
   miReload.Enabled := State;
   tbReload.Enabled := State;
+  miLocateOnDisk.Enabled := State;
+  miFileProperties.Enabled := State;
 end;
 
 procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);

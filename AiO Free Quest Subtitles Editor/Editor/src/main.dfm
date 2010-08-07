@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Title Generated > // Free Quest Editor'
-  ClientHeight = 496
+  ClientHeight = 536
   ClientWidth = 572
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -27,7 +27,7 @@ object frmMain: TfrmMain
     Left = 3
     Top = 3
     Width = 148
-    Height = 367
+    Height = 407
     Margins.Right = 0
     Align = alLeft
     Caption = ' Files list: '
@@ -36,11 +36,12 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 0
+    ExplicitHeight = 367
     object lbFilesList: TListBox
       Left = 4
       Top = 17
       Width = 140
-      Height = 319
+      Height = 359
       Align = alClient
       ItemHeight = 13
       PopupMenu = pmFilesList
@@ -49,15 +50,17 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnDblClick = lbFilesListDblClick
       OnKeyPress = lbFilesListKeyPress
+      ExplicitHeight = 319
     end
     object Panel2: TPanel
       Left = 4
-      Top = 336
+      Top = 376
       Width = 140
       Height = 27
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitTop = 336
       DesignSize = (
         140
         27)
@@ -87,40 +90,45 @@ object frmMain: TfrmMain
     Left = 154
     Top = 3
     Width = 415
-    Height = 367
+    Height = 407
     ActivePage = tsEditor
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
+    ExplicitHeight = 367
     object tsEditor: TTabSheet
       Caption = '&Editor'
+      ExplicitHeight = 339
       DesignSize = (
         407
-        339)
+        379)
       object Label4: TLabel
         Left = 146
-        Top = 319
+        Top = 359
         Width = 91
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Second line length:'
+        ExplicitTop = 319
       end
       object Label3: TLabel
         Left = 8
-        Top = 320
+        Top = 360
         Width = 77
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'First line length:'
+        ExplicitTop = 320
       end
       object Label2: TLabel
         Left = 8
-        Top = 290
+        Top = 330
         Width = 65
         Height = 13
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
         Caption = 'New text:'
+        ExplicitTop = 290
       end
       object Label1: TLabel
         Left = 8
@@ -131,11 +139,12 @@ object frmMain: TfrmMain
       end
       object Label8: TLabel
         Left = 288
-        Top = 319
+        Top = 359
         Width = 75
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = 'Subtitles count:'
+        ExplicitTop = 319
       end
       object Label6: TLabel
         Left = 173
@@ -148,12 +157,13 @@ object frmMain: TfrmMain
       end
       object lOldText: TLabel
         Left = 8
-        Top = 248
+        Top = 288
         Width = 86
         Height = 13
         Anchors = [akLeft, akRight, akBottom]
         AutoSize = False
         Caption = '<Generated>'
+        ExplicitTop = 248
       end
       object lGender: TLabel
         Left = 8
@@ -180,7 +190,7 @@ object frmMain: TfrmMain
       end
       object eSecondLineLength: TEdit
         Left = 246
-        Top = 316
+        Top = 356
         Width = 30
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -188,10 +198,11 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 0
         Text = '0'
+        ExplicitTop = 316
       end
       object eFirstLineLength: TEdit
         Left = 104
-        Top = 316
+        Top = 356
         Width = 30
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -199,10 +210,11 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 1
         Text = '0'
+        ExplicitTop = 316
       end
       object mSubText: TMemo
         Left = 104
-        Top = 276
+        Top = 316
         Width = 300
         Height = 37
         Anchors = [akLeft, akRight, akBottom]
@@ -212,10 +224,11 @@ object frmMain: TfrmMain
         MaxLength = 90
         TabOrder = 2
         OnChange = mSubTextChange
+        ExplicitTop = 276
       end
       object eSubCount: TEdit
         Left = 368
-        Top = 316
+        Top = 356
         Width = 36
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -223,6 +236,7 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 3
         Text = '100'
+        ExplicitTop = 316
       end
       object eCharID: TEdit
         Left = 230
@@ -238,7 +252,7 @@ object frmMain: TfrmMain
         Left = 104
         Top = 104
         Width = 300
-        Height = 129
+        Height = 169
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
           item
@@ -267,10 +281,11 @@ object frmMain: TfrmMain
           end
           item
           end>
+        ExplicitHeight = 129
       end
       object mOldSubEd: TMemo
         Left = 104
-        Top = 236
+        Top = 276
         Width = 300
         Height = 37
         Anchors = [akLeft, akRight, akBottom]
@@ -281,6 +296,7 @@ object frmMain: TfrmMain
         MaxLength = 90
         ReadOnly = True
         TabOrder = 6
+        ExplicitTop = 236
       end
       object rbMale: TRadioButton
         Left = 164
@@ -397,39 +413,38 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 359
       DesignSize = (
         407
-        339)
+        379)
       object GroupBox2: TGroupBox
         Left = 3
         Top = 3
         Width = 401
-        Height = 202
+        Height = 242
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = ' Global-Translation available strings : '
         TabOrder = 0
+        ExplicitHeight = 222
         DesignSize = (
           401
-          202)
+          242)
         object bMTClear: TButton
           Left = 316
-          Top = 174
+          Top = 214
           Width = 80
           Height = 25
           Anchors = [akRight, akBottom]
           Caption = 'Clear...'
           TabOrder = 0
           OnClick = bMTClearClick
+          ExplicitTop = 174
         end
         object tvMultiSubs: TTreeView
           Left = 8
           Top = 16
           Width = 387
-          Height = 157
+          Height = 197
           Anchors = [akLeft, akTop, akRight, akBottom]
           Images = ilMultiSubs
           Indent = 19
@@ -440,31 +455,34 @@ object frmMain: TfrmMain
           OnClick = tvMultiSubsClick
           OnContextPopup = tvMultiSubsContextPopup
           OnKeyUp = tvMultiSubsKeyUp
+          ExplicitHeight = 177
         end
         object bMTExpandAll: TButton
           Left = 156
-          Top = 174
+          Top = 214
           Width = 80
           Height = 25
           Anchors = [akRight, akBottom]
           Caption = 'Expand all'
           TabOrder = 2
           OnClick = bMTExpandAllClick
+          ExplicitTop = 174
         end
         object bMTCollapseAll: TButton
           Left = 236
-          Top = 174
+          Top = 214
           Width = 80
           Height = 25
           Anchors = [akRight, akBottom]
           Caption = 'Collapse all'
           TabOrder = 3
           OnClick = bMTCollapseAllClick
+          ExplicitTop = 174
         end
       end
       object GroupBox4: TGroupBox
         Left = 3
-        Top = 208
+        Top = 248
         Width = 401
         Height = 129
         Margins.Left = 0
@@ -474,6 +492,7 @@ object frmMain: TfrmMain
         Anchors = [akLeft, akRight, akBottom]
         Caption = ' Replace the string with : '
         TabOrder = 1
+        ExplicitTop = 228
         DesignSize = (
           401
           129)
@@ -564,20 +583,21 @@ object frmMain: TfrmMain
       end
       object bMTRetrieveSubs: TButton
         Left = 78
-        Top = 177
+        Top = 217
         Width = 80
         Height = 25
         Anchors = [akRight, akBottom]
         Caption = 'Retrieve...'
         TabOrder = 2
         OnClick = bMTRetrieveSubsClick
+        ExplicitTop = 177
       end
     end
   end
   object gbDebug: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 373
+    Top = 413
     Width = 566
     Height = 101
     Margins.Top = 0
@@ -588,6 +608,7 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 2
+    ExplicitTop = 373
     object mDebug: TMemo
       Left = 4
       Top = 16
@@ -602,7 +623,7 @@ object frmMain: TfrmMain
   end
   object sb: TStatusBar
     Left = 0
-    Top = 477
+    Top = 517
     Width = 572
     Height = 19
     Panels = <
@@ -618,6 +639,7 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
+    ExplicitTop = 477
   end
   object MainMenu: TMainMenu
     Left = 80
