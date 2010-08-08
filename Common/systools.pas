@@ -30,6 +30,7 @@ function CopyFile(SourceFileName, DestFileName: TFileName;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
+function ExtractDirectoryName(const FullDirectoryPath: TFileName): TFileName;
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
@@ -713,6 +714,13 @@ begin
     pvXbox:
       Result := 'Xbox';
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function ExtractDirectoryName(const FullDirectoryPath: TFileName): TFileName;
+begin
+  Result := ExtremeRight('\', Copy(FullDirectoryPath, 1, Length(FullDirectoryPath)-1))
 end;
 
 //------------------------------------------------------------------------------

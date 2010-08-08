@@ -5,7 +5,20 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
-___| Version 2.0: 2010-08-?? |__________________________________________________
+___| Version 2.0: 2010-08-08 |__________________________________________________
+
+********************************************************************************
+** BEWARE !!!                                                                 **
+**                                                                            **
+** This application was rewritten at 100% and it should be compatible with    **
+** old SRF files hacked by the v1.4a, but I recommand you to export all your  **
+** v1.4a SRF files to the XML format, and import in this new version using    **
+** original SRF files.                                                        **
+**                                                                            **
+** I'M NOT RESPONSIBLE IF YOU LOSE DATA BY USING THIS NEW VERSION. IN FACT,   **
+** THE HACKING ALGORITHM IMPLEMENTED IN THIS NEW VERSION IS THE RIGHT ONE.    **
+**                                                                            **
+********************************************************************************
 
 ADDED:
 - The directory scanner function is now powerful and shared with other tools.
@@ -16,6 +29,7 @@ ADDED:
 FIXED:
 - The application was written at 100%. The hacking algorithm is now properly
   implemented (everything is managed, like padding blocks, and more).
+- New fast memory manager.
 - The Debug Log can be closed now by hitting the Escape Key. Same for the 
   Previewer.
 - The "AiO" (All-in-One) mention was removed from application title.

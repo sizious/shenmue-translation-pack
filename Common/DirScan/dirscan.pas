@@ -287,6 +287,9 @@ begin
 end;
 
 function TDirectoryScanner.Execute(const QuerySourceDirectory: Boolean): Boolean;
+var
+  StartAllowed: Boolean;
+
 begin
   Result := False;
   if not Active then begin
@@ -295,8 +298,11 @@ begin
     KillThread;
     fScannerThread := TDirectoryScannerThread.Create;
 
-    // Show the UI
-    if QuerySourceDirectory and ShowQueryDialog then begin
+    // Show the UI if needed
+    StartAllowed := (QuerySourceDirectory and ShowQueryDialog) or (not QuerySourceDirectory);    
+
+    // Starting the process
+    if StartAllowed then begin
 
       // Initializing parameters
       with ScannerThread do begin
@@ -379,6 +385,9 @@ begin
       FindClose(SR); // Must free up resources used by these successful finds
     end;
     fMaxValue := SL.Count;
+
+    // Sort files list
+    SL.Sort;
 
 {$IFDEF DEBUG}
   WriteLn('Files count: ', fMaxValue);

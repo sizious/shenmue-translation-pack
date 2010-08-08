@@ -99,10 +99,22 @@ type
     ToolButton6: TToolButton;
     tbMakeBackup: TToolButton;
     N10: TMenuItem;
-    miBrowseDirectory: TMenuItem;
-    miLocateOnDisk: TMenuItem;
+    miBrowseDirectory2: TMenuItem;
+    miLocateOnDisk2: TMenuItem;
     N11: TMenuItem;
+    miFileProperties2: TMenuItem;
+    miCloseAll2: TMenuItem;
+    miExportFilesList2: TMenuItem;
+    miRefreshFilesList2: TMenuItem;
+    miReload2: TMenuItem;
+    N12: TMenuItem;
+    miLocateOnDisk: TMenuItem;
+    miBrowseDirectory: TMenuItem;
+    miRefreshFilesList: TMenuItem;
+    miExportFilesList: TMenuItem;
     miFileProperties: TMenuItem;
+    N14: TMenuItem;
+    sdExportFilesList: TSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -142,9 +154,11 @@ type
     procedure miBatchImportSubtitlesClick(Sender: TObject);
     procedure lbFilesListContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
-    procedure miBrowseDirectoryClick(Sender: TObject);
     procedure miLocateOnDiskClick(Sender: TObject);
+    procedure miBrowseDirectoryClick(Sender: TObject);
     procedure miFilePropertiesClick(Sender: TObject);
+    procedure miRefreshFilesListClick(Sender: TObject);
+    procedure miExportFilesListClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -159,6 +173,10 @@ type
     fBatchExportPreviousSelectedDirectory: TFileName;
     fAutoSave: Boolean;
     fMakeBackup: Boolean;
+    fCharsetFileShenmue2: TFileName;
+    fCharsetFileShenmue: TFileName;
+    fCharsetCanEnableShenmue2: Boolean;
+    fCharsetCanEnableShenmue: Boolean;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -183,15 +201,18 @@ type
     procedure InitBugsHandler;
     procedure InitDebugLog;
     procedure InitPreviewer;
-    procedure LoadFile; overload;
-    procedure LoadFile(FileName: TFileName); overload;
+    procedure LoadFile(FileName: TFileName);
     procedure LoadSelectedFile;
+    procedure LoadShenmueCharset;
     procedure ModulesFree;
     procedure ModulesInit;    
     procedure PreviewerWindowClosed(Sender: TObject);
+    function PromptImportConfirmation: Boolean;
     procedure RefreshSubtitleSelection;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetAutoSave(const Value: Boolean);
+    procedure SetControlsStateCharsetOperations(State: Boolean);
+    procedure SetControlsStateCharsetOperationsChecked(Checked: Boolean);
     procedure SetControlsStateDirectoryOperations(State: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
@@ -204,6 +225,13 @@ type
     procedure SetSelectedDirectory(const Value: TFileName);
     procedure SetStatusText(const Value: string);
     function GetSelectedFileName: TFileName;
+    function GetSelectedFileEntry: TFileEntry;
+    property CharsetCanEnableShenmue: Boolean read fCharsetCanEnableShenmue;
+    property CharsetCanEnableShenmue2: Boolean read fCharsetCanEnableShenmue2;
+    property CharsetFileShenmue: TFileName read fCharsetFileShenmue
+      write fCharsetFileShenmue;
+    property CharsetFileShenmue2: TFileName read fCharsetFileShenmue2
+      write fCharsetFileShenmue2;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
@@ -224,6 +252,7 @@ type
       write SetPreviewerVisible;
     property SelectedDirectory: TFileName read GetSelectedDirectory write
       SetSelectedDirectory;
+    property SelectedFileEntry: TFileEntry read GetSelectedFileEntry;
     property SelectedFileName: TFileName read GetSelectedFileName;
     property SelectedFileIndex: Integer read fSelectedFileIndex
       write fSelectedFileIndex;
@@ -395,23 +424,35 @@ begin
 {$IFDEF DEBUG}  raise Exception.Create('TEST EXCEPTION'); {$ENDIF}
 end;
 
+procedure TfrmMain.miExportFilesListClick(Sender: TObject);
+begin
+  with sdExportFilesList do begin
+    FileName := ExtractDirectoryName(SelectedDirectory) + '_FilesList';
+    if Execute then
+      WorkingFilesList.SaveToFile(FileName);
+  end;
+end;
+
 procedure TfrmMain.miExportSubtitlesClick(Sender: TObject);
 var
   Buf: string;
 
 begin
-  with sdExport do
-    if Execute then begin
-      Buf := ' subtitles from "' + SRFEditor.SourceFileName + '" to "'
-        + FileName + '"';
+  if SaveFileOnDemand(True) then
+    with sdExport do begin
+      FileName := SelectedFileEntry.ExtractedFileName('');
+      if Execute then begin
+        Buf := ' subtitles from "' + SRFEditor.SourceFileName + '" to "'
+          + FileName + '"';
 
-      StatusText := 'Exporting...';
-      if SRFEditor.Subtitles.ExportToFile(FileName) then
-        Debug.AddLine(ltInformation, 'Successfully exported' + Buf + '.')
-      else
-        Debug.AddLine(ltWarning, 'Failed when exporting' + Buf + ' !');
-      LoadFile;
-      StatusText := '';
+        StatusText := 'Exporting...';
+        if SRFEditor.Subtitles.ExportToFile(FileName) then
+          Debug.AddLine(ltInformation, 'Successfully exported' + Buf + '.')
+        else
+          Debug.AddLine(ltWarning, 'Failed when exporting' + Buf + ' !');
+        ReloadFile;
+        StatusText := '';
+      end;
     end;
 end;
 
@@ -425,18 +466,24 @@ var
   Buf: string;
 
 begin
-  with odImport do
-    if Execute then begin
-      Buf := ' subtitles from "' + FileName + '" into "'
-        + SRFEditor.SourceFileName + '"';
+  if PromptImportConfirmation then  
+    with odImport do begin
+      FileName := SelectedFileEntry.ExtractedFileName('');
+      if Execute then begin
+        Buf := ' subtitles from "' + FileName + '" into "'
+          + SRFEditor.SourceFileName + '"';
 
-      StatusText := 'Importing...';
-      if SRFEditor.Subtitles.ImportFromFile(FileName) then
-        Debug.AddLine(ltInformation, 'Successfully imported' + Buf + '.')
-      else
-        Debug.AddLine(ltWarning, 'Failed when importing' + Buf + ' !');
-      LoadFile;
-      StatusText := '';
+        StatusText := 'Importing...';
+        if SRFEditor.Subtitles.ImportFromFile(FileName) then begin
+          SRFEditor.Save; // sauvegarde du fichier importé        
+          Debug.AddLine(ltInformation, 'Successfully imported' + Buf + '.')
+        end else
+          Debug.Report(ltWarning, 'Import failed. The imported file is ' +
+            'incorrect for the current entry !',
+            'Import file structure mismatch when importing' + Buf + ' !');
+        ReloadFile;
+        StatusText := '';
+      end;
     end;
 end;
 
@@ -475,6 +522,7 @@ begin
 
   // Init UI
   Caption := Application.Title + ' v' + GetApplicationVersion;
+  Application.Title := Caption;
   ToolBarInitControl(Self, tbMain);
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
@@ -483,7 +531,14 @@ begin
   CopyMenuItem(miImportSubtitles, miImportSubtitles2);
   CopyMenuItem(miExportSubtitles, miExportSubtitles2);
   CopyMenuItem(miClose, miClose2);
-
+  CopyMenuItem(miBrowseDirectory, miBrowseDirectory2);
+  CopyMenuItem(miLocateOnDisk, miLocateOnDisk2);
+  CopyMenuItem(miReload, miReload2);
+  CopyMenuItem(miExportFilesList, miExportFilesList2);
+  CopyMenuItem(miRefreshFilesList, miRefreshFilesList2);
+  CopyMenuItem(miFileProperties, miFileProperties2);
+  CopyMenuItem(miCloseAll, miCloseAll2);
+  
   // Init Modules
   ModulesInit;
 
@@ -544,8 +599,16 @@ begin
 end;
 
 procedure TfrmMain.ModulesInit;
-var
-  CharsetFile: TFileName;
+
+  function CheckCharsetExists(FileName: TFileName; Version: TSRFGameVersion): Boolean;
+  begin
+    Result := FileExists(FileName);
+    if not Result then
+      Debug.Report(ltWarning, 'Sorry, the ' + SRFGameVersionToString(Version)
+        + ' Charset list wasn''t found! The '
+        + 'Shenmue Decode subtitle function won''t be available.',
+        'FileName: "' + FileName + '".');
+  end;
 
 begin
   // Init Bugs Handler
@@ -560,17 +623,12 @@ begin
   // Init NBIK Sequence Editor
   SRFEditor := TSRFEditor.Create;
 
-  // Load Charset
-  CharsetFile := GetApplicationDataDirectory + 'chrlist1.csv';
-  if FileExists(CharsetFile) then
-    DecodeSubtitles := SRFEditor.Charset.LoadFromFile(CharsetFile)
-  else begin
-    tbCharset.Enabled := False;
-    miCharset.Enabled := False;
-    Debug.Report(ltWarning, 'Sorry, the Charset list wasn''t found! The ' +
-      'Shenmue Decode subtitle function won''t be available.',
-      'FileName: "' + CharsetFile + '".');
-  end;
+  // Prepare Charset Functionality
+  CharsetFileShenmue := GetApplicationDataDirectory + 'chrlist1.csv';
+  fCharsetCanEnableShenmue := CheckCharsetExists(CharsetFileShenmue, sgvShenmue);
+  CharsetFileShenmue2 := GetapplicationDataDirectory + 'chrlist2.csv';
+  fCharsetCanEnableShenmue2 := CheckCharsetExists(CharsetFileShenmue2, sgvShenmue2);
+  DecodeSubtitles := CharsetCanEnableShenmue or CharsetCanEnableShenmue2;
 
   // Init the Previewer
   InitPreviewer;
@@ -596,6 +654,9 @@ begin
 
   // Creating the Batch Subtitles Exporter
   BatchExporter := TBatchSubtitlesExporter.Create;
+
+  // Init Auto Save
+  AutoSave := True;
 end;
 
 function TfrmMain.MsgBox(Text, Caption: string; Flags: Integer): Integer;
@@ -613,6 +674,20 @@ begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
+function TfrmMain.PromptImportConfirmation: Boolean;
+var
+  CanDo: Integer;
+
+begin
+  Result := True;
+  if FileModified then begin
+    CanDo := MsgBox('Are you sure to import subtitles on a modified file ?'
+      + WrapStr + 'Current modifications will be lost!', 'Warning',
+      MB_ICONWARNING + MB_DEFBUTTON2 + MB_YESNO);
+    Result := CanDo = IDYES;
+  end;
+end;
+
 procedure TfrmMain.RefreshSubtitleSelection;
 begin
   if IsSubtitleSelected then
@@ -622,7 +697,7 @@ end;
 procedure TfrmMain.ReloadFile;
 begin
   if SRFEditor.Loaded then begin
-    LoadFile(SRFEditor.SourceFileName);
+    LoadFile(SelectedFileName);
     Debug.AddLine(ltInformation, 'Successfully reloaded the file "'
       + SRFEditor.SourceFileName + '".');
   end;
@@ -660,11 +735,18 @@ begin
   Result := eSelectedDirectory.Text;
 end;
 
+function TfrmMain.GetSelectedFileEntry: TFileEntry;
+begin
+  Result := nil;
+  if SelectedFileIndex <> -1 then
+    Result := WorkingFilesList[SelectedFileIndex];
+end;
+
 function TfrmMain.GetSelectedFileName: TFileName;
 begin
   Result := '';
-  if SelectedFileIndex <> -1 then
-    Result := WorkingFilesList[SelectedFileIndex].FileName;
+  if Assigned(SelectedFileEntry) then
+    Result := SelectedFileEntry.FileName;
 end;
 
 function TfrmMain.GetSelectedSubtitle: string;
@@ -788,6 +870,9 @@ begin
   // Loading the file
   if SRFEditor.LoadFromFile(FileName) then begin
 
+    // Load Charset
+    LoadShenmueCharset;
+
     // Filling the UI with the content
     if SRFEditor.Loaded then begin
 
@@ -848,11 +933,6 @@ begin
   StatusText := '';
 end;
 
-procedure TfrmMain.LoadFile;
-begin
-  LoadFile(SRFEditor.SourceFileName);
-end;
-
 procedure TfrmMain.LoadSelectedFile;
 var
   i: Integer;
@@ -866,6 +946,37 @@ begin
     SaveFileOnDemand(False);
     LoadFile(SelectedFileName);
   end;
+end;
+
+procedure TfrmMain.LoadShenmueCharset;
+var
+  CharsetFile: TFileName;
+  CharsetCanEnable: Boolean;
+
+begin
+  CharsetCanEnable := False;
+  CharsetFile := '';
+  
+  // Determine the right charset to use
+  case SRFEditor.GameVersion of
+    sgvShenmue:
+      begin
+        CharsetFile := CharsetFileShenmue;
+        CharsetCanEnable := CharsetCanEnableShenmue;
+      end;
+    sgvShenmue2:
+      begin
+        CharsetFile := CharsetFileShenmue2;
+        CharsetCanEnable := CharsetCanEnableShenmue2;
+      end;
+  end;
+
+  // Change the buttons state
+  SetControlsStateCharsetOperations(CharsetCanEnable);
+
+  // Apply the charset
+  if CharsetCanEnable then
+    SRFEditor.Charset.LoadFromFile(CharsetFile)
 end;
 
 procedure TfrmMain.miAboutClick(Sender: TObject);
@@ -891,15 +1002,20 @@ begin
 end;
 
 procedure TfrmMain.miBatchImportSubtitlesClick(Sender: TObject);
+var
+  MassImport: TfrmMassImport;
+
 begin
-  if SaveFileOnDemand(True) then
-    with TfrmMassImport.Create(Application) do
+  if PromptImportConfirmation then begin
+    MassImport := TfrmMassImport.Create(Application);
+    with MassImport do
       try
         SourceDirectory := BatchPreviousSelectedDirectory;
         ShowModal;
       finally
         Free;
       end;
+  end;
 end;
 
 procedure TfrmMain.miBrowseDirectoryClick(Sender: TObject);
@@ -939,7 +1055,8 @@ end;
 
 procedure TfrmMain.miOpenClick(Sender: TObject);
 begin
-  SRFDirectoryScanner.Execute(True);
+  if SaveFileOnDemand(False) then  
+    SRFDirectoryScanner.Execute(True);
 end;
 
 procedure TfrmMain.miOpenFilesClick(Sender: TObject);
@@ -948,19 +1065,20 @@ var
   Dir: TFileName;
 
 begin
-  with odOpen do
-    if Execute then begin
-      Clear;
-      FilesListClear;
-      Dir := '';
-      for i := 0 to Files.Count - 1 do
-        FilesListAdd(Files[i]);
-      if WorkingFilesList.Count > 0 then begin
-        SelectedDirectory := WorkingFilesList[0].ExtractedPath;
-        SetControlsStateDirectoryOperations(True);
-        Debug.AddLine(ltInformation, 'Files sucessfully opened from the directory.');
+  if SaveFileOnDemand(False) then
+    with odOpen do
+      if Execute then begin
+        Clear;
+        FilesListClear;
+        Dir := '';
+        for i := 0 to Files.Count - 1 do
+          FilesListAdd(Files[i]);
+        if WorkingFilesList.Count > 0 then begin
+          SelectedDirectory := WorkingFilesList[0].ExtractedPath;
+          SetControlsStateDirectoryOperations(True);
+          Debug.AddLine(ltInformation, 'Files sucessfully opened from the directory.');
+        end;
       end;
-    end;
 end;
 
 procedure TfrmMain.miPreviewClick(Sender: TObject);
@@ -971,6 +1089,14 @@ end;
 procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmMain.miRefreshFilesListClick(Sender: TObject);
+begin
+  if DirectoryExists(SelectedDirectory) then begin
+    SRFDirectoryScanner.SourceDirectory := SelectedDirectory;
+    SRFDirectoryScanner.Execute;
+  end;
 end;
 
 procedure TfrmMain.miReloadClick(Sender: TObject);
@@ -1015,13 +1141,13 @@ begin
   StatusText := 'Saving file...';
   if SRFEditor.Save then
     Debug.AddLine(ltInformation, Format('Save successfully done on the ' +
-      'disk for "%s".', [SRFEditor.SourceFileName])
+      'disk for "%s".', [SelectedFileName])
     )
   else
     Debug.Report(ltWarning, 'Unable to save the file on the disk!',
-      Format('Unable to save on disk for "%s".', [SRFEditor.SourceFileName])
+      Format('Unable to save on disk for "%s".', [SelectedFileName])
     );
-  LoadFile(SRFEditor.SourceFileName);
+  LoadFile(SelectedFileName);
 end;
 
 procedure TfrmMain.mNewSubChange(Sender: TObject);
@@ -1080,6 +1206,20 @@ begin
   miAutoSave.Checked := Value;
 end;
 
+procedure TfrmMain.SetControlsStateCharsetOperations(State: Boolean);
+begin
+  tbCharset.Enabled := State;
+  miCharset.Enabled := tbCharset.Enabled;
+  SetControlsStateCharsetOperationsChecked(State and DecodeSubtitles);
+  SRFEditor.Subtitles.DecodeText := State and DecodeSubtitles;
+end;
+
+procedure TfrmMain.SetControlsStateCharsetOperationsChecked(Checked: Boolean);
+begin
+  tbCharset.Down := Checked;
+  miCharset.Checked := Checked;
+end;
+
 procedure TfrmMain.SetControlsStateDirectoryOperations(State: Boolean);
 var
   CanEnable: Boolean;
@@ -1087,11 +1227,15 @@ var
 begin
   CanEnable := State and (WorkingFilesList.Count > 0);
   miCloseAll.Enabled := CanEnable;
+  miCloseAll2.Enabled := CanEnable;
   miBatchImportSubtitles.Enabled := CanEnable;
   tbBatchImportSubtitles.Enabled := CanEnable;
   miBatchExportSubtitles.Enabled := CanEnable;
   tbBatchExportSubtitles.Enabled := CanEnable;
   miBrowseDirectory.Enabled := State;
+  miBrowseDirectory2.Enabled := State;
+  miExportFilesList.Enabled := CanEnable;
+  miExportFilesList2.Enabled := CanEnable;
 end;
 
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
@@ -1106,8 +1250,11 @@ begin
   tbExportSubtitles.Enabled := State;
   miReload.Enabled := State;
   tbReload.Enabled := State;
+  miReload2.Enabled := State;  
   miLocateOnDisk.Enabled := State;
+  miLocateOnDisk2.Enabled := State;
   miFileProperties.Enabled := State;
+  miFileProperties2.Enabled := State;
 end;
 
 procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);
@@ -1129,23 +1276,29 @@ var
 
 begin
   fDecodeSubtitles := Value;
-  tbCharset.Down := fDecodeSubtitles;
-  miCharset.Checked := fDecodeSubtitles;
 
-  // Update the SequenceEditor
-  SRFEditor.Subtitles.DecodeText := fDecodeSubtitles;
+  // Update the GUI options controls
+  SetControlsStateCharsetOperationsChecked(DecodeSubtitles);
 
-  // Update the GUI: ListView
-  for i := 0 to lvSubs.Items.Count - 1 do begin
-    ListItem := lvSubs.FindData(0, Pointer(i), True, False);
-    if Assigned(ListItem) then begin
-      ListItem.SubItems[SUBTITLES_COLUMN_INDEX] := BR(SRFEditor.Subtitles[i].Text);
+  // Update the SRF Editor
+  SRFEditor.Subtitles.DecodeText := DecodeSubtitles;
+
+  // Update the GUI
+  if SRFEditor.Loaded then begin
+
+    // ListView
+    for i := 0 to lvSubs.Items.Count - 1 do begin
+      ListItem := lvSubs.FindData(0, Pointer(i), True, False);
+      if Assigned(ListItem) then begin
+        ListItem.SubItems[SUBTITLES_COLUMN_INDEX] := BR(SRFEditor.Subtitles[i].Text);
+      end;
     end;
-  end;
 
-  // Update the GUI: Memos
-  mOldSub.Text := SRFEditor.Subtitles.TransformText(mOldSub.Text);
-  mNewSub.Text := SRFEditor.Subtitles.TransformText(mNewSub.Text);
+    // Memos
+    mOldSub.Text := SRFEditor.Subtitles.TransformText(mOldSub.Text);
+    mNewSub.Text := SRFEditor.Subtitles.TransformText(mNewSub.Text);
+
+  end;
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);
@@ -1180,7 +1333,13 @@ begin
 end;
 
 procedure TfrmMain.SetSelectedDirectory(const Value: TFileName);
+var
+  DirExists: Boolean;
+
 begin
+  DirExists := DirectoryExists(Value);
+  miRefreshFilesList.Enabled := DirExists;
+  miRefreshFilesList2.Enabled := DirExists;
   with eSelectedDirectory do begin
     Text := Value;
     Hint := Value;

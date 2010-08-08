@@ -100,6 +100,7 @@ type
   end;
 
 function DataBlockToString(D: TSRFDataBlock; ADataSize: LongWord): string;
+function SRFGameVersionToString(SRFGameVersion: TSRFGameVersion): string;
 
 implementation
 
@@ -127,6 +128,15 @@ type
     Size: LongWord;
     CharID: array[0..3] of Char;
   end;
+
+function SRFGameVersionToString(SRFGameVersion: TSRFGameVersion): string;
+begin
+  case SRFGameVersion of
+    sgvUndef: Result := '';
+    sgvShenmue: Result := 'Shenmue';
+    sgvShenmue2: Result := 'Shenmue II';
+  end;
+end;
 
 function DataBlockToString(D: TSRFDataBlock; ADataSize: LongWord): string;
 var
@@ -385,6 +395,8 @@ var
   XMLRoot: IXMLDocument;
   RootNode, Node: IXMLNode;
   i: Integer;
+  LegacyFormat, ValidImportFile: Boolean;
+  SubtitlesRoot: string;
 
   function GetInputFileEncoding: string;
   begin
@@ -414,9 +426,19 @@ begin
       XMLRoot.LoadFromFile(FileName);
 
       // Reading the root
-      if XMLRoot.DocumentElement.NodeName = 'srfeditor' then begin
+      LegacyFormat := (XMLRoot.DocumentElement.NodeName = 'subseditor');  // 1.x editor
+      ValidImportFile := LegacyFormat
+        or (XMLRoot.DocumentElement.NodeName = 'srfeditor');  // new editor!
+
+      // Legacy support
+      SubtitlesRoot := 'subtitles';
+      if LegacyFormat then
+        SubtitlesRoot := 'list';
+
+      // Reading XML tree
+      if ValidImportFile then begin
         // Subtitle list
-        RootNode := XMLRoot.DocumentElement.ChildNodes.FindNode('subtitles');
+        RootNode := XMLRoot.DocumentElement.ChildNodes.FindNode(SubtitlesRoot);
         Result := RootNode.Attributes['count'] = Count; // Check count
         if Result then
           for i := 0 to Count - 1 do begin

@@ -28,7 +28,8 @@ uses
   batchexe in '..\..\Common\batchexe.pas',
   subsexp in 'engine\subsexp.pas',
   massimp in 'massimp.pas' {frmMassImport},
-  subsimp in 'engine\subsimp.pas';
+  subsimp in 'engine\subsimp.pas',
+  warning in 'warning.pas' {frmWarning};
 
 {$R *.res}
 
@@ -45,12 +46,17 @@ begin
 {$ENDIF}
 
   Application.Initialize;
-  Application.MainFormOnTaskbar := False;
+  Application.MainFormOnTaskbar := False; // fix for the "hint" bug
   Application.Title := 'Shenmue Cinematics Subtitles Editor';
   InitConfiguration;
 
+  // Show migration Warning
+  ShowWarningOnDemand;
+
+  // Create forms
   Application.CreateForm(TfrmMain, frmMain);
-  {$IFDEF DEBUG}
+  
+{$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

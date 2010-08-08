@@ -53,6 +53,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     function IndexOf(const FileName: TFileName): Integer;
+    procedure SaveToFile(const FileName: TFileName);    
     function Remove(Index: Integer): Boolean;
     property Count: Integer read GetCount;
     property Files[Index: Integer]: TFileEntry read GetItem write SetItem; default;
@@ -175,6 +176,22 @@ begin
   Result := False;
   if (Index >= 0) and (Index < Count) then
     Result := Files[Index].Remove;
+end;
+
+procedure TFilesList.SaveToFile(const FileName: TFileName);
+var
+  SL: TStringList;
+  i: Integer;
+
+begin
+  SL := TStringList.Create;
+  try
+    for i := 0 to Count - 1 do
+      SL.Add(Files[i].FileName);
+    SL.SaveToFile(FileName);
+  finally
+    SL.Free;
+  end;
 end;
 
 procedure TFilesList.SetItem(Index: Integer; const Value: TFileEntry);

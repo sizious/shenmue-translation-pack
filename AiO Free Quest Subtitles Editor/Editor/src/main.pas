@@ -970,7 +970,7 @@ end;
 procedure TfrmMain.miExportFilesListClick(Sender: TObject);
 begin
   with sdMain do begin
-    FileName := ExtremeRight('\', Copy(SelectedDirectory, 1, Length(SelectedDirectory)-1)) + '_FilesList.txt';
+    FileName := ExtractDirectoryName(SelectedDirectory) + '_FilesList.txt';
     Title := 'Export files list to...';
     DefaultExt := 'txt';
     Filter := 'Text Files (*.txt)|*.txt';

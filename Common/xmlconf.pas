@@ -24,11 +24,13 @@ type
     constructor Create(const FileName: TFileName; const ConfigID: string);
     destructor Destroy; override;
     function ReadBool(const Section, Key: string; DefaultValue: Boolean): Boolean;
+    function ReadDirectoryPath(const Section, Key: string; DefaultValue: TFileName): TFileName;
     procedure ReadFormAttributes(Form: TForm); overload;
     procedure ReadFormAttributes(const Section: string; Form: TForm); overload;
     function ReadInteger(const Section, Key: string; DefaultValue: Integer): Integer;
     function ReadString(const Section, Key: string; DefaultValue: string): string;
     procedure WriteBool(const Section, Key: string; Value: Boolean);
+    procedure WriteDirectoryPath(const Section, Key: string; Value: TFileName);
     procedure WriteFormAttributes(Form: TForm); overload;
     procedure WriteFormAttributes(const Section: string; Form: TForm); overload;
     procedure WriteInteger(const Section, Key: string; Value: Integer);
@@ -124,6 +126,15 @@ begin
     Key, LowerCase(BoolToStr(DefaultValue, True))));
 end;
 
+function TXMLConfigurationFile.ReadDirectoryPath(const Section, Key: string;
+  DefaultValue: TFileName): TFileName;
+begin
+  Result := ReadString(Section, Key, '');
+  if not DirectoryExists(Result) then
+    Result := DefaultValue;
+  Result := IncludeTrailingPathDelimiter(Result);
+end;
+
 procedure TXMLConfigurationFile.ReadFormAttributes(const Section: string;
   Form: TForm);
 begin
@@ -170,6 +181,12 @@ end;
 procedure TXMLConfigurationFile.WriteBool(const Section, Key: string; Value: Boolean);
 begin
   WriteString(Section, Key, LowerCase(BoolToStr(Value, True)));
+end;
+
+procedure TXMLConfigurationFile.WriteDirectoryPath(const Section, Key: string;
+  Value: TFileName);
+begin
+  WriteString(Section, Key, IncludeTrailingPathDelimiter(Value));
 end;
 
 procedure TXMLConfigurationFile.WriteFormAttributes(const Section: string;

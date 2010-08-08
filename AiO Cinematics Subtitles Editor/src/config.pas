@@ -9,9 +9,11 @@ type
   EConfigurationNotInitialized = class(Exception);
   
 function Configuration: TXMLConfigurationFile;
-procedure InitConfiguration;
+procedure InitConfiguration; // called from dpr
+function IsMigrationWarningUnderstood: Boolean;
 procedure LoadConfig;
 procedure SaveConfig;
+procedure SetWarningUnderstood(const Agree: Boolean);
 
 //------------------------------------------------------------------------------
 implementation
@@ -54,9 +56,6 @@ end;
 //------------------------------------------------------------------------------
 
 procedure LoadConfig;
-var
-  S: string;
-
 begin
   with Configuration do begin
     with frmMain do begin
@@ -67,11 +66,12 @@ begin
       lvSubs.ColumnsOrder := ReadString('main', 'columns', lvSubs.ColumnsOrder);
       DecodeSubtitles := ReadBool('main', 'decodesubs', DecodeSubtitles);
       PreviewerVisible := ReadBool('main', 'preview', PreviewerVisible);
-      S := ReadString('main', 'batchexportdir', BatchPreviousSelectedDirectory);
-      if DirectoryExists(S) then
-        BatchPreviousSelectedDirectory := S;
+      BatchPreviousSelectedDirectory :=
+        ReadDirectoryPath('main', 'batchexportdir', GetApplicationDirectory);
       AutoSave := ReadBool('main', 'autosave', AutoSave);
       MakeBackup := ReadBool('main', 'makebackup', MakeBackup);
+      SelectedDirectory := ReadDirectoryPath('main', 'sourcedir',
+        GetApplicationDirectory);
     end; // frmMain
   end; // Configuration
 end;
@@ -86,11 +86,28 @@ begin
       WriteString('main', 'columns', lvSubs.ColumnsOrder);
       WriteBool('main', 'decodesubs', DecodeSubtitles);
       WriteBool('main', 'preview', PreviewerVisible);
-      WriteString('main', 'batchexportdir', BatchPreviousSelectedDirectory);
+      WriteDirectoryPath('main', 'batchexportdir', BatchPreviousSelectedDirectory);
       WriteBool('main', 'autosave', AutoSave);
       WriteBool('main', 'makebackup', MakeBackup);
+      WriteDirectoryPath('main', 'sourcedir', SelectedDirectory);
     end;
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function IsMigrationWarningUnderstood: Boolean;
+begin
+  with Configuration do
+    Result := ReadBool('main', 'warningdisplayed', False);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure SetWarningUnderstood(const Agree: Boolean);
+begin
+  with Configuration do
+    WriteBool('main', 'warningdisplayed', Agree);
 end;
 
 //------------------------------------------------------------------------------

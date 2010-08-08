@@ -69,8 +69,10 @@ begin
     if not FileExists(WorkFile) then
       Result := irNotFound
     else
-      if BatchSRF.Subtitles.ImportFromFile(WorkFile) then
+      if BatchSRF.Subtitles.ImportFromFile(WorkFile) then begin
         Result := irSuccess;
+        BatchSRF.Save;
+      end;
 
     // Event
     if Assigned(OnFileProceed) then
