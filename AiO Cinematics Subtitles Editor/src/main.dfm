@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Dynamic Title > // SRF Editor'
-  ClientHeight = 516
+  ClientHeight = 496
   ClientWidth = 572
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -24,7 +24,7 @@ object frmMain: TfrmMain
   TextHeight = 13
   object sbMain: TStatusBar
     Left = 0
-    Top = 497
+    Top = 477
     Width = 572
     Height = 19
     Panels = <
@@ -40,7 +40,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 477
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -185,18 +184,17 @@ object frmMain: TfrmMain
     Left = 155
     Top = 29
     Width = 414
-    Height = 465
+    Height = 445
     Margins.Left = 4
     Align = alClient
     Caption = ' Editor : '
     TabOrder = 2
-    ExplicitHeight = 445
     DesignSize = (
       414
-      465)
+      445)
     object lOldSub: TLabel
       Left = 11
-      Top = 360
+      Top = 340
       Width = 43
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -205,7 +203,7 @@ object frmMain: TfrmMain
     end
     object lblText: TLabel
       Left = 11
-      Top = 403
+      Top = 383
       Width = 48
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -213,37 +211,34 @@ object frmMain: TfrmMain
       ExplicitTop = 429
     end
     object Label3: TLabel
-      Left = 17
-      Top = 434
+      Left = 7
+      Top = 418
       Width = 77
       Height = 13
       Anchors = [akLeft, akBottom]
       Caption = 'First line length:'
-      ExplicitTop = 414
     end
     object Label4: TLabel
       Left = 142
-      Top = 434
+      Top = 418
       Width = 91
       Height = 13
       Anchors = [akLeft, akBottom]
       Caption = 'Second line length:'
-      ExplicitTop = 414
     end
     object Label8: TLabel
       Left = 288
-      Top = 434
+      Top = 418
       Width = 75
       Height = 13
       Anchors = [akRight, akBottom]
       Caption = 'Subtitles count:'
-      ExplicitTop = 414
     end
     object lvSubs: TJvListView
       Left = 11
       Top = 17
       Width = 394
-      Height = 322
+      Height = 302
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = <
         item
@@ -277,7 +272,7 @@ object frmMain: TfrmMain
     end
     object mOldSub: TMemo
       Left = 96
-      Top = 345
+      Top = 325
       Width = 309
       Height = 38
       Anchors = [akLeft, akRight, akBottom]
@@ -295,11 +290,10 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       WordWrap = False
-      ExplicitTop = 325
     end
     object mNewSub: TMemo
       Left = 96
-      Top = 389
+      Top = 369
       Width = 309
       Height = 39
       Anchors = [akLeft, akRight, akBottom]
@@ -316,11 +310,10 @@ object frmMain: TfrmMain
       TabOrder = 2
       WordWrap = False
       OnChange = mNewSubChange
-      ExplicitTop = 369
     end
     object eFirstLineLength: TEdit
       Left = 96
-      Top = 434
+      Top = 414
       Width = 30
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -328,11 +321,10 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 3
       Text = '(nb)'
-      ExplicitTop = 414
     end
     object eSecondLineLength: TEdit
       Left = 239
-      Top = 434
+      Top = 414
       Width = 30
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -340,11 +332,10 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 4
       Text = '(nb)'
-      ExplicitTop = 414
     end
     object eSubCount: TEdit
       Left = 369
-      Top = 434
+      Top = 414
       Width = 36
       Height = 21
       Anchors = [akRight, akBottom]
@@ -352,7 +343,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 5
       Text = '(nb)'
-      ExplicitTop = 414
     end
   end
   object gbFilesList: TGroupBox
@@ -360,7 +350,7 @@ object frmMain: TfrmMain
     Left = 3
     Top = 29
     Width = 148
-    Height = 465
+    Height = 445
     Margins.Right = 0
     Align = alLeft
     Caption = ' Files list: '
@@ -369,12 +359,11 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 3
-    ExplicitHeight = 445
     object lbFilesList: TListBox
       Left = 4
       Top = 17
       Width = 140
-      Height = 391
+      Height = 371
       Align = alClient
       ItemHeight = 13
       PopupMenu = pmFilesList
@@ -382,18 +371,16 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnKeyUp = lbFilesListKeyUp
       OnMouseUp = lbFilesListMouseUp
-      ExplicitHeight = 371
     end
     object Panel2: TPanel
       Left = 4
-      Top = 408
+      Top = 388
       Width = 140
       Height = 53
       Align = alBottom
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
-      ExplicitTop = 388
       DesignSize = (
         140
         53)
@@ -440,17 +427,17 @@ object frmMain: TfrmMain
   end
   object mmMain: TMainMenu
     Left = 12
-    Top = 54
+    Top = 52
     object miFile: TMenuItem
       Caption = '&File'
       object miOpen: TMenuItem
         Caption = '&Open directory...'
-        Hint = 'Open a directory in the tool.'
+        Hint = 'Scan the selected directory to find editable SRF files.'
         ShortCut = 16463
         OnClick = miOpenClick
       end
       object miOpenFiles: TMenuItem
-        Caption = '&Open files...'
+        Caption = 'Ope&n files...'
         Hint = 'Open single files.'
         ShortCut = 49231
         OnClick = miOpenFilesClick
@@ -458,6 +445,7 @@ object frmMain: TfrmMain
       object miReload: TMenuItem
         Caption = '&Reload...'
         Hint = 'Reload the current selected file from the disk.'
+        ShortCut = 116
         OnClick = miReloadClick
       end
       object N2: TMenuItem
@@ -484,7 +472,7 @@ object frmMain: TfrmMain
         OnClick = miCloseClick
       end
       object miCloseAll: TMenuItem
-        Caption = 'Close all...'
+        Caption = 'Close &all...'
         Hint = 'Close all opened files.'
         OnClick = miCloseAllClick
       end
@@ -492,14 +480,33 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object miImportSubtitles: TMenuItem
-        Caption = 'IMPORT'
+        Caption = '&Import subtitles...'
+        Hint = 'Import subtitles from XML file.'
+        ShortCut = 16457
         OnClick = miImportSubtitlesClick
       end
       object miExportSubtitles: TMenuItem
-        Caption = 'EXPORT'
+        Caption = '&Export subtitles...'
+        Hint = 'Export subtitles to a XML file.'
+        ShortCut = 16453
         OnClick = miExportSubtitlesClick
       end
       object N5: TMenuItem
+        Caption = '-'
+      end
+      object miFileProperties: TMenuItem
+        Caption = '&Properties...'
+        Hint = 'Show the Windows Explorer File Properties dialog.'
+        ShortCut = 115
+        OnClick = miFilePropertiesClick
+      end
+      object miLocateOnDisk: TMenuItem
+        Caption = '&Locate on disk...'
+        Hint = 'Open Windows Explorer and select the current file on it.'
+        ShortCut = 16460
+        OnClick = miLocateOnDiskClick
+      end
+      object N12: TMenuItem
         Caption = '-'
       end
       object miQuit: TMenuItem
@@ -529,6 +536,27 @@ object frmMain: TfrmMain
       object N6: TMenuItem
         Caption = '-'
       end
+      object miBrowseDirectory: TMenuItem
+        Caption = '&Browse directory...'
+        Hint = 'Open the selected directory in Windows Explorer.'
+        ShortCut = 16450
+        OnClick = miBrowseDirectoryClick
+      end
+      object miExportFilesList: TMenuItem
+        Caption = 'E&xport files list...'
+        Hint = 'Export the current files list to a text file.'
+        ShortCut = 49221
+        OnClick = miExportFilesListClick
+      end
+      object miRefreshFilesList: TMenuItem
+        Caption = 'Refres&h files list'
+        Hint = 'Rescan the selected directory.'
+        ShortCut = 16500
+        OnClick = miRefreshFilesListClick
+      end
+      object N14: TMenuItem
+        Caption = '-'
+      end
       object miCharset: TMenuItem
         Caption = 'D&ecode subtitles'
         Hint = 'Translate the Shenmue charset to Windows charset and vice-versa.'
@@ -539,22 +567,30 @@ object frmMain: TfrmMain
     object miTools: TMenuItem
       Caption = '&Tools'
       object miAutoSave: TMenuItem
-        Caption = 'Auto-save'
+        Caption = '&Auto-save'
+        Hint = 'Auto-saving the current file when needed.'
+        ShortCut = 118
         OnClick = miAutoSaveClick
       end
       object miMakeBackup: TMenuItem
-        Caption = 'Make backup'
+        Caption = '&Make backup'
+        Hint = 'Auto-create a copy of the current file before saving it.'
+        ShortCut = 119
         OnClick = miMakeBackupClick
       end
       object N9: TMenuItem
         Caption = '-'
       end
       object miBatchImportSubtitles: TMenuItem
-        Caption = 'BATCH IMPORT'
+        Caption = '&Batch import...'
+        Hint = 'Import subtitles in mass.'
+        ShortCut = 49225
         OnClick = miBatchImportSubtitlesClick
       end
       object miBatchExportSubtitles: TMenuItem
-        Caption = 'BATCH EXPORT'
+        Caption = 'Ba&tch export...'
+        Hint = 'Export subtitles in mass.'
+        ShortCut = 49221
         OnClick = miBatchExportSubtitlesClick
       end
     end
@@ -576,7 +612,7 @@ object frmMain: TfrmMain
       end
       object miAbout: TMenuItem
         Caption = '&About...'
-        Hint = 'Get an Audi RS6 for free !'
+        Hint = 'This is the magical button !'
         ShortCut = 123
         OnClick = miAboutClick
       end
@@ -1935,21 +1971,21 @@ object frmMain: TfrmMain
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 12
-    Top = 86
+    Top = 84
   end
   object sdSave: TSaveDialog
     DefaultExt = 'SRF'
     Filter = 'Cinematic Files (*.SRF)|*.SRF|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save the current file'
-    Left = 46
-    Top = 86
+    Left = 48
+    Top = 84
   end
   object aeMain: TApplicationEvents
     OnException = aeMainException
     OnHint = aeMainHint
-    Left = 46
-    Top = 54
+    Left = 48
+    Top = 52
   end
   object sdExport: TSaveDialog
     DefaultExt = 'XML'
@@ -1969,14 +2005,18 @@ object frmMain: TfrmMain
   end
   object pmFilesList: TPopupMenu
     Left = 12
-    Top = 116
-    object miFileProperties: TMenuItem
-      Caption = 'Properties'
-      ShortCut = 115
-      OnClick = miFilePropertiesClick
+    Top = 112
+    object miFileProperties2: TMenuItem
+      Caption = '<Properties>'
     end
     object N11: TMenuItem
       Caption = '-'
+    end
+    object miLocateOnDisk2: TMenuItem
+      Caption = '<Locate On Disk>'
+    end
+    object miReload2: TMenuItem
+      Caption = '<Reload>'
     end
     object miClose2: TMenuItem
       Caption = '<Close>'
@@ -1993,18 +2033,30 @@ object frmMain: TfrmMain
     object N10: TMenuItem
       Caption = '-'
     end
-    object miBrowseDirectory: TMenuItem
-      Caption = 'Browse dir'
-      OnClick = miBrowseDirectoryClick
+    object miCloseAll2: TMenuItem
+      Caption = '<Close All>'
     end
-    object miLocateOnDisk: TMenuItem
-      Caption = 'Locate disk'
-      OnClick = miLocateOnDiskClick
+    object miExportFilesList2: TMenuItem
+      Caption = '<Export Files List>'
+    end
+    object miBrowseDirectory2: TMenuItem
+      Caption = '<Browse Directory>'
+    end
+    object miRefreshFilesList2: TMenuItem
+      Caption = '<Refresh Files List>'
     end
   end
   object bfdBatchExport: TJvBrowseForFolderDialog
     Title = 'Please select the target directory where to export files:'
-    Left = 44
-    Top = 116
+    Left = 48
+    Top = 112
+  end
+  object sdExportFilesList: TSaveDialog
+    DefaultExt = 'txt'
+    Filter = 'Text Files (*.txt)|*.txt|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Export the files list to...'
+    Left = 12
+    Top = 140
   end
 end

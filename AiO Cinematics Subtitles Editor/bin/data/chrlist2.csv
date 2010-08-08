@@ -1,0 +1,64 @@
+' "Shenmue II" Charset
+
+' List originally created by Manic
+' Updated by Ryo Suzuki and IlDucci
+' Format changed by [big_fury]SiZiOUS to accept multiple characters
+' Last Update: August 8th, 2010
+
+' Lines empties or with the ' character are ignored.
+
+' The left value is the Shenmue code string (in hex form, like #$00..#$FF, or 
+' in decimal form, like #00..#255). Value < 0 or > 255 will be ignored. You can
+' combine multiples values (like "#$3D#$40#$FF...").
+
+' The right value is the Windows code string, it's a normal character.
+' Note: if you want to translate the quote character ("), you must write it in 
+' double: "#$00...#$FF";""""
+
+"#$8B";"ä"
+"#$C0";"Ä"
+"#$CA";"â"
+"#$B6";"Â"
+"#$C5";"à"
+"#$B1";"À"
+"#$CF";"á"
+"#$BB";"Á"
+"#$8C";"ï"
+"#$C1";"Ï"
+"#$CB";"î"
+"#$AD";"Î"
+"#$D0";"í"
+"#$BC";"Í"
+"#$8E";"ë"
+"#$AC";"Ë"
+"#$CD";"ê"
+"#$B9";"Ê"
+"#$D2";"é"
+"#$BE";"É"
+"#$C8";"è"
+"#$B4";"È"
+"#$8F";"ö"
+"#$C4";"Ö"
+"#$CE";"ô"
+"#$AE";"Ô"
+"#$D3";"ó"
+"#$BF";"Ó"
+"#$8D";"ü"
+"#$C2";"Ü"
+"#$B8";"Û"
+"#$CC";"û"
+"#$D1";"ú"
+"#$BD";"Ú"
+"#$C7";"ù"
+"#$B3";"Ù"
+"#$DC";"ç"
+"#$D4";"Ç"
+"#$DD";"ñ"
+"#$D6";"Ñ"
+"#$81";"ß"
+"#$82";"¿"
+"#$83";"¡"
+"#$7B";"«"
+"#$7D";"»"
+"#$3D#$40";"..."
+"#$A1#$F5";"#$0D#$0A"

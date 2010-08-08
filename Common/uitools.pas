@@ -82,6 +82,7 @@ begin
     Caption := SourceItem.Caption;
     Hint := SourceItem.Hint;
     OnClick := SourceItem.OnClick;
+    ShortCut := SourceItem.ShortCut;
   end;
 end;
 
