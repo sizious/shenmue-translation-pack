@@ -464,6 +464,7 @@ end;
 procedure TfrmMain.miImportSubtitlesClick(Sender: TObject);
 var
   Buf: string;
+  ImportOption: TSRFImportFileFormat;
 
 begin
   if PromptImportConfirmation then  
@@ -473,8 +474,12 @@ begin
         Buf := ' subtitles from "' + FileName + '" into "'
           + SRFEditor.SourceFileName + '"';
 
+        ImportOption := iffXML;
+        if FilterIndex = 2 then
+          ImportOption := iffText;
+
         StatusText := 'Importing...';
-        if SRFEditor.Subtitles.ImportFromFile(FileName) then begin
+        if SRFEditor.Subtitles.ImportFromFile(FileName, ImportOption) then begin
           SRFEditor.Save; // sauvegarde du fichier importé        
           Debug.AddLine(ltInformation, 'Successfully imported' + Buf + '.')
         end else

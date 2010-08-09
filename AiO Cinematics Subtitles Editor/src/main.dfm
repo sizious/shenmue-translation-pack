@@ -1989,7 +1989,7 @@ object frmMain: TfrmMain
   end
   object sdExport: TSaveDialog
     DefaultExt = 'XML'
-    Filter = 'XML Files (*.XML)|*.XML|All Files (*.*)|*.*'
+    Filter = 'XML Script Files (*.xml)|*.XML|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save the current file'
     Left = 42
@@ -1997,7 +1997,9 @@ object frmMain: TfrmMain
   end
   object odImport: TOpenDialog
     DefaultExt = 'XML'
-    Filter = 'XML Files (*.XML)|*.XML|All Files (*.*)|*.*'
+    Filter = 
+      'XML Script Files (*.xml)|*.XML|Legacy Text Script Files (*.txt)|' +
+      '*.TXT|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 12

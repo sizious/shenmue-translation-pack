@@ -47,6 +47,8 @@ type
     property Owner: TSRFSubtitlesList read fOwner;
   end;
 
+  TSRFImportFileFormat = (iffXML, iffText);
+
   TSRFSubtitlesList = class(TObject)
   private
     fInternalSubtitlesList: TList;
@@ -58,12 +60,16 @@ type
   protected
     function Add: TSRFSubtitlesListItem;
     procedure Clear;
+    function ImportFromText(const FileName: TFileName): Boolean;
+    function ImportFromXML(const FileName: TFileName): Boolean;
     procedure SwitchJapaneseEncoding(const FileName: TFileName);
   public
     constructor Create(AOwner: TSRFEditor);
     destructor Destroy; override;
     function ExportToFile(const FileName: TFileName): Boolean;
-    function ImportFromFile(const FileName: TFileName): Boolean;
+    function ImportFromFile(const FileName: TFileName;
+      FileFormat: TSRFImportFileFormat): Boolean; overload;
+    function ImportFromFile(const FileName: TFileName): Boolean; overload;
     function TransformText(const Subtitle: string): string;
     property Count: Integer read GetCount;
     property DecodeText: Boolean read fDecodeText write fDecodeText;
@@ -390,7 +396,67 @@ begin
     Result := IsJapaneseString(Items[0].RawText);
 end;
 
+function TSRFSubtitlesList.ImportFromFile(const FileName: TFileName;
+  FileFormat: TSRFImportFileFormat): Boolean;
+begin
+  Result := False;
+  case FileFormat of
+    iffXML: Result := ImportFromXML(FileName);
+    iffText: Result := ImportFromText(FileName);
+  end;
+end;
+
 function TSRFSubtitlesList.ImportFromFile(const FileName: TFileName): Boolean;
+begin
+  Result := ImportFromFile(FileName, iffXML);
+end;
+
+function TSRFSubtitlesList.ImportFromText(const FileName: TFileName): Boolean;
+var
+  SL: TStringList;
+  LinePtr, SubIndex, SubsCount: Integer;
+  CharID: string;
+  SubtitleText: WideString;
+  
+begin
+  Result := False;
+  if not FileExists(FileName) then Exit;
+
+  SL := TStringList.Create;
+  try
+    LoadUnicodeTextFile(SL, FileName);
+    
+    // ImportFile[0]: Filename. Ignore this
+    SubsCount := StrToIntDef(SL[1], 0);
+    if Count <> SubsCount then Exit;
+
+    LinePtr := 2;
+    while LinePtr < SL.Count do begin
+      // Reading the entry
+      SubIndex := StrToIntDef(SL[LinePtr + 1], -1);
+      CharID := SL[LinePtr + 2];
+      SubtitleText := SL[LinePtr + 3];
+
+{$IFDEF DEBUG}
+      WriteLn('SubIndex: ', SubIndex, ', CharID: ', CharID,
+        ', SubtitleText: ', SubtitleText);
+{$ENDIF}
+
+      // Modifying the entry if possible
+      if (SubIndex <> -1) and (Items[SubIndex].CharID = CharID) then
+        Items[SubIndex].fText := SubtitleText;
+
+      // Passing to the next entry
+      Inc(LinePtr, 4);
+    end;
+
+    Result := True;
+  finally
+    SL.Free;
+  end;
+end;
+
+function TSRFSubtitlesList.ImportFromXML(const FileName: TFileName): Boolean;
 var
   XMLRoot: IXMLDocument;
   RootNode, Node: IXMLNode;

@@ -47,6 +47,7 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
+procedure LoadUnicodeTextFile(SL: TStringList; const FileName: TFileName);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
@@ -721,6 +722,46 @@ end;
 function ExtractDirectoryName(const FullDirectoryPath: TFileName): TFileName;
 begin
   Result := ExtremeRight('\', Copy(FullDirectoryPath, 1, Length(FullDirectoryPath)-1))
+end;
+
+//------------------------------------------------------------------------------
+
+// Found at http://www.eksperten.dk/spm/775112
+// Author unknow
+
+procedure LoadUnicodeTextFile(SL: TStringList; const FileName: TFileName);
+var
+  F: TStream;
+  UnicodeString: WideString;
+  UnicodeSign: Word;
+  FileSize: Cardinal;
+  Unicode: Boolean;
+
+begin
+  Unicode := True;
+  F := TFileStream.Create(FileName, fmOpenRead);
+  try
+
+    FileSize := F.Size;
+    if FileSize >= SizeOf(UnicodeSign) then begin
+      F.ReadBuffer(UnicodeSign, SizeOf(UnicodeSign));
+
+      if UnicodeSign = $FEFF then begin
+        Dec(FileSize, SizeOf(UnicodeSign));
+        SetLength(UnicodeString, FileSize div SizeOf(WideChar));
+        F.ReadBuffer(UnicodeString[1], FileSize);
+        // now UnicodeString contains Unicode string read from stream
+        SL.Text := UnicodeString;
+      end else
+        Unicode := False;
+
+    end;
+
+  finally
+    F.Free;
+    if not Unicode then
+      SL.LoadFromFile(FileName);
+  end;
 end;
 
 //------------------------------------------------------------------------------
