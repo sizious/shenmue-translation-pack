@@ -6,8 +6,8 @@ uses
   Windows,
   SysUtils,
   Classes,
-  progress in '..\..\Common\Progress\progress.pas' {ProgressWindow},
-  uitools in '..\..\Common\uitools.pas';
+  progress in '..\..\..\Common\Progress\progress.pas' {ProgressWindow},
+  uitools in '..\..\..\Common\uitools.pas';
 
 type
   TTestThread = class(TThread)
