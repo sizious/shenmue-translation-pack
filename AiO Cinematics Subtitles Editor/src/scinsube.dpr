@@ -29,7 +29,9 @@ uses
   subsexp in 'engine\subsexp.pas',
   massimp in 'massimp.pas' {frmMassImport},
   subsimp in 'engine\subsimp.pas',
-  warning in 'warning.pas' {frmWarning};
+  warning in 'warning.pas' {frmWarning},
+  MD5Api in '..\..\Common\MD5\MD5Api.pas',
+  MD5Core in '..\..\Common\MD5\MD5Core.pas';
 
 {$R *.res}
 
@@ -55,8 +57,7 @@ begin
 
   // Create forms
   Application.CreateForm(TfrmMain, frmMain);
-  
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

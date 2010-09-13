@@ -6,15 +6,19 @@ program srfdebug;
 
 uses
   SysUtils,
+  Classes,
   srfedit in '..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas',
   hashidx in '..\..\..\Common\hashidx.pas',
   chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
-  systools in '..\..\..\Common\systools.pas';
+  systools in '..\..\..\Common\systools.pas',
+  MD5Api in '..\..\..\Common\MD5\MD5Api.pas',
+  MD5Core in '..\..\..\Common\MD5\MD5Core.pas';
 
 var
   SRFEditor: TSRFEditor;
   OldFile, NewFile, XmlFile: TFileName;
-
+  HashFile: TStringList;
+  
 procedure Interactive;
 begin
 {$IFDEF INTERACTIVE}
@@ -28,9 +32,11 @@ end;
 procedure StrongTest;
 var
   i, j: Integer;
-  
+
 begin
   SRFEditor.LoadFromFile(OldFile);
+  HashFile.Add(ExtractFileName(ChangeFileExt(OldFile, '')) + ': ' + SRFEditor.HashKey);
+
   if not SRFEditor.Subtitles.JapaneseCharset then begin
     SRFEditor.SaveToFile(NewFile);
     SRFEditor.LoadFromFile(NewFile);
@@ -60,10 +66,12 @@ begin
   OldFile := ExpandFileName(ParamStr(1));
   NewFile := ChangeFileExt(OldFile, '.NEW');
   XmlFile := ChangeFileExt(OldFile, '.XML');
-  
+
+  HashFile := TStringList.Create;
   SRFEditor := TSRFEditor.Create;
   try
     try
+      if FileExists('HASH.TXT') then HashFile.LoadFromFile('HASH.TXT');
 //      SaveBugTest;
       StrongTest;
     except
@@ -71,7 +79,9 @@ begin
         Writeln(E.Classname, ': ', E.Message);
     end;
   finally
+    HashFile.SaveToFile('HASH.TXT');
     SRFEditor.Free;
+    HashFile.Free;
     Interactive;
   end;
 end.

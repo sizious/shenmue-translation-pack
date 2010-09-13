@@ -29,6 +29,7 @@ type
     function GetRecordSize: LongWord;
     function GetOwnerEditor: TSRFEditor;
     function GetTextPaddingSize: LongWord;
+    function GetExtraDataString: string;
   protected
     procedure WriteShenmueEntry(F: TFileStream);
     procedure WriteShenmue2Entry(F: TFileStream);
@@ -41,6 +42,7 @@ type
     property CharID: string read fCharID;
     property ExtraData: TSRFDataBlock read GetExtraData;
     property ExtraDataSize: LongWord read GetExtraDataSize;
+    property ExtraDataString: string read GetExtraDataString;
     property RawText: string read fText;
     property RecordSize: LongWord read GetRecordSize;
     property Text: string read GetText write SetText;
@@ -86,7 +88,9 @@ type
     fSourceFileName: TFileName;
     fMakeBackup: Boolean;
     fCharset: TShenmueCharsetCodec;
+    fHashKey: string;
   protected
+    function ComputeHashKey: string;
     function DetectGameVersion(var InStream: TFileStream): TSRFGameVersion;
     procedure ParseShenmueFormat(var InStream: TFileStream);
     procedure ParseShenmue2Format(var InStream: TFileStream);
@@ -99,6 +103,7 @@ type
     function SaveToFile(const FileName: TFileName): Boolean;
     property Charset: TShenmueCharsetCodec read fCharset;
     property GameVersion: TSRFGameVersion read fGameVersion;
+    property HashKey: string read fHashKey;
     property Loaded: Boolean read fFileLoaded;
     property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
     property SourceFileName: TFileName read fSourceFileName;
@@ -107,12 +112,13 @@ type
 
 function DataBlockToString(D: TSRFDataBlock; ADataSize: LongWord): string;
 function SRFGameVersionToString(SRFGameVersion: TSRFGameVersion): string;
+function SRFGameVersionToCodeString(SRFGameVersion: TSRFGameVersion): string;
 
 implementation
 
 uses
   {$IFDEF DEBUG}TypInfo, {$ENDIF}
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, MD5Api;
 
 const
   SHENMUE_SIGN                = #$08#$00#$00#$00;
@@ -141,6 +147,15 @@ begin
     sgvUndef: Result := '';
     sgvShenmue: Result := 'Shenmue';
     sgvShenmue2: Result := 'Shenmue II';
+  end;
+end;
+
+function SRFGameVersionToCodeString(SRFGameVersion: TSRFGameVersion): string;
+begin
+  case SRFGameVersion of
+    sgvUndef: Result := 'UNDEF';
+    sgvShenmue: Result := 'SHENMUE';
+    sgvShenmue2: Result := 'SHENMUE2';
   end;
 end;
 
@@ -176,6 +191,11 @@ end;
 function TSRFSubtitlesListItem.GetExtraDataSize: LongWord;
 begin
   Result := LongWord(ExtraDataStream.Size);
+end;
+
+function TSRFSubtitlesListItem.GetExtraDataString: string;
+begin
+  Result := DataBlockToString(ExtraData, ExtraDataSize);
 end;
 
 function TSRFSubtitlesListItem.GetOwnerEditor: TSRFEditor;
@@ -569,6 +589,7 @@ begin
   fFileLoaded := False;
   Subtitles.Clear;
   fSourceFileName := '';
+  fHashKey := '';
 end;
 
 constructor TSRFEditor.Create;
@@ -584,6 +605,21 @@ begin
   fSRFSubtitlesList.Free;
   fCharset.Free;
   inherited;
+end;
+
+function TSRFEditor.ComputeHashKey: string;
+var
+  i: Integer;
+
+begin
+  Result := '';
+  (* Compute a MD5 Hash key based on the ExtraData, used to identify the
+     file, even if the subtitles are modified. *)
+  try
+    for i := 0 to Subtitles.Count - 1 do
+      Result := MD5(Result + Subtitles[i].ExtraDataString);
+  except
+  end;
 end;
 
 function TSRFEditor.DetectGameVersion(
@@ -648,6 +684,9 @@ begin
         fFileLoaded := True;
         Result := True;
         fSourceFileName := FileName;
+
+        // Compute MD5 Hash Key
+        fHashKey := ComputeHashKey;
       end;
       
     except

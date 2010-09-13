@@ -36,7 +36,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 0
-    ExplicitHeight = 407
     object lbFilesList: TListBox
       Left = 4
       Top = 17
@@ -50,7 +49,6 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnDblClick = lbFilesListDblClick
       OnKeyPress = lbFilesListKeyPress
-      ExplicitHeight = 359
     end
     object Panel2: TPanel
       Left = 4
@@ -60,7 +58,6 @@ object frmMain: TfrmMain
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitTop = 376
       DesignSize = (
         140
         27)
@@ -95,10 +92,8 @@ object frmMain: TfrmMain
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
-    ExplicitHeight = 407
     object tsEditor: TTabSheet
       Caption = '&Editor'
-      ExplicitHeight = 379
       DesignSize = (
         407
         339)
@@ -193,7 +188,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 0
         Text = '0'
-        ExplicitTop = 356
       end
       object eFirstLineLength: TEdit
         Left = 104
@@ -205,7 +199,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 1
         Text = '0'
-        ExplicitTop = 356
       end
       object mSubText: TMemo
         Left = 104
@@ -219,7 +212,6 @@ object frmMain: TfrmMain
         MaxLength = 90
         TabOrder = 2
         OnChange = mSubTextChange
-        ExplicitTop = 316
       end
       object eSubCount: TEdit
         Left = 368
@@ -231,7 +223,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 3
         Text = '100'
-        ExplicitTop = 356
       end
       object eCharID: TEdit
         Left = 230
@@ -290,7 +281,6 @@ object frmMain: TfrmMain
         MaxLength = 90
         ReadOnly = True
         TabOrder = 6
-        ExplicitTop = 276
       end
       object rbMale: TRadioButton
         Left = 164
@@ -600,7 +590,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 2
-    ExplicitTop = 413
     object mDebug: TMemo
       Left = 4
       Top = 16
@@ -631,7 +620,6 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
-    ExplicitTop = 517
   end
   object MainMenu: TMainMenu
     Left = 80
