@@ -14,11 +14,16 @@ uses
   MD5Api in '..\..\..\Common\MD5\MD5Api.pas',
   MD5Core in '..\..\..\Common\MD5\MD5Core.pas';
 
+const
+  sTab = Chr(9);
+  
 var
   SRFEditor: TSRFEditor;
   OldFile, NewFile, XmlFile: TFileName;
   HashFile: TStringList;
-  
+  S: string;
+
+
 procedure Interactive;
 begin
 {$IFDEF INTERACTIVE}
@@ -29,28 +34,62 @@ begin
 {$ENDIF}
 end;
 
+procedure AddToLog(S: string);
+begin
+  HashFile.Add(StringReplace(S, ';', sTab, [rfReplaceAll, rfIgnoreCase]));
+end;
+
 procedure StrongTest;
 var
   i, j: Integer;
 
 begin
-  SRFEditor.LoadFromFile(OldFile);
-  HashFile.Add(ExtractFileName(ChangeFileExt(OldFile, '')) + ': ' + SRFEditor.HashKey);
+  try
+    S :=
+      ExtractFileName(ChangeFileExt(OldFile, '')) + ';';
+    S := S + ExtremeRight('\', Copy(ExtractFilePath(OldFile), 1, Length(ExtractFilePath(OldFile))-1)) + ';';
 
-  if not SRFEditor.Subtitles.JapaneseCharset then begin
-    SRFEditor.SaveToFile(NewFile);
-    SRFEditor.LoadFromFile(NewFile);
-    SRFEditor.Subtitles.ExportToFile(XmlFile);
+    if SRFEditor.LoadFromFile(OldFile) then begin
 
-    for i := 0 to 4 do begin
-      for j := 0 to SRFEditor.Subtitles.Count - 1 do
-        SRFEditor.Subtitles[j].Text := GetRandomString(90);
-      SRFEditor.Save;
-    end;
 
-    SRFEditor.Subtitles.ImportFromFile(XmlFile);
-    SRFEditor.Save;
-  end; // not supported
+      if not SRFEditor.Subtitles.JapaneseCharset then begin
+        S := S + IntToStr(SRFEditor.Subtitles.Count) + ';'
+          +       SRFEditor.HashKey + ';' +
+          MD5FromFile(SRFEditor.SourceFileName);
+
+        SRFEditor.SaveToFile(NewFile);
+        SRFEditor.LoadFromFile(NewFile);
+
+        SRFEditor.Subtitles.ExportToFile(XmlFile);
+
+        for i := 0 to 4 do begin
+          for j := 0 to SRFEditor.Subtitles.Count - 1 do
+            SRFEditor.Subtitles[j].Text := GetRandomString(90);
+          SRFEditor.Save;
+        end;
+
+        S :=
+            S + ';' +
+            SRFEditor.HashKey + ';' +
+            MD5FromFile(SRFEditor.SourceFileName);
+
+        SRFEditor.Subtitles.ImportFromFile(XmlFile);
+        SRFEditor.Save;
+
+        S :=
+            S + ';' +
+            SRFEditor.HashKey + ';' +
+            MD5FromFile(SRFEditor.SourceFileName);
+
+        AddToLog(S);
+      end else
+        AddToLog(S + 'JAPANESE FILES NOT SUPPORTED'); // not supported
+
+    end else
+      AddToLog(S + ' FAILED WHEN OPENING FILE');
+  except
+    AddToLog(S + ' EXCEPTION RAISED');
+  end;
 end;
 
 procedure SaveBugTest;
@@ -71,7 +110,12 @@ begin
   SRFEditor := TSRFEditor.Create;
   try
     try
-      if FileExists('HASH.TXT') then HashFile.LoadFromFile('HASH.TXT');
+
+      if FileExists('HASH.TXT') then
+        HashFile.LoadFromFile('HASH.TXT')
+      else
+        AddToLog('File;Disc;SubtitlesCount;HashKey;FileMD5;HakHashKey;HakFileMD5;NewHashKey;NewFileMD5');
+        
 //      SaveBugTest;
       StrongTest;
     except
