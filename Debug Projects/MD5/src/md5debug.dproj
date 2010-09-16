@@ -1,11 +1,12 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{82105999-9eab-4511-bec9-a3e605dcc0ca}</ProjectGuid>
-    <MainSource>datasgen.dpr</MainSource>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <ProjectGuid>{11a0cf2d-de1f-4976-8957-f8f125a6f832}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-    <DCC_DependencyCheckOutputName>..\bin\datasgen.exe</DCC_DependencyCheckOutputName>
+    <DCC_DependencyCheckOutputName>..\bin\md5debug.exe</DCC_DependencyCheckOutputName>
+    <MainSource>md5debug.dpr</MainSource>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Version>7.0</Version>
@@ -28,7 +29,7 @@
   </PropertyGroup>
   <ProjectExtensions>
     <Borland.Personality>Delphi.Personality</Borland.Personality>
-    <Borland.ProjectType>VCLApplication</Borland.ProjectType>
+    <Borland.ProjectType />
     <BorlandProject>
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">False</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS</VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
       
@@ -37,34 +38,20 @@
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
-    </Excluded_Packages><Source><Source Name="MainSource">datasgen.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
+    </Excluded_Packages><Source><Source Name="MainSource">md5debug.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
-    <DelphiCompile Include="datasgen.dpr">
+    <DelphiCompile Include="md5debug.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas" />
-    <DCCReference Include="..\..\..\..\Common\hashidx.pas" />
-    <DCCReference Include="..\..\..\..\Common\MD5\MD5Api.pas" />
-    <DCCReference Include="..\..\..\..\Common\MD5\MD5Core.pas" />
-    <DCCReference Include="..\..\..\..\Common\SubsUtil\chrcodec.pas" />
-    <DCCReference Include="..\..\..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas" />
+    <DCCReference Include="..\..\..\Common\hashidx.pas" />
+    <DCCReference Include="..\..\..\Common\MD5\MD5Api.pas" />
+    <DCCReference Include="..\..\..\Common\MD5\MD5Core.pas" />
+    <DCCReference Include="..\..\..\Common\SubsUtil\chrcodec.pas" />
+    <DCCReference Include="..\..\..\Common\systools.pas" />
   </ItemGroup>
 </Project>

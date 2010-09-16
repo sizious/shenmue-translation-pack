@@ -20,7 +20,7 @@ uses
   MD5Core in '..\..\..\..\Common\MD5\MD5Core.pas';
 
 const
-  OUTPUT_FILE_EXT = '.xml'; // dbi
+  OUTPUT_FILE_EXT = '.dbi';
   MAX_DATABASE_FILES = 256;
   
 var

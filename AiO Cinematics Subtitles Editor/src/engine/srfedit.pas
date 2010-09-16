@@ -618,6 +618,7 @@ begin
   try
     for i := 0 to Subtitles.Count - 1 do
       Result := MD5(Result + Subtitles[i].ExtraDataString);
+    Result := UpperCase(Result);
   except
   end;
 end;
