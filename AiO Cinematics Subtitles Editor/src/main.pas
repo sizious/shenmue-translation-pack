@@ -177,6 +177,7 @@ type
     fCharsetFileShenmue: TFileName;
     fCharsetCanEnableShenmue2: Boolean;
     fCharsetCanEnableShenmue: Boolean;
+    fIsTextDBOK: Boolean;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -233,6 +234,7 @@ type
       write fCharsetFileShenmue;
     property CharsetFileShenmue2: TFileName read fCharsetFileShenmue2
       write fCharsetFileShenmue2;
+    property IsTextDBOK: Boolean read fIsTextDBOK;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
@@ -883,8 +885,15 @@ begin
 
     // Filling the UI with the content
     if SRFEditor.Loaded then begin
+
       // Loading the TextCorrectionDatabase
-      TextCorrectorDatabaseUpdate;
+      fIsTextDBOK := TextCorrectorDatabaseUpdate;
+      if not IsTextDBOK then
+        Debug.AddLine(ltWarning,
+          Format('Unable to load the original subtitles database for ' +
+          'the current file [File: "%s", HashKey: "%s"]!',
+          [SRFEditor.SourceFileName, SRFEditor.HashKey])
+        );
 
       // Display the subtitles count
       eSubCount.Text := IntToStr(SRFEditor.Subtitles.Count);
@@ -917,8 +926,9 @@ begin
             Caption := IntToStr(i);
             SubItems[0] := CharID;
             SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
-            SubItems[ORIGINAL_SUBS_COLINDEX] :=
-              TransformText(TextDatabaseCorrector.Subtitles[i].Text);
+            if IsTextDBOK then            
+              SubItems[ORIGINAL_SUBS_COLINDEX] :=
+                TransformText(TextDatabaseCorrector.Subtitles[i].Text);
           end;
       end;                   
 
@@ -1304,8 +1314,9 @@ begin
       if Assigned(ListItem) then begin
         with ListItem do begin
           SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
-          SubItems[ORIGINAL_SUBS_COLINDEX] :=
-            TransformText(TextDatabaseCorrector.Subtitles[i].Text);
+          if IsTextDBOK then
+            SubItems[ORIGINAL_SUBS_COLINDEX] :=
+              TransformText(TextDatabaseCorrector.Subtitles[i].Text);
         end;
       end;
     end;
