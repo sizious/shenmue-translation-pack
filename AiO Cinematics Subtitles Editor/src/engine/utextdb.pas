@@ -8,7 +8,7 @@ uses
 var
   TextDatabaseCorrector: TTextDatabaseCorrector;
 
-procedure TextCorrectorDatabaseUpdate;
+function TextCorrectorDatabaseUpdate: Boolean;
 
 implementation
 
@@ -22,8 +22,8 @@ function GameVersionToDatabaseName(GameVersion: TSRFGameVersion): TFileName;
 begin
   case GameVersion of
     sgvUndef: Result := '';
-    sgvShenmue: Result := 'shenmue';
-    sgvShenmue2: Result := 'shenmue2';
+    sgvShenmue: Result := 'sm1dc';
+    sgvShenmue2: Result := 'sm2dc';
   end;
 end;
 
@@ -44,7 +44,7 @@ begin
   Result := OutputDir + DBName + '.dbi'; // return the DBI index file  
 end;
 
-procedure TextCorrectorDatabaseUpdate;
+function TextCorrectorDatabaseUpdate: Boolean;
 var
   DBIFileName: TFileName;
 
@@ -55,7 +55,7 @@ begin
     TextDatabaseCorrector.OpenDatabase(DBIFileName); // Load the DBI (index) file
 
   // Load the next subtitle
-  TextDatabaseCorrector.LoadTable(SRFEditor.HashKey);
+  Result := TextDatabaseCorrector.LoadTable(SRFEditor.HashKey);
 end;
 
 initialization

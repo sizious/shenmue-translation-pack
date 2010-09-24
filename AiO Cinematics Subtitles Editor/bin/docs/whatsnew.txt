@@ -5,6 +5,16 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.1: 2010-09-XX |__________________________________________________
+
+ADDED:
+- The Original Subtitles Text Correction functionnality is now available for
+  this editor too! This special feature can help you to check if you translation
+  is good enough for a release.
+
+FIXED:
+- Several some little bugs fixes that I don't remember
+___                           __________________________________________________
 ___| Version 2.0: 2010-08-08 |__________________________________________________
 
 ********************************************************************************
@@ -12,7 +22,7 @@ ___| Version 2.0: 2010-08-08 |__________________________________________________
 **                                                                            **
 ** This application was rewritten at 100% and it should be compatible with    **
 ** old SRF files hacked by the v1.4a, but I recommand you to export all your  **
-** v1.4a SRF files to the XML format, and import in this new version using    **
+** v1.4a SRF files to the XML format, and re-import in this new version using **
 ** original SRF files.                                                        **
 **                                                                            **
 ** I'M NOT RESPONSIBLE IF YOU LOSE DATA BY USING THIS NEW VERSION. IN FACT,   **
