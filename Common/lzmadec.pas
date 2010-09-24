@@ -10,7 +10,7 @@ type
   ESevenZipEngineMissing = class(ESevenZipGeneric);
   ESevenZipBatchFileWriting = class(ESevenZipGeneric);
 
-function SevenZipExtract(const SourceFile: TFileName; OutputDir: TFileName): Boolean;
+function SevenZipExtract(SourceFile: TFileName; OutputDir: TFileName): Boolean;
 function SevenZipInitEngine(WorkDirectory: TFileName): Boolean;
 
 //==============================================================================
@@ -28,7 +28,7 @@ var
 
 //==============================================================================
 
-function SevenZipExtract(const SourceFile: TFileName; OutputDir: TFileName): Boolean;
+function SevenZipExtract(SourceFile: TFileName; OutputDir: TFileName): Boolean;
 var
 {$IFDEF DEBUG}
   SevenZipDebugOutput: string;
@@ -45,6 +45,8 @@ begin
     raise ESevenZipEngineMissing.Create('SevenZipExtract [LZMADec]: Engine '
       + 'doesn''t exists. Please call SevenZipInitEngine() first.');
 
+  SourceFile := ExpandFileName(SourceFile);
+  OutputDir := ExpandFileName(OutputDir);  
   if not DirectoryExists(OutputDir) then
     ForceDirectories(OutputDir);
 

@@ -226,6 +226,7 @@ type
     procedure SetStatusText(const Value: string);
     function GetSelectedFileName: TFileName;
     function GetSelectedFileEntry: TFileEntry;
+    function TransformText(S: string): string;
     property CharsetCanEnableShenmue: Boolean read fCharsetCanEnableShenmue;
     property CharsetCanEnableShenmue2: Boolean read fCharsetCanEnableShenmue2;
     property CharsetFileShenmue: TFileName read fCharsetFileShenmue
@@ -277,10 +278,12 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, ChrCount, About, DirScan, SubsExp, MassImp;
+  Config, UITools, SysTools, ChrCount, About, DirScan, SubsExp, MassImp,
+  UTextDB;
 
 const
-  SUBTITLES_COLUMN_INDEX = 1;
+  SUBS_COLINDEX = 1;
+  ORIGINAL_SUBS_COLINDEX = 2;
 
 type
   TSRFDirectoryScanner = class(TDirectoryScanner)
@@ -880,6 +883,8 @@ begin
 
     // Filling the UI with the content
     if SRFEditor.Loaded then begin
+      // Loading the TextCorrectionDatabase
+      TextCorrectorDatabaseUpdate;
 
       // Display the subtitles count
       eSubCount.Text := IntToStr(SRFEditor.Subtitles.Count);
@@ -902,7 +907,7 @@ begin
           repeat
             ListItem.SubItems.Add('');
             Inc(j);
-          until j = 2;
+          until j = 3;
         end;
 
         // Updating the current item with the new values
@@ -911,7 +916,9 @@ begin
             Data := Pointer(i);
             Caption := IntToStr(i);
             SubItems[0] := CharID;
-            SubItems[SUBTITLES_COLUMN_INDEX] := BR(SRFEditor.Subtitles[i].Text);
+            SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
+            SubItems[ORIGINAL_SUBS_COLINDEX] :=
+              TransformText(TextDatabaseCorrector.Subtitles[i].Text);
           end;
       end;                   
 
@@ -1295,7 +1302,11 @@ begin
     for i := 0 to lvSubs.Items.Count - 1 do begin
       ListItem := lvSubs.FindData(0, Pointer(i), True, False);
       if Assigned(ListItem) then begin
-        ListItem.SubItems[SUBTITLES_COLUMN_INDEX] := BR(SRFEditor.Subtitles[i].Text);
+        with ListItem do begin
+          SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
+          SubItems[ORIGINAL_SUBS_COLINDEX] :=
+            TransformText(TextDatabaseCorrector.Subtitles[i].Text);
+        end;
       end;
     end;
 
@@ -1354,7 +1365,7 @@ end;
 procedure TfrmMain.SetSelectedSubtitle(const Value: string);
 begin
   if IsSubtitleSelected then begin
-    fSelectedSubtitleUI.SubItems[SUBTITLES_COLUMN_INDEX] := BR(Value);
+    fSelectedSubtitleUI.SubItems[SUBS_COLINDEX] := BR(Value);
     fSelectedSubtitle.Text := Value;
   end;
 end;
@@ -1372,6 +1383,15 @@ procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
   var DefaultDraw: Boolean);
 begin
   ToolBarCustomDraw(Sender);
+end;
+
+// if needed, encode/decode the subtitle text (used in TextCorrectionDatabase)
+function TfrmMain.TransformText(S: string): string;
+begin
+  Result := S;
+  if DecodeSubtitles then
+    Result := SRFEditor.Charset.Decode(S);
+  Result := BR(Result);
 end;
 
 //==============================================================================

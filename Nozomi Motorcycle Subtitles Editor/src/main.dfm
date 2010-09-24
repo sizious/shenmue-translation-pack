@@ -179,10 +179,11 @@ object frmMain: TfrmMain
       end
       item
         Caption = 'Subtitle'
-        Width = 200
+        Width = 218
       end
       item
         Caption = 'Original'
+        Width = 218
       end>
     ColumnClick = False
     ReadOnly = True
@@ -190,7 +191,7 @@ object frmMain: TfrmMain
     TabOrder = 2
     ViewStyle = vsReport
     OnSelectItem = lvSubsSelectItem
-    ColumnsOrder = '0=20,1=200,2=50'
+    ColumnsOrder = '0=20,1=218,2=218'
     Groups = <>
     ExtendedColumns = <
       item

@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{c79d0854-b8b8-4148-86f2-7c3592f7467d}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="Corrector\src\datasgen.dproj" />
+    <Projects Include="MoveSRF\src\movesrf.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="datasgen">
+    <MSBuild Projects="Corrector\src\datasgen.dproj" Targets="" />
+  </Target>
+  <Target Name="datasgen:Clean">
+    <MSBuild Projects="Corrector\src\datasgen.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="datasgen:Make">
+    <MSBuild Projects="Corrector\src\datasgen.dproj" Targets="Make" />
+  </Target>
+  <Target Name="movesrf">
+    <MSBuild Projects="MoveSRF\src\movesrf.dproj" Targets="" />
+  </Target>
+  <Target Name="movesrf:Clean">
+    <MSBuild Projects="MoveSRF\src\movesrf.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="movesrf:Make">
+    <MSBuild Projects="MoveSRF\src\movesrf.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="datasgen;movesrf" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="datasgen:Clean;movesrf:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="datasgen:Make;movesrf:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

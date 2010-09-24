@@ -84,8 +84,6 @@ type
     property SourceFileName: TFileName read fLoadedFileName; 
   end;
 
-function IsJapaneseString(const S: string): Boolean;
-
 implementation
 
 uses
@@ -106,17 +104,6 @@ type
 *)
 
 {$ENDIF}
-
-function IsJapaneseString(const S: string): Boolean;
-var
-  i: Integer;
-  
-begin
-  Result := False;
-  if S <> '' then
-    for i := 1 to Length(S) do
-      Result := Result or (S[i] in [#$A4, #$B6, #$A5, #$BB]);
-end;
 
 { TShenmueCharsetCodec }
 
