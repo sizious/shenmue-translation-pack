@@ -250,7 +250,11 @@ object frmMain: TfrmMain
         end
         item
           Caption = 'Subtitle'
-          Width = 300
+          Width = 147
+        end
+        item
+          Caption = 'Original'
+          Width = 147
         end>
       ColumnClick = False
       ReadOnly = True
@@ -258,7 +262,7 @@ object frmMain: TfrmMain
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = lvSubsSelectItem
-      ColumnsOrder = '0=25,1=50,2=300'
+      ColumnsOrder = '0=25,1=50,2=147,3=147'
       Groups = <>
       ExtendedColumns = <
         item
@@ -266,9 +270,9 @@ object frmMain: TfrmMain
         item
         end
         item
+        end
+        item
         end>
-      ExplicitWidth = 622
-      ExplicitHeight = 348
     end
     object mOldSub: TMemo
       Left = 96

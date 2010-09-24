@@ -37,6 +37,7 @@ function ExtremeRight(SubStr: string; S: string): string;
 function EOFS(var F: TFileStream): Boolean; overload;
 function FindStr(const SubStr, S: string): Boolean;
 function GetApplicationDirectory: TFileName;
+function GetApplicationRadicalName: string;
 function GetApplicationInstancesCount: Integer;
 function GetApplicationDataDirectory: TFileName;
 function GetFileSize(const FileName: TFileName): Int64;
@@ -47,6 +48,7 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
+function IsJapaneseString(const S: string): Boolean;
 procedure LoadUnicodeTextFile(SL: TStringList; const FileName: TFileName);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
@@ -291,6 +293,13 @@ function GetApplicationDirectory: TFileName;
 begin
   Result :=
     IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
+end;
+
+//------------------------------------------------------------------------------
+
+function GetApplicationRadicalName: string;
+begin
+  Result := ExtractFileName(ChangeFileExt(ParamStr(0), ''));
 end;
 
 //------------------------------------------------------------------------------
@@ -798,6 +807,19 @@ function MakeJapaneseString(const WS: WideString): AnsiString;
 begin
   Result := WideStringToString(WS, 20932);
 end; *)
+
+//------------------------------------------------------------------------------
+
+function IsJapaneseString(const S: string): Boolean;
+var
+  i: Integer;
+  
+begin
+  Result := False;
+  if S <> '' then
+    for i := 1 to Length(S) do
+      Result := Result or (S[i] in [#$A4, #$B6, #$A5, #$BB]);
+end;
 
 //------------------------------------------------------------------------------
 

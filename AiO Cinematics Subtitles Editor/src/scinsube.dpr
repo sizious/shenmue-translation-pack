@@ -1,6 +1,7 @@
 program scinsube;
 
 {$R 'about\credits.res' 'about\credits.rc'}
+{$R 'engine\lzmabin.res' 'engine\lzmabin.rc'}
 
 uses
   Windows,
@@ -31,7 +32,13 @@ uses
   subsimp in 'engine\subsimp.pas',
   warning in 'warning.pas' {frmWarning},
   MD5Api in '..\..\Common\MD5\MD5Api.pas',
-  MD5Core in '..\..\Common\MD5\MD5Core.pas';
+  MD5Core in '..\..\Common\MD5\MD5Core.pas',
+  dbindex in '..\..\Common\TextDB\dbindex.pas',
+  dbinlay in '..\..\Common\TextDB\dbinlay.pas',
+  textdb in '..\..\Common\TextDB\textdb.pas',
+  utextdb in 'engine\utextdb.pas',
+  lzmadec in '..\..\Common\lzmadec.pas',
+  workdir in '..\..\Common\workdir.pas';
 
 {$R *.res}
 
