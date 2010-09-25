@@ -72,6 +72,13 @@ begin
       MakeBackup := ReadBool('main', 'makebackup', MakeBackup);
       SelectedDirectory := ReadDirectoryPath('main', 'sourcedir',
         GetApplicationDirectory);
+      OriginalColumnList := ReadBool('main', 'originalcolumnlist',
+        OriginalColumnList);
+      OriginalTextField := ReadBool('main', 'originaltextfield',
+        OriginalTextField);
+      OriginalSubtitlesColumnObjectWidth :=
+        ReadInteger('main', 'originalcolumnlistwidth',
+          OriginalSubtitlesColumnObjectWidth);
     end; // frmMain
   end; // Configuration
 end;
@@ -90,6 +97,10 @@ begin
       WriteBool('main', 'autosave', AutoSave);
       WriteBool('main', 'makebackup', MakeBackup);
       WriteDirectoryPath('main', 'sourcedir', SelectedDirectory);
+      WriteBool('main', 'originalcolumnlist', OriginalColumnList);
+      WriteBool('main', 'originaltextfield', OriginalTextField);
+      WriteInteger('main', 'originalcolumnlistwidth',
+        OriginalSubtitlesColumnObjectWidth);
     end;
   end;
 end;

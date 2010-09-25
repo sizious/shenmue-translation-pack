@@ -6,7 +6,7 @@ uses
   Windows, SysUtils, TextDB, SRFEdit;
 
 var
-  TextDatabaseCorrector: TTextDatabaseCorrector;
+  TextCorrectorDatabase: TTextCorrectorDatabase;
 
 function TextCorrectorDatabaseUpdate: Boolean;
 
@@ -22,8 +22,8 @@ function GameVersionToDatabaseName(GameVersion: TSRFGameVersion): TFileName;
 begin
   case GameVersion of
     sgvUndef: Result := '';
-    sgvShenmue: Result := 'sm1dc';
-    sgvShenmue2: Result := 'sm2dc';
+    sgvShenmue: Result := 's1dcue';
+    sgvShenmue2: Result := 's2dcue';
   end;
 end;
 
@@ -41,7 +41,7 @@ begin
     if FileExists(DBFile) then
       SevenZipExtract(DBFile, OutputDir);
   end;
-  Result := OutputDir + DBName + '.dbi'; // return the DBI index file  
+  Result := OutputDir + 'index.dbi'; // return the DBI index file
 end;
 
 function TextCorrectorDatabaseUpdate: Boolean;
@@ -52,17 +52,17 @@ begin
   // Initialize the TextCorrectorDatabase if needed
   DBIFileName := DBInitialize(SRFEditor.GameVersion);
   if FileExists(DBIFileName) then
-    TextDatabaseCorrector.OpenDatabase(DBIFileName); // Load the DBI (index) file
+    TextCorrectorDatabase.OpenDatabase(DBIFileName); // Load the DBI (index) file
 
   // Load the next subtitle
-  Result := TextDatabaseCorrector.LoadTable(SRFEditor.HashKey);
+  Result := TextCorrectorDatabase.LoadTable(SRFEditor.HashKey);
 end;
 
 initialization
   SevenZipInitEngine(GetWorkingTempDirectory);
-  TextDatabaseCorrector := TTextDatabaseCorrector.Create;
+  TextCorrectorDatabase := TTextCorrectorDatabase.Create;
 
 finalization
-  TextDatabaseCorrector.Free;
+  TextCorrectorDatabase.Free;
 
 end.

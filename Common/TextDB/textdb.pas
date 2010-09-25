@@ -18,7 +18,7 @@ uses
   Windows, SysUtils, Classes, DBInlay, DBIndex;
 
 type
-  TTextDatabaseCorrector = class
+  TTextCorrectorDatabase = class(TObject)
   private
     fDatabaseIndex: TTextDatabaseIndex;
     fLoaded: Boolean;
@@ -41,33 +41,33 @@ implementation
 uses
   ActiveX;
 
-{ TTextDatabaseCorrector }
+{ TTextCorrectorDatabase }
 
-procedure TTextDatabaseCorrector.Clear;
+procedure TTextCorrectorDatabase.Clear;
 begin
   fLoaded := False;
   fIndexFileName := '';
 end;
 
-procedure TTextDatabaseCorrector.CloseDatabase;
+procedure TTextCorrectorDatabase.CloseDatabase;
 begin
   Clear;
 end;
 
-constructor TTextDatabaseCorrector.Create;
+constructor TTextCorrectorDatabase.Create;
 begin
   fSubtitles := TTextDatabaseSubtitlesContainer.Create;
   fDatabaseIndex := TTextDatabaseIndex.Create;
 end;
 
-destructor TTextDatabaseCorrector.Destroy;
+destructor TTextCorrectorDatabase.Destroy;
 begin
   fDatabaseIndex.Free;
   fSubtitles.Free;
   inherited;
 end;
 
-function TTextDatabaseCorrector.OpenDatabase(FileName: TFileName): Boolean;
+function TTextCorrectorDatabase.OpenDatabase(FileName: TFileName): Boolean;
 begin
   Clear;
 
@@ -80,7 +80,7 @@ begin
   Result := Loaded;
 end;
 
-function TTextDatabaseCorrector.LoadTable(
+function TTextCorrectorDatabase.LoadTable(
   const HashKey: string): Boolean;
 var
   IndexItem: TTextDatabaseIndexItem;

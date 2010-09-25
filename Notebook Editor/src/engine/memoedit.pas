@@ -295,7 +295,7 @@ begin
   Pages.Clear;
   Dependances.Clear;
   XboxMemoFlagInfo.Clear;
-  fPlatformVersion := pvUnknow;
+  fPlatformVersion := pvUndef;
 end;
 
 constructor TDiaryEditor.Create;
