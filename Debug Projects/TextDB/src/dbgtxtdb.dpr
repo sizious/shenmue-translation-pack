@@ -14,7 +14,7 @@ uses
   hashidx in '..\..\..\Common\hashidx.pas';
 
 var
-  DB: TTextDatabaseCorrector;
+  DB: TTextCorrectorDatabase;
 
 (*
 function GetTextDatabaseIndexFile(GameVersion: TGameVersion): TFileName;
@@ -50,7 +50,7 @@ begin
 
 //    SevenZipExtract('dc_pal_shenmue2.db', 'unpack');
 
-    DB := TTextDatabaseCorrector.Create;
+    DB := TTextCorrectorDatabase.Create;
     try
       DB.OpenDatabase('unpack\dc_pal_shenmue2.dbi');
       DB.LoadTable('FEX10_00A_');

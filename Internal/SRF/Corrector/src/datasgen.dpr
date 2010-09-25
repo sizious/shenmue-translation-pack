@@ -17,7 +17,8 @@ uses
   chrcodec in '..\..\..\..\Common\SubsUtil\chrcodec.pas',
   hashidx in '..\..\..\..\Common\hashidx.pas',
   MD5Api in '..\..\..\..\Common\MD5\MD5Api.pas',
-  MD5Core in '..\..\..\..\Common\MD5\MD5Core.pas';
+  MD5Core in '..\..\..\..\Common\MD5\MD5Core.pas',
+  filespec in '..\..\..\..\Common\filespec.pas';
 
 const
   OUTPUT_FILE_EXT = '.dbi';
@@ -34,7 +35,10 @@ var
   InfoNode, Node,
   FileNamesRootNode,
   ContainerDiscsRootNode: IXMLNode;
+
   GameVersion: TSRFGameVersion;
+  Region: TGameRegion;
+  PlatformVersion: TPlatformVersion;
 
 //------------------------------------------------------------------------------
 
@@ -60,7 +64,7 @@ var
 
 begin
   try
-    Key := 'K' + SRFEditor.HashKey;
+    Key := SRFEditor.HashKey;
     Node := FileNamesRootNode.ChildNodes.FindNode(Key);
 
     if not Assigned(Node) then begin      
@@ -102,7 +106,7 @@ var
   
 begin
   Result := False;
-  Key := 'K' + SRFEditor.HashKey;
+  Key := SRFEditor.HashKey;
 
   Node := ContainerDiscsRootNode.ChildNodes.FindNode(Key); // search for the key in DBI
   if not Assigned(Node) then begin // add the new key to the database
@@ -120,14 +124,33 @@ end;
 //------------------------------------------------------------------------------
 
 procedure InitParameters;
-  function StrToGameVersion(Param: string): TSRFGameVersion;
+
+  procedure DetermineGameInformation(Param: string);
   begin
-    Result := sgvUndef;
-    Param := UpperCase(Param);
-    if Param = 'S1' then
-      Result := sgvShenmue
-    else if Param = 'S2' then
-      Result := sgvShenmue2;
+    // game version
+    GameVersion := sgvUndef;
+    if IsInString('s1', param) then
+      GameVersion := sgvShenmue
+    else if IsInString('whats', param) then
+      GameVersion := sgvUndef // incorrect..
+    else if IsInString('s2', param) then
+      GameVersion := sgvShenmue2;
+
+    // game region
+    Region := prUndef;
+    if IsInString('jap', param) then
+      Region := prJapan
+    else if IsInString('eur', param) then
+      Region := prEurope
+    else if IsInString('usa', param) then
+      Region := prUSA;
+
+    // platform version
+    PlatformVersion := pvUndef;
+    if IsInString('dc', param) then
+      PlatformVersion := pvDreamcast
+    else if IsInString('xb', param) then
+      PlatformVersion := pvXbox;         
   end;
 
 begin
@@ -139,9 +162,7 @@ begin
     FileIndex := StrToInt(ExtractFileName(ChangeFileExt(TCDOutputFile, '')));
     DBIOutputDirectory := IncludeTrailingPathDelimiter(ParamStr(4));
     DiscNumber := ParamStr(5);
-    GameVersion := StrToGameVersion(ParamStr(6));
-    if GameVersion = sgvUndef then
-      raise Exception.Create('INVALID VERSION');
+    DetermineGameInformation(paramstr(6));
   except
     WriteLn('Invalid parameters!');
     Exit;
@@ -151,6 +172,9 @@ end;
 //------------------------------------------------------------------------------
 
 procedure InitDBI;
+var
+  HeaderNode: IXMLNode;
+  
 begin
   DBINumEntries := 0;
   
@@ -162,7 +186,7 @@ begin
     Encoding := 'utf-8'; //'ISO-8859-1';
   end;
 
-  DBIOutputFile := DBIOutputDirectory + LowerCase(SRFGameVersionToCodeString(GameVersion))
+  DBIOutputFile := DBIOutputDirectory + 'index'  //LowerCase(SRFGameVersionToCodeString(GameVersion))
     + OUTPUT_FILE_EXT;
 
   // Loading the DBIOutputFile
@@ -170,8 +194,16 @@ begin
     // Creating the root
     DBI_XMLDoc.DocumentElement := DBI_XMLDoc.CreateNode('TextCorrectorDatabaseIndex');
 
-    Node := DBI_XMLDoc.DocumentElement.AddChild('GameVersion');
+//    Node := DBI_XMLDoc.DocumentElement.AddChild('GameVersion');
+//    Node.NodeValue := SRFGameVersionToCodeString(GameVersion);
+
+    HeaderNode := DBI_XMLDoc.DocumentElement.AddChild('HeaderInfo');
+    Node := HeaderNode.AddChild('Version');
     Node.NodeValue := SRFGameVersionToCodeString(GameVersion);
+    Node := HeaderNode.AddChild('Region');
+    Node.NodeValue := GameRegionToCodeString(Region);
+    Node := HeaderNode.AddChild('System');
+    Node.NodeValue := PlatformVersionToCodeString(PlatformVersion);        
 
     ContainerDiscsRootNode := DBI_XMLDoc.DocumentElement.AddChild('Entries');
     ContainerDiscsRootNode.Attributes['Count'] := 0;
@@ -202,11 +234,15 @@ begin
         '       <GameVersion> : The game version of the folder (see below)', sLineBreak,
         sLineBreak,
         'Game Version values:', sLineBreak,
-        '       S1            : Shenmue 1', sLineBreak,
-        '       S2            : Shenmue 2', sLineBreak,
+        '       whats         : What''s Shenmue JAP DC', sLineBreak,
+        '       s1_dc_jap     : Shenmue 1 JAP DC', sLineBreak,
+        '       s1_dc_eur     : Shenmue 1 PAL DC', sLineBreak,
+        '       s2_dc_jap     : Shenmue 2 JAP DC', sLineBreak,
+        '       s2_dc_eur     : Shenmue 2 PAL DC', sLineBreak,
+        '       s2_xb_eur     : Shenmue 2X PAL Xbox', sLineBreak,
         sLineBreak,
         'Example:', sLineBreak,
-        '       ', PrgName, ' .\db_root\disc1\ *.* 1.tcd .\db_root\ 1 S1'
+        '       ', PrgName, ' .\db_root\disc1\ *.* 1.tcd .\db_root\ 1 s1_dc_eur'
   );
   ExitCode := 1;
 end;
@@ -234,9 +270,13 @@ begin
       TCD_XMLDoc.DocumentElement := TCD_XMLDoc.CreateNode('TextCorrectorDatabase');
 
       // adding the file info
-      InfoNode := TCD_XMLDoc.DocumentElement.AddChild('Information');
-      Node := InfoNode.AddChild('GameVersion');
+      InfoNode := TCD_XMLDoc.DocumentElement.AddChild('HeaderInfo');
+      Node := InfoNode.AddChild('Version');
       Node.NodeValue := SRFGameVersionToCodeString(GameVersion);
+      Node := InfoNode.AddChild('Region');
+      Node.NodeValue := GameRegionToCodeString(Region);
+      Node := InfoNode.AddChild('System');
+      Node.NodeValue := PlatformVersionToCodeString(PlatformVersion);      
       Node := InfoNode.AddChild('DiscNumber');
       Node.NodeValue := DiscNumber;
 
@@ -301,8 +341,8 @@ begin
         FindClose(SR);
       end;
 
-      FileNamesRootNode.Attributes['Count'] :=
-        Integer(FileNamesRootNode.Attributes['Count']) + FilesCount;
+      FileNamesRootNode.Attributes['Count'] := FilesCount;
+//        Integer(FileNamesRootNode.Attributes['Count']) + FilesCount;
       ContainerDiscsRootNode.Attributes['Count'] :=
         Integer(ContainerDiscsRootNode.Attributes['Count']) + DBINumEntries;
 

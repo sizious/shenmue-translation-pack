@@ -115,6 +115,9 @@ type
     miFileProperties: TMenuItem;
     N14: TMenuItem;
     sdExportFilesList: TSaveDialog;
+    N13: TMenuItem;
+    miOriginalTextField: TMenuItem;
+    miOriginalColumnList: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -159,10 +162,12 @@ type
     procedure miFilePropertiesClick(Sender: TObject);
     procedure miRefreshFilesListClick(Sender: TObject);
     procedure miExportFilesListClick(Sender: TObject);
+    procedure miOriginalTextFieldClick(Sender: TObject);
+    procedure miOriginalColumnListClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
-    fSelectedSubtitle: TSRFSubtitlesListItem;
+    fSelectedSubtitleItem: TSRFSubtitlesListItem;
     fDebugLogVisible: Boolean;
     fFileModified: Boolean;
     fQuitOnFailure: Boolean;
@@ -177,7 +182,13 @@ type
     fCharsetFileShenmue: TFileName;
     fCharsetCanEnableShenmue2: Boolean;
     fCharsetCanEnableShenmue: Boolean;
-    fIsTextDBOK: Boolean;
+    fIsTextCorrectionDatabaseLoaded: Boolean;
+    fOriginalTextField: Boolean;
+    fOriginalColumnList: Boolean;
+    fSelectedOriginalSubtitle: string;
+    fSelectedOldSubtitle: string;
+    fOriginalSubtitlesColumnObject: TListColumn;
+    fOriginalSubtitlesColumnObjectWidth: Integer;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
@@ -228,13 +239,20 @@ type
     function GetSelectedFileName: TFileName;
     function GetSelectedFileEntry: TFileEntry;
     function TransformText(S: string): string;
+    procedure SetOriginalTextInField(const Value: Boolean);
+    procedure SetOriginalColumnInList(const Value: Boolean);
+    procedure UpdateOldTextField;
     property CharsetCanEnableShenmue: Boolean read fCharsetCanEnableShenmue;
     property CharsetCanEnableShenmue2: Boolean read fCharsetCanEnableShenmue2;
     property CharsetFileShenmue: TFileName read fCharsetFileShenmue
       write fCharsetFileShenmue;
     property CharsetFileShenmue2: TFileName read fCharsetFileShenmue2
       write fCharsetFileShenmue2;
-    property IsTextDBOK: Boolean read fIsTextDBOK;
+    property IsTextCorrectionDatabaseLoaded: Boolean
+      read fIsTextCorrectionDatabaseLoaded;
+    property OriginalSubtitlesColumnObject: TListColumn
+      read fOriginalSubtitlesColumnObject
+      write fOriginalSubtitlesColumnObject;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
@@ -251,6 +269,13 @@ type
       write SetDecodeSubtitles;
     property FileModified: Boolean read fFileModified write SetFileModified;
     property MakeBackup: Boolean read fMakeBackup write SetMakeBackup;
+    property OriginalColumnList: Boolean read fOriginalColumnList
+      write SetOriginalColumnInList;
+    property OriginalSubtitlesColumnObjectWidth: Integer
+      read fOriginalSubtitlesColumnObjectWidth
+      write fOriginalSubtitlesColumnObjectWidth;      
+    property OriginalTextField: Boolean read fOriginalTextField
+      write SetOriginalTextInField;
     property PreviewerVisible: Boolean read fPreviewerVisible
       write SetPreviewerVisible;
     property SelectedDirectory: TFileName read GetSelectedDirectory write
@@ -261,6 +286,10 @@ type
       write fSelectedFileIndex;
     property SelectedSubtitle: string read GetSelectedSubtitle
       write SetSelectedSubtitle;
+    property SelectedOriginalSubtitle: string
+      read fSelectedOriginalSubtitle;
+    property SelectedOldSubtitle: string
+      read fSelectedOldSubtitle;
     property StatusText: string read GetStatusText write SetStatusText;
     property WorkingFilesList: TFilesList read fWorkingFilesList
       write fWorkingFilesList;
@@ -312,7 +341,7 @@ begin
     SRFEditor.Clear;
     lvSubs.Clear;
     fSelectedSubtitleUI := nil;
-    fSelectedSubtitle := nil;
+    fSelectedSubtitleItem := nil;
     mOldSub.Text := '';
     mNewSub.Text := '';
     UpdateSubtitleLengthControls('', eFirstLineLength, eSecondLineLength);
@@ -548,6 +577,11 @@ begin
   CopyMenuItem(miRefreshFilesList, miRefreshFilesList2);
   CopyMenuItem(miFileProperties, miFileProperties2);
   CopyMenuItem(miCloseAll, miCloseAll2);
+
+  // 'Original' column
+  fOriginalSubtitlesColumnObject := lvSubs.Columns[3];
+  OriginalSubtitlesColumnObjectWidth := lvSubs.Columns[3].Width;
+  OriginalColumnList := True;
   
   // Init Modules
   ModulesInit;
@@ -763,7 +797,7 @@ function TfrmMain.GetSelectedSubtitle: string;
 begin
   Result := '';
   if not IsSubtitleSelected then Exit;
-  Result := fSelectedSubtitle.Text;
+  Result := fSelectedSubtitleItem.Text;
 end;
 
 function TfrmMain.GetStatusText: string;
@@ -809,7 +843,7 @@ end;
 
 function TfrmMain.IsSubtitleSelected: Boolean;
 begin
-  Result := Assigned(fSelectedSubtitle);
+  Result := Assigned(fSelectedSubtitleItem);
 end;
 
 procedure TfrmMain.lbFilesListContextPopup(Sender: TObject; MousePos: TPoint;
@@ -841,10 +875,16 @@ begin
     // Setting the variables to store the selected item
     fSelectedSubtitleUI := Item;
     Index := Integer(Item.Data);
-    fSelectedSubtitle := SRFEditor.Subtitles[Index];
+    fSelectedSubtitleItem := SRFEditor.Subtitles[Index];
+
+    // Saving the Original Subtitle and the Old Subtitle (for the Old Memo Field)
+    fSelectedOriginalSubtitle := '##UNDEF!##';
+    if IsTextCorrectionDatabaseLoaded then
+      fSelectedOriginalSubtitle := TextCorrectorDatabase.Subtitles[Index].Text;
+    fSelectedOldSubtitle := SelectedSubtitle;
 
     // Refresh the view
-    mOldSub.Text := SelectedSubtitle;
+    UpdateOldTextField;
     mNewSub.Text := SelectedSubtitle;
 
     // Updating the Previewer if possible
@@ -887,8 +927,8 @@ begin
     if SRFEditor.Loaded then begin
 
       // Loading the TextCorrectionDatabase
-      fIsTextDBOK := TextCorrectorDatabaseUpdate;
-      if not IsTextDBOK then
+      fIsTextCorrectionDatabaseLoaded:= TextCorrectorDatabaseUpdate;
+      if not IsTextCorrectionDatabaseLoaded then
         Debug.AddLine(ltWarning,
           Format('Unable to load the original subtitles database for ' +
           'the current file [File: "%s", HashKey: "%s"]!',
@@ -926,9 +966,10 @@ begin
             Caption := IntToStr(i);
             SubItems[0] := CharID;
             SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
-            if IsTextDBOK then            
+
+            if IsTextCorrectionDatabaseLoaded then
               SubItems[ORIGINAL_SUBS_COLINDEX] :=
-                TransformText(TextDatabaseCorrector.Subtitles[i].Text);
+                BR(TransformText(TextCorrectorDatabase.Subtitles[i].Text));
           end;
       end;                   
 
@@ -1172,6 +1213,16 @@ begin
   LoadFile(SelectedFileName);
 end;
 
+procedure TfrmMain.miOriginalColumnListClick(Sender: TObject);
+begin
+  OriginalColumnList := not OriginalColumnList;
+end;
+
+procedure TfrmMain.miOriginalTextFieldClick(Sender: TObject);
+begin
+  OriginalTextField := not OriginalTextField;
+end;
+
 procedure TfrmMain.mNewSubChange(Sender: TObject);
 begin
   if SelectedSubtitle <> mNewSub.Text then begin  
@@ -1314,17 +1365,16 @@ begin
       if Assigned(ListItem) then begin
         with ListItem do begin
           SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
-          if IsTextDBOK then
+          if IsTextCorrectionDatabaseLoaded then
             SubItems[ORIGINAL_SUBS_COLINDEX] :=
-              TransformText(TextDatabaseCorrector.Subtitles[i].Text);
+              BR(TransformText(TextCorrectorDatabase.Subtitles[i].Text));
         end;
       end;
     end;
 
     // Memos
-    mOldSub.Text := SRFEditor.Subtitles.TransformText(mOldSub.Text);
-    mNewSub.Text := SRFEditor.Subtitles.TransformText(mNewSub.Text);
-
+    mOldSub.Text := TransformText(mOldSub.Text);
+    mNewSub.Text := TransformText(mNewSub.Text);
   end;
 end;
 
@@ -1344,6 +1394,40 @@ begin
   miMakeBackup.Checked := Value;
   tbMakeBackup.Down := Value;
   SRFEditor.MakeBackup := Value;
+end;
+
+procedure TfrmMain.SetOriginalColumnInList(const Value: Boolean);
+begin
+  fOriginalColumnList := Value;
+  miOriginalColumnList.Checked := OriginalColumnList;
+
+  if OriginalColumnList then begin
+    if not Assigned(OriginalSubtitlesColumnObject) then begin
+      OriginalSubtitlesColumnObject := lvSubs.Columns.Add;
+      OriginalSubtitlesColumnObject.Caption := 'Original';
+      OriginalSubtitlesColumnObject.Width := OriginalSubtitlesColumnObjectWidth;
+    end;
+  end else
+    if Assigned(OriginalSubtitlesColumnObject) then begin
+      OriginalSubtitlesColumnObjectWidth := OriginalSubtitlesColumnObject.Width;
+      lvSubs.Columns.Delete(OriginalSubtitlesColumnObject.Index);
+      OriginalSubtitlesColumnObject := nil;
+    end;    
+end;
+
+procedure TfrmMain.SetOriginalTextInField(const Value: Boolean);
+begin
+  fOriginalTextField := Value;
+  miOriginalTextField.Checked := OriginalTextField;
+
+  // change the label
+  if OriginalTextField then
+    lOldSub.Caption := 'Original text:'
+  else
+    lOldSub.Caption := 'Old text:';
+
+  // refresh the field
+  UpdateOldTextField;
 end;
 
 procedure TfrmMain.SetPreviewerVisible(const Value: Boolean);
@@ -1377,7 +1461,7 @@ procedure TfrmMain.SetSelectedSubtitle(const Value: string);
 begin
   if IsSubtitleSelected then begin
     fSelectedSubtitleUI.SubItems[SUBS_COLINDEX] := BR(Value);
-    fSelectedSubtitle.Text := Value;
+    fSelectedSubtitleItem.Text := Value;
   end;
 end;
 
@@ -1399,10 +1483,16 @@ end;
 // if needed, encode/decode the subtitle text (used in TextCorrectionDatabase)
 function TfrmMain.TransformText(S: string): string;
 begin
-  Result := S;
-  if DecodeSubtitles then
-    Result := SRFEditor.Charset.Decode(S);
-  Result := BR(Result);
+  Result := SRFEditor.Subtitles.TransformText(S);
+end;
+
+procedure TfrmMain.UpdateOldTextField;
+begin
+  if OriginalTextField then
+    mOldSub.Text := SelectedOriginalSubtitle
+  else
+    mOldSub.Text := SelectedOldSubtitle;
+  mOldSub.Text := TransformText(mOldSub.Text);
 end;
 
 //==============================================================================

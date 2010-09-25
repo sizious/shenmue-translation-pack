@@ -195,11 +195,10 @@ object frmMain: TfrmMain
     object lOldSub: TLabel
       Left = 11
       Top = 340
-      Width = 43
+      Width = 67
       Height = 13
       Anchors = [akLeft, akBottom]
-      Caption = 'Old text:'
-      ExplicitTop = 386
+      Caption = '<Generated>'
     end
     object lblText: TLabel
       Left = 11
@@ -538,6 +537,25 @@ object frmMain: TfrmMain
         OnClick = miDebugLogClick
       end
       object N6: TMenuItem
+        Caption = '-'
+      end
+      object miOriginalTextField: TMenuItem
+        Caption = 'Original text in field'
+        Hint = 
+          'Show untouched original subtitles extracted from the game in the' +
+          ' old text field.'
+        ShortCut = 120
+        OnClick = miOriginalTextFieldClick
+      end
+      object miOriginalColumnList: TMenuItem
+        Caption = 'Original column in list'
+        Hint = 
+          'Show an additional column with the original subtitle text in the' +
+          ' view.'
+        ShortCut = 16504
+        OnClick = miOriginalColumnListClick
+      end
+      object N13: TMenuItem
         Caption = '-'
       end
       object miBrowseDirectory: TMenuItem

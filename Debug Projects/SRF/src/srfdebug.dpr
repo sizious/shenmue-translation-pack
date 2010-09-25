@@ -62,7 +62,7 @@ begin
 
         SRFEditor.Subtitles.ExportToFile(XmlFile);
 
-        for i := 0 to 4 do begin
+        for i := 0 to 9 do begin
           for j := 0 to SRFEditor.Subtitles.Count - 1 do
             SRFEditor.Subtitles[j].Text := GetRandomString(90);
           SRFEditor.Save;

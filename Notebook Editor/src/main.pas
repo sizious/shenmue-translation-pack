@@ -1122,7 +1122,7 @@ begin
   PagePosition := ppLeft;
   FlagCodeEditName := 'Left';
 
-  if FindStr('Right', (Sender as TEdit).Name) then begin
+  if IsInString('Right', (Sender as TEdit).Name) then begin
     PagePosition := ppRight;
     Inc(PageIndex);
     FlagCodeEditName := 'Right';

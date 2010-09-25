@@ -15,8 +15,6 @@ type
   EDataDirectoryNotFound = class(ESystemTools);
   EFourCCNotSameLengthAsString = class(ESystemTools);
 
-  TPlatformVersion = (pvUnknow, pvDreamcast, pvXbox);
-
   // Standard section header (used by many units, like FSParser)
   TSectionEntry = record
     Name: array[0..3] of Char;
@@ -35,7 +33,6 @@ function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
 function EOFS(var F: TFileStream): Boolean; overload;
-function FindStr(const SubStr, S: string): Boolean;
 function GetApplicationDirectory: TFileName;
 function GetApplicationRadicalName: string;
 function GetApplicationInstancesCount: Integer;
@@ -48,13 +45,13 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
+function IsInString(const SubStr, S: string): Boolean;
 function IsJapaneseString(const S: string): Boolean;
 procedure LoadUnicodeTextFile(SL: TStringList; const FileName: TFileName);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
 function ParseStr(SubStr, S: string; n: Integer): string;
-function PlateformVersionToString(PlateformVersion: TPlatformVersion): string;
 function ReadNullTerminatedString(var F: TFileStream): string; overload;
 function ReadNullTerminatedString(var F: TFileStream;
   const StrSize: LongWord): string; overload;
@@ -225,7 +222,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-function FindStr(const SubStr, S: string): Boolean;
+function IsInString(const SubStr, S: string): Boolean;
 begin
   Result := Pos(LowerCase(SubStr), LowerCase(S)) > 0;
 end;
@@ -709,20 +706,6 @@ begin
   Result := '';
   for x := 0 to Random(StringMaxLength) do begin
     Result := Result + ALPHA_CHARS[Random(Length(ALPHA_CHARS)) + 1];
-  end;
-end;
-
-//------------------------------------------------------------------------------
-
-function PlateformVersionToString(PlateformVersion: TPlatformVersion): string;
-begin
-  case PlateformVersion of
-    pvUnknow:
-      Result := '(Unknow)';
-    pvDreamcast:
-      Result := 'Dreamcast';
-    pvXbox:
-      Result := 'Xbox';
   end;
 end;
 
