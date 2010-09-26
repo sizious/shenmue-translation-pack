@@ -7,6 +7,7 @@ program hashdb;
 uses
   Windows,
   SysUtils,
+  Classes,
   XMLDom,
   XMLIntf,
   MSXMLDom,
@@ -31,37 +32,68 @@ var
   FileNamesRootNode,
   ContainerDiscsRootNode: IXMLNode;
 
-  GameVersion: TSRFGameVersion;
+  GameVersion: TGameVersion;
   Region: TGameRegion;
   PlatformVersion: TPlatformVersion;
+
+  SL: TStringList;
 
 //------------------------------------------------------------------------------
 
 function UpdateDBI: Boolean;
 var
-  Key: string;
+  sRegion, Key, SameMD5, SRFName, AFSName: string;
+  i: Integer;
   
 begin
   Result := False;
   Key := SRFEditor.HashKey;
 
+  sRegion := LowerCase(GameRegionToCodeString(Region)[1]);
+  SRFName := ExtractFileName(ChangeFileExt(SRFEditor.SourceFileName, ''));
+  AFSName := ExtremeRight('\', AFSFileName);
+
   Node := ContainerDiscsRootNode.ChildNodes.FindNode(Key); // search for the key in DBI
   if not Assigned(Node) then begin // add the new key to the database
     Inc(DBINumEntries);  
     Node := ContainerDiscsRootNode.AddChild(Key);
-    Node.Attributes['v'] := SRFGameVersionToCodeString(GameVersion);
-    Node.Attributes['s'] := PlatformVersionToCodeString(PlatformVersion);
-    Node.Attributes['d' + DiscNumber] := True;
-    Node.Attributes['n'] := ExtractFileName(ChangeFileExt(SRFEditor.SourceFileName, ''));
-    Node.Attributes['a'] := AFSFileName; 
     Result := True;
+
+//    for i := 1 to 4 do
+//      Node.Attributes['d' + IntToStr(i)] := False;
+//    Node.Attributes['j'] := false;
+//    Node.Attributes['u'] := false;
+//    Node.Attributes['e'] := false;
+//    Node.Attributes['NAME'] := SRFName;
+//    Node.Attributes['AFS'] := AFSName;
+//    Node.NodeValue := MD5FromFile(SRFEditor.SourceFileName);
 
 //    WriteLn('ACCEPT: "' + Key + '" (i = ', FileIndex, ', d = ', DiscNumber, ')');
   end else begin
     WriteLn('**************** REJECT ' + KEY);
+    SameMD5 := '';
     
+    if Node.NodeValue <> MD5FromFile(SRFEditor.SourceFileName) then
+      SameMD5 := '_MD5_';
 
+    if Node.Attributes['NAME'] <> SRFName then
+      SameMD5 := SameMD5 + '_NAME_';
+
+    if Node.Attributes['AFS'] <> AFSName then
+      SameMD5 := SameMD5 + '_AFS_';
+
+    if SameMD5 = '' then SameMD5 := 'OK';
+
+    SL.Add(KEY + ';' + SRFEditor.SourceFileName + ';' + DiscNumber + ';' + SameMD5);
   end;
+
+//  Node.Attributes['v'] := GameVersionToCodeString(GameVersion);
+  Node.Attributes['s'] := PlatformVersionToCodeString(PlatformVersion);
+//  Node.Attributes['d' + DiscNumber] := True;
+//  Node.Attributes[sRegion] := True;
+//  Node.Attributes['n' + DiscNumber] := SRFName;
+//  Node.Attributes['a' + DiscNumber] := AFSName;
+
 //    WriteLn('REJECT: "' + Key);
 end;
 
@@ -72,13 +104,15 @@ procedure InitParameters;
   procedure DetermineGameInformation(Param: string);
   begin
     // game version
-    GameVersion := sgvUndef;
+    GameVersion := gvUndef;
     if IsInString('s1', param) then
-      GameVersion := sgvShenmue
-    else if IsInString('whats', param) then
-      GameVersion := sgvUndef // incorrect..
+      GameVersion := gvShenmue
+    else if IsInString('wh', param) then
+      GameVersion := gvWhatsShenmue // incorrect..
     else if IsInString('s2', param) then
-      GameVersion := sgvShenmue2;
+      GameVersion := gvShenmue2
+    else if IsInString('us', param) then
+      GameVersion := gvUSShenmue;
 
     // game region
     Region := prUndef;
@@ -187,19 +221,24 @@ begin
   ReportMemoryLeaksOnShutDown := True;
 
   PrgName := ExtractFileName(ChangeFileExt(ParamStr(0), ''));
-  if ParamCount < 5 then begin
+  if ParamCount < 6 then begin
 //    ShowHelp;
     Exit;
   end;
 
   InitParameters;
 
+  SL := TStringList.Create;
+
   CoInitialize(nil);
   DBI_XMLDoc := TXMLDocument.Create(nil);
   SRFEditor := TSRFEditor.Create;
   try
     try
-//      InitTCD;
+      if FileExists('REJECT.LOG') then
+        SL.LoadFromFile('REJECT.LOG');
+        
+//      InitTCD;                                  
 
       InitDBI;
 
@@ -225,12 +264,14 @@ begin
 
       // Saving the file
       DBI_XMLDoc.SaveToFile(DBIOutputFile);
+      SL.SaveToFile('REJECT.LOG');
     except
       on E:Exception do
         Writeln('MAIN EXCEPTION: ', FoundFile, ': ', E.Message);
     end;
 
   finally
+    SL.Free;
     SRFEditor.Free;
     DBI_XMLDoc.Active := False;
     DBI_XMLDoc := nil;

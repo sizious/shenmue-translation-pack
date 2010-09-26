@@ -30,6 +30,7 @@ procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
 function ExtractDirectoryName(const FullDirectoryPath: TFileName): TFileName;
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
+function ExtractRadicalFileName(const FullPathFileName: TFileName): TFileName;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
 function EOFS(var F: TFileStream): Boolean; overload;
@@ -85,6 +86,13 @@ const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
   NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+function ExtractRadicalFileName(const FullPathFileName: TFileName): TFileName;
+begin
+  Result := ExtractFileName(ChangeFileExt(FullPathFileName, ''));
+end;
 
 //------------------------------------------------------------------------------
 
@@ -296,7 +304,7 @@ end;
 
 function GetApplicationRadicalName: string;
 begin
-  Result := ExtractFileName(ChangeFileExt(ParamStr(0), ''));
+  Result := ExtractRadicalFileName(ParamStr(0));
 end;
 
 //------------------------------------------------------------------------------
