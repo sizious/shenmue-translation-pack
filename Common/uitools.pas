@@ -10,6 +10,9 @@ type
   EUserInterface = class(Exception);
   EInvalidToolBarButton = class(EUserInterface);
   TScrollDirection = (sdTop, sdBottom);
+
+const
+  UNDEFINED_VALUE = '##UNDEF!##';
   
 function BR(const Text: string): string;
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);

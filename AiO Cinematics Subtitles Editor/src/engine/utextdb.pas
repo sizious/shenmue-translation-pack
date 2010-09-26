@@ -13,27 +13,20 @@ function TextCorrectorDatabaseUpdate: Boolean;
 implementation
 
 uses
-  Main, SysTools, LZMADec, WorkDir;
+  Main, SysTools, LZMADec, WorkDir, FileSpec;
 
 const
   TEXTDB_ROOT_DIR = 'textdb';
 
-function GameVersionToDatabaseName(GameVersion: TSRFGameVersion): TFileName;
-begin
-  case GameVersion of
-    sgvUndef: Result := '';
-    sgvShenmue: Result := 's1dcue';
-    sgvShenmue2: Result := 's2dcue';
-  end;
-end;
-
 // Extract every textdb/*.db files to working temp directory
-function DBInitialize(GameVersion: TSRFGameVersion): TFileName;
+function DBInitialize(GameVersion: TGameVersion; PlatformVersion: TPlatformVersion): TFileName;
 var
   InputDir, OutputDir, DBFile, DBName: TFileName;
 
 begin
-  DBName := GameVersionToDatabaseName(GameVersion);
+  DBName := GameVersionToCodeString(GameVersion, True)
+    + PlatformVersionToCodeString(PlatformVersion) + 'e'; 
+
   OutputDir := GetWorkingTempDirectory + TEXTDB_ROOT_DIR + '\' + DBName + '\';
   if not DirectoryExists(OutputDir) then begin
     InputDir := GetApplicationDataDirectory + TEXTDB_ROOT_DIR + '\';
@@ -50,7 +43,7 @@ var
 
 begin
   // Initialize the TextCorrectorDatabase if needed
-  DBIFileName := DBInitialize(SRFEditor.GameVersion);
+  DBIFileName := DBInitialize(SRFEditor.GameVersion, SRFEditor.PlatformVersion);
   if FileExists(DBIFileName) then
     TextCorrectorDatabase.OpenDatabase(DBIFileName); // Load the DBI (index) file
 

@@ -118,6 +118,7 @@ type
     N13: TMenuItem;
     miOriginalTextField: TMenuItem;
     miOriginalColumnList: TMenuItem;
+    tbOriginalTextField: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -310,7 +311,7 @@ implementation
 
 uses
   Config, UITools, SysTools, ChrCount, About, DirScan, SubsExp, MassImp,
-  UTextDB;
+  UTextDB, FileSpec;
 
 const
   SUBS_COLINDEX = 1;
@@ -629,7 +630,7 @@ begin
   // Destroying the Previewer
   Previewer.Free;
 
-  // Destroying NBIK Sequence Editor
+  // Destroying SRF Editor
   SRFEditor.Free;
 
   // Destroying the Files List
@@ -644,11 +645,11 @@ end;
 
 procedure TfrmMain.ModulesInit;
 
-  function CheckCharsetExists(FileName: TFileName; Version: TSRFGameVersion): Boolean;
+  function CheckCharsetExists(FileName: TFileName; Version: TGameVersion): Boolean;
   begin
     Result := FileExists(FileName);
     if not Result then
-      Debug.Report(ltWarning, 'Sorry, the ' + SRFGameVersionToString(Version)
+      Debug.Report(ltWarning, 'Sorry, the ' + GameVersionToString(Version)
         + ' Charset list wasn''t found! The '
         + 'Shenmue Decode subtitle function won''t be available.',
         'FileName: "' + FileName + '".');
@@ -664,14 +665,14 @@ begin
   // Create the Files List
   fWorkingFilesList := TFilesList.Create;
 
-  // Init NBIK Sequence Editor
-  SRFEditor := TSRFEditor.Create;
+  // Init SRF Editor
+  SRFEditor := TSRFEditor.Create(GetApplicationDataDirectory);
 
   // Prepare Charset Functionality
   CharsetFileShenmue := GetApplicationDataDirectory + 'chrlist1.csv';
-  fCharsetCanEnableShenmue := CheckCharsetExists(CharsetFileShenmue, sgvShenmue);
+  fCharsetCanEnableShenmue := CheckCharsetExists(CharsetFileShenmue, gvShenmue);
   CharsetFileShenmue2 := GetapplicationDataDirectory + 'chrlist2.csv';
-  fCharsetCanEnableShenmue2 := CheckCharsetExists(CharsetFileShenmue2, sgvShenmue2);
+  fCharsetCanEnableShenmue2 := CheckCharsetExists(CharsetFileShenmue2, gvShenmue2);
   DecodeSubtitles := CharsetCanEnableShenmue or CharsetCanEnableShenmue2;
 
   // Init the Previewer
@@ -878,7 +879,7 @@ begin
     fSelectedSubtitleItem := SRFEditor.Subtitles[Index];
 
     // Saving the Original Subtitle and the Old Subtitle (for the Old Memo Field)
-    fSelectedOriginalSubtitle := '##UNDEF!##';
+    fSelectedOriginalSubtitle := UNDEFINED_VALUE;
     if IsTextCorrectionDatabaseLoaded then
       fSelectedOriginalSubtitle := TextCorrectorDatabase.Subtitles[Index].Text;
     fSelectedOldSubtitle := SelectedSubtitle;
@@ -968,10 +969,14 @@ begin
             SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
 
             if IsTextCorrectionDatabaseLoaded then
-              SubItems[ORIGINAL_SUBS_COLINDEX] :=
-                BR(TransformText(TextCorrectorDatabase.Subtitles[i].Text));
+              if SRFEditor.Subtitles.DecodeText then              
+                SubItems[ORIGINAL_SUBS_COLINDEX] :=
+                  BR(TransformText(TextCorrectorDatabase.Subtitles[i].Text))
+              else
+                SubItems[ORIGINAL_SUBS_COLINDEX] :=
+                  BR(TextCorrectorDatabase.Subtitles[i].Text);
           end;
-      end;                   
+      end;
 
       // Updating UI
       if not UpdateUI then begin
@@ -990,7 +995,7 @@ begin
     end;
 
   end else
-    Debug.Report(ltWarning, 'This file isn''t a supported NBIK sequence MAPINFO.BIN file.',
+    Debug.Report(ltWarning, 'This file isn''t a supported SRF file.',
       'FileName: ' + FileName);
 
   StatusText := '';
@@ -1022,12 +1027,12 @@ begin
   
   // Determine the right charset to use
   case SRFEditor.GameVersion of
-    sgvShenmue:
+    gvShenmue:
       begin
         CharsetFile := CharsetFileShenmue;
         CharsetCanEnable := CharsetCanEnableShenmue;
       end;
-    sgvShenmue2:
+    gvShenmue2:
       begin
         CharsetFile := CharsetFileShenmue2;
         CharsetCanEnable := CharsetCanEnableShenmue2;
@@ -1366,8 +1371,12 @@ begin
         with ListItem do begin
           SubItems[SUBS_COLINDEX] := BR(SRFEditor.Subtitles[i].Text);
           if IsTextCorrectionDatabaseLoaded then
-            SubItems[ORIGINAL_SUBS_COLINDEX] :=
-              BR(TransformText(TextCorrectorDatabase.Subtitles[i].Text));
+            if SRFEditor.Subtitles.DecodeText then            
+              SubItems[ORIGINAL_SUBS_COLINDEX] :=
+                BR(TransformText(TextCorrectorDatabase.Subtitles[i].Text))
+            else
+              SubItems[ORIGINAL_SUBS_COLINDEX] :=
+                BR(TextCorrectorDatabase.Subtitles[i].Text);
         end;
       end;
     end;
@@ -1419,6 +1428,7 @@ procedure TfrmMain.SetOriginalTextInField(const Value: Boolean);
 begin
   fOriginalTextField := Value;
   miOriginalTextField.Checked := OriginalTextField;
+  tbOriginalTextField.Down := OriginalTextField;
 
   // change the label
   if OriginalTextField then
@@ -1488,11 +1498,13 @@ end;
 
 procedure TfrmMain.UpdateOldTextField;
 begin
-  if OriginalTextField then
-    mOldSub.Text := SelectedOriginalSubtitle
-  else
+  if OriginalTextField then begin
+    if SRFEditor.Subtitles.DecodeText then    
+      mOldSub.Text := SRFEditor.Charset.Decode(SelectedOriginalSubtitle)
+    else
+      mOldSub.Text := SelectedOriginalSubtitle;
+  end else
     mOldSub.Text := SelectedOldSubtitle;
-  mOldSub.Text := TransformText(mOldSub.Text);
 end;
 
 //==============================================================================

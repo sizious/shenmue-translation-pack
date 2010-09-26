@@ -38,7 +38,9 @@ uses
   textdb in '..\..\Common\TextDB\textdb.pas',
   utextdb in 'engine\utextdb.pas',
   lzmadec in '..\..\Common\lzmadec.pas',
-  workdir in '..\..\Common\workdir.pas';
+  workdir in '..\..\Common\workdir.pas',
+  filespec in '..\..\Common\filespec.pas',
+  srfkeydb in 'engine\srfkeydb.pas';
 
 {$R *.res}
 

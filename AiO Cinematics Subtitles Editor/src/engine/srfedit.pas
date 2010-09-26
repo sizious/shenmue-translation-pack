@@ -3,14 +3,12 @@ unit SRFEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes, SysTools, ChrCodec;
+  Windows, SysUtils, Classes, SysTools, FileSpec, SRFKeyDB, ChrCodec;
 
 const
   SRF_DATABLOCK_SIZE = 1024;
   
 type
-  TSRFGameVersion = (sgvUndef, sgvShenmue, sgvShenmue2);
-
   TSRFEditor = class;
   TSRFSubtitlesList = class;
 
@@ -82,37 +80,41 @@ type
 
   TSRFEditor = class(TObject)
   private
+    fCinematicsHashKeyDatabase: TCinematicsHashKeyDatabase;
     fSRFSubtitlesList: TSRFSubtitlesList;
-    fGameVersion: TSRFGameVersion;
+    fGameVersion: TGameVersion;
     fFileLoaded: Boolean;
     fSourceFileName: TFileName;
     fMakeBackup: Boolean;
     fCharset: TShenmueCharsetCodec;
     fHashKey: string;
+    fPlatformVersion: TPlatformVersion;
+    property CinematicsHashKeyDatabase: TCinematicsHashKeyDatabase
+      read fCinematicsHashKeyDatabase;
   protected
     function ComputeHashKey: string;
-    function DetectGameVersion(var InStream: TFileStream): TSRFGameVersion;
+    function DetectGameVersion(var InStream: TFileStream): TGameVersion;
     procedure ParseShenmueFormat(var InStream: TFileStream);
     procedure ParseShenmue2Format(var InStream: TFileStream);
   public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(const DataDirectory: TFileName); overload;
     destructor Destroy; override;
     procedure Clear;
     function LoadFromFile(const FileName: TFileName): Boolean;
     function Save: Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
     property Charset: TShenmueCharsetCodec read fCharset;
-    property GameVersion: TSRFGameVersion read fGameVersion;
+    property GameVersion: TGameVersion read fGameVersion;
     property HashKey: string read fHashKey;
     property Loaded: Boolean read fFileLoaded;
     property MakeBackup: Boolean read fMakeBackup write fMakeBackup;
+    property PlatformVersion: TPlatformVersion read fPlatformVersion;
     property SourceFileName: TFileName read fSourceFileName;
     property Subtitles: TSRFSubtitlesList read fSRFSubtitlesList;
   end;
 
 function DataBlockToString(D: TSRFDataBlock; ADataSize: LongWord): string;
-function SRFGameVersionToString(SRFGameVersion: TSRFGameVersion): string;
-function SRFGameVersionToCodeString(SRFGameVersion: TSRFGameVersion): string;
 
 implementation
 
@@ -140,24 +142,6 @@ type
     Size: LongWord;
     CharID: array[0..3] of Char;
   end;
-
-function SRFGameVersionToString(SRFGameVersion: TSRFGameVersion): string;
-begin
-  case SRFGameVersion of
-    sgvUndef: Result := '';
-    sgvShenmue: Result := 'Shenmue';
-    sgvShenmue2: Result := 'Shenmue II';
-  end;
-end;
-
-function SRFGameVersionToCodeString(SRFGameVersion: TSRFGameVersion): string;
-begin
-  case SRFGameVersion of
-    sgvUndef: Result := 'UNDEF';
-    sgvShenmue: Result := 'SHENMUE';
-    sgvShenmue2: Result := 'SHENMUE2';
-  end;
-end;
 
 function DataBlockToString(D: TSRFDataBlock; ADataSize: LongWord): string;
 var
@@ -207,10 +191,10 @@ function TSRFSubtitlesListItem.GetRecordSize: LongWord;
 begin
   Result := ExtraDataSize + LongWord(Length(RawText));
   case Editor.GameVersion of
-    sgvShenmue:
+    gvShenmue:
       // Result + Size of the sub header (12) + DataSize header (4)
       Result := Result + SizeOf(TShenmueSubtitleHeader) + UINT32_SIZE + TextPaddingSize;
-    sgvShenmue2:
+    gvShenmue2:
       begin
         // Result + Size of the CHID section (12) + ENDC header (8)
         Result := Result + SizeOf(TShenmue2SubtitleHeader) + SizeOf(TSectionEntry);
@@ -585,26 +569,11 @@ end;
 
 procedure TSRFEditor.Clear;
 begin
-  fGameVersion := sgvUndef;
+  fGameVersion := gvUndef;
   fFileLoaded := False;
   Subtitles.Clear;
   fSourceFileName := '';
   fHashKey := '';
-end;
-
-constructor TSRFEditor.Create;
-begin
-  fSRFSubtitlesList := TSRFSubtitlesList.Create(Self);
-  fCharset := TShenmueCharsetCodec.Create;
-  Subtitles.DecodeText := True;
-  Clear;
-end;
-
-destructor TSRFEditor.Destroy;
-begin
-  fSRFSubtitlesList.Free;
-  fCharset.Free;
-  inherited;
 end;
 
 function TSRFEditor.ComputeHashKey: string;
@@ -623,26 +592,50 @@ begin
   end;
 end;
 
+constructor TSRFEditor.Create;
+begin
+  fSRFSubtitlesList := TSRFSubtitlesList.Create(Self);
+  fCharset := TShenmueCharsetCodec.Create;
+  Subtitles.DecodeText := True;
+  fCinematicsHashKeyDatabase := TCinematicsHashKeyDatabase.Create;
+  Clear;
+end;
+
+constructor TSRFEditor.Create(const DataDirectory: TFileName);
+begin
+  Create;
+  CinematicsHashKeyDatabase.OpenDatabase(DataDirectory + 'srfkeys.db');
+end;
+
+destructor TSRFEditor.Destroy;
+begin
+  fSRFSubtitlesList.Free;
+  fCharset.Free;
+  fCinematicsHashKeyDatabase.Free;
+  inherited;
+end;
+
 function TSRFEditor.DetectGameVersion(
-  var InStream: TFileStream): TSRFGameVersion;
+  var InStream: TFileStream): TGameVersion;
 var
   Header: array[0..3] of Char;
 
 begin
-  Result := sgvUndef;
+  // Reading the file signature
+  Result := gvUndef;
   InStream.Seek(0, soFromBeginning);
   InStream.Read(Header, SizeOf(Header));
   if StrEquals(Header, SHENMUE_SIGN) then
-    Result := sgvShenmue
+    Result := gvShenmue
   else if StrEquals(Header, PChar(SHENMUE2_SIGN)) then
-    Result := sgvShenmue2;
-  InStream.Seek(0, soFromBeginning);    
+    Result := gvShenmue2;
+  InStream.Seek(0, soFromBeginning);
 end;
 
 function TSRFEditor.LoadFromFile(const FileName: TFileName): Boolean;
 var
   InStream: TFileStream;
-  CurrentGameVersion: TSRFGameVersion;
+  CurrentGameVersion: TGameVersion;
 
 begin
   Result := False;
@@ -661,7 +654,7 @@ begin
       CurrentGameVersion := DetectGameVersion(InStream);
 
       // The file is valid so we can continue
-      if CurrentGameVersion <> sgvUndef then begin
+      if CurrentGameVersion <> gvUndef then begin
         // Clearing the object
         Clear;
 
@@ -672,11 +665,11 @@ begin
         case GameVersion of
 
           // Shenmue I
-          sgvShenmue:
+          gvShenmue:
             ParseShenmueFormat(InStream);
 
           // Shenmue II
-          sgvShenmue2:
+          gvShenmue2:
             ParseShenmue2Format(InStream);
 
         end;
@@ -688,6 +681,13 @@ begin
 
         // Compute MD5 Hash Key
         fHashKey := ComputeHashKey;
+
+        // Reading the platform version
+        fPlatformVersion := pvUndef;
+        with CinematicsHashKeyDatabase do
+          if Loaded then begin
+            fPlatformVersion := GetPlatformVersion(HashKey);
+          end;
       end;
       
     except
@@ -923,9 +923,9 @@ begin
 
       // Write the subtitle
       case GameVersion of
-        sgvShenmue:
+        gvShenmue:
           Subtitles[i].WriteShenmueEntry(OutStream);
-        sgvShenmue2:
+        gvShenmue2:
           Subtitles[i].WriteShenmue2Entry(OutStream);
       end;
 

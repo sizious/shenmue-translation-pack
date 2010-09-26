@@ -82,8 +82,9 @@ begin
             MD5FromFile(SRFEditor.SourceFileName);
 
         AddToLog(S);
-      end else
-        AddToLog(S + 'JAPANESE FILES NOT SUPPORTED'); // not supported
+      end else begin
+        AddToLog(S + 'JAPANESE FILES NOT SUPPORTED ' + SRFEditor.hashkey); // not supported
+      end;
 
     end else
       AddToLog(S + ' FAILED WHEN OPENING FILE');
