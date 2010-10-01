@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE translation [
+<!ELEMENT translation (translate | insert | patch)* >
+<!ELEMENT ptr EMPTY>
+<!ATTLIST ptr
+    addr CDATA #REQUIRED
+>
+<!ELEMENT translate (ptr)+ >
+<!ATTLIST translate
+	section CDATA #REQUIRED
+	text CDATA #REQUIRED
+>
+<!ELEMENT insert (ptr)+ >
+<!ATTLIST insert
+	text CDATA #REQUIRED
+>
+<!ELEMENT patch (ptr)+ >
+<!ATTLIST patch
+	addr CDATA #REQUIRED
+>
+]>
+
+<translation>
+    <translate section="options" text="Hi dude, what's up?" >
+        <ptr addr="0x216be8" />
+        <ptr addr="0x123456" />
+    </translate>
+    <insert text="Yo bro, nuthin' bro" >
+        <ptr addr="0x2cef0" />
+    </insert>
+    <patch addr="0x21bc54" >
+        <ptr addr="0x46acc" />
+        <ptr addr="0x46c48" />
+        <ptr addr="0x70a70" />
+    </patch>
+</translation>
