@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE allocation_table [
+<!ELEMENT allocation_table ANY>
+<!ELEMENT block EMPTY>
+<!ATTLIST block
+    addr    CDATA #REQUIRED
+    size    CDATA #REQUIRED
+>
+]>
+
+<allocation_table>
+    <block addr="0x216be8" size="0x657"  />
+    <block addr="0x217978" size="0x2060" />
+    <block addr="0x21b8b8" size="0x1a3"  />
+    <block addr="0x21d540" size="0x95"   />
+    <block addr="0x220408" size="0x1f96" />
+    <block addr="0x2224bc" size="0x1683" />
+    <block addr="0x229f8d" size="0x104d" />
+    <block addr="0x22b0dc" size="0xc26"  />
+    <block addr="0x25159e" size="0x26b"  />
+</allocation_table> 
+
