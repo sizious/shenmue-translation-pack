@@ -101,7 +101,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, Common, CharsLst, NPCInfo, ScnfUtil,
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, SRFDB
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, Variants, SRFNPCDB
   {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF}
   ;
 

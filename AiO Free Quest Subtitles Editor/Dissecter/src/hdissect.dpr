@@ -17,7 +17,7 @@ uses
   npclist in '..\..\Editor\src\engine\npc\npclist.pas',
   imgtools in '..\..\..\Common\imgtools.pas',
   scnfutil in '..\..\Editor\src\engine\scnfutil.pas',
-  srfdb in '..\..\Editor\src\engine\srfdb.pas',
+  srfnpcdb in '..\..\Editor\src\engine\srfnpcdb.pas',
   hashidx in '..\..\..\Common\hashidx.pas';
 
 {$R *.res}

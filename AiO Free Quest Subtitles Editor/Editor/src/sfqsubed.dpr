@@ -49,7 +49,7 @@ uses
   oldskool_font_vcl in '..\..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
   viewer in '..\..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
   hashidx in '..\..\..\Common\hashidx.pas',
-  srfdb in 'engine\srfdb.pas',
+  srfnpcdb in 'engine\srfnpcdb.pas',
   srfscript in 'srfscript.pas' {frmCinematicsScript},
   batchsrf in 'engine\batch\batchsrf.pas',
   fileslst in '..\..\..\Common\fileslst.pas',
