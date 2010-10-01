@@ -549,7 +549,7 @@ implementation
 {$ENDIF}
 
 uses
-  {$IFDEF DEBUG} TypInfo, SRFDB, DBLzma, {$ENDIF}
+  {$IFDEF DEBUG} TypInfo, SRFNPCDB, DBLzma, {$ENDIF}
   MultiTrd, SelDir, Utils, CharsCnt, CharsLst, FileInfo, MassImp,
   Common, NPCInfo, About, FacesExt, IconsUI,
   BugsMgr, UITools, SysTools, srfscript;
