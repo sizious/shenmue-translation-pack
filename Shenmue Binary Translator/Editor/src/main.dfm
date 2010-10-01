@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'frmMain'
-  ClientHeight = 460
-  ClientWidth = 562
+  ClientHeight = 352
+  ClientWidth = 540
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,7 +18,7 @@ object frmMain: TfrmMain
   object tbMain: TJvToolBar
     Left = 0
     Top = 0
-    Width = 562
+    Width = 540
     Height = 26
     DisabledImages = ilToolBarDisabled
     EdgeBorders = [ebTop]
@@ -26,8 +26,6 @@ object frmMain: TfrmMain
     List = True
     TabOrder = 0
     Transparent = True
-    ExplicitLeft = -10
-    ExplicitWidth = 572
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -1501,8 +1499,8 @@ object frmMain: TfrmMain
       C0FF8001C003FE07FFFFFFFFC007FFFF}
   end
   object MainMenu1: TMainMenu
-    Left = 16
-    Top = 80
+    Left = 428
+    Top = 8
     object File1: TMenuItem
       Caption = '&File'
     end
