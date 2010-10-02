@@ -1,4 +1,4 @@
-<!ELEMENT translation (header, script, allocation_table) >
+<!ELEMENT translation (header, script, allocation_table)>
 
 <!ELEMENT header EMPTY>
 <!ATTLIST header
@@ -7,7 +7,7 @@
     region CDATA #REQUIRED
 >
 
-<!ELEMENT script (section+, insert*, patch*) >
+<!ELEMENT script (section+, insert*, patch*)>
 
 <!ELEMENT section (translate*) >
 <!ATTLIST section
