@@ -1,0 +1,10 @@
+binpatch <script.xml> <1ST_READ.BIN>
+
+binpatch.exe s2paldc.xml 1ST_READ.BIN --> traduira 1ST_READ.BIN avec le contenu du fichier XML s2paldc.xml
+
+ce fichier contient tout ce qu'il faut pour effecter les modifs:
+- les infos du jeu (version, plateforme, région)
+- les phrases à traduire
+- les phrases à insérer (qui ne sont pas à traduire, typiquement 'DC_KANA.FON')
+- les pointeurs à mettre à jour
+- les blocks disponibles permettant de stocker les chaines
