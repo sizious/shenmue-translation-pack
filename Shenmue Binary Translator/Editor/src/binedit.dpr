@@ -3,7 +3,8 @@ program binedit;
 uses
   Windows,
   Forms,
-  main in 'main.pas' {frmMain};
+  main in 'main.pas' {frmMain},
+  binedit in 'engine\binedit.pas';
 
 {$R *.res}
 

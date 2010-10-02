@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
+    <Projects Include="Binary\src\dbgbin.dproj" />
     <Projects Include="ChrCodec\src\dbgcodec.dproj" />
     <Projects Include="DirScan\src\dbgscan.dproj" />
     <Projects Include="HashMap\src\dbghash.dproj" />
@@ -91,14 +92,23 @@
   <Target Name="dbgtxtdb:Make">
     <MSBuild Projects="TextDB\src\dbgtxtdb.dproj" Targets="Make" />
   </Target>
+  <Target Name="dbgbin">
+    <MSBuild Projects="Binary\src\dbgbin.dproj" Targets="" />
+  </Target>
+  <Target Name="dbgbin:Clean">
+    <MSBuild Projects="Binary\src\dbgbin.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="dbgbin:Make">
+    <MSBuild Projects="Binary\src\dbgbin.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb" />
+    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean" />
+    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make" />
+    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
