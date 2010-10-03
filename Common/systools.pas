@@ -3,7 +3,7 @@ unit SysTools;
 interface
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, XMLIntf;
 
 const
   UINT16_SIZE = 2;
@@ -42,6 +42,7 @@ function GetFileSize(const FileName: TFileName): Int64;
 function GetRandomString(const StringMaxLength: Integer): string;
 function GetTempDir: TFileName;
 function GetTempFileName: TFileName;
+function GetXMLDocType(const XMLBuffer: string): string;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
@@ -56,6 +57,7 @@ function ParseStr(SubStr, S: string; n: Integer): string;
 function ReadNullTerminatedString(var F: TFileStream): string; overload;
 function ReadNullTerminatedString(var F: TFileStream;
   const StrSize: LongWord): string; overload;
+procedure SetXMLDocType(XMLDocument: IXMLDocument; const DocType: string);
 function StrEquals(S1, S2: string): Boolean;
 procedure StrToFourCC(var FourCC: array of Char; S: string);
 function StringArrayBinarySearch(SortedSource: array of string;
@@ -80,7 +82,7 @@ implementation
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  TlHelp32, Forms, Math, Variants;
+  TlHelp32, Forms, Math, Variants, XMLDom, MSXMLDom, XMLDoc, ActiveX;
 
 const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
@@ -92,6 +94,53 @@ const
 function ExtractRadicalFileName(const FullPathFileName: TFileName): TFileName;
 begin
   Result := ExtractFileName(ChangeFileExt(FullPathFileName, ''));
+end;
+
+//------------------------------------------------------------------------------
+
+// http://delphi.about.com/od/adptips2006/qt/doctype_txmldoc.htm
+function GetXMLDocType(const XMLBuffer: string): string;
+var
+  SL: TStringList;
+  Found: Boolean;
+  i: Integer;
+
+begin
+  Result := '';
+  SL := TStringList.Create;
+  try
+    SL.Text := XMLBuffer;
+//    SL.LoadFromFile(XMLFileName);
+    Found := False;
+    i := 0;
+    while (i < SL.Count) and (not Found) do begin
+      Found := IsInString('DOCTYPE', UpperCase(SL[i]));
+      if Found then
+        Result := SL[i];
+      Inc(i);
+    end;
+  finally
+    SL.Free;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure SetXMLDocType(XMLDocument: IXMLDocument; const DocType: string);
+var
+  SL: TStringList;
+
+begin
+  if (DocType = '') or (XMLDocument.XML.Count = 0) then Exit;
+  SL := TStringList.Create;
+  try
+    SL.Assign(XMLDocument.XML);
+    SL.Insert(1, DocType);
+    XMLDocument.XML.Assign(SL);
+    XMLDocument.Active := True;
+  finally
+    SL.Free;
+  end;
 end;
 
 //------------------------------------------------------------------------------

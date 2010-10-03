@@ -3,7 +3,7 @@ unit BINEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, FileSpec;
   
 type
   TBinaryScriptEditor = class;
@@ -183,6 +183,23 @@ type
   end;
 
 //------------------------------------------------------------------------------
+// HEADER INFOS
+// -----------------------------------------------------------------------------
+
+  TBinaryHeader = class(TObject)
+  private
+    fVersion: TGameVersion;
+    fPlatformKind: TPlatformVersion;
+    fRegion: TGameRegion;
+  protected
+    procedure Clear;
+  public
+    property Region: TGameRegion read fRegion;
+    property PlatformKind: TPlatformVersion read fPlatformKind;
+    property Version: TGameVersion read fVersion;
+  end;
+
+//------------------------------------------------------------------------------
 // MAIN CLASS
 // -----------------------------------------------------------------------------
 
@@ -192,15 +209,22 @@ type
     fSections: TSectionTable;
     fPointers: TPointerTable;
     fReserved: TFixedStringTable;
+    fFileLoaded: Boolean;
+    fHeader: TBinaryHeader;
+    fDocType: string;
   protected
     procedure Clear;
+    property DocType: string read fDocType;
   public
     constructor Create;
     destructor Destroy; override;
     function LoadFromFile(const FileName: TFileName): Boolean;
+    procedure SaveToFile(const FileName: TFileName);
     property Allocations: TAllocationTable read fAllocations;
-    property Sections: TSectionTable read fSections;
     property Constants: TFixedStringTable read fReserved;
+    property Header: TBinaryHeader read fHeader;
+    property Loaded: Boolean read fFileLoaded;
+    property Sections: TSectionTable read fSections;
     property Pointers: TPointerTable read fPointers;
   end;
 
@@ -209,7 +233,7 @@ implementation
 //==============================================================================
 
 uses
-  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX;
+  XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, SysTools;
 
 { TAddressList }
 
@@ -424,9 +448,12 @@ end;
 
 procedure TBinaryScriptEditor.Clear;
 begin
+  fFileLoaded := False;
   Allocations.Clear;
   Sections.Clear;
   Pointers.Clear;
+  Constants.Clear;
+  Header.Clear;
 end;
 
 constructor TBinaryScriptEditor.Create;
@@ -435,6 +462,8 @@ begin
   fSections := TSectionTable.Create;
   fPointers := TPointerTable.Create;
   fReserved := TFixedStringTable.Create;
+  fHeader := TBinaryHeader.Create;
+  Header.Clear;  
 end;
 
 destructor TBinaryScriptEditor.Destroy;
@@ -443,6 +472,7 @@ begin
   fSections.Free;
   fPointers.Free;
   fReserved.Free;
+  fHeader.Free;
   inherited;
 end;
 
@@ -454,7 +484,7 @@ var
   ScriptDocument: IXMLDocument;
   RootNode, ScriptNode,
   WorkingNode, TranslateNode,
-  AllocationsNode: IXMLNode;
+  AllocationsNode, HeaderNode: IXMLNode;
   i, j: Integer;
 
 // IsValidScriptFile
@@ -492,7 +522,7 @@ begin
   Clear;
 
   // setting the file / directory properties
-//  fLoaded := True;
+  fFileLoaded := True;
 
   // parsing the XML index file
   ScriptDocument := TXMLDocument.Create(nil);
@@ -511,7 +541,17 @@ begin
       if IsValidScriptFile then begin
         RootNode := ScriptDocument.DocumentElement;
 
+        // Getting the DOCTYPE
+        fDocType := GetXMLDocType(ScriptDocument.XML.Text);
+
         // Parsing header
+        HeaderNode := RootNode.ChildNodes.FindNode('header');
+        with Header do begin
+          fVersion := CodeStringToGameVersion(HeaderNode.Attributes['game']);
+          fPlatformKind :=
+            CodeStringToPlatformVersion(HeaderNode.Attributes['platform']);
+          fRegion := CodeStringToGameRegion(HeaderNode.Attributes['region']);
+        end;
 
         // Parsing script
         ScriptNode := RootNode.ChildNodes.FindNode('script');
@@ -573,6 +613,145 @@ begin
       end;
     end;
 
+  finally
+    ScriptDocument.Active := False;
+    ScriptDocument := nil;
+  end;
+end;
+
+procedure TBinaryScriptEditor.SaveToFile(const FileName: TFileName);
+var
+  ScriptDocument: IXMLDocument;
+  HeaderNode, ScriptNode, SectionNode,
+  TranslateNode, PointerNode: IXMLNode;
+  WorkingSection: TSectionTableItem;
+  WorkingStringItem: TStringTableItem;
+  FixedInsertString: TFixedStringTableItem;
+  PointerItem: TPointerTableItem;
+  i, j, k: Integer;
+
+  function IntelHex(Value: LongWord): string;
+  begin
+    Result := '0x' + LowerCase(IntToHex(Value, 2));
+  end;
+
+begin
+  ScriptDocument := TXMLDocument.Create(nil);
+  try
+    try
+      with ScriptDocument do begin
+        Options := [doNodeAutoCreate];
+        ParseOptions:= [];
+        NodeIndentStr:= '  ';
+        Active := True;
+        Version := '1.0';
+        Encoding := 'utf-8';
+
+        // Creating the root
+        DocumentElement := CreateNode('translation');
+
+        // Writing the header
+        HeaderNode := CreateNode('header');
+        HeaderNode.Attributes['game'] :=
+          GameVersionToCodeString(Header.Version);
+        HeaderNode.Attributes['platform'] :=
+          PlatformVersionToCodeString(Header.PlatformKind);
+        HeaderNode.Attributes['region'] :=
+          GameRegionToCodeString(Header.Region);
+        DocumentElement.ChildNodes.Add(HeaderNode);
+
+        // Writing the script node
+        ScriptNode := CreateNode('script');
+        DocumentElement.ChildNodes.Add(ScriptNode);
+
+        // Writing the 'sections' nodes
+        for i := 0 to Sections.Count - 1 do begin
+          WorkingSection := Sections[i];
+
+          // Creating the section root node
+          SectionNode := CreateNode('section');
+          SectionNode.Attributes['name'] := WorkingSection.Name;
+          ScriptNode.ChildNodes.Add(SectionNode);
+
+          // writing strings
+          for j := 0 to WorkingSection.Table.Count - 1 do begin
+            WorkingStringItem := WorkingSection.Table[j];
+
+            // creating the string entry in the xml
+            TranslateNode := CreateNode('translate');
+            TranslateNode.Attributes['text'] := WorkingStringItem.Text;
+            SectionNode.ChildNodes.Add(TranslateNode);
+
+            // writing addresses of that string
+            for k := 0 to WorkingStringItem.Addresses.Count - 1 do begin
+              PointerNode := CreateNode('ptr');
+              PointerNode.Attributes['addr'] :=
+                IntelHex(WorkingStringItem.Addresses[k]);
+              TranslateNode.ChildNodes.Add(PointerNode);
+            end; // k
+          end; // j
+        end; // i
+
+        // Writing the 'insert' nodes
+        for i := 0 to Constants.Count - 1 do begin
+          FixedInsertString := Constants[i];
+
+          // adding the 'insert' node
+          TranslateNode := CreateNode('insert');
+          TranslateNode.Attributes['text'] := FixedInsertString.Text;
+          ScriptNode.ChildNodes.Add(TranslateNode);
+
+          // adding addresses of that string
+          for j := 0 to FixedInsertString.Addresses.Count - 1 do begin
+            PointerNode := CreateNode('ptr');
+            PointerNode.Attributes['addr'] :=
+              IntelHex(FixedInsertString.Addresses[j]);
+            TranslateNode.ChildNodes.Add(PointerNode);
+          end;
+        end;
+
+        // Writing the 'patch' nodes
+        for i := 0 to Pointers.Count - 1 do begin
+          PointerItem := Pointers[i];
+
+          // adding the 'patch' node
+          TranslateNode := CreateNode('patch');
+          TranslateNode.Attributes['addr'] := IntelHex(PointerItem.Offset);
+          ScriptNode.ChildNodes.Add(TranslateNode);
+
+          // writing the addresses
+          for j := 0 to PointerItem.Addresses.Count - 1 do begin
+            PointerNode := CreateNode('ptr');
+            PointerNode.Attributes['addr'] :=
+              IntelHex(PointerItem.Addresses[j]);
+            TranslateNode.ChildNodes.Add(PointerNode);
+          end;
+        end;
+
+        // Writing the 'allocation_table' nodes
+        ScriptNode := CreateNode('allocation_table');
+        for i := 0 to Allocations.Count - 1 do begin
+          PointerNode := CreateNode('block');
+          PointerNode.Attributes['addr'] := IntelHex(Allocations[i].Offset);
+          PointerNode.Attributes['size'] := IntelHex(Allocations[i].Size);
+          ScriptNode.ChildNodes.Add(PointerNode);
+        end;
+        DocumentElement.ChildNodes.Add(ScriptNode);
+
+        // adding the DOCTYPE
+        SetXMLDocType(ScriptDocument, DocType);
+      end; // ScriptDocument
+
+      // Saving the file!
+      ScriptDocument.SaveToFile(FileName);
+    except
+      on E:Exception do begin
+{$IFDEF DEBUG}
+        WriteLn('SaveToFile Exception: "' + E.Message + '"');
+{$ENDIF}
+//        Result := False;
+      end;
+    end;
   finally
     ScriptDocument.Active := False;
     ScriptDocument := nil;
@@ -655,6 +834,15 @@ destructor TPointerTableItem.Destroy;
 begin
   fAddresses.Free;
   inherited;
+end;
+
+{ TBinaryHeader }
+
+procedure TBinaryHeader.Clear;
+begin
+  fVersion := gvUndef;
+  fPlatformKind := pvUndef;
+  fRegion := prUndef;
 end;
 
 initialization
