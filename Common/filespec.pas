@@ -15,6 +15,8 @@ type
   // System version
   TPlatformVersion = (pvUndef, pvDreamcast, pvXbox);
 
+function CodeStringToGameVersion(S: string): TGameVersion;
+function CodeStringToGameRegion(S: string): TGameRegion;
 function CodeStringToPlatformVersion(S: string): TPlatformVersion;
 function GameRegionToCodeString(GameRegion: TGameRegion): string;
 function GameRegionToString(GameRegion: TGameRegion): string;
@@ -25,6 +27,34 @@ function PlatformVersionToString(PlateformVersion: TPlatformVersion): string;
 
 //------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
+
+function CodeStringToGameVersion(S: string): TGameVersion;
+begin
+  Result := gvUndef;
+  S := UpperCase(S);
+  if ((S = 'S1') or (S = 'SHENMUE1') or (S = 'SHENMUE')) then
+    Result := gvShenmue
+  else if ((S = 'S2') or (S = 'SHENMUE2') or (S = 'SHENMUEII')) then
+    Result := gvShenmue2
+  else if ((S = 'WH') or (S = 'WHATSSHENMUE') or (S = 'WHATS')) then
+    Result := gvWhatsShenmue;
+end;
+
+//------------------------------------------------------------------------------
+
+function CodeStringToGameRegion(S: string): TGameRegion;
+begin
+  Result := prUndef;
+  S := UpperCase(S);
+  if ((S = 'J') or (S = 'JAP') or (S = 'JAPAN') or (S = 'NTSC-J')) then
+    Result := prJapan
+  else if ((S = 'U') or (S = 'USA') or (S = 'NTSC-U')) then
+    Result := prUSA
+  else if ((S = 'E') or (S = 'EUR') or (S = 'PAL') or (S = 'EUROPE')) then
+    Result := prEurope;
+end;
+
 //------------------------------------------------------------------------------
 
 function GameVersionToString(GameVersion: TGameVersion): string;
@@ -42,13 +72,22 @@ end;
 
 function GameVersionToCodeString(GameVersion: TGameVersion; Short: Boolean = False): string;
 begin
-  case GameVersion of
-    gvUndef: Result := 'NA';
-    gvShenmue: Result := 'S1';
-    gvShenmue2: Result := 'S2';
-    gvWhatsShenmue: Result := 'WH';
-    gvUSShenmue: Result := 'US';
-  end;
+  if Short then  
+    case GameVersion of
+      gvUndef: Result := 'NA';
+      gvShenmue: Result := 'S1';
+      gvShenmue2: Result := 'S2';
+      gvWhatsShenmue: Result := 'WH';
+      gvUSShenmue: Result := 'US';
+    end
+  else
+    case GameVersion of
+      gvUndef: Result := 'UNKNOW';
+      gvShenmue: Result := 'SHENMUE';
+      gvShenmue2: Result := 'SHENMUE2';
+      gvWhatsShenmue: Result := 'WHATSSHENMUE';
+      gvUSShenmue: Result := 'USSHENMUE';
+    end;
 end;
 
 //------------------------------------------------------------------------------
@@ -101,17 +140,6 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-
-(*
-  Result := gvUndef;
-  S := UpperCase(S);
-  if ((S = 'S1') or (S = 'SHENMUE1')) then
-    Result := gvShenmue
-  else if ((S = 'S2') or (S = 'SHENMUE2')) then
-    Result := gvShenmue2
-  else if ((S = 'WH') or (S = 'WHATSSHENMUE')) then
-    Result := gvWhatsShenmue
-*)
 
 function CodeStringToPlatformVersion(S: string): TPlatformVersion;
 begin

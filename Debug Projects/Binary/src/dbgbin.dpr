@@ -5,7 +5,8 @@ program dbgbin;
 uses
   SysUtils,
   binedit in '..\..\..\Shenmue Binary Translator\Editor\src\engine\binedit.pas',
-  systools in '..\..\..\Common\systools.pas';
+  systools in '..\..\..\Common\systools.pas',
+  filespec in '..\..\..\Common\filespec.pas';
 
 var
   BinaryEditor: TBinaryScriptEditor;
@@ -62,6 +63,8 @@ begin
 
       for i := 0 to BinaryEditor.Allocations.Count - 1 do
         WriteLn(' ', BinaryEditor.Allocations[i].Offset, ' ', BinaryEditor.Allocations[i].Size);
+
+      BinaryEditor.SaveToFile('TEST.xml');
 
       ReadLn;
     except
