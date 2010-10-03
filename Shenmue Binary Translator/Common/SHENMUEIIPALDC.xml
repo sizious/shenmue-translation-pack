@@ -4,7 +4,7 @@
 <translation>
 
 <!-- Header -->
-<header game="SHENMUEII" platform="DC" region="PAL" />
+<header game="SHENMUE2" platform="DC" region="EUR" addrbase="0x8c010000" />
 
 <script>
 

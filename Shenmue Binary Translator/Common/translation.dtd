@@ -5,6 +5,7 @@
     game CDATA #REQUIRED
     platform CDATA #REQUIRED
     region CDATA #REQUIRED
+    addrbase CDATA #REQUIRED
 >
 
 <!ELEMENT script (section+, insert*, patch*)>
