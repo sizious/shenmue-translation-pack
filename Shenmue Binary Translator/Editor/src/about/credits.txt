@@ -1,0 +1,42 @@
+Main coder:
+Ayla
+
+GUI coder:
+[big_fury]SiZiOUS
+
+Thanks to:
+Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-, alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, PlusTuta, Nerox92, Master Kyodai, yazgoo, the MetaGames-EU and Shenmue Dojo forums and everyone supporting us!
+
+-- About us --
+
+The SHENTRAD Team is Manic, from Québec, and SiZiOUS from France (and Portugal!).
+
+-- Powered by --
+
+Icons authors:
+Microsoft (Office 2007)
+Iconaholic
+FixIcon / Mr Missiku (Main icon)
+
+Thanks to the authors of the following libraries...
+
+Delphi libraries:
+DCL
+PNGImage
+Project JEDI
+
+Thanks to them for their free useful code:
+Gzav, Igor Pavlov, Jean-loup Gailly, Mark Adler, Brandon Staggs, rdm_30, DelphiForFun, David Butler, Gustavo Huffenbacher Daud, The Project JEDI Team, Marc Collin, Michel Bardou, Jean-Yves Quéinec, Zarko Gajic, Nono40, Columbo, JROD, ZeuS...
+
+-- The End --
+
+Ryô is saying "Now, I can speak every language!" in French.
+
+Check for news and updates:
+shenmuesubs.sourceforge.net
+
+Cheers !
+
+The SHENTRAD Team, here to breake the language barrier!
+
+Oh and forget about the free Audi RS6... It's a great joke!
