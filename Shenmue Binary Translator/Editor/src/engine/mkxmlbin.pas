@@ -1,4 +1,4 @@
-unit BINEdit;
+unit MkXmlBin;
 
 interface
 
