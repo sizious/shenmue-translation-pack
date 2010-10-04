@@ -1186,7 +1186,7 @@
         <translate text="Nagai Industries" >
             <ptr addr="0x26ef4c" />
             <ptr addr="0x2753e8" />
-        </ptr>
+        </translate>
         <translate text="Seek amusement" >
             <ptr addr="0x26ef60" />
         </translate>

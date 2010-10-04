@@ -10,8 +10,8 @@ class IOHandler {
         uint32_t addrBase;
 
     public:
-        bool writeInt(uint32_t addr, uint32_t value);
-        bool writeString(uint32_t addr, std::string text);
+        void writeInt(uint32_t addr, uint32_t value);
+        void writeString(uint32_t addr, std::string text);
 
         IOHandler(std::string filename, uint32_t addrBase);
         ~IOHandler();
