@@ -9,12 +9,12 @@
 
 
 static bool cmpInserts(Insert *a, Insert *b) {
-    return *b < *a;
+    return *a < *b;
 }
 
 
 static bool cmpBlocks(Block *a, Block *b) {
-    return *b < *a;
+    return *a < *b;
 }
 
 

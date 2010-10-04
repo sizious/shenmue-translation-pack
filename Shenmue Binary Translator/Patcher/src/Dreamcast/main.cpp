@@ -2,8 +2,8 @@
 #include <vector>
 #include <string>
 
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -72,31 +72,73 @@ static std::vector<Insert*> get_all_inserts(const xmlNode *root) {
 }
 
 
-static uint32_t getAddrBase(const xmlNode *root) {
-    return 0x8c010000;
+static bool getAddrBase(const xmlNode *root, uint32_t *addrbase) {
+    xmlChar *string;
+    xmlNode *cur_node;
+
+    for (cur_node = root->children; cur_node; cur_node = cur_node->next) {
+        if ((cur_node->type == XML_ELEMENT_NODE) && !strcmp((const char*)cur_node->name, "header")) {
+            string = xmlGetProp(cur_node, (const xmlChar*)"addrbase");
+            *addrbase = strtol((const char*)string, NULL, 16);
+            xmlFree(string);
+            return true;
+        }
+    }
+    return false;
 }
 
 
-static void loadAllocationTable(const xmlNode *root, MemoryManager *mm) {
+static unsigned int loadAllocationTable(const xmlNode *root, MemoryManager *mm) {
+    xmlChar *string;
+    xmlNode *cur_node, *tmp;
+    uint32_t addr, size;
+    unsigned int nb = 0;
 
+    for (cur_node = root->children; cur_node; cur_node = cur_node->next) {
+        if ((cur_node->type == XML_ELEMENT_NODE) && !strcmp((const char*)cur_node->name, "allocation_table")) {
+            for (tmp = cur_node->children; tmp; tmp = tmp->next) {
+                if ((tmp->type == XML_ELEMENT_NODE) && !strcmp((const char*)tmp->name, "block")) {
+                    string = xmlGetProp(tmp, (const xmlChar*)"addr");
+                    addr = strtol((const char*)string, NULL, 16);
+                    xmlFree(string);
+                    string = xmlGetProp(tmp, (const xmlChar*)"size");
+                    if (!string) printf("test2\n");
+                    size = strtol((const char*)string, NULL, 16);
+                    xmlFree(string);
+                    mm->insertNewBlock(addr, size);
+                    nb++;
+                }
+            }
+        }
+    }
+    return nb;
 }
 
 
-void copy_file(const char *f1, const char *f2) {
+static bool copy_file(const char *f1, const char *f2) {
+    unsigned int length = 0x100;
+    size_t nbRead = 0;
+
+    void *buffer = malloc(length);
+    if (!buffer) return false;
+
     FILE *in = fopen(f1, "rb");
-    FILE *out = fopen(f2, "wb");
+    FILE *out = fopen(f2, "wb+");
+    if ((!in) || (!out)) {
+        free(buffer);
+        return false;
+    }
 
-    fseek(in, 0, SEEK_END);
-    unsigned int length = ftell(in);
-    rewind(in);
 
-    char *buffer = (char*)malloc(length);
-    fread(buffer, sizeof(char), length, in);
-    fwrite(buffer, sizeof(char), length, out);
+    while(!feof(in)) {
+        nbRead = fread(buffer, sizeof(char), length, in);
+        fwrite(buffer, sizeof(char), nbRead, out);
+    }
 
-    free(buffer);
-    fclose(in);
     fclose(out);
+    fclose(in);
+    free(buffer);
+    return true;
 }
 
 
@@ -123,22 +165,33 @@ int main(int argc, char **argv) {
 
     std::vector<Insert*> inserts = get_all_inserts(root);
     if (!inserts.size()) {
-        printf("Erreur: array vide.\n");
+        fprintf(stderr, "Error: unable to load inserts.\n");
         return 2;
     }
     printf("Inserts extracted.\n");
 
-    copy_file(argv[2], argv[3]);
+    if (!copy_file(argv[2], argv[3])) {
+        fprintf(stderr, "Error: unable to copy file (please check the filenames you provided)\n");
+        return 3;
+    }
     printf("File copied.\n");
 
-    IOHandler handler(argv[3], getAddrBase(root));
+    uint32_t addrbase;
+    if (!getAddrBase(root, &addrbase)) {
+        fprintf(stderr, "Error: unable to load base address from XML file.\n");
+        return 4;
+    }
+    IOHandler handler(argv[3], addrbase);
     printf("IOHandler created.\n");
 
     MemoryManager mm(&handler);
     printf("Memory manager created.\n");
 
-    loadAllocationTable(root, &mm);
+    if (!loadAllocationTable(root, &mm)) {
+        fprintf(stderr, "Error: unable to load allocation table.\n");
+        return 5;
+    }
     printf("Allocation table loaded.\n");
 
-    //mm.insertStrings();
+    mm.insertStrings(inserts);
 }
