@@ -1,0 +1,74 @@
+###############################################################################
+# Makefile by [big_fury]SiZiOUS
+# http://sbibuilder.shorturl.com/
+#
+# This Makefile is for mingw32-make. 
+# I don't know if it works for other make tool...
+#
+# Oh yeah, this makefile is NOT standard, and yes, I DON'T GIVE A F*CK!!!
+# It works, who cares ???
+###############################################################################
+
+# Project Name
+PRJNAME 	= dc_patcher
+
+# Debug or not ?
+DEBUG		= False
+
+# Project files
+OBJS 		= 	$(OBJSDIR)main.o $(OBJSDIR)rsrc.o $(OBJSDIR)block.o \
+				$(OBJSDIR)iohandler.o $(OBJSDIR)memorymanager.o \
+				$(OBJSDIR)insert.o $(OBJSDIR)ptr.o
+
+# Directories
+BINDIR 		= ../../bin/
+OBJSDIR 	= ../../obj/
+LIBDIR		= ../../deps/
+
+# Proggies
+AR 			= ar
+CC 			= gcc
+CXX 		= g++
+RM 			= rm
+STRIP 		= strip
+UPX 		= upx
+WINDRES 	= windres
+
+# Flags
+CXXFLAGS 	= -O3 -Wall -I"$(LIBDIR)include"
+LDFLAGS 	= -L"$(LIBDIR)lib" -lxml2 -liconv -lstdc++
+UPXFLAGS 	= -9
+
+###############################################################################
+# START MAKING
+###############################################################################
+
+# Target binary
+TARGET = $(BINDIR)$(PRJNAME).exe
+
+# Debug test...
+ifeq ($(DEBUG),True)
+CXXFLAGS += -DDEBUG
+endif
+
+# Go !	
+all : $(OBJS)
+	$(CXX) -o $(TARGET) $(OBJS) $(LDFLAGS) $(CXXFLAGS)
+	$(STRIP) $(TARGET)
+	$(UPX) $(UPXFLAGS) $(TARGET)
+	
+# Compile sources
+$(OBJSDIR)%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+	
+# Include win32 resources
+$(OBJSDIR)rsrc.o: rsrc.rc
+	$(WINDRES) -i $< -o $@
+	
+# Clean	
+clean:
+	$(RM) $(OBJS)
+	
+clean-all:
+	$(RM) $(OBJS) $(TARGET)
+	
