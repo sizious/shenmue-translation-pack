@@ -14,7 +14,8 @@ uses
   systools in '..\..\..\Common\systools.pas',
   uitools in '..\..\..\Common\uitools.pas',
   about in '..\..\..\Common\About\about.pas' {frmAbout},
-  filespec in '..\..\..\Common\filespec.pas';
+  filespec in '..\..\..\Common\filespec.pas',
+  newproj in 'newproj.pas' {Form2};
 
 {$R *.res}
 
@@ -38,6 +39,7 @@ begin
   InitConfiguration;
 
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TForm2, Form2);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...

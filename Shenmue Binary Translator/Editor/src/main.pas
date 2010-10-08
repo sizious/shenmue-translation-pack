@@ -23,7 +23,6 @@ type
     tbAbout: TToolButton;
     ilToolBarDisabled: TImageList;
     ilToolBar: TImageList;
-    tbPreview: TToolButton;
     ToolButton2: TToolButton;
     miOpen: TMenuItem;
     miView: TMenuItem;
@@ -39,17 +38,14 @@ type
     miSaveAs: TMenuItem;
     miReload: TMenuItem;
     miClose: TMenuItem;
-    miPreview: TMenuItem;
     miAbout: TMenuItem;
     N2: TMenuItem;
     N3: TMenuItem;
-    N4: TMenuItem;
     aeMain: TApplicationEvents;
     miDEBUG_TEST2: TMenuItem;
     miCharset: TMenuItem;
     N5: TMenuItem;
     miOriginal: TMenuItem;
-    miOriginalColumn: TMenuItem;
     N6: TMenuItem;
     tbCharset: TToolButton;
     tbOriginal: TToolButton;
@@ -66,6 +62,8 @@ type
     cbSections: TComboBox;
     GroupBox4: TGroupBox;
     lbStrings: TListBox;
+    N8: TMenuItem;
+    New1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -82,13 +80,11 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure miCloseClick(Sender: TObject);
     procedure miReloadClick(Sender: TObject);
-    procedure miPreviewClick(Sender: TObject);
     procedure miCharsetClick(Sender: TObject);
     procedure ProjectHome1Click(Sender: TObject);
     procedure Checkforupdate1Click(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure miOriginalClick(Sender: TObject);
-    procedure miOriginalColumnClick(Sender: TObject);
     procedure cbSectionsSelect(Sender: TObject);
     procedure lbStringsClick(Sender: TObject);
   private
@@ -121,7 +117,6 @@ type
     procedure InitBugsHandler;
     procedure InitDebugLog;
     procedure LoadFile(FileName: TFileName);
-    procedure PreviewerWindowClosed(Sender: TObject);
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetSelectedSubtitle(const Value: string);
     procedure SetStatusText(const Value: string);
@@ -149,10 +144,6 @@ type
     property FileModified: Boolean read fFileModified write SetFileModified;
     property OriginalSubtitleField: Boolean read fOriginalSubtitleField
       write SetOriginalSubtitleField;
-    property OriginalSubtitlesColumn: Boolean read fOriginalSubtitleColumn
-      write SetOriginalSubtitleColumn;
-    property PreviewerVisible: Boolean read fPreviewerVisible
-      write SetPreviewerVisible;
     property StatusText: string read GetStatusText write SetStatusText;
   end;
 
@@ -345,11 +336,6 @@ begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
 end;
 
-procedure TfrmMain.PreviewerWindowClosed(Sender: TObject);
-begin
-  PreviewerVisible := False;
-end;
-
 procedure TfrmMain.ProjectHome1Click(Sender: TObject);
 begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
@@ -454,16 +440,6 @@ end;
 procedure TfrmMain.miOriginalClick(Sender: TObject);
 begin
   OriginalSubtitleField := not OriginalSubtitleField;
-end;
-
-procedure TfrmMain.miOriginalColumnClick(Sender: TObject);
-begin
-  OriginalSubtitlesColumn := not OriginalSubtitlesColumn;
-end;
-
-procedure TfrmMain.miPreviewClick(Sender: TObject);
-begin
-  PreviewerVisible := not PreviewerVisible;
 end;
 
 procedure TfrmMain.miQuitClick(Sender: TObject);

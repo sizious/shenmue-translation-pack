@@ -41,8 +41,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 357
-    ExplicitWidth = 492
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -56,7 +54,6 @@ object frmMain: TfrmMain
     TabOrder = 1
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
-    ExplicitWidth = 492
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -96,26 +93,20 @@ object frmMain: TfrmMain
       Caption = 'tbDebugLog'
       ImageIndex = 7
     end
-    object tbPreview: TToolButton
-      Left = 108
-      Top = 0
-      Caption = 'tbPreview'
-      ImageIndex = 8
-    end
     object tbOriginal: TToolButton
-      Left = 131
+      Left = 108
       Top = 0
       Caption = 'tbOriginal'
       ImageIndex = 9
     end
     object tbCharset: TToolButton
-      Left = 154
+      Left = 131
       Top = 0
       Caption = 'tbCharset'
       ImageIndex = 10
     end
     object ToolButton2: TToolButton
-      Left = 177
+      Left = 154
       Top = 0
       Width = 8
       Caption = 'ToolButton2'
@@ -123,7 +114,7 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object tbAbout: TToolButton
-      Left = 185
+      Left = 162
       Top = 0
       Caption = 'tbAbout'
       ImageIndex = 11
@@ -234,8 +225,6 @@ object frmMain: TfrmMain
       ItemHeight = 13
       TabOrder = 0
       OnClick = lbStringsClick
-      ExplicitLeft = 3
-      ExplicitTop = 20
     end
   end
   object mmMain: TMainMenu
@@ -243,6 +232,13 @@ object frmMain: TfrmMain
     Top = 2
     object miFile: TMenuItem
       Caption = '&File'
+      object New1: TMenuItem
+        Caption = '&New...'
+        ShortCut = 16462
+      end
+      object N8: TMenuItem
+        Caption = '-'
+      end
       object miOpen: TMenuItem
         Caption = '&Open...'
         Hint = 'Open the Nozomi and the Motorcycle sequence file.'
@@ -289,15 +285,6 @@ object frmMain: TfrmMain
     end
     object miView: TMenuItem
       Caption = '&View'
-      object miPreview: TMenuItem
-        Caption = '&Preview...'
-        Hint = 'Show/hide the Subtitles Previewer.'
-        ShortCut = 114
-        OnClick = miPreviewClick
-      end
-      object N4: TMenuItem
-        Caption = '-'
-      end
       object miDebugLog: TMenuItem
         Caption = '&Debug log...'
         Hint = 'Show/hide the Debug Log window.'
@@ -314,14 +301,6 @@ object frmMain: TfrmMain
           ' field.'
         ShortCut = 122
         OnClick = miOriginalClick
-      end
-      object miOriginalColumn: TMenuItem
-        Caption = 'Original column in list'
-        Hint = 
-          'Show an additional column with the untouched subtitle text in th' +
-          'e view.'
-        ShortCut = 16506
-        OnClick = miOriginalColumnClick
       end
       object N6: TMenuItem
         Caption = '-'
@@ -1449,22 +1428,16 @@ object frmMain: TfrmMain
       C0FF8001C003FE07FFFFFFFFC007FFFF}
   end
   object odOpen: TOpenDialog
-    DefaultExt = 'BIN'
-    FileName = 'MAPINFO.BIN'
-    Filter = 
-      'NBIK Sequence File (MAPINFO.BIN)|MAPINFO.BIN|Generic Binary File' +
-      's (*.BIN)|*.BIN|All Files (*.*)|*.*'
+    DefaultExt = 'XML'
+    Filter = 'XML Files (*.XML)|*.XML|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 452
     Top = 2
   end
   object sdSave: TSaveDialog
-    DefaultExt = 'BIN'
-    FileName = 'MAPINFO.BIN'
-    Filter = 
-      'NBIK Sequence File (MAPINFO.BIN)|MAPINFO.BIN|Generic Binary File' +
-      's (*.BIN)|*.BIN|All Files (*.*)|*.*'
+    DefaultExt = 'XML'
+    Filter = 'XML Files (*.XML)|*.XML|All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Export the current entry to...'
     Left = 422
