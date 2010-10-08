@@ -1,0 +1,5 @@
+Libraries version
+---
+
+libiconv-1.13.1-1-mingw32-dev
+libxml2-2.6.23
