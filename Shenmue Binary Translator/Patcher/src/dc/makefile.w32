@@ -16,9 +16,9 @@ PRJNAME 	= dc_patcher
 DEBUG		= False
 
 # Project files
-OBJS 		= 	$(OBJSDIR)main.o $(OBJSDIR)rsrc.o $(OBJSDIR)block.o \
+OBJS 		= 	$(OBJSDIR)main.o $(OBJSDIR)block.o \
 				$(OBJSDIR)iohandler.o $(OBJSDIR)memorymanager.o \
-				$(OBJSDIR)insert.o $(OBJSDIR)ptr.o
+				$(OBJSDIR)insert.o $(OBJSDIR)ptr.o $(OBJSDIR)version.o
 
 # Directories
 BINDIR 		= ../../bin/
@@ -62,7 +62,7 @@ $(OBJSDIR)%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 	
 # Include win32 resources
-$(OBJSDIR)rsrc.o: rsrc.rc
+$(OBJSDIR)%.o: %.rc
 	$(WINDRES) -i $< -o $@
 	
 # Clean	
