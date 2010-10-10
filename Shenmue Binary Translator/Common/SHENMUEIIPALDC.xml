@@ -734,13 +734,13 @@
     </section>
 
     <section name="Help menu" >
-        <translate text="	*5*5Return&amp;">
+        <translate text="&#9;*5*5Return&amp;">
             <ptr addr="0x23a194" />
             <ptr addr="0x23a1fc" />
             <ptr addr="0x23a264" />
             <ptr addr="0x23a2cc" />
         </translate>
-        <translate text="	^BCancel">
+        <translate text="&#9;^BCancel">
             <ptr addr="0x23a19c" />
             <ptr addr="0x23a204" />
             <ptr addr="0x23a26c" />
@@ -752,7 +752,7 @@
             <ptr addr="0x23a210" />
             <ptr addr="0x23a2e0" />
         </translate>
-        <translate text="	@AHere Ryo can shop for various items.&amp;">
+        <translate text="&#9;@AHere Ryo can shop for various items.&amp;">
             <ptr addr="0x23a1ac" />
             <ptr addr="0x23a2e4" />
             <ptr addr="0x23a27c" />
@@ -764,19 +764,19 @@
             <ptr addr="0x23a2c4" />
             <ptr addr="0x23a32c" />
         </translate>
-        <translate text="	@APress ^A to save the game or display&amp;the game settings.&amp;">
+        <translate text="&#9;@APress ^A to save the game or display&amp;the game settings.&amp;">
             <ptr addr="0x23a198" />
             <ptr addr="0x23a268" />
             <ptr addr="0x23a2d0" />
             <ptr addr="0x23a200" />
         </translate>
-        <translate text="[Selection of Key]@ASelect which key to use.&amp;&amp;	^CSelection	^XEnter&amp;">
+        <translate text="[Selection of Key]@ASelect which key to use.&amp;&amp;&#9;^CSelection&#9;^XEnter&amp;">
             <ptr addr="0x23a1c8" />
             <ptr addr="0x23a298" />
             <ptr addr="0x23a230" />
             <ptr addr="0x23a300" />
         </translate>
-        <translate text="&amp;BET/COIN  : Bet/Bet tokens&amp;START     : Start&amp;PAY OUT   : Collect winnings&amp;&amp;	^CSelect	^XEnter&amp;">
+        <translate text="&amp;BET/COIN  : Bet/Bet tokens&amp;START     : Start&amp;PAY OUT   : Collect winnings&amp;&amp;&#9;^CSelect&#9;^XEnter&amp;">
             <ptr addr="0x23a1dc" />
             <ptr addr="0x23a244" />
             <ptr addr="0x23a2ac" />
@@ -788,13 +788,13 @@
             <ptr addr="0x23a2b4" />
             <ptr addr="0x23a31c" />
         </translate>
-        <translate text="&amp;	^YCheck the information panel&amp;	^CSelect the stand/position ball&amp;	^ADrop ball/Choose stand&amp;">
+        <translate text="&amp;&#9;^YCheck the information panel&amp;&#9;^CSelect the stand/position ball&amp;&#9;^ADrop ball/Choose stand&amp;">
             <ptr addr="0x23a1e8" />
             <ptr addr="0x23a320" />
             <ptr addr="0x23a250" />
             <ptr addr="0x23a2b8" />
         </translate>
-        <translate text="[Free Quest]@A&amp;	^WRun	^AConversation&amp;	^CWalk@C&amp;	^BStop	Navigation Mark&amp;&amp;	^QZoom	^XNotebook&amp;	Lock-on	Action&amp;">
+        <translate text="[Free Quest]@A&amp;&#9;^WRun&#9;^AConversation&amp;&#9;^CWalk@C&amp;&#9;^BStop&#9;Navigation Mark&amp;&amp;&#9;^QZoom&#9;^XNotebook&amp;&#9;Lock-on&#9;Action&amp;">
             <ptr addr="0x23a1d4" />
             <ptr addr="0x23a23c" />
             <ptr addr="0x23a30c" />
@@ -826,13 +826,13 @@
         </translate>
 
 
-        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;	^CMove cursor	^LScroll up&amp;		^RScroll down&amp;">
+        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMove cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;">
             <ptr addr="0x23a1f0" />
         </translate>
-        <translate text="sur ^A pour augmenter le nombre d&apos;objets&amp;�� vendre. Appuyez sur ^B pour diminuer&amp;le nombre d&apos;objets �� vendre. Apr��s avoir&amp;s��lectionn�� la quantit�� d&apos;objets, placez&amp;le curseur sur Valider et appuyez sur ^A.&amp;&amp;	^CD��placer curseur	^LRemonter&amp;		^RDescendre">
+        <translate text="sur ^A pour augmenter le nombre d&apos;objets&amp;�� vendre. Appuyez sur ^B pour diminuer&amp;le nombre d&apos;objets �� vendre. Apr��s avoir&amp;s��lectionn�� la quantit�� d&apos;objets, placez&amp;le curseur sur Valider et appuyez sur ^A.&amp;&amp;&#9;^CD��placer curseur&#9;^LRemonter&amp;&#9;&#9;^RDescendre">
             <ptr addr="0x23a258" />
         </translate>
-        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;	^CMueve el cursor	^LScroll up&amp;		^RScroll down&amp;">
+        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMueve el cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;">
             <ptr addr="0x23a328" />
         </translate>
     </section>
