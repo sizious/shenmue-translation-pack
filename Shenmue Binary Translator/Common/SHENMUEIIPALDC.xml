@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE translation SYSTEM "translation.dtd">
+<!DOCTYPE translation SYSTEM "translation.dtd" >
 
 <translation>
 
@@ -9,167 +9,167 @@
 <script>
 
     <section name="Options menu" >
-        <translate text="Dialog/Text">
+        <translate text="Dialog/Text" >
             <ptr addr="0x237558" />
             <ptr addr="0x2375e8" />
             <ptr addr="0x237678" />
             <ptr addr="0x237708" />
         </translate>
-        <translate text="Sound">
+        <translate text="Sound" >
             <ptr addr="0x237560" />
             <ptr addr="0x2375f0" />
             <ptr addr="0x237680" />
             <ptr addr="0x237710" />
         </translate>
-        <translate text="Shenmue Mode">
+        <translate text="Shenmue Mode" >
             <ptr addr="0x237580" />
             <ptr addr="0x237610" />
             <ptr addr="0x2376a0" />
             <ptr addr="0x237730" />
         </translate>
-        <translate text="Cinema Mode">
+        <translate text="Cinema Mode" >
             <ptr addr="0x237588" />
             <ptr addr="0x237618" />
             <ptr addr="0x2376a8" />
             <ptr addr="0x237738" />
         </translate>
-        <translate text="Text Mode">
+        <translate text="Text Mode" >
             <ptr addr="0x237590" />
             <ptr addr="0x237620" />
             <ptr addr="0x2376b0" />
             <ptr addr="0x237740" />
         </translate>
-        <translate text="Game Mode">
+        <translate text="Game Mode" >
             <ptr addr="0x237598" />
             <ptr addr="0x237628" />
             <ptr addr="0x2376b8" />
             <ptr addr="0x237748" />
         </translate>
-        <translate text="Mono">
+        <translate text="Mono" >
             <ptr addr="0x2375a0" />
             <ptr addr="0x237630" />
             <ptr addr="0x2376c0" />
             <ptr addr="0x237750" />
         </translate>
-        <translate text="Stereo">
+        <translate text="Stereo" >
             <ptr addr="0x2375a8" />
             <ptr addr="0x237638" />
             <ptr addr="0x2376c8" />
             <ptr addr="0x237758" />
         </translate>
-        <translate text="On">
+        <translate text="On" >
             <ptr addr="0x2375b0" />
             <ptr addr="0x237640" />
             <ptr addr="0x2376d0" />
             <ptr addr="0x237760" />
         </translate>
-        <translate text="Off">
+        <translate text="Off" >
             <ptr addr="0x2375b8" />
             <ptr addr="0x237648" />
             <ptr addr="0x2376d8" />
             <ptr addr="0x237768" />
         </translate>
-        <translate text=" Run">
+        <translate text=" Run" >
             <ptr addr="0x2375c0" />
             <ptr addr="0x237650" />
             <ptr addr="0x2376e0" />
             <ptr addr="0x237770" />
         </translate>
-        <translate text=" Zoom">
+        <translate text=" Zoom" >
             <ptr addr="0x2375c8" />
             <ptr addr="0x237658" />
             <ptr addr="0x2376e8" />
             <ptr addr="0x237778" />
         </translate>
-        <translate text="Look">
+        <translate text="Look" >
             <ptr addr="0x2375d0" />
             <ptr addr="0x2376f0" />
             <ptr addr="0x237780" />
             <ptr addr="0x237660" />
         </translate>
-        <translate text="Move">
+        <translate text="Move" >
             <ptr addr="0x2375d8" />
             <ptr addr="0x2376f8" />
             <ptr addr="0x237788" />
             <ptr addr="0x237668" />
         </translate>
-        <translate text="Analog">
+        <translate text="Analog" >
             <ptr addr="0x237568" />
             <ptr addr="0x237688" />
             <ptr addr="0x237718" />
             <ptr addr="0x2375f8" />
         </translate>
-        <translate text="Thumb Pad">
+        <translate text="Thumb Pad" >
             <ptr addr="0x2375e0" />
             <ptr addr="0x237700" />
             <ptr addr="0x237790" />
         </translate>
-        <translate text="Toggle">
+        <translate text="Toggle" >
             <ptr addr="0x237570" />
             <ptr addr="0x237690" />
             <ptr addr="0x237718" />
             <ptr addr="0x237600" />
         </translate>
-        <translate text="Controls">
+        <translate text="Controls" >
             <ptr addr="0x237578" />
             <ptr addr="0x237698" />
             <ptr addr="0x237720" />
         </translate>
 
-        <translate text="Play using dialog only.">
+        <translate text="Play using dialog only." >
             <ptr addr="0x2377a8" />
             <ptr addr="0x2377b8" />
             <ptr addr="0x2377c8" />
             <ptr addr="0x2377d8" />
         </translate>
-        <translate text="Play using both dialog and text.">
+        <translate text="Play using both dialog and text." >
             <ptr addr="0x2377ac" />
             <ptr addr="0x2377bc" />
             <ptr addr="0x2377cc" />
             <ptr addr="0x2377dc" />
         </translate>
-        <translate text="Text is displayed when skip is used.">
+        <translate text="Text is displayed when skip is used." >
             <ptr addr="0x2377b0" />
             <ptr addr="0x2377c0" />
             <ptr addr="0x2377d0" />
             <ptr addr="0x2377e0" />
         </translate>
-        <translate text="Play using text only.">
+        <translate text="Play using text only." >
             <ptr addr="0x2377b4" />
             <ptr addr="0x2377c4" />
             <ptr addr="0x2377d4" />
             <ptr addr="0x2377e4" />
         </translate>
 
-        <translate text="Toggle the sound setting">
+        <translate text="Toggle the sound setting" >
             <ptr addr="0x2377f8" />
             <ptr addr="0x237810" />
             <ptr addr="0x237828" />
             <ptr addr="0x237810" />
         </translate>
-        <translate text="between stereo or mono.">
+        <translate text="between stereo or mono." >
             <ptr addr="0x2377fc" />
             <ptr addr="0x237814" />
             <ptr addr="0x237814" />
         </translate>
-        <translate text="Toggle the setting of">
+        <translate text="Toggle the setting of" >
             <ptr addr="0x237800" />
             <ptr addr="0x237818" />
             <ptr addr="0x237818" />
             <ptr addr="0x237830" />
         </translate>
-        <translate text="the Analog Thumb Pad.">
+        <translate text="the Analog Thumb Pad." >
             <ptr addr="0x237804" />
             <ptr addr="0x23781c" />
             <ptr addr="0x23781c" />
             <ptr addr="0x237834" />
         </translate>
-        <translate text="Toggle the Run and Zoom">
+        <translate text="Toggle the Run and Zoom" >
             <ptr addr="0x237808" />
             <ptr addr="0x237820" />
             <ptr addr="0x237820" />
         </translate>
-        <translate text="control buttons.">
+        <translate text="control buttons." >
             <ptr addr="0x23780c" />
             <ptr addr="0x237824" />
             <ptr addr="0x237824" />
@@ -178,36 +178,36 @@
     </section>
 
     <section name="Locations" >
-        <translate text="F Warehouse">
+        <translate text="F Warehouse" >
             <ptr addr="0x239adc" />
         </translate>
-        <translate text="Fortune&apos;s Eatery">
+        <translate text="Fortune&apos;s Eatery" >
             <ptr addr="0x239ae4" />
         </translate>
-        <translate text="Blue Sky">
+        <translate text="Blue Sky" >
             <ptr addr="0x239aec" />
             <ptr addr="0x24979c" />
         </translate>
-        <translate text="No.6 Warehouse">
+        <translate text="No.6 Warehouse" >
             <ptr addr="0x239af4" />
         </translate>
-        <translate text="No.10 Warehouse">
+        <translate text="No.10 Warehouse" >
             <ptr addr="0x239afc" />
         </translate>
-        <translate text="No.12 Warehouse">
+        <translate text="No.12 Warehouse" >
             <ptr addr="0x239b04" />
         </translate>
-        <translate text="No.9 Warehouse">
+        <translate text="No.9 Warehouse" >
             <ptr addr="0x239b0c" />
         </translate>
-        <translate text="Fortune&apos;s Office">
+        <translate text="Fortune&apos;s Office" >
             <ptr addr="0x239b14" />
         </translate>
-        <translate text="No.8 Warehouse">
+        <translate text="No.8 Warehouse" >
             <ptr addr="0x239b1c" />
             <ptr addr="0x239b24" />
         </translate>
-        <translate text="Fortune&apos;s Pier">
+        <translate text="Fortune&apos;s Pier" >
             <ptr addr="0x239b2c" />
             <ptr addr="0x239b7c" />
             <ptr addr="0x239b94" />
@@ -215,28 +215,28 @@
             <ptr addr="0x23f54c" />
             <ptr addr="0x24920c" />
         </translate>
-        <translate text="Swing">
+        <translate text="Swing" >
             <ptr addr="0x239b34" />
         </translate>
-        <translate text="Pigeon Cafe">
+        <translate text="Pigeon Cafe" >
             <ptr addr="0x239b3c" />
         </translate>
-        <translate text="Hong Kong Souvenirs">
+        <translate text="Hong Kong Souvenirs" >
             <ptr addr="0x239b44" />
         </translate>
-        <translate text="The Big Catch Tackle Shop">
+        <translate text="The Big Catch Tackle Shop" >
             <ptr addr="0x239b4c" />
         </translate>
-        <translate text="General Store">
+        <translate text="General Store" >
             <ptr addr="0x239b54" />
         </translate>
-        <translate text="Honest Pawnshop">
+        <translate text="Honest Pawnshop" >
             <ptr addr="0x239b5c" />
         </translate>
-        <translate text="Ren&apos;s Warehouse">
+        <translate text="Ren&apos;s Warehouse" >
             <ptr addr="0x239b64" />
         </translate>
-        <translate text="Worker&apos;s Pier">
+        <translate text="Worker&apos;s Pier" >
             <ptr addr="0x239b6c" />
             <ptr addr="0x239b74" />
             <ptr addr="0x239bb4" />
@@ -245,237 +245,237 @@
             <ptr addr="0x23f51c" />
             <ptr addr="0x249204" />
         </translate>
-        <translate text="Beverly Hills Wharf">
+        <translate text="Beverly Hills Wharf" >
             <ptr addr="0x239b8c" />
         </translate>
-        <translate text="Rooftop Fight">
+        <translate text="Rooftop Fight" >
             <ptr addr="0x239b9c" />
         </translate>
-        <translate text="Lucky Plaza">
+        <translate text="Lucky Plaza" >
             <ptr addr="0x239bac" />
         </translate>
-        <translate text="Green Market&apos;s Pawnshop">
+        <translate text="Green Market&apos;s Pawnshop" >
             <ptr addr="0x239bc4" />
         </translate>
-        <translate text="Yamato Sushi">
+        <translate text="Yamato Sushi" >
             <ptr addr="0x239bcc" />
         </translate>
-        <translate text="Come Over Guest House">
+        <translate text="Come Over Guest House" >
             <ptr addr="0x239bd4" />
         </translate>
-        <translate text="A Vacant Lot">
+        <translate text="A Vacant Lot" >
             <ptr addr="0x239bdc" />
         </translate>
-        <translate text="Hermit Fortunetellers">
+        <translate text="Hermit Fortunetellers" >
             <ptr addr="0x239be4" />
         </translate>
-        <translate text="Fujiyama Sushi">
+        <translate text="Fujiyama Sushi" >
             <ptr addr="0x239bec" />
         </translate>
-        <translate text="Japanese Soba">
+        <translate text="Japanese Soba" >
             <ptr addr="0x239bf4" />
         </translate>
-        <translate text="Pub Point">
+        <translate text="Pub Point" >
             <ptr addr="0x239bfc" />
         </translate>
-        <translate text="Bar Man Mo">
+        <translate text="Bar Man Mo" >
             <ptr addr="0x239c04" />
         </translate>
-        <translate text="Ohshu Soba">
+        <translate text="Ohshu Soba" >
             <ptr addr="0x239c0c" />
         </translate>
-        <translate text="Yan Tin Apartments">
+        <translate text="Yan Tin Apartments" >
             <ptr addr="0x239c14" />
         </translate>
-        <translate text="Carmain Pawnshop">
+        <translate text="Carmain Pawnshop" >
             <ptr addr="0x239c1c" />
         </translate>
-        <translate text="Shine Pawnshop">
+        <translate text="Shine Pawnshop" >
             <ptr addr="0x239c24" />
         </translate>
-        <translate text="Glamorous Jewelers">
+        <translate text="Glamorous Jewelers" >
             <ptr addr="0x239c2c" />
         </translate>
-        <translate text="Pine Game Arcade">
+        <translate text="Pine Game Arcade" >
             <ptr addr="0x239c34" />
         </translate>
-        <translate text="Juk Man Bookstore">
+        <translate text="Juk Man Bookstore" >
             <ptr addr="0x239c3c" />
         </translate>
-        <translate text="Beautiful Shine Jewelers">
+        <translate text="Beautiful Shine Jewelers" >
             <ptr addr="0x239c44" />
         </translate>
-        <translate text="Tomato Convenience Store">
+        <translate text="Tomato Convenience Store" >
             <ptr addr="0x239c4c" />
         </translate>
-        <translate text="Moon Cafe">
+        <translate text="Moon Cafe" >
             <ptr addr="0x239c54" />
         </translate>
-        <translate text="Pop Ice Cream Store">
+        <translate text="Pop Ice Cream Store" >
             <ptr addr="0x239c5c" />
         </translate>
-        <translate text="Golden Jewelers">
+        <translate text="Golden Jewelers" >
             <ptr addr="0x239c64" />
         </translate>
-        <translate text="Slot House W">
+        <translate text="Slot House W" >
             <ptr addr="0x239c6c" />
         </translate>
-        <translate text="S.I.C. Pool Hall">
+        <translate text="S.I.C. Pool Hall" >
             <ptr addr="0x239c74" />
         </translate>
-        <translate text="Golden Shopping Mall">
+        <translate text="Golden Shopping Mall" >
             <ptr addr="0x239c7c" />
         </translate>
-        <translate text="Bloom Tailor">
+        <translate text="Bloom Tailor" >
             <ptr addr="0x239c84" />
         </translate>
-        <translate text="Gladness Garments">
+        <translate text="Gladness Garments" >
             <ptr addr="0x239c8c" />
         </translate>
-        <translate text="Complete Clothier">
+        <translate text="Complete Clothier" >
             <ptr addr="0x239c94" />
         </translate>
-        <translate text="Wan Chai Electronic Goods">
+        <translate text="Wan Chai Electronic Goods" >
             <ptr addr="0x239c9c" />
         </translate>
-        <translate text="Lucky Charm Electronics">
+        <translate text="Lucky Charm Electronics" >
             <ptr addr="0x239ca4" />
         </translate>
-        <translate text="Flower King Electronic Shop">
+        <translate text="Flower King Electronic Shop" >
             <ptr addr="0x239cac" />
         </translate>
-        <translate text="Latest Electronic Emporium">
+        <translate text="Latest Electronic Emporium" >
             <ptr addr="0x239cb4" />
         </translate>
-        <translate text="Lucky Charm Tailor">
+        <translate text="Lucky Charm Tailor" >
             <ptr addr="0x239cbc" />
         </translate>
-        <translate text="First Class Tailor">
+        <translate text="First Class Tailor" >
             <ptr addr="0x239cc4" />
         </translate>
-        <translate text="Lee Barber&apos;s Shop">
+        <translate text="Lee Barber&apos;s Shop" >
             <ptr addr="0x239ccc" />
         </translate>
-        <translate text="Lucky Charm Barber&apos;s Shop">
+        <translate text="Lucky Charm Barber&apos;s Shop" >
             <ptr addr="0x239cd4" />
         </translate>
-        <translate text="Bright Teahouse">
+        <translate text="Bright Teahouse" >
             <ptr addr="0x239cdc" />
         </translate>
-        <translate text="Man Mo General Store">
+        <translate text="Man Mo General Store" >
             <ptr addr="0x239ce4" />
         </translate>
-        <translate text="Man Mo Electrical Goods">
+        <translate text="Man Mo Electrical Goods" >
             <ptr addr="0x239cec" />
         </translate>
-        <translate text="Zhangyu Barber&apos;s Shop">
+        <translate text="Zhangyu Barber&apos;s Shop" >
             <ptr addr="0x239cf4" />
         </translate>
-        <translate text="Dou Jiang Diner">
+        <translate text="Dou Jiang Diner" >
             <ptr addr="0x239d04" />
             <ptr addr="0x239e0c" />
             <ptr addr="0x23a578" />
         </translate>
-        <translate text="Man Mo Restaurant">
+        <translate text="Man Mo Restaurant" >
             <ptr addr="0x239d0c" />
         </translate>
-        <translate text="Western Fashions Clothier">
+        <translate text="Western Fashions Clothier" >
             <ptr addr="0x239d14" />
         </translate>
-        <translate text="Many Palace Tailor">
+        <translate text="Many Palace Tailor" >
             <ptr addr="0x239d1c" />
         </translate>
-        <translate text="Heaven Buddhist Altar Shop">
+        <translate text="Heaven Buddhist Altar Shop" >
             <ptr addr="0x239d24" />
         </translate>
-        <translate text="Happiness Buddhist Altar Shop">
+        <translate text="Happiness Buddhist Altar Shop" >
             <ptr addr="0x239d2c" />
         </translate>
-        <translate text="Worship Buddhist Altar Shop">
+        <translate text="Worship Buddhist Altar Shop" >
             <ptr addr="0x239d34" />
         </translate>
-        <translate text="Beautiful Country China Shop">
+        <translate text="Beautiful Country China Shop" >
             <ptr addr="0x239d3c" />
         </translate>
-        <translate text="Da Yuan Apartments">
+        <translate text="Da Yuan Apartments" >
             <ptr addr="0x239d44" />
             <ptr addr="0x23aa64" />
         </translate>
-        <translate text="Man Mo Antiques">
+        <translate text="Man Mo Antiques" >
             <ptr addr="0x239d4c" />
         </translate>
-        <translate text="Collect Antiques">
+        <translate text="Collect Antiques" >
             <ptr addr="0x239d54" />
         </translate>
-        <translate text="King&apos;s Ransom Antiques">
+        <translate text="King&apos;s Ransom Antiques" >
             <ptr addr="0x239d5c" />
         </translate>
-        <translate text="Man Mo Herb Medicine">
+        <translate text="Man Mo Herb Medicine" >
             <ptr addr="0x239d64" />
         </translate>
-        <translate text="Centre Pawnshop">
+        <translate text="Centre Pawnshop" >
             <ptr addr="0x239d6c" />
         </translate>
-        <translate text="Accounts Settled Pawnshop">
+        <translate text="Accounts Settled Pawnshop" >
             <ptr addr="0x239d74" />
         </translate>
-        <translate text="Lucky Pawnshop">
+        <translate text="Lucky Pawnshop" >
             <ptr addr="0x239d7c" />
         </translate>
-        <translate text="Golden Flower Pawnshop">
+        <translate text="Golden Flower Pawnshop" >
             <ptr addr="0x239d84" />
         </translate>
-        <translate text="Wise Men&apos;s Pawnshop">
+        <translate text="Wise Men&apos;s Pawnshop" >
             <ptr addr="0x239d8c" />
         </translate>
-        <translate text="Man Mo China Shop">
+        <translate text="Man Mo China Shop" >
             <ptr addr="0x239d94" />
         </translate>
-        <translate text="Wise Men&apos;s Chemist">
+        <translate text="Wise Men&apos;s Chemist" >
             <ptr addr="0x239d9c" />
         </translate>
-        <translate text="Man Mo Bistro">
+        <translate text="Man Mo Bistro" >
             <ptr addr="0x239da4" />
             <ptr addr="0x249644" />
         </translate>
-        <translate text="Wise Men&apos;s Kung Fu">
+        <translate text="Wise Men&apos;s Kung Fu" >
             <ptr addr="0x239dac" />
         </translate>
-        <translate text="Man Mo Temple">
+        <translate text="Man Mo Temple" >
             <ptr addr="0x239db4" />
             <ptr addr="0x24921c" />
         </translate>
-        <translate text="Yard">
+        <translate text="Yard" >
             <ptr addr="0x239dbc" />
             <ptr addr="0x239dcc" />
             <ptr addr="0x239df4" />
         </translate>
-        <translate text="Godhead Fortuneteller&apos;s">
+        <translate text="Godhead Fortuneteller&apos;s" >
             <ptr addr="0x239dc4" />
         </translate>
-        <translate text="Scarlet Hills">
+        <translate text="Scarlet Hills" >
             <ptr addr="0x239dd4" />
             <ptr addr="0x239e5c" />
             <ptr addr="0x23a94c" />
             <ptr addr="0x23f60c" />
         </translate>
-        <translate text="White Dynasty Pawnshop">
+        <translate text="White Dynasty Pawnshop" >
             <ptr addr="0x239ddc" />
         </translate>
-        <translate text="London">
+        <translate text="London" >
             <ptr addr="0x239de4" />
         </translate>
-        <translate text="Liverpool">
+        <translate text="Liverpool" >
             <ptr addr="0x239dec" />
         </translate>
-        <translate text="Green Market Qr.">
+        <translate text="Green Market Qr." >
             <ptr addr="0x239dfc" />
             <ptr addr="0x239e1c" />
             <ptr addr="0x239e34" />
             <ptr addr="0x23a8d4" />
             <ptr addr="0x23f5c4" />
         </translate>
-        <translate text="Wise Men&apos;s Qr.">
+        <translate text="Wise Men&apos;s Qr." >
             <ptr addr="0x239e04" />
             <ptr addr="0x239e2c" />
             <ptr addr="0x239e54" />
@@ -483,342 +483,342 @@
             <ptr addr="0x23f5f4" />
             <ptr addr="0x249224" />
         </translate>
-        <translate text="South  Carmain  Qr.">
+        <translate text="South  Carmain  Qr." >
             <ptr addr="0x239e14" />
             <ptr addr="0x239e3c" />
         </translate>
-        <translate text="Lucky Charm Qr.">
+        <translate text="Lucky Charm Qr." >
             <ptr addr="0x239e24" />
             <ptr addr="0x239e4c" />
             <ptr addr="0x23a8fc" />
             <ptr addr="0x23f624" />
         </translate>
-        <translate text="Golden Qr.">
+        <translate text="Golden Qr." >
             <ptr addr="0x239e44" />
             <ptr addr="0x23a8e8" />
             <ptr addr="0x23f63c" />
             <ptr addr="0x24956c" />
         </translate>
-        <translate text="White Dynasty Qr.">
+        <translate text="White Dynasty Qr." >
             <ptr addr="0x239e64" />
             <ptr addr="0x23a910" />
             <ptr addr="0x23f654" />
         </translate>
-        <translate text="Ren&apos;s Hideout">
+        <translate text="Ren&apos;s Hideout" >
             <ptr addr="0x239e6c" />
         </translate>
-        <translate text="Huang&apos;s Room">
+        <translate text="Huang&apos;s Room" >
             <ptr addr="0x239e74" />
         </translate>
-        <translate text="Kai&apos;s Room">
+        <translate text="Kai&apos;s Room" >
             <ptr addr="0x239e7c" />
             <ptr addr="0x239e84" />
             <ptr addr="0x239f5c" />
         </translate>
-        <translate text="Moon Child Orphanage">
+        <translate text="Moon Child Orphanage" >
             <ptr addr="0x239e8c" />
         </translate>
-        <translate text="Yuan&apos;s Room">
+        <translate text="Yuan&apos;s Room" >
             <ptr addr="0x239e94" />
         </translate>
-        <translate text="Mind Reading Fortunetellers">
+        <translate text="Mind Reading Fortunetellers" >
             <ptr addr="0x239e9c" />
         </translate>
-        <translate text="Tortoise Fortunetellers">
+        <translate text="Tortoise Fortunetellers" >
             <ptr addr="0x239ea4" />
         </translate>
-        <translate text="Kowloon Dimsum">
+        <translate text="Kowloon Dimsum" >
             <ptr addr="0x239eac" />
         </translate>
-        <translate text="Slot House K">
+        <translate text="Slot House K" >
             <ptr addr="0x239eb4" />
         </translate>
-        <translate text="Spring and Autumn Dimsum">
+        <translate text="Spring and Autumn Dimsum" >
             <ptr addr="0x239ebc" />
         </translate>
-        <translate text="Min Min Dimsum">
+        <translate text="Min Min Dimsum" >
             <ptr addr="0x239ec4" />
         </translate>
-        <translate text="Kowloon Pawnshop">
+        <translate text="Kowloon Pawnshop" >
             <ptr addr="0x239ecc" />
         </translate>
-        <translate text="Great View Pawnshop">
+        <translate text="Great View Pawnshop" >
             <ptr addr="0x239ed4" />
         </translate>
-        <translate text="Great View Herbs">
+        <translate text="Great View Herbs" >
             <ptr addr="0x239edc" />
         </translate>
-        <translate text="Thousand White Warehouse">
+        <translate text="Thousand White Warehouse" >
             <ptr addr="0x239ee4" />
             <ptr addr="0x239f64" />
         </translate>
-        <translate text="Thousand White Convent">
+        <translate text="Thousand White Convent" >
             <ptr addr="0x239eec" />
         </translate>
-        <translate text="Tiger Gate Kung Fu">
+        <translate text="Tiger Gate Kung Fu" >
             <ptr addr="0x239ef4" />
         </translate>
-        <translate text="Bronze Room">
+        <translate text="Bronze Room" >
             <ptr addr="0x239efc" />
         </translate>
-        <translate text="Silver Room">
+        <translate text="Silver Room" >
             <ptr addr="0x239f04" />
         </translate>
-        <translate text="Dural Room">
+        <translate text="Dural Room" >
             <ptr addr="0x239f0c" />
         </translate>
-        <translate text="Five Stars Corp.">
+        <translate text="Five Stars Corp." >
             <ptr addr="0x239f14" />
         </translate>
-        <translate text="Moon Child Dentist">
+        <translate text="Moon Child Dentist" >
             <ptr addr="0x239f1c" />
         </translate>
-        <translate text="Seventh Dentist">
+        <translate text="Seventh Dentist" >
             <ptr addr="0x239f24" />
         </translate>
-        <translate text="Unicorn Dentist">
+        <translate text="Unicorn Dentist" >
             <ptr addr="0x239f2c" />
         </translate>
-        <translate text="Golden Dentist">
+        <translate text="Golden Dentist" >
             <ptr addr="0x239f34" />
         </translate>
-        <translate text="Kowloon Dentist">
+        <translate text="Kowloon Dentist" >
             <ptr addr="0x239f3c" />
         </translate>
-        <translate text="Moon Child Bldg.">
+        <translate text="Moon Child Bldg." >
             <ptr addr="0x239f44" />
             <ptr addr="0x239fcc" />
             <ptr addr="0x23a5c8" />
         </translate>
-        <translate text="Dragon St.">
+        <translate text="Dragon St." >
             <ptr addr="0x239f4c" />
             <ptr addr="0x239fec" />
             <ptr addr="0x23a960" />
             <ptr addr="0x23f684" />
             <ptr addr="0x2494ac" />
         </translate>
-        <translate text="Thousand White Qr.">
+        <translate text="Thousand White Qr." >
             <ptr addr="0x239f54" />
             <ptr addr="0x239ff4" />
             <ptr addr="0x23a974" />
             <ptr addr="0x23f69c" />
         </translate>
-        <translate text="Yellow Head Bldg.">
+        <translate text="Yellow Head Bldg." >
             <ptr addr="0x239f6c" />
             <ptr addr="0x23a074" />
         </translate>
-        <translate text="Ghost Hall Bldg.">
+        <translate text="Ghost Hall Bldg." >
             <ptr addr="0x239f74" />
             <ptr addr="0x23a06c" />
         </translate>
-        <translate text="Old Government Office Site">
+        <translate text="Old Government Office Site" >
             <ptr addr="0x239f7c" />
             <ptr addr="0x23a034" />
         </translate>
-        <translate text="Tea Break Bldg.">
+        <translate text="Tea Break Bldg." >
             <ptr addr="0x239f84" />
         </translate>
-        <translate text="Three Birds Bldg.">
+        <translate text="Three Birds Bldg." >
             <ptr addr="0x239f8c" />
         </translate>
-        <translate text="Dimsum Bldg.">
+        <translate text="Dimsum Bldg." >
             <ptr addr="0x239f94" />
             <ptr addr="0x24968c" />
         </translate>
-        <translate text="Phoenix Bldg.">
+        <translate text="Phoenix Bldg." >
             <ptr addr="0x239f9c" />
         </translate>
-        <translate text="Dancing Dragon Bldg.">
+        <translate text="Dancing Dragon Bldg." >
             <ptr addr="0x239fa4" />
         </translate>
-        <translate text="Great View Bldg.">
+        <translate text="Great View Bldg." >
             <ptr addr="0x239fac" />
         </translate>
-        <translate text="God of Wealth Bldg.">
+        <translate text="God of Wealth Bldg." >
             <ptr addr="0x239fb4" />
         </translate>
-        <translate text="Black Heaven Bldg.">
+        <translate text="Black Heaven Bldg." >
             <ptr addr="0x239fbc" />
             <ptr addr="0x23a05c" />
         </translate>
-        <translate text="Golden Flower Bldg.">
+        <translate text="Golden Flower Bldg." >
             <ptr addr="0x239fc4" />
         </translate>
-        <translate text="Big Ox Bldg.">
+        <translate text="Big Ox Bldg." >
             <ptr addr="0x239fd4" />
             <ptr addr="0x239fdc" />
             <ptr addr="0x23a07c" />
         </translate>
-        <translate text="Underground">
+        <translate text="Underground" >
             <ptr addr="0x239fe4" />
         </translate>
-        <translate text="Stand Qr.">
+        <translate text="Stand Qr." >
             <ptr addr="0x239ffc" />
             <ptr addr="0x23a99c" />
             <ptr addr="0x23f6b4" />
             <ptr addr="0x2494a4" />
         </translate>
-        <translate text="Dimsum Qr.">
+        <translate text="Dimsum Qr." >
             <ptr addr="0x23a004" />
             <ptr addr="0x23a988" />
             <ptr addr="0x23f6cc" />
         </translate>
-        <translate text="Former Barracks">
+        <translate text="Former Barracks" >
             <ptr addr="0x23a00c" />
         </translate>
-        <translate text="Small Dragon Garden">
+        <translate text="Small Dragon Garden" >
             <ptr addr="0x23a014" />
         </translate>
-        <translate text="Star Gazing Point">
+        <translate text="Star Gazing Point" >
             <ptr addr="0x23a01c" />
         </translate>
-        <translate text="Construction Base">
+        <translate text="Construction Base" >
             <ptr addr="0x23a024" />
         </translate>
-        <translate text="Former Factory Site">
+        <translate text="Former Factory Site" >
             <ptr addr="0x23a02c" />
         </translate>
-        <translate text="Fighting Place">
+        <translate text="Fighting Place" >
             <ptr addr="0x23a03c" />
         </translate>
-        <translate text="Thunder House">
+        <translate text="Thunder House" >
             <ptr addr="0x23a044" />
             <ptr addr="0x23a04c" />
         </translate>
-        <translate text="Blue Dragon Garden">
+        <translate text="Blue Dragon Garden" >
             <ptr addr="0x23a054" />
         </translate>
-        <translate text="Thousand White Bldg.">
+        <translate text="Thousand White Bldg." >
             <ptr addr="0x23a064" />
         </translate>
-        <translate text="Langhuishan">
+        <translate text="Langhuishan" >
             <ptr addr="0x23a084" />
         </translate>
-        <translate text="Yingshuihe">
+        <translate text="Yingshuihe" >
             <ptr addr="0x23a08c" />
         </translate>
-        <translate text="Crag">
+        <translate text="Crag" >
             <ptr addr="0x23a094" />
         </translate>
-        <translate text="Rocky Area">
+        <translate text="Rocky Area" >
             <ptr addr="0x23a09c" />
         </translate>
-        <translate text="Forest">
+        <translate text="Forest" >
             <ptr addr="0x23a0a4" />
             <ptr addr="0x23a0ac" />
             <ptr addr="0x2498fc" />
         </translate>
-        <translate text="Green Field">
+        <translate text="Green Field" >
             <ptr addr="0x23a0b4" />
         </translate>
-        <translate text="Path Through a Wood">
+        <translate text="Path Through a Wood" >
             <ptr addr="0x23a0bc" />
         </translate>
-        <translate text="Cloud Bird Trail">
+        <translate text="Cloud Bird Trail" >
             <ptr addr="0x23a0c4" />
         </translate>
-        <translate text="Deep Green Way">
+        <translate text="Deep Green Way" >
             <ptr addr="0x23a0cc" />
             <ptr addr="0x23a0d4" />
         </translate>
-        <translate text="Shenhua&apos;s House">
+        <translate text="Shenhua&apos;s House" >
             <ptr addr="0x23a0dc" />
             <ptr addr="0x2499b4" />
         </translate>
-        <translate text="Stone Pit">
+        <translate text="Stone Pit" >
             <ptr addr="0x23a0e4" />
         </translate>
-        <translate text="Langhui Shop">
+        <translate text="Langhui Shop" >
             <ptr addr="0x23a0ec" />
         </translate>
     </section>
 
     <section name="Help menu" >
-        <translate text="&#9;*5*5Return&amp;">
+        <translate text="&#9;*5*5Return&amp;" >
             <ptr addr="0x23a194" />
             <ptr addr="0x23a1fc" />
             <ptr addr="0x23a264" />
             <ptr addr="0x23a2cc" />
         </translate>
-        <translate text="&#9;^BCancel">
+        <translate text="&#9;^BCancel" >
             <ptr addr="0x23a19c" />
             <ptr addr="0x23a204" />
             <ptr addr="0x23a26c" />
             <ptr addr="0x23a2d4" />
         </translate>
-        <translate text="A Free Battle three-set match.&amp;The one who wins twice will&amp;be the winner.&amp;">
+        <translate text="A Free Battle three-set match.&amp;The one who wins twice will&amp;be the winner.&amp;" >
             <ptr addr="0x23a1a8" />
             <ptr addr="0x23a278" />
             <ptr addr="0x23a210" />
             <ptr addr="0x23a2e0" />
         </translate>
-        <translate text="&#9;@AHere Ryo can shop for various items.&amp;">
+        <translate text="&#9;@AHere Ryo can shop for various items.&amp;" >
             <ptr addr="0x23a1ac" />
             <ptr addr="0x23a2e4" />
             <ptr addr="0x23a27c" />
             <ptr addr="0x23a214" />
         </translate>
-        <translate text="&amp;*1^L^R Run*9*7^Y Guard&amp;*6*6*7Punch ^X*1^B Throw&amp;*4^C Move*8*2Kick ^A&amp;">
+        <translate text="&amp;*1^L^R Run*9*7^Y Guard&amp;*6*6*7Punch ^X*1^B Throw&amp;*4^C Move*8*2Kick ^A&amp;" >
             <ptr addr="0x23a1f4" />
             <ptr addr="0x23a25c" />
             <ptr addr="0x23a2c4" />
             <ptr addr="0x23a32c" />
         </translate>
-        <translate text="&#9;@APress ^A to save the game or display&amp;the game settings.&amp;">
+        <translate text="&#9;@APress ^A to save the game or display&amp;the game settings.&amp;" >
             <ptr addr="0x23a198" />
             <ptr addr="0x23a268" />
             <ptr addr="0x23a2d0" />
             <ptr addr="0x23a200" />
         </translate>
-        <translate text="[Selection of Key]@ASelect which key to use.&amp;&amp;&#9;^CSelection&#9;^XEnter&amp;">
+        <translate text="[Selection of Key]@ASelect which key to use.&amp;&amp;&#9;^CSelection&#9;^XEnter&amp;" >
             <ptr addr="0x23a1c8" />
             <ptr addr="0x23a298" />
             <ptr addr="0x23a230" />
             <ptr addr="0x23a300" />
         </translate>
-        <translate text="&amp;BET/COIN  : Bet/Bet tokens&amp;START     : Start&amp;PAY OUT   : Collect winnings&amp;&amp;&#9;^CSelect&#9;^XEnter&amp;">
+        <translate text="&amp;BET/COIN  : Bet/Bet tokens&amp;START     : Start&amp;PAY OUT   : Collect winnings&amp;&amp;&#9;^CSelect&#9;^XEnter&amp;" >
             <ptr addr="0x23a1dc" />
             <ptr addr="0x23a244" />
             <ptr addr="0x23a2ac" />
             <ptr addr="0x23a314" />
         </translate>
-        <translate text="[Slot House]@APress^Xin front of a slot machine&amp;to play.&amp;$5 buys 20 tokens.&amp;&amp;">
+        <translate text="[Slot House]@APress^Xin front of a slot machine&amp;to play.&amp;$5 buys 20 tokens.&amp;&amp;" >
             <ptr addr="0x23a1e4" />
             <ptr addr="0x23a24c" />
             <ptr addr="0x23a2b4" />
             <ptr addr="0x23a31c" />
         </translate>
-        <translate text="&amp;&#9;^YCheck the information panel&amp;&#9;^CSelect the stand/position ball&amp;&#9;^ADrop ball/Choose stand&amp;">
+        <translate text="&amp;&#9;^YCheck the information panel&amp;&#9;^CSelect the stand/position ball&amp;&#9;^ADrop ball/Choose stand&amp;" >
             <ptr addr="0x23a1e8" />
             <ptr addr="0x23a320" />
             <ptr addr="0x23a250" />
             <ptr addr="0x23a2b8" />
         </translate>
-        <translate text="[Free Quest]@A&amp;&#9;^WRun&#9;^AConversation&amp;&#9;^CWalk@C&amp;&#9;^BStop&#9;Navigation Mark&amp;&amp;&#9;^QZoom&#9;^XNotebook&amp;&#9;Lock-on&#9;Action&amp;">
+        <translate text="[Free Quest]@A&amp;&#9;^WRun&#9;^AConversation&amp;&#9;^CWalk@C&amp;&#9;^BStop&#9;Navigation Mark&amp;&amp;&#9;^QZoom&#9;^XNotebook&amp;&#9;Lock-on&#9;Action&amp;" >
             <ptr addr="0x23a1d4" />
             <ptr addr="0x23a23c" />
             <ptr addr="0x23a30c" />
             <ptr addr="0x23a2a4" />
         </translate>
-        <translate text="Ryo can play at a special stand that will&amp;double his bet. Limited to five double-&amp;ups. �� Ryo can&apos;t play the far right stand&amp;first. It&apos;s for a double-up challenge.&amp;@V">
+        <translate text="Ryo can play at a special stand that will&amp;double his bet. Limited to five double-&amp;ups. �� Ryo can&apos;t play the far right stand&amp;first. It&apos;s for a double-up challenge.&amp;@V" >
             <ptr addr="0x23a1d8" />
             <ptr addr="0x23a240" />
             <ptr addr="0x23a2a8" />
             <ptr addr="0x23a310" />
         </translate>
-        <translate text="&amp;Press^Bon the title screen to quit.&amp;">
+        <translate text="&amp;Press^Bon the title screen to quit.&amp;" >
             <ptr addr="0x23a1c4" />
             <ptr addr="0x23a294" />
             <ptr addr="0x23a22c" />
             <ptr addr="0x23a2fc" />
         </translate>
-        <translate text="Remaining credits will be returned in cash.&amp;&amp;">
+        <translate text="Remaining credits will be returned in cash.&amp;&amp;" >
             <ptr addr="0x23a1c0" />
             <ptr addr="0x23a290" />
             <ptr addr="0x23a228" />
             <ptr addr="0x23a2f8" />
         </translate>
-        <translate text="press^X. Select |Buy| or |Don&apos;t Buy|&amp;from the AS.&amp;Some items have descriptions that can&amp;">
+        <translate text="press^X. Select |Buy| or |Don&apos;t Buy|&amp;from the AS.&amp;Some items have descriptions that can&amp;" >
             <ptr addr="0x23a1b0" />
             <ptr addr="0x23a218" />
             <ptr addr="0x23a2e8" />
@@ -826,19 +826,19 @@
         </translate>
 
 
-        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMove cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;">
+        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMove cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;" >
             <ptr addr="0x23a1f0" />
         </translate>
-        <translate text="sur ^A pour augmenter le nombre d&apos;objets&amp;�� vendre. Appuyez sur ^B pour diminuer&amp;le nombre d&apos;objets �� vendre. Apr��s avoir&amp;s��lectionn�� la quantit�� d&apos;objets, placez&amp;le curseur sur Valider et appuyez sur ^A.&amp;&amp;&#9;^CD��placer curseur&#9;^LRemonter&amp;&#9;&#9;^RDescendre">
+        <translate text="sur ^A pour augmenter le nombre d&apos;objets&amp;�� vendre. Appuyez sur ^B pour diminuer&amp;le nombre d&apos;objets �� vendre. Apr��s avoir&amp;s��lectionn�� la quantit�� d&apos;objets, placez&amp;le curseur sur Valider et appuyez sur ^A.&amp;&amp;&#9;^CD��placer curseur&#9;^LRemonter&amp;&#9;&#9;^RDescendre" >
             <ptr addr="0x23a258" />
         </translate>
-        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMueve el cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;">
+        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMueve el cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;" >
             <ptr addr="0x23a328" />
         </translate>
     </section>
 
     <section name="In-game menu" >
-        <translate text="Save">
+        <translate text="Save" >
             <ptr addr="0x23c4e0" />
             <ptr addr="0x24860c" />
             <ptr addr="0x23c54c" />
@@ -848,7 +848,7 @@
             <ptr addr="0x23c504" />
             <ptr addr="0x248610" />
         </translate>
-        <translate text="Settings">
+        <translate text="Settings" >
             <ptr addr="0x23c4e4" />
             <ptr addr="0x24861c" />
             <ptr addr="0x23c550" />
@@ -858,45 +858,45 @@
             <ptr addr="0x23c508" />
             <ptr addr="0x248620" />
         </translate>
-        <translate text="Maps">
+        <translate text="Maps" >
             <ptr addr="0x23c4f4" />
             <ptr addr="0x23c518" />
             <ptr addr="0x23c53c" />
             <ptr addr="0x23c560" />
         </translate>
-        <translate text="Collection">
+        <translate text="Collection" >
             <ptr addr="0x23c4ec" />
             <ptr addr="0x23c534" />
             <ptr addr="0x24933c" />
             <ptr addr="0x23c558" />
             <ptr addr="0x23c510" />
         </translate>
-        <translate text="Moves Scroll">
+        <translate text="Moves Scroll" >
             <ptr addr="0x23c4e8" />
             <ptr addr="0x23c50c" />
             <ptr addr="0x23c530" />
             <ptr addr="0x23c554" />
         </translate>
-        <translate text="Move Handbook">
+        <translate text="Move Handbook" >
             <ptr addr="0x23c4fc" />
             <ptr addr="0x23c568" />
             <ptr addr="0x23c520" />
             <ptr addr="0x23c544" />
             <ptr addr="0x249b84" />
         </translate>
-        <translate text="Pawnshop Fliers">
+        <translate text="Pawnshop Fliers" >
             <ptr addr="0x23c4f8" />
             <ptr addr="0x23c51c" />
             <ptr addr="0x23c540" />
             <ptr addr="0x23c564" />
         </translate>
-        <translate text="Album">
+        <translate text="Album" >
             <ptr addr="0x23c4f0" />
             <ptr addr="0x23c514" />
             <ptr addr="0x23c538" />
             <ptr addr="0x23c55c" />
         </translate>
-        <translate text="Map Jamp">
+        <translate text="Map Jamp" >
             <ptr addr="0x23c500" />
             <ptr addr="0x23c524" />
             <ptr addr="0x23c548" />
@@ -905,130 +905,130 @@
     </section>
 
     <section name="Items" >
-        <translate text="Overall Map">
+        <translate text="Overall Map" >
             <ptr addr="0x23a3c0" />
         </translate>
-        <translate text="Notebook">
+        <translate text="Notebook" >
             <ptr addr="0x23a3d4" />
         </translate>
-        <translate text="Token(s)">
+        <translate text="Token(s)" >
             <ptr addr="0x23a3e8" />
         </translate>
-        <translate text="Watch">
+        <translate text="Watch" >
             <ptr addr="0x23a3fc" />
             <ptr addr="0x2491e4" />
         </translate>
 
-        <translate text="Sword Handguard">
+        <translate text="Sword Handguard" >
             <ptr addr="0x23a410" />
         </translate>
-        <translate text="Phoenix Mirror">
+        <translate text="Phoenix Mirror" >
             <ptr addr="0x23a424" />
             <ptr addr="0x2492a4" />
         </translate>
-        <translate text="Chen Intro Letter">
+        <translate text="Chen Intro Letter" >
             <ptr addr="0x23a438" />
         </translate>
-        <translate text="Amulet">
+        <translate text="Amulet" >
             <ptr addr="0x23a44c" />
         </translate>
-        <translate text="White Leaf">
+        <translate text="White Leaf" >
             <ptr addr="0x23a460" />
         </translate>
-        <translate text="HEAVENS ZIPPO">
+        <translate text="HEAVENS ZIPPO" >
             <ptr addr="0x23a474" />
         </translate>
-        <translate text="Comma Shaped Bead">
+        <translate text="Comma Shaped Bead" >
             <ptr addr="0x23a488" />
         </translate>
-        <translate text="Four Divine Beasts">
+        <translate text="Four Divine Beasts" >
             <ptr addr="0x23a49c" />
         </translate>
-        <translate text="Right Coin">
+        <translate text="Right Coin" >
             <ptr addr="0x23a4b0" />
         </translate>
-        <translate text="Reverse Coin">
+        <translate text="Reverse Coin" >
             <ptr addr="0x23a4c4" />
         </translate>
-        <translate text="Xun&apos;s Amulet">
+        <translate text="Xun&apos;s Amulet" >
             <ptr addr="0x23a4d8" />
         </translate>
-        <translate text="Big Gold Medal">
+        <translate text="Big Gold Medal" >
             <ptr addr="0x23a4ec" />
         </translate>
-        <translate text="Big Silver Medal">
+        <translate text="Big Silver Medal" >
             <ptr addr="0x23a500" />
         </translate>
-        <translate text="Big Bronze Medal">
+        <translate text="Big Bronze Medal" >
             <ptr addr="0x23a514" />
         </translate>
-        <translate text="Letter to Father">
+        <translate text="Letter to Father" >
             <ptr addr="0x23a528" />
         </translate>
-        <translate text="Chawan Sign">
+        <translate text="Chawan Sign" >
             <ptr addr="0x23a550" />
         </translate>
-        <translate text="Zongquan Letter">
+        <translate text="Zongquan Letter" >
             <ptr addr="0x23a564" />
         </translate>
-        <translate text="C. O. G. H.">
+        <translate text="C. O. G. H." >
             <ptr addr="0x23a58c" />
         </translate>
-        <translate text="Man Mo Park">
+        <translate text="Man Mo Park" >
             <ptr addr="0x23a5a0" />
             <ptr addr="0x23a5b4" />
             <ptr addr="0x249954" />
         </translate>
-        <translate text="White Tiger">
+        <translate text="White Tiger" >
             <ptr addr="0x23a5f0" />
             <ptr addr="0x23bd74" />
         </translate>
-        <translate text="Snake Tortoise">
+        <translate text="Snake Tortoise" >
             <ptr addr="0x23a604" />
             <ptr addr="0x23bd60" />
         </translate>
-        <translate text="Blue Dragon">
+        <translate text="Blue Dragon" >
             <ptr addr="0x23a618" />
             <ptr addr="0x23bd9c" />
         </translate>
-        <translate text="Fish">
+        <translate text="Fish" >
             <ptr addr="0x23a62c" />
         </translate>
-        <translate text="Rooster">
+        <translate text="Rooster" >
             <ptr addr="0x23a640" />
         </translate>
-        <translate text="Phoenix">
+        <translate text="Phoenix" >
             <ptr addr="0x23a654" />
             <ptr addr="0x23bd88" />
         </translate>
-        <translate text="Wild Boar">
+        <translate text="Wild Boar" >
             <ptr addr="0x23a668" />
         </translate>
-        <translate text="Goat">
+        <translate text="Goat" >
             <ptr addr="0x23a67c" />
         </translate>
-        <translate text="EV Key 29">
+        <translate text="EV Key 29" >
             <ptr addr="0x23a690" />
         </translate>
-        <translate text="EV Key 10">
+        <translate text="EV Key 10" >
             <ptr addr="0x23a6a4" />
         </translate>
-        <translate text="EV Key 46">
+        <translate text="EV Key 46" >
             <ptr addr="0x23a6b8" />
         </translate>
-        <translate text="EV Key 9">
+        <translate text="EV Key 9" >
             <ptr addr="0x23a6cc" />
         </translate>
-        <translate text="EV Key 18">
+        <translate text="EV Key 18" >
             <ptr addr="0x23a6e0" />
         </translate>
-        <translate text="EV Key 21">
+        <translate text="EV Key 21" >
             <ptr addr="0x23a6f4" />
         </translate>
-        <translate text="Duck">
+        <translate text="Duck" >
             <ptr addr="0x23a708" />
         </translate>
-        <translate text="Nozomi">
+        <translate text="Nozomi" >
             <ptr addr="0x23a71c" />
             <ptr addr="0x23a730" />
             <ptr addr="0x23a744" />
@@ -1037,54 +1037,54 @@
             <ptr addr="0x23a780" />
             <ptr addr="0x2493b4" />
         </translate>
-        <translate text="Father">
+        <translate text="Father" >
             <ptr addr="0x23a794" />
             <ptr addr="0x2492b4" />
         </translate>
-        <translate text="Hazukis">
+        <translate text="Hazukis" >
             <ptr addr="0x23a7a8" />
         </translate>
-        <translate text="Friends">
+        <translate text="Friends" >
             <ptr addr="0x23a7bc" />
         </translate>
-        <translate text="Wong">
+        <translate text="Wong" >
             <ptr addr="0x23a7d0" />
             <ptr addr="0x23aa50" />
             <ptr addr="0x23f57c" />
             <ptr addr="0x249a64" />
         </translate>
-        <translate text="Xiuying">
+        <translate text="Xiuying" >
             <ptr addr="0x23a7e4" />
             <ptr addr="0x23f66c" />
             <ptr addr="0x2498cc" />
         </translate>
-        <translate text="Scout">
+        <translate text="Scout" >
             <ptr addr="0x23a7f8" />
             <ptr addr="0x23aa78" />
             <ptr addr="0x23f774" />
         </translate>
-        <translate text="Joy">
+        <translate text="Joy" >
             <ptr addr="0x23a80c" />
             <ptr addr="0x249a74" />
         </translate>
-        <translate text="Fangmei">
+        <translate text="Fangmei" >
             <ptr addr="0x23a820" />
             <ptr addr="0x23a834" />
             <ptr addr="0x249a6c" />
         </translate>
-        <translate text="Rod">
+        <translate text="Rod" >
             <ptr addr="0x23a848" />
             <ptr addr="0x2497ac" />
         </translate>
-        <translate text="Greg">
+        <translate text="Greg" >
             <ptr addr="0x23a85c" />
             <ptr addr="0x2497b4" />
         </translate>
-        <translate text="Chunyan">
+        <translate text="Chunyan" >
             <ptr addr="0x23a870" />
             <ptr addr="0x2497bc" />
         </translate>
-        <translate text="Ren">
+        <translate text="Ren" >
             <ptr addr="0x23aa3c" />
             <ptr addr="0x23f594" />
             <ptr addr="0x249474" />
@@ -1093,1013 +1093,1013 @@
     </section>
 
     <section name="Collection" >
-        <translate text="Akira 1">
+        <translate text="Akira 1" >
             <ptr addr="0x23aa8c" />
         </translate>
-        <translate text="Akira 2">
+        <translate text="Akira 2" >
             <ptr addr="0x23aaa0" />
         </translate>
-        <translate text="Jacky 1">
+        <translate text="Jacky 1" >
             <ptr addr="0x23aab4" />
         </translate>
-        <translate text="Jacky 2">
+        <translate text="Jacky 2" >
             <ptr addr="0x23aac8" />
         </translate>
-        <translate text="Sarah 1">
+        <translate text="Sarah 1" >
             <ptr addr="0x23aadc" />
         </translate>
-        <translate text="Sarah 2">
+        <translate text="Sarah 2" >
             <ptr addr="0x23aaf0" />
         </translate>
-        <translate text="Lau 1">
+        <translate text="Lau 1" >
             <ptr addr="0x23ab04" />
         </translate>
-        <translate text="Lau 2">
+        <translate text="Lau 2" >
             <ptr addr="0x23ab18" />
         </translate>
-        <translate text="Pai 1">
+        <translate text="Pai 1" >
             <ptr addr="0x23ab2c" />
         </translate>
-        <translate text="Pai 2">
+        <translate text="Pai 2" >
             <ptr addr="0x23ab40" />
         </translate>
-        <translate text="Wolf 1">
+        <translate text="Wolf 1" >
             <ptr addr="0x23ab54" />
         </translate>
-        <translate text="Wolf 2">
+        <translate text="Wolf 2" >
             <ptr addr="0x23ab68" />
         </translate>
-        <translate text="Jeffry 1">
+        <translate text="Jeffry 1" >
             <ptr addr="0x23ab7c" />
         </translate>
-        <translate text="Jeffry 2">
+        <translate text="Jeffry 2" >
             <ptr addr="0x23ab90" />
         </translate>
-        <translate text="Kage 1">
+        <translate text="Kage 1" >
             <ptr addr="0x23aba4" />
         </translate>
-        <translate text="Kage 2">
+        <translate text="Kage 2" >
             <ptr addr="0x23abb8" />
         </translate>
-        <translate text="Dural Silver">
+        <translate text="Dural Silver" >
             <ptr addr="0x23abcc" />
         </translate>
-        <translate text="Dural Gold">
+        <translate text="Dural Gold" >
             <ptr addr="0x23abe0" />
         </translate>
-        <translate text="Wooden man">
+        <translate text="Wooden man" >
             <ptr addr="0x23abf4" />
         </translate>
-        <translate text="Rent-A-Hero">
+        <translate text="Rent-A-Hero" >
             <ptr addr="0x23ac08" />
         </translate>
-        <translate text="TRY-Z">
+        <translate text="TRY-Z" >
             <ptr addr="0x23ac1c" />
         </translate>
-        <translate text="Solo Wing">
+        <translate text="Solo Wing" >
             <ptr addr="0x23ac30" />
         </translate>
-        <translate text="Kids Akira 1">
+        <translate text="Kids Akira 1" >
             <ptr addr="0x23ac44" />
         </translate>
-        <translate text="Kids Akira 2">
+        <translate text="Kids Akira 2" >
             <ptr addr="0x23ac58" />
         </translate>
-        <translate text="Kids Jacky 1">
+        <translate text="Kids Jacky 1" >
             <ptr addr="0x23ac6c" />
         </translate>
-        <translate text="Kids Jacky 2">
+        <translate text="Kids Jacky 2" >
             <ptr addr="0x23ac80" />
         </translate>
-        <translate text="Kids Sarah 1">
+        <translate text="Kids Sarah 1" >
             <ptr addr="0x23ac94" />
         </translate>
-        <translate text="Kids Sarah 2">
+        <translate text="Kids Sarah 2" >
             <ptr addr="0x23aca8" />
         </translate>
-        <translate text="Kids Lau 1">
+        <translate text="Kids Lau 1" >
             <ptr addr="0x23acbc" />
         </translate>
-        <translate text="Kids Lau 2">
+        <translate text="Kids Lau 2" >
             <ptr addr="0x23acd0" />
         </translate>
-        <translate text="Kids Pai 1">
+        <translate text="Kids Pai 1" >
             <ptr addr="0x23ace4" />
         </translate>
-        <translate text="Kids Pai 2">
+        <translate text="Kids Pai 2" >
             <ptr addr="0x23acf8" />
         </translate>
-        <translate text="Kids Wolf 1">
+        <translate text="Kids Wolf 1" >
             <ptr addr="0x23ad0c" />
         </translate>
-        <translate text="Kids Wolf 2">
+        <translate text="Kids Wolf 2" >
             <ptr addr="0x23ad20" />
         </translate>
-        <translate text="Kids Jeffry 1">
+        <translate text="Kids Jeffry 1" >
             <ptr addr="0x23ad34" />
         </translate>
-        <translate text="Kids Jeffry 2">
+        <translate text="Kids Jeffry 2" >
             <ptr addr="0x23ad48" />
         </translate>
-        <translate text="Kids Kage 1">
+        <translate text="Kids Kage 1" >
             <ptr addr="0x23ad5c" />
         </translate>
-        <translate text="Kids Kage 2">
+        <translate text="Kids Kage 2" >
             <ptr addr="0x23ad70" />
         </translate>
-        <translate text="Kids Shun Di 1">
+        <translate text="Kids Shun Di 1" >
             <ptr addr="0x23ad84" />
         </translate>
-        <translate text="Kids Shun Di 2">
+        <translate text="Kids Shun Di 2" >
             <ptr addr="0x23ad98" />
         </translate>
-        <translate text="Kids Lion 1">
+        <translate text="Kids Lion 1" >
             <ptr addr="0x23adac" />
         </translate>
-        <translate text="Kids Lion 2">
+        <translate text="Kids Lion 2" >
             <ptr addr="0x23adc0" />
         </translate>
-        <translate text="Kids Dural S">
+        <translate text="Kids Dural S" >
             <ptr addr="0x23add4" />
         </translate>
-        <translate text="Kids Dural G">
+        <translate text="Kids Dural G" >
             <ptr addr="0x23ade8" />
         </translate>
-        <translate text="NiGHTS 1">
+        <translate text="NiGHTS 1" >
             <ptr addr="0x23adfc" />
         </translate>
-        <translate text="NiGHTS 2">
+        <translate text="NiGHTS 2" >
             <ptr addr="0x23ae10" />
         </translate>
-        <translate text="Sonic 1">
+        <translate text="Sonic 1" >
             <ptr addr="0x23ae24" />
         </translate>
-        <translate text="Sonic 2">
+        <translate text="Sonic 2" >
             <ptr addr="0x23ae38" />
         </translate>
-        <translate text="Super Sonic">
+        <translate text="Super Sonic" >
             <ptr addr="0x23ae4c" />
         </translate>
-        <translate text="Tails">
+        <translate text="Tails" >
             <ptr addr="0x23ae60" />
             <ptr addr="0x249414" />
         </translate>
-        <translate text="Knuckles">
+        <translate text="Knuckles" >
             <ptr addr="0x23ae74" />
         </translate>
-        <translate text="Berk">
+        <translate text="Berk" >
             <ptr addr="0x23ae88" />
         </translate>
-        <translate text="Bean">
+        <translate text="Bean" >
             <ptr addr="0x23ae9c" />
         </translate>
-        <translate text="Fang">
+        <translate text="Fang" >
             <ptr addr="0x23aeb0" />
         </translate>
-        <translate text="Amy">
+        <translate text="Amy" >
             <ptr addr="0x23aec4" />
         </translate>
-        <translate text="Espio">
+        <translate text="Espio" >
             <ptr addr="0x23aed8" />
         </translate>
-        <translate text="Metal Sonic">
+        <translate text="Metal Sonic" >
             <ptr addr="0x23aeec" />
         </translate>
-        <translate text="Eggman">
+        <translate text="Eggman" >
             <ptr addr="0x23af00" />
         </translate>
-        <translate text="Hang On 1">
+        <translate text="Hang On 1" >
             <ptr addr="0x23af14" />
         </translate>
-        <translate text="Hang On 2">
+        <translate text="Hang On 2" >
             <ptr addr="0x23af28" />
         </translate>
-        <translate text="Hang On 3">
+        <translate text="Hang On 3" >
             <ptr addr="0x23af3c" />
         </translate>
-        <translate text="Hang On 4">
+        <translate text="Hang On 4" >
             <ptr addr="0x23af50" />
         </translate>
-        <translate text="Hang On 5">
+        <translate text="Hang On 5" >
             <ptr addr="0x23af64" />
         </translate>
-        <translate text="Hang On G">
+        <translate text="Hang On G" >
             <ptr addr="0x23af78" />
         </translate>
-        <translate text="Space Harrier">
+        <translate text="Space Harrier" >
             <ptr addr="0x23af8c" />
             <ptr addr="0x23b798" />
         </translate>
-        <translate text="Ruber">
+        <translate text="Ruber" >
             <ptr addr="0x23afa0" />
         </translate>
-        <translate text="Binsbein 1">
+        <translate text="Binsbein 1" >
             <ptr addr="0x23afb4" />
         </translate>
-        <translate text="Binsbein 2">
+        <translate text="Binsbein 2" >
             <ptr addr="0x23afc8" />
         </translate>
-        <translate text="Binsbein 3">
+        <translate text="Binsbein 3" >
             <ptr addr="0x23afdc" />
         </translate>
-        <translate text="B. B. Ultra">
+        <translate text="B. B. Ultra" >
             <ptr addr="0x23aff0" />
         </translate>
-        <translate text="Pochi">
+        <translate text="Pochi" >
             <ptr addr="0x23b004" />
         </translate>
-        <translate text="John">
+        <translate text="John" >
             <ptr addr="0x23b018" />
         </translate>
-        <translate text="Kelly">
+        <translate text="Kelly" >
             <ptr addr="0x23b02c" />
         </translate>
-        <translate text="Kuro">
+        <translate text="Kuro" >
             <ptr addr="0x23b040" />
         </translate>
-        <translate text="Tora">
+        <translate text="Tora" >
             <ptr addr="0x23b054" />
         </translate>
-        <translate text="Big Robin">
+        <translate text="Big Robin" >
             <ptr addr="0x23b068" />
         </translate>
-        <translate text="Little Robin">
+        <translate text="Little Robin" >
             <ptr addr="0x23b07c" />
         </translate>
-        <translate text="Robins">
+        <translate text="Robins" >
             <ptr addr="0x23b090" />
         </translate>
-        <translate text="Big Philip">
+        <translate text="Big Philip" >
             <ptr addr="0x23b0a4" />
         </translate>
-        <translate text="Little Philip">
+        <translate text="Little Philip" >
             <ptr addr="0x23b0b8" />
         </translate>
-        <translate text="Philips">
+        <translate text="Philips" >
             <ptr addr="0x23b0cc" />
         </translate>
-        <translate text="Chip">
+        <translate text="Chip" >
             <ptr addr="0x23b0e0" />
         </translate>
-        <translate text="Rap">
+        <translate text="Rap" >
             <ptr addr="0x23b0f4" />
         </translate>
-        <translate text="Pop">
+        <translate text="Pop" >
             <ptr addr="0x23b108" />
         </translate>
-        <translate text="Pip">
+        <translate text="Pip" >
             <ptr addr="0x23b11c" />
         </translate>
-        <translate text="Mary">
+        <translate text="Mary" >
             <ptr addr="0x23b130" />
         </translate>
-        <translate text="Pyonta">
+        <translate text="Pyonta" >
             <ptr addr="0x23b144" />
         </translate>
-        <translate text="Myau">
+        <translate text="Myau" >
             <ptr addr="0x23b158" />
         </translate>
-        <translate text="Chicken Leg">
+        <translate text="Chicken Leg" >
             <ptr addr="0x23b16c" />
         </translate>
-        <translate text="Chao &amp; Pian">
+        <translate text="Chao &amp; Pian" >
             <ptr addr="0x23b180" />
         </translate>
-        <translate text="Ristar">
+        <translate text="Ristar" >
             <ptr addr="0x23b194" />
         </translate>
-        <translate text="Alex Kidd">
+        <translate text="Alex Kidd" >
             <ptr addr="0x23b1a8" />
         </translate>
-        <translate text="Opa-opa">
+        <translate text="Opa-opa" >
             <ptr addr="0x23b1bc" />
         </translate>
-        <translate text="Jet Opa-opa">
+        <translate text="Jet Opa-opa" >
             <ptr addr="0x23b1d0" />
         </translate>
-        <translate text="Poppors">
+        <translate text="Poppors" >
             <ptr addr="0x23b1e4" />
         </translate>
-        <translate text="Goba Beach">
+        <translate text="Goba Beach" >
             <ptr addr="0x23b1f8" />
         </translate>
-        <translate text="Aida II">
+        <translate text="Aida II" >
             <ptr addr="0x23b20c" />
         </translate>
-        <translate text="Shop">
+        <translate text="Shop" >
             <ptr addr="0x23b220" />
         </translate>
-        <translate text="Heavy Bomb 1">
+        <translate text="Heavy Bomb 1" >
             <ptr addr="0x23b234" />
         </translate>
-        <translate text="Heavy Bomb 2">
+        <translate text="Heavy Bomb 2" >
             <ptr addr="0x23b248" />
         </translate>
-        <translate text="Heavy Bomb 3">
+        <translate text="Heavy Bomb 3" >
             <ptr addr="0x23b25c" />
         </translate>
-        <translate text="MOBO">
+        <translate text="MOBO" >
             <ptr addr="0x23b270" />
         </translate>
-        <translate text="ROBO">
+        <translate text="ROBO" >
             <ptr addr="0x23b284" />
         </translate>
-        <translate text="Bonanza Brothers">
+        <translate text="Bonanza Brothers" >
             <ptr addr="0x23b298" />
         </translate>
-        <translate text="Motor Scooter">
+        <translate text="Motor Scooter" >
             <ptr addr="0x23b2ac" />
         </translate>
-        <translate text="Delivery Moped">
+        <translate text="Delivery Moped" >
             <ptr addr="0x23b2c0" />
         </translate>
-        <translate text="Coupe 1">
+        <translate text="Coupe 1" >
             <ptr addr="0x23b2d4" />
         </translate>
-        <translate text="Coupe 2">
+        <translate text="Coupe 2" >
             <ptr addr="0x23b2e8" />
         </translate>
-        <translate text="Coupe 3">
+        <translate text="Coupe 3" >
             <ptr addr="0x23b2fc" />
         </translate>
-        <translate text="Coupe 4">
+        <translate text="Coupe 4" >
             <ptr addr="0x23b310" />
         </translate>
-        <translate text="Coupe 5">
+        <translate text="Coupe 5" >
             <ptr addr="0x23b324" />
         </translate>
-        <translate text="Hornet">
+        <translate text="Hornet" >
             <ptr addr="0x23b338" />
         </translate>
-        <translate text="Wagon 1">
+        <translate text="Wagon 1" >
             <ptr addr="0x23b34c" />
         </translate>
-        <translate text="Wagon 2">
+        <translate text="Wagon 2" >
             <ptr addr="0x23b360" />
         </translate>
-        <translate text="Wagon 3">
+        <translate text="Wagon 3" >
             <ptr addr="0x23b374" />
         </translate>
-        <translate text="Wagon 4">
+        <translate text="Wagon 4" >
             <ptr addr="0x23b388" />
         </translate>
-        <translate text="Truck 1">
+        <translate text="Truck 1" >
             <ptr addr="0x23b39c" />
         </translate>
-        <translate text="Truck 2">
+        <translate text="Truck 2" >
             <ptr addr="0x23b3b0" />
         </translate>
-        <translate text="Truck 3">
+        <translate text="Truck 3" >
             <ptr addr="0x23b3c4" />
         </translate>
-        <translate text="Truck 4">
+        <translate text="Truck 4" >
             <ptr addr="0x23b3d8" />
         </translate>
-        <translate text="Hot Dog Truck">
+        <translate text="Hot Dog Truck" >
             <ptr addr="0x23b3ec" />
         </translate>
-        <translate text="Bus">
+        <translate text="Bus" >
             <ptr addr="0x23b400" />
         </translate>
-        <translate text="Forklift">
+        <translate text="Forklift" >
             <ptr addr="0x23b414" />
         </translate>
-        <translate text="Forklift No.1">
+        <translate text="Forklift No.1" >
             <ptr addr="0x23b428" />
         </translate>
-        <translate text="Forklift No.2">
+        <translate text="Forklift No.2" >
             <ptr addr="0x23b43c" />
         </translate>
-        <translate text="Forklift No.3">
+        <translate text="Forklift No.3" >
             <ptr addr="0x23b450" />
         </translate>
-        <translate text="Forklift No.4">
+        <translate text="Forklift No.4" >
             <ptr addr="0x23b464" />
         </translate>
-        <translate text="Forklift No.5">
+        <translate text="Forklift No.5" >
             <ptr addr="0x23b478" />
         </translate>
-        <translate text="Forklift Red">
+        <translate text="Forklift Red" >
             <ptr addr="0x23b48c" />
         </translate>
-        <translate text="Forklift Blue">
+        <translate text="Forklift Blue" >
             <ptr addr="0x23b4a0" />
         </translate>
-        <translate text="Crane">
+        <translate text="Crane" >
             <ptr addr="0x23b4b4" />
         </translate>
-        <translate text="SHENMUE container">
+        <translate text="SHENMUE container" >
             <ptr addr="0x23b4c8" />
         </translate>
-        <translate text="Container">
+        <translate text="Container" >
             <ptr addr="0x23b4dc" />
         </translate>
-        <translate text="Wooden Crate">
+        <translate text="Wooden Crate" >
             <ptr addr="0x23b4f0" />
         </translate>
-        <translate text="Anchor">
+        <translate text="Anchor" >
             <ptr addr="0x23b504" />
         </translate>
-        <translate text="Ferry">
+        <translate text="Ferry" >
             <ptr addr="0x23b518" />
         </translate>
-        <translate text="Steering Wheel">
+        <translate text="Steering Wheel" >
             <ptr addr="0x23b52c" />
         </translate>
-        <translate text="Float">
+        <translate text="Float" >
             <ptr addr="0x23b540" />
         </translate>
-        <translate text="X Button">
+        <translate text="X Button" >
             <ptr addr="0x23b554" />
         </translate>
-        <translate text="Y Button">
+        <translate text="Y Button" >
             <ptr addr="0x23b568" />
         </translate>
-        <translate text="A Button">
+        <translate text="A Button" >
             <ptr addr="0x23b57c" />
         </translate>
-        <translate text="B Button">
+        <translate text="B Button" >
             <ptr addr="0x23b590" />
         </translate>
-        <translate text="Cherry">
+        <translate text="Cherry" >
             <ptr addr="0x23b5a4" />
         </translate>
-        <translate text="Mini Jukebox">
+        <translate text="Mini Jukebox" >
             <ptr addr="0x23b5b8" />
         </translate>
-        <translate text="Mini Slot Game">
+        <translate text="Mini Slot Game" >
             <ptr addr="0x23b5cc" />
         </translate>
-        <translate text="Mini QTE Title">
+        <translate text="Mini QTE Title" >
             <ptr addr="0x23b5e0" />
         </translate>
-        <translate text="Mini Harrier">
+        <translate text="Mini Harrier" >
             <ptr addr="0x23b5f4" />
         </translate>
-        <translate text="Mini Hang On">
+        <translate text="Mini Hang On" >
             <ptr addr="0x23b608" />
         </translate>
-        <translate text="R-360">
+        <translate text="R-360" >
             <ptr addr="0x23b61c" />
         </translate>
-        <translate text="Mini Darts">
+        <translate text="Mini Darts" >
             <ptr addr="0x23b630" />
         </translate>
-        <translate text="Mini QTE">
+        <translate text="Mini QTE" >
             <ptr addr="0x23b644" />
         </translate>
-        <translate text="Mini Pool">
+        <translate text="Mini Pool" >
             <ptr addr="0x23b658" />
         </translate>
-        <translate text="Matsuyama Prize">
+        <translate text="Matsuyama Prize" >
             <ptr addr="0x23b66c" />
         </translate>
-        <translate text="Mitsuzuka Prize">
+        <translate text="Mitsuzuka Prize" >
             <ptr addr="0x23b680" />
         </translate>
-        <translate text="Harrier Token">
+        <translate text="Harrier Token" >
             <ptr addr="0x23b694" />
         </translate>
-        <translate text="Hang On Token">
+        <translate text="Hang On Token" >
             <ptr addr="0x23b6a8" />
         </translate>
-        <translate text="Super Ball 1">
+        <translate text="Super Ball 1" >
             <ptr addr="0x23b6bc" />
         </translate>
-        <translate text="Super Ball 2">
+        <translate text="Super Ball 2" >
             <ptr addr="0x23b6d0" />
         </translate>
-        <translate text="Super Ball 3">
+        <translate text="Super Ball 3" >
             <ptr addr="0x23b6e4" />
         </translate>
-        <translate text="Dice 1">
+        <translate text="Dice 1" >
             <ptr addr="0x23b6f8" />
         </translate>
-        <translate text="Dice 2">
+        <translate text="Dice 2" >
             <ptr addr="0x23b70c" />
         </translate>
-        <translate text="Dice 3">
+        <translate text="Dice 3" >
             <ptr addr="0x23b720" />
         </translate>
-        <translate text="A Size Battery">
+        <translate text="A Size Battery" >
             <ptr addr="0x23b734" />
         </translate>
-        <translate text="AAA Size Battery">
+        <translate text="AAA Size Battery" >
             <ptr addr="0x23b748" />
         </translate>
-        <translate text="Box of Matches">
+        <translate text="Box of Matches" >
             <ptr addr="0x23b75c" />
         </translate>
-        <translate text="Light Bulb">
+        <translate text="Light Bulb" >
             <ptr addr="0x23b770" />
         </translate>
-        <translate text="Hang On">
+        <translate text="Hang On" >
             <ptr addr="0x23b784" />
         </translate>
-        <translate text="VF2 Akira 1">
+        <translate text="VF2 Akira 1" >
             <ptr addr="0x23b7ac" />
         </translate>
-        <translate text="VF2 Akira 2">
+        <translate text="VF2 Akira 2" >
             <ptr addr="0x23b7c0" />
         </translate>
-        <translate text="VF2 Pai 1">
+        <translate text="VF2 Pai 1" >
             <ptr addr="0x23b7d4" />
         </translate>
-        <translate text="VF2 Pai 2">
+        <translate text="VF2 Pai 2" >
             <ptr addr="0x23b7e8" />
         </translate>
-        <translate text="VF2 Lau 1">
+        <translate text="VF2 Lau 1" >
             <ptr addr="0x23b7fc" />
         </translate>
-        <translate text="VF2 Lau 2">
+        <translate text="VF2 Lau 2" >
             <ptr addr="0x23b810" />
         </translate>
-        <translate text="VF2 Wolf 1">
+        <translate text="VF2 Wolf 1" >
             <ptr addr="0x23b824" />
         </translate>
-        <translate text="VF2 Wolf 2">
+        <translate text="VF2 Wolf 2" >
             <ptr addr="0x23b838" />
         </translate>
-        <translate text="VF2 Jeffry 1">
+        <translate text="VF2 Jeffry 1" >
             <ptr addr="0x23b84c" />
         </translate>
-        <translate text="VF2 Jeffry 2">
+        <translate text="VF2 Jeffry 2" >
             <ptr addr="0x23b860" />
         </translate>
-        <translate text="VF2 Kage 1">
+        <translate text="VF2 Kage 1" >
             <ptr addr="0x23b874" />
         </translate>
-        <translate text="VF2 Kage 2">
+        <translate text="VF2 Kage 2" >
             <ptr addr="0x23b888" />
         </translate>
-        <translate text="VF2 Sarah 1">
+        <translate text="VF2 Sarah 1" >
             <ptr addr="0x23b89c" />
         </translate>
-        <translate text="VF2 Sarah 2">
+        <translate text="VF2 Sarah 2" >
             <ptr addr="0x23b8b0" />
         </translate>
-        <translate text="VF2 Jacky 1">
+        <translate text="VF2 Jacky 1" >
             <ptr addr="0x23b8c4" />
         </translate>
-        <translate text="VF2 Jacky 2">
+        <translate text="VF2 Jacky 2" >
             <ptr addr="0x23b8d8" />
         </translate>
-        <translate text="VF2 Shun Di 1">
+        <translate text="VF2 Shun Di 1" >
             <ptr addr="0x23b8ec" />
         </translate>
-        <translate text="VF2 Shun Di 2">
+        <translate text="VF2 Shun Di 2" >
             <ptr addr="0x23b900" />
         </translate>
-        <translate text="VF2 Lion 1">
+        <translate text="VF2 Lion 1" >
             <ptr addr="0x23b914" />
         </translate>
-        <translate text="VF2 Lion 2">
+        <translate text="VF2 Lion 2" >
             <ptr addr="0x23b928" />
         </translate>
-        <translate text="Kids Dural C">
+        <translate text="Kids Dural C" >
             <ptr addr="0x23b93c" />
         </translate>
-        <translate text="OutRun">
+        <translate text="OutRun" >
             <ptr addr="0x23b950" />
         </translate>
-        <translate text="F14-XX">
+        <translate text="F14-XX" >
             <ptr addr="0x23b964" />
         </translate>
     </section>
 
     <section name="???" >
-        <translate text="ASPHALT COWBOY">
+        <translate text="ASPHALT COWBOY" >
             <ptr addr="0x23b978" />
         </translate>
-        <translate text="HIGHWAY CAT">
+        <translate text="HIGHWAY CAT" >
             <ptr addr="0x23b98c" />
         </translate>
-        <translate text="LONG HORN">
+        <translate text="LONG HORN" >
             <ptr addr="0x23b9a0" />
         </translate>
-        <translate text="STREAM LINE">
+        <translate text="STREAM LINE" >
             <ptr addr="0x23b9b4" />
         </translate>
-        <translate text="NIPPONMARU">
+        <translate text="NIPPONMARU" >
             <ptr addr="0x23b9c8" />
         </translate>
-        <translate text="TEXAS HAWK">
+        <translate text="TEXAS HAWK" >
             <ptr addr="0x23b9dc" />
         </translate>
-        <translate text="WILD ROSE">
+        <translate text="WILD ROSE" >
             <ptr addr="0x23b9f0" />
         </translate>
-        <translate text="MAD BULL">
+        <translate text="MAD BULL" >
             <ptr addr="0x23ba04" />
         </translate>
-        <translate text="MOON LIGHT">
+        <translate text="MOON LIGHT" >
             <ptr addr="0x23ba18" />
         </translate>
-        <translate text="JAY">
+        <translate text="JAY" >
             <ptr addr="0x23ba2c" />
         </translate>
-        <translate text="ALAIN">
+        <translate text="ALAIN" >
             <ptr addr="0x23ba40" />
         </translate>
-        <translate text="LINA">
+        <translate text="LINA" >
             <ptr addr="0x23ba54" />
         </translate>
-        <translate text="TALON">
+        <translate text="TALON" >
             <ptr addr="0x23ba68" />
         </translate>
-        <translate text="TERESHKOVA">
+        <translate text="TERESHKOVA" >
             <ptr addr="0x23ba7c" />
         </translate>
-        <translate text="Kate">
+        <translate text="Kate" >
             <ptr addr="0x23ba90" />
         </translate>
-        <translate text="Mat">
+        <translate text="Mat" >
             <ptr addr="0x23baa4" />
         </translate>
-        <translate text="Max">
+        <translate text="Max" >
             <ptr addr="0x23bab8" />
         </translate>
-        <translate text="Ryan">
+        <translate text="Ryan" >
             <ptr addr="0x23bacc" />
         </translate>
-        <translate text="Spike">
+        <translate text="Spike" >
             <ptr addr="0x23bae0" />
         </translate>
-        <translate text="Yuki">
+        <translate text="Yuki" >
             <ptr addr="0x23baf4" />
         </translate>
-        <translate text="TEMJIN">
+        <translate text="TEMJIN" >
             <ptr addr="0x23bb08" />
         </translate>
-        <translate text="TEMJIN Prototype">
+        <translate text="TEMJIN Prototype" >
             <ptr addr="0x23bb1c" />
         </translate>
-        <translate text="10/80">
+        <translate text="10/80" >
             <ptr addr="0x23bb30" />
         </translate>
-        <translate text="GRYS-VOK">
+        <translate text="GRYS-VOK" >
             <ptr addr="0x23bb44" />
         </translate>
-        <translate text="STEIN-VOK">
+        <translate text="STEIN-VOK" >
             <ptr addr="0x23bb58" />
         </translate>
-        <translate text="BAL-BADOS">
+        <translate text="BAL-BADOS" >
             <ptr addr="0x23bb6c" />
         </translate>
-        <translate text="BAL-KEROS">
+        <translate text="BAL-KEROS" >
             <ptr addr="0x23bb80" />
         </translate>
-        <translate text="BAL-BAROS">
+        <translate text="BAL-BAROS" >
             <ptr addr="0x23bb94" />
         </translate>
-        <translate text="Fei-Yen DNA">
+        <translate text="Fei-Yen DNA" >
             <ptr addr="0x23bba8" />
         </translate>
-        <translate text="ANGELAN">
+        <translate text="ANGELAN" >
             <ptr addr="0x23bbbc" />
         </translate>
-        <translate text="APHARMD S">
+        <translate text="APHARMD S" >
             <ptr addr="0x23bbd0" />
         </translate>
-        <translate text="APHARMD B">
+        <translate text="APHARMD B" >
             <ptr addr="0x23bbe4" />
         </translate>
-        <translate text="APHARMD C">
+        <translate text="APHARMD C" >
             <ptr addr="0x23bbf8" />
         </translate>
-        <translate text="CYPHER">
+        <translate text="CYPHER" >
             <ptr addr="0x23bc0c" />
         </translate>
-        <translate text="DORDRAY">
+        <translate text="DORDRAY" >
             <ptr addr="0x23bc20" />
         </translate>
-        <translate text="SPECINEFF">
+        <translate text="SPECINEFF" >
             <ptr addr="0x23bc34" />
         </translate>
-        <translate text="RAIDEN">
+        <translate text="RAIDEN" >
             <ptr addr="0x23bc48" />
         </translate>
-        <translate text="Fei-Yen rna">
+        <translate text="Fei-Yen rna" >
             <ptr addr="0x23bc5c" />
         </translate>
-        <translate text="Fei-Yen HYPER">
+        <translate text="Fei-Yen HYPER" >
             <ptr addr="0x23bc70" />
         </translate>
-        <translate text="AJIM">
+        <translate text="AJIM" >
             <ptr addr="0x23bc84" />
         </translate>
-        <translate text="BRADTOS">
+        <translate text="BRADTOS" >
             <ptr addr="0x23bc98" />
         </translate>
-        <translate text="TANGRAM">
+        <translate text="TANGRAM" >
             <ptr addr="0x23bcac" />
         </translate>
-        <translate text="Flame Tree">
+        <translate text="Flame Tree" >
             <ptr addr="0x23bcc0" />
         </translate>
-        <translate text="Lighthouse">
+        <translate text="Lighthouse" >
             <ptr addr="0x23bcd4" />
         </translate>
-        <translate text="Boat">
+        <translate text="Boat" >
             <ptr addr="0x23bce8" />
         </translate>
-        <translate text="Chinese Violin">
+        <translate text="Chinese Violin" >
             <ptr addr="0x23bcfc" />
         </translate>
-        <translate text="Koto">
+        <translate text="Koto" >
             <ptr addr="0x23bd10" />
         </translate>
-        <translate text="Long Range Jet">
+        <translate text="Long Range Jet" >
             <ptr addr="0x23bd24" />
         </translate>
-        <translate text="Chainsaw">
+        <translate text="Chainsaw" >
             <ptr addr="0x23bd38" />
         </translate>
-        <translate text="Chinese Broadsword">
+        <translate text="Chinese Broadsword" >
             <ptr addr="0x23bd4c" />
         </translate>
-        <translate text="AFTERBURNER Token">
+        <translate text="AFTERBURNER Token" >
             <ptr addr="0x23bdb0" />
         </translate>
-        <translate text="OutRun Token">
+        <translate text="OutRun Token" >
             <ptr addr="0x23bdc4" />
         </translate>
-        <translate text="Harrier Token 2">
+        <translate text="Harrier Token 2" >
             <ptr addr="0x23bdd8" />
         </translate>
-        <translate text="Hang On Token 2">
+        <translate text="Hang On Token 2" >
             <ptr addr="0x23bdec" />
         </translate>
-        <translate text="3000 Prize">
+        <translate text="3000 Prize" >
             <ptr addr="0x23be00" />
         </translate>
-        <translate text="10000 Prize">
+        <translate text="10000 Prize" >
             <ptr addr="0x23be14" />
         </translate>
-        <translate text="50000 Prize">
+        <translate text="50000 Prize" >
             <ptr addr="0x23be28" />
         </translate>
-        <translate text="200000 Prize">
+        <translate text="200000 Prize" >
             <ptr addr="0x23be3c" />
         </translate>
-        <translate text="500000 Prize">
+        <translate text="500000 Prize" >
             <ptr addr="0x23be50" />
         </translate>
-        <translate text="1000000 Prize">
+        <translate text="1000000 Prize" >
             <ptr addr="0x23be64" />
         </translate>
-        <translate text="Mini AB2">
+        <translate text="Mini AB2" >
             <ptr addr="0x23be78" />
         </translate>
-        <translate text="Mini OutRun">
+        <translate text="Mini OutRun" >
             <ptr addr="0x23be8c" />
         </translate>
-        <translate text="Green Stone">
+        <translate text="Green Stone" >
             <ptr addr="0x23bea0" />
         </translate>
-        <translate text="Red Stone">
+        <translate text="Red Stone" >
             <ptr addr="0x23beb4" />
         </translate>
-        <translate text="Yellow Stone">
+        <translate text="Yellow Stone" >
             <ptr addr="0x23bec8" />
         </translate>
-        <translate text="Purple Stone">
+        <translate text="Purple Stone" >
             <ptr addr="0x23bedc" />
         </translate>
-        <translate text="Blue Stone">
+        <translate text="Blue Stone" >
             <ptr addr="0x23bef0" />
         </translate>
-        <translate text="Transparent Stone">
+        <translate text="Transparent Stone" >
             <ptr addr="0x23bf04" />
         </translate>
-        <translate text="Moon Wolf">
+        <translate text="Moon Wolf" >
             <ptr addr="0x23bf18" />
         </translate>
-        <translate text="Vampire">
+        <translate text="Vampire" >
             <ptr addr="0x23bf2c" />
         </translate>
-        <translate text="Wing">
+        <translate text="Wing" >
             <ptr addr="0x23bf40" />
         </translate>
-        <translate text="Jackal">
+        <translate text="Jackal" >
             <ptr addr="0x23bf54" />
         </translate>
-        <translate text="Muecas">
+        <translate text="Muecas" >
             <ptr addr="0x23bf68" />
         </translate>
-        <translate text="Scorpion">
+        <translate text="Scorpion" >
             <ptr addr="0x23bf7c" />
         </translate>
-        <translate text="King">
+        <translate text="King" >
             <ptr addr="0x23bf90" />
         </translate>
-        <translate text="Dragon">
+        <translate text="Dragon" >
             <ptr addr="0x23bfa4" />
         </translate>
-        <translate text="Helm">
+        <translate text="Helm" >
             <ptr addr="0x23bfb8" />
         </translate>
-        <translate text="Rose">
+        <translate text="Rose" >
             <ptr addr="0x23bfcc" />
         </translate>
-        <translate text="Heart">
+        <translate text="Heart" >
             <ptr addr="0x23bfe0" />
         </translate>
 
-        <translate text="No Smoking">
+        <translate text="No Smoking" >
             <ptr addr="0x23bff4" />
         </translate>
-        <translate text="Honest">
+        <translate text="Honest" >
             <ptr addr="0x23c008" />
         </translate>
-        <translate text="G.M.P">
+        <translate text="G.M.P" >
             <ptr addr="0x23c01c" />
         </translate>
-        <translate text="Shine">
+        <translate text="Shine" >
             <ptr addr="0x23c044" />
         </translate>
-        <translate text="Centre">
+        <translate text="Centre" >
             <ptr addr="0x23c058" />
         </translate>
-        <translate text="Accounts Settled">
+        <translate text="Accounts Settled" >
             <ptr addr="0x23c06c" />
         </translate>
-        <translate text="Lucky">
+        <translate text="Lucky" >
             <ptr addr="0x23c080" />
         </translate>
-        <translate text="Golden Flower">
+        <translate text="Golden Flower" >
             <ptr addr="0x23c094" />
         </translate>
-        <translate text="Wise Men&apos;s">
+        <translate text="Wise Men&apos;s" >
             <ptr addr="0x23c0a8" />
         </translate>
-        <translate text="White Dynasty">
+        <translate text="White Dynasty" >
             <ptr addr="0x23c0bc" />
         </translate>
-        <translate text="Kowloon">
+        <translate text="Kowloon" >
             <ptr addr="0x23c0d0" />
             <ptr addr="0x23f7f0" />
         </translate>
-        <translate text="Great View">
+        <translate text="Great View" >
             <ptr addr="0x23c0e4" />
         </translate>
-        <translate text="Queen&apos;s St.">
+        <translate text="Queen&apos;s St." >
             <ptr addr="0x23a8ac" />
             <ptr addr="0x23f534" />
         </translate>
-        <translate text="B.H.W.">
+        <translate text="B.H.W." >
             <ptr addr="0x23a8c0" />
             <ptr addr="0x23f564" />
         </translate>
-        <translate text="South Carmain Qr.">
+        <translate text="South Carmain Qr." >
             <ptr addr="0x23a938" />
             <ptr addr="0x23f5dc" />
         </translate>
-        <translate text="A Bldg.">
+        <translate text="A Bldg." >
             <ptr addr="0x23a9c4" />
             <ptr addr="0x23f6e4" />
         </translate>
-        <translate text="B Bldg.">
+        <translate text="B Bldg." >
             <ptr addr="0x23a9d8" />
             <ptr addr="0x23f6fc" />
         </translate>
-        <translate text="C Bldg.">
+        <translate text="C Bldg." >
             <ptr addr="0x23a9ec" />
             <ptr addr="0x23f714" />
         </translate>
-        <translate text="D Bldg.">
+        <translate text="D Bldg." >
             <ptr addr="0x23aa00" />
             <ptr addr="0x23f72c" />
         </translate>
-        <translate text="E Bldg.">
+        <translate text="E Bldg." >
             <ptr addr="0x23aa14" />
             <ptr addr="0x23f744" />
         </translate>
-        <translate text="F Bldg.">
+        <translate text="F Bldg." >
             <ptr addr="0x23aa28" />
             <ptr addr="0x23f75c" />
         </translate>
-        <translate text="Aberdeen">
+        <translate text="Aberdeen" >
             <ptr addr="0x23f7a8" />
             <ptr addr="0x2491fc" />
             <ptr addr="0x2498ec" />
         </translate>
-        <translate text="Wan Chai">
+        <translate text="Wan Chai" >
             <ptr addr="0x23f7cc" />
             <ptr addr="0x249244" />
         </translate>
-        <translate text="Carmain">
+        <translate text="Carmain" >
             <ptr addr="0x23c030" />
         </translate>
     </section>
 
     <section name="Scrolls" >
-        <translate text="Twin Blades">
+        <translate text="Twin Blades" >
             <ptr addr="0x23c0f8" />
             <ptr addr="0x24e444" />
         </translate>
-        <translate text="Shadow Reaper">
+        <translate text="Shadow Reaper" >
             <ptr addr="0x23c10c" />
             <ptr addr="0x24e79c" />
         </translate>
-        <translate text="Stab Armor">
+        <translate text="Stab Armor" >
             <ptr addr="0x23c120" />
             <ptr addr="0x24e45c" />
         </translate>
-        <translate text="Twin Swallow Leap">
+        <translate text="Twin Swallow Leap" >
             <ptr addr="0x23c134" />
             <ptr addr="0x24e790" />
         </translate>
-        <translate text="Mud Spider">
+        <translate text="Mud Spider" >
             <ptr addr="0x23c148" />
             <ptr addr="0x24e76c" />
         </translate>
-        <translate text="Rising Flash">
+        <translate text="Rising Flash" >
             <ptr addr="0x23c15c" />
             <ptr addr="0x24e438" />
         </translate>
-        <translate text="Crawl Cyclone">
+        <translate text="Crawl Cyclone" >
             <ptr addr="0x23c170" />
             <ptr addr="0x24e778" />
         </translate>
-        <translate text="Tiger Storm">
+        <translate text="Tiger Storm" >
             <ptr addr="0x23c184" />
             <ptr addr="0x24e9e8" />
         </translate>
-        <translate text="Arm Break Fire">
+        <translate text="Arm Break Fire" >
             <ptr addr="0x23c198" />
             <ptr addr="0x24e9dc" />
         </translate>
-        <translate text="Poetry Scroll">
+        <translate text="Poetry Scroll" >
             <ptr addr="0x23c1ac" />
         </translate>
-        <translate text="Mysterious Scroll">
+        <translate text="Mysterious Scroll" >
             <ptr addr="0x23c1c0" />
         </translate>
-        <translate text="Dragon Spin">
+        <translate text="Dragon Spin" >
             <ptr addr="0x23c1d4" />
             <ptr addr="0x24e7cc" />
         </translate>
-        <translate text="Serpent Coil">
+        <translate text="Serpent Coil" >
             <ptr addr="0x23c1e8" />
             <ptr addr="0x24ea3c" />
         </translate>
-        <translate text="Rear Foot Sweep">
+        <translate text="Rear Foot Sweep" >
             <ptr addr="0x23c1fc" />
             <ptr addr="0x24ea24" />
         </translate>
-        <translate text="Diagonal Wipe">
+        <translate text="Diagonal Wipe" >
             <ptr addr="0x23c210" />
             <ptr addr="0x24e4e0" />
         </translate>
-        <translate text="Oblique Slam">
+        <translate text="Oblique Slam" >
             <ptr addr="0x23c224" />
             <ptr addr="0x24e4d4" />
         </translate>
-        <translate text="Twin Palm Thrust">
+        <translate text="Twin Palm Thrust" >
             <ptr addr="0x23c238" />
             <ptr addr="0x24e4b0" />
         </translate>
-        <translate text="Horseshoe Kick">
+        <translate text="Horseshoe Kick" >
             <ptr addr="0x23c24c" />
             <ptr addr="0x24e7a8" />
         </translate>
-        <translate text="Mantis Combo">
+        <translate text="Mantis Combo" >
             <ptr addr="0x23c260" />
             <ptr addr="0x24e4c8" />
         </translate>
-        <translate text="Stepping Strike">
+        <translate text="Stepping Strike" >
             <ptr addr="0x23c274" />
             <ptr addr="0x24e480" />
         </translate>
-        <translate text="Oblique Air Kick">
+        <translate text="Oblique Air Kick" >
             <ptr addr="0x23c288" />
             <ptr addr="0x24e7c0" />
         </translate>
-        <translate text="Heel Sweep">
+        <translate text="Heel Sweep" >
             <ptr addr="0x23c29c" />
             <ptr addr="0x24e7b4" />
         </translate>
-        <translate text="Monkey Roll Drop">
+        <translate text="Monkey Roll Drop" >
             <ptr addr="0x23c2b0" />
             <ptr addr="0x24ea48" />
         </translate>
-        <translate text="Machinegun Fist">
+        <translate text="Machinegun Fist" >
             <ptr addr="0x23c2c4" />
             <ptr addr="0x24ea30" />
         </translate>
-        <translate text="Double Storm Kick">
+        <translate text="Double Storm Kick" >
             <ptr addr="0x23c2d8" />
             <ptr addr="0x24e6f4" />
         </translate>
-        <translate text="Demon&apos;s Triangle">
+        <translate text="Demon&apos;s Triangle" >
             <ptr addr="0x23c2ec" />
             <ptr addr="0x24ea54" />
         </translate>
     </section>
 
     <section name="Misc" >
-        <translate text="Cancel">
+        <translate text="Cancel" >
             <ptr addr="0x11b828" />
             <ptr addr="0x248604" />
             <ptr addr="0x248608" />
@@ -2107,94 +2107,94 @@
             <ptr addr="0x23e454" />
             <ptr addr="0x2485fc" />
         </translate>
-        <translate text="Sleep">
+        <translate text="Sleep" >
             <ptr addr="0x24862c" />
             <ptr addr="0x249a34" />
             <ptr addr="0x248638" />
             <ptr addr="0x248634" />
             <ptr addr="0x248630" />
         </translate>
-        <translate text="Sell">
+        <translate text="Sell" >
             <ptr addr="0x11b818" />
             <ptr addr="0x249324" />
         </translate>
-        <translate text="Total :">
+        <translate text="Total :" >
             <ptr addr="0x11be94" />
         </translate>
-        <translate text="Power">
+        <translate text="Power" >
             <ptr addr="0x1a6784" />
         </translate>
-        <translate text="Speed">
+        <translate text="Speed" >
             <ptr addr="0x1a6788" />
         </translate>
-        <translate text="Rigid">
+        <translate text="Rigid" >
             <ptr addr="0x1a678c" />
         </translate>
-        <translate text="Level">
+        <translate text="Level" >
             <ptr addr="0x235af8" />
         </translate>
-        <translate text="Adjust">
+        <translate text="Adjust" >
             <ptr addr="0x235afc" />
         </translate>
-        <translate text="Contact">
+        <translate text="Contact" >
             <ptr addr="0x235b00" />
         </translate>
-        <translate text="Size">
+        <translate text="Size" >
             <ptr addr="0x235b04" />
         </translate>
-        <translate text="Weight">
+        <translate text="Weight" >
             <ptr addr="0x235b08" />
         </translate>
-        <translate text="Blur">
+        <translate text="Blur" >
             <ptr addr="0x237918" />
         </translate>
-        <translate text="Challenge">
+        <translate text="Challenge" >
             <ptr addr="0x248d84" />
         </translate>
-        <translate text="Don&apos;t Play">
+        <translate text="Don&apos;t Play" >
             <ptr addr="0x248d8c" />
         </translate>
-        <translate text="Don&apos;t Catch">
+        <translate text="Don&apos;t Catch" >
             <ptr addr="0x248d94" />
         </translate>
-        <translate text="Try">
+        <translate text="Try" >
             <ptr addr="0x248d9c" />
         </translate>
-        <translate text="Don&apos;t Try">
+        <translate text="Don&apos;t Try" >
             <ptr addr="0x248da4" />
         </translate>
-        <translate text="Quit">
+        <translate text="Quit" >
             <ptr addr="0x248de4" />
             <ptr addr="0x2491a4" />
         </translate>
-        <translate text="Play">
+        <translate text="Play" >
             <ptr addr="0x248df4" />
         </translate>
-        <translate text="Continue">
+        <translate text="Continue" >
             <ptr addr="0x248dfc" />
             <ptr addr="0x249194" />
         </translate>
-        <translate text="Do">
+        <translate text="Do" >
             <ptr addr="0x248e04" />
         </translate>
-        <translate text="Don&apos;t">
+        <translate text="Don&apos;t" >
             <ptr addr="0x248e0c" />
         </translate>
-        <translate text="Buy">
+        <translate text="Buy" >
             <ptr addr="0x248e14" />
             <ptr addr="0x248f54" />
         </translate>
-        <translate text="Don&apos;t Buy">
+        <translate text="Don&apos;t Buy" >
             <ptr addr="0x248e1c" />
             <ptr addr="0x248f5c" />
         </translate>
-        <translate text="Tell Fortune">
+        <translate text="Tell Fortune" >
             <ptr addr="0x248e5c" />
         </translate>
-        <translate text="Decline">
+        <translate text="Decline" >
             <ptr addr="0x248eb4" />
         </translate>
-        <translate text="No">
+        <translate text="No" >
             <ptr addr="0x248ebc" />
             <ptr addr="0x248f2c" />
             <ptr addr="0x248f6c" />
@@ -2204,7 +2204,7 @@
             <ptr addr="0x249aac" />
             <ptr addr="0x249af4" />
         </translate>
-        <translate text="Yes">
+        <translate text="Yes" >
             <ptr addr="0x248f24" />
             <ptr addr="0x248f64" />
             <ptr addr="0x248fa4" />
@@ -2213,1196 +2213,1196 @@
             <ptr addr="0x2491bc" />
             <ptr addr="0x249aa4" />
         </translate>
-        <translate text="Accept">
+        <translate text="Accept" >
             <ptr addr="0x248ec4" />
         </translate>
-        <translate text="Ride">
+        <translate text="Ride" >
             <ptr addr="0x248ee4" />
             <ptr addr="0x24936c" />
         </translate>
-        <translate text="Right">
+        <translate text="Right" >
             <ptr addr="0x248ef4" />
         </translate>
-        <translate text="Left">
+        <translate text="Left" >
             <ptr addr="0x248efc" />
         </translate>
-        <translate text="Pay">
+        <translate text="Pay" >
             <ptr addr="0x248f04" />
         </translate>
-        <translate text="Don&apos;t Pay">
+        <translate text="Don&apos;t Pay" >
             <ptr addr="0x248f0c" />
         </translate>
-        <translate text="Listen">
+        <translate text="Listen" >
             <ptr addr="0x248f14" />
             <ptr addr="0x249424" />
         </translate>
-        <translate text="Not Listen">
+        <translate text="Not Listen" >
             <ptr addr="0x248f1c" />
         </translate>
-        <translate text="Pretty Much">
+        <translate text="Pretty Much" >
             <ptr addr="0x248f34" />
         </translate>
-        <translate text="Fairly">
+        <translate text="Fairly" >
             <ptr addr="0x248f3c" />
         </translate>
-        <translate text="Not Yet">
+        <translate text="Not Yet" >
             <ptr addr="0x248f44" />
             <ptr addr="0x249714" />
         </translate>
-        <translate text="Probably">
+        <translate text="Probably" >
             <ptr addr="0x248f4c" />
         </translate>
-        <translate text="Guide">
+        <translate text="Guide" >
             <ptr addr="0x248f74" />
         </translate>
-        <translate text="No Guide">
+        <translate text="No Guide" >
             <ptr addr="0x248f7c" />
         </translate>
-        <translate text="Take Photo">
+        <translate text="Take Photo" >
             <ptr addr="0x248f84" />
         </translate>
-        <translate text="Don&apos;t Take">
+        <translate text="Don&apos;t Take" >
             <ptr addr="0x248f8c" />
         </translate>
-        <translate text="Cup">
+        <translate text="Cup" >
             <ptr addr="0x248f94" />
         </translate>
-        <translate text="Bowl">
+        <translate text="Bowl" >
             <ptr addr="0x248f9c" />
         </translate>
-        <translate text="Very Good">
+        <translate text="Very Good" >
             <ptr addr="0x248fb4" />
         </translate>
-        <translate text="Good">
+        <translate text="Good" >
             <ptr addr="0x248fbc" />
         </translate>
-        <translate text="So So">
+        <translate text="So So" >
             <ptr addr="0x248fc4" />
         </translate>
-        <translate text="Not Good">
+        <translate text="Not Good" >
             <ptr addr="0x248fcc" />
         </translate>
-        <translate text="Pay $5">
+        <translate text="Pay $5" >
             <ptr addr="0x248fd4" />
         </translate>
-        <translate text="Go Back">
+        <translate text="Go Back" >
             <ptr addr="0x248fdc" />
         </translate>
-        <translate text="Don&apos;t Go Back">
+        <translate text="Don&apos;t Go Back" >
             <ptr addr="0x248fe4" />
         </translate>
-        <translate text="Give Money">
+        <translate text="Give Money" >
             <ptr addr="0x248fec" />
         </translate>
-        <translate text="Don&apos;t Give">
+        <translate text="Don&apos;t Give" >
             <ptr addr="0x248ff4" />
             <ptr addr="0x2493e4" />
         </translate>
-        <translate text="Anything">
+        <translate text="Anything" >
             <ptr addr="0x248ffc" />
         </translate>
-        <translate text="Vegetables=@">
+        <translate text="Vegetables=@" >
             <ptr addr="0x249004" />
         </translate>
-        <translate text="Meat">
+        <translate text="Meat" >
             <ptr addr="0x24900c" />
             <ptr addr="0x24981c" />
         </translate>
-        <translate text="What&apos;s tasty?">
+        <translate text="What&apos;s tasty?" >
             <ptr addr="0x249014" />
         </translate>
-        <translate text="Nozomi=@">
+        <translate text="Nozomi=@" >
             <ptr addr="0x24901c" />
         </translate>
-        <translate text="Lan Di=@">
+        <translate text="Lan Di=@" >
             <ptr addr="0x249024" />
         </translate>
-        <translate text="Guizhang=@">
+        <translate text="Guizhang=@" >
             <ptr addr="0x24902c" />
         </translate>
-        <translate text="I guess so">
+        <translate text="I guess so" >
             <ptr addr="0x249034" />
         </translate>
-        <translate text="Not certain">
+        <translate text="Not certain" >
             <ptr addr="0x24903c" />
         </translate>
-        <translate text="Truth=@">
+        <translate text="Truth=@" >
             <ptr addr="0x249044" />
         </translate>
-        <translate text="Revenge">
+        <translate text="Revenge" >
             <ptr addr="0x24904c" />
             <ptr addr="0x2492dc" />
             <ptr addr="0x24986c" />
         </translate>
-        <translate text="I Want to win">
+        <translate text="I Want to win" >
             <ptr addr="0x249054" />
         </translate>
-        <translate text="Beautiful">
+        <translate text="Beautiful" >
             <ptr addr="0x24905c" />
             <ptr addr="0x2497c4" />
             <ptr addr="0x249adc" />
         </translate>
-        <translate text="Very Strong">
+        <translate text="Very Strong" >
             <ptr addr="0x249064" />
         </translate>
-        <translate text="Is she?">
+        <translate text="Is she?" >
             <ptr addr="0x24906c" />
         </translate>
-        <translate text="You too">
+        <translate text="You too" >
             <ptr addr="0x249074" />
         </translate>
-        <translate text="No time">
+        <translate text="No time" >
             <ptr addr="0x24907c" />
         </translate>
-        <translate text="Nothing">
+        <translate text="Nothing" >
             <ptr addr="0x24908c" />
             <ptr addr="0x249254" />
         </translate>
-        <translate text="Like Master">
+        <translate text="Like Master" >
             <ptr addr="0x249094" />
         </translate>
-        <translate text="Looking good">
+        <translate text="Looking good" >
             <ptr addr="0x24909c" />
         </translate>
-        <translate text="Normal">
+        <translate text="Normal" >
             <ptr addr="0x2490a4" />
         </translate>
-        <translate text="Look good">
+        <translate text="Look good" >
             <ptr addr="0x2490ac" />
         </translate>
-        <translate text="Want clothes?">
+        <translate text="Want clothes?" >
             <ptr addr="0x2490b4" />
         </translate>
-        <translate text="To be honest=@">
+        <translate text="To be honest=@" >
             <ptr addr="0x2490bc" />
         </translate>
-        <translate text="Not hard">
+        <translate text="Not hard" >
             <ptr addr="0x2490c4" />
         </translate>
-        <translate text="I&apos;m prepared">
+        <translate text="I&apos;m prepared" >
             <ptr addr="0x2490cc" />
         </translate>
-        <translate text="Never felt so">
+        <translate text="Never felt so" >
             <ptr addr="0x2490d4" />
         </translate>
-        <translate text="What&apos;s that?">
+        <translate text="What&apos;s that?" >
             <ptr addr="0x2490dc" />
         </translate>
-        <translate text="Sorry">
+        <translate text="Sorry" >
             <ptr addr="0x2490e4" />
         </translate>
-        <translate text="Pretty">
+        <translate text="Pretty" >
             <ptr addr="0x2490ec" />
         </translate>
-        <translate text="Fangmei?">
+        <translate text="Fangmei?" >
             <ptr addr="0x2490f4" />
         </translate>
-        <translate text="That&apos;s all">
+        <translate text="That&apos;s all" >
             <ptr addr="0x2490fc" />
         </translate>
-        <translate text="I&apos;d like to be">
+        <translate text="I&apos;d like to be" >
             <ptr addr="0x249104" />
         </translate>
-        <translate text="Mentally too">
+        <translate text="Mentally too" >
             <ptr addr="0x24910c" />
         </translate>
-        <translate text="I don&apos;t know">
+        <translate text="I don&apos;t know" >
             <ptr addr="0x249114" />
         </translate>
-        <translate text="A little more">
+        <translate text="A little more" >
             <ptr addr="0x24911c" />
         </translate>
-        <translate text="I won&apos;t forget">
+        <translate text="I won&apos;t forget" >
             <ptr addr="0x249134" />
         </translate>
-        <translate text="No, what day?">
+        <translate text="No, what day?" >
             <ptr addr="0x24913c" />
         </translate>
-        <translate text="I thought=@">
+        <translate text="I thought=@" >
             <ptr addr="0x249144" />
         </translate>
-        <translate text="Of course">
+        <translate text="Of course" >
             <ptr addr="0x24914c" />
         </translate>
-        <translate text="Come Again">
+        <translate text="Come Again" >
             <ptr addr="0x249154" />
         </translate>
-        <translate text="Darts 1">
+        <translate text="Darts 1" >
             <ptr addr="0x24915c" />
         </translate>
-        <translate text="Darts 2">
+        <translate text="Darts 2" >
             <ptr addr="0x249164" />
         </translate>
-        <translate text="QTE 1">
+        <translate text="QTE 1" >
             <ptr addr="0x24916c" />
         </translate>
-        <translate text="QTE 2">
+        <translate text="QTE 2" >
             <ptr addr="0x249174" />
         </translate>
-        <translate text="Redo the Sign">
+        <translate text="Redo the Sign" >
             <ptr addr="0x249184" />
         </translate>
-        <translate text="Practice">
+        <translate text="Practice" >
             <ptr addr="0x24918c" />
         </translate>
-        <translate text="Don&apos;t Wait">
+        <translate text="Don&apos;t Wait" >
             <ptr addr="0x2491ac" />
         </translate>
-        <translate text="Spar">
+        <translate text="Spar" >
             <ptr addr="0x2491b4" />
         </translate>
-        <translate text="Know">
+        <translate text="Know" >
             <ptr addr="0x2491c4" />
         </translate>
-        <translate text="Don&apos;t Know">
+        <translate text="Don&apos;t Know" >
             <ptr addr="0x2491cc" />
         </translate>
-        <translate text="Go In">
+        <translate text="Go In" >
             <ptr addr="0x2491d4" />
         </translate>
-        <translate text="Don&apos;t Go In">
+        <translate text="Don&apos;t Go In" >
             <ptr addr="0x2491dc" />
         </translate>
-        <translate text="Don&apos;t Watch">
+        <translate text="Don&apos;t Watch" >
             <ptr addr="0x2491ec" />
         </translate>
-        <translate text="Back Again">
+        <translate text="Back Again" >
             <ptr addr="0x2491f4" />
         </translate>
-        <translate text="B. H. Wharf">
+        <translate text="B. H. Wharf" >
             <ptr addr="0x249214" />
         </translate>
-        <translate text="Da Yuan Apt.">
+        <translate text="Da Yuan Apt." >
             <ptr addr="0x24922c" />
         </translate>
-        <translate text="South Carmain">
+        <translate text="South Carmain" >
             <ptr addr="0x249234" />
         </translate>
-        <translate text="Green Market">
+        <translate text="Green Market" >
             <ptr addr="0x24923c" />
         </translate>
-        <translate text="Tired">
+        <translate text="Tired" >
             <ptr addr="0x24924c" />
         </translate>
-        <translate text="Animal Trail?">
+        <translate text="Animal Trail?" >
             <ptr addr="0x24925c" />
         </translate>
-        <translate text="Really">
+        <translate text="Really" >
             <ptr addr="0x249264" />
         </translate>
-        <translate text="Bailu Village">
+        <translate text="Bailu Village" >
             <ptr addr="0x24926c" />
         </translate>
-        <translate text="Guilin">
+        <translate text="Guilin" >
             <ptr addr="0x249274" />
         </translate>
-        <translate text="Age">
+        <translate text="Age" >
             <ptr addr="0x24927c" />
         </translate>
-        <translate text="Sibling">
+        <translate text="Sibling" >
             <ptr addr="0x249284" />
         </translate>
-        <translate text="Teach">
+        <translate text="Teach" >
             <ptr addr="0x24928c" />
         </translate>
-        <translate text="Evade">
+        <translate text="Evade" >
             <ptr addr="0x249294" />
         </translate>
-        <translate text="Mirror Stone">
+        <translate text="Mirror Stone" >
             <ptr addr="0x24929c" />
         </translate>
-        <translate text="Can&apos;t Talk">
+        <translate text="Can&apos;t Talk" >
             <ptr addr="0x2492ac" />
         </translate>
-        <translate text="Yo">
+        <translate text="Yo" >
             <ptr addr="0x2492bc" />
         </translate>
-        <translate text="Scared">
+        <translate text="Scared" >
             <ptr addr="0x2492c4" />
         </translate>
-        <translate text="Japan">
+        <translate text="Japan" >
             <ptr addr="0x2492cc" />
         </translate>
-        <translate text="Don&apos;t Teach">
+        <translate text="Don&apos;t Teach" >
             <ptr addr="0x2492d4" />
         </translate>
-        <translate text="Searching">
+        <translate text="Searching" >
             <ptr addr="0x2492e4" />
         </translate>
-        <translate text="Fuku-san">
+        <translate text="Fuku-san" >
             <ptr addr="0x2492ec" />
         </translate>
-        <translate text="No one">
+        <translate text="No one" >
             <ptr addr="0x2492f4" />
         </translate>
-        <translate text="Ito">
+        <translate text="Ito" >
             <ptr addr="0x2492fc" />
         </translate>
-        <translate text="Tom">
+        <translate text="Tom" >
             <ptr addr="0x249304" />
         </translate>
-        <translate text="Guizhang">
+        <translate text="Guizhang" >
             <ptr addr="0x24930c" />
         </translate>
-        <translate text="Put In">
+        <translate text="Put In" >
             <ptr addr="0x249314" />
         </translate>
-        <translate text="Don&apos;t Put In">
+        <translate text="Don&apos;t Put In" >
             <ptr addr="0x24931c" />
         </translate>
-        <translate text="Don&apos;t Sell">
+        <translate text="Don&apos;t Sell" >
             <ptr addr="0x24932c" />
         </translate>
-        <translate text="Nadam">
+        <translate text="Nadam" >
             <ptr addr="0x249344" />
         </translate>
-        <translate text="Agon">
+        <translate text="Agon" >
             <ptr addr="0x24934c" />
         </translate>
-        <translate text="Uzun">
+        <translate text="Uzun" >
             <ptr addr="0x249354" />
         </translate>
-        <translate text="Park">
+        <translate text="Park" >
             <ptr addr="0x24935c" />
         </translate>
-        <translate text="Push">
+        <translate text="Push" >
             <ptr addr="0x249364" />
         </translate>
-        <translate text="$5">
+        <translate text="$5" >
             <ptr addr="0x24952c" />
         </translate>
-        <translate text="$10">
+        <translate text="$10" >
             <ptr addr="0x249374" />
         </translate>
-        <translate text="$20">
+        <translate text="$20" >
             <ptr addr="0x24937c" />
         </translate>
-        <translate text="$30">
+        <translate text="$30" >
             <ptr addr="0x249384" />
         </translate>
-        <translate text="$50">
+        <translate text="$50" >
             <ptr addr="0x24953c" />
         </translate>
-        <translate text="$100">
+        <translate text="$100" >
             <ptr addr="0x24938c" />
         </translate>
-        <translate text="$200">
+        <translate text="$200" >
             <ptr addr="0x249394" />
         </translate>
-        <translate text="$300">
+        <translate text="$300" >
             <ptr addr="0x24939c" />
         </translate>
-        <translate text="Show">
+        <translate text="Show" >
             <ptr addr="0x2493a4" />
         </translate>
-        <translate text="Don&apos;t Show">
+        <translate text="Don&apos;t Show" >
             <ptr addr="0x2493ac" />
         </translate>
-        <translate text="Talk To">
+        <translate text="Talk To" >
             <ptr addr="0x2493bc" />
         </translate>
-        <translate text="Password">
+        <translate text="Password" >
             <ptr addr="0x2493c4" />
         </translate>
-        <translate text="Don&apos;t Tell">
+        <translate text="Don&apos;t Tell" >
             <ptr addr="0x2493cc" />
         </translate>
-        <translate text="Goro">
+        <translate text="Goro" >
             <ptr addr="0x2493d4" />
         </translate>
-        <translate text="Give">
+        <translate text="Give" >
             <ptr addr="0x2493dc" />
         </translate>
-        <translate text="Crow">
+        <translate text="Crow" >
             <ptr addr="0x2493ec" />
         </translate>
-        <translate text="Dog">
+        <translate text="Dog" >
             <ptr addr="0x2493f4" />
         </translate>
-        <translate text="Cat">
+        <translate text="Cat" >
             <ptr addr="0x2493fc" />
         </translate>
-        <translate text="Talking Bird">
+        <translate text="Talking Bird" >
             <ptr addr="0x249404" />
         </translate>
-        <translate text="Heads">
+        <translate text="Heads" >
             <ptr addr="0x24940c" />
         </translate>
-        <translate text="From Yesterday">
+        <translate text="From Yesterday" >
             <ptr addr="0x24941c" />
         </translate>
-        <translate text="Listen to Song">
+        <translate text="Listen to Song" >
             <ptr addr="0x24942c" />
         </translate>
-        <translate text="Talk">
+        <translate text="Talk" >
             <ptr addr="0x249434" />
         </translate>
-        <translate text="Set">
+        <translate text="Set" >
             <ptr addr="0x24943c" />
         </translate>
-        <translate text="Single">
+        <translate text="Single" >
             <ptr addr="0x249444" />
         </translate>
-        <translate text="Gon">
+        <translate text="Gon" >
             <ptr addr="0x24944c" />
         </translate>
-        <translate text="Dan">
+        <translate text="Dan" >
             <ptr addr="0x249454" />
         </translate>
-        <translate text="Jie">
+        <translate text="Jie" >
             <ptr addr="0x24945c" />
         </translate>
-        <translate text="Yi">
+        <translate text="Yi" >
             <ptr addr="0x249464" />
         </translate>
-        <translate text="Zhong">
+        <translate text="Zhong" >
             <ptr addr="0x24946c" />
         </translate>
-        <translate text="Xiao">
+        <translate text="Xiao" >
             <ptr addr="0x24947c" />
         </translate>
-        <translate text="Xin">
+        <translate text="Xin" >
             <ptr addr="0x249484" />
         </translate>
-        <translate text="Li">
+        <translate text="Li" >
             <ptr addr="0x24948c" />
         </translate>
-        <translate text="Yan">
+        <translate text="Yan" >
             <ptr addr="0x249494" />
         </translate>
-        <translate text="Kowloon Entry">
+        <translate text="Kowloon Entry" >
             <ptr addr="0x24949c" />
         </translate>
-        <translate text="Stop by">
+        <translate text="Stop by" >
             <ptr addr="0x2494b4" />
         </translate>
-        <translate text="From here">
+        <translate text="From here" >
             <ptr addr="0x2494bc" />
         </translate>
-        <translate text="Come Over GH">
+        <translate text="Come Over GH" >
             <ptr addr="0x2494c4" />
         </translate>
-        <translate text="Pharmacy">
+        <translate text="Pharmacy" >
             <ptr addr="0x2494cc" />
         </translate>
-        <translate text="Dou Jiang">
+        <translate text="Dou Jiang" >
             <ptr addr="0x2494d4" />
         </translate>
-        <translate text="Martial Artist">
+        <translate text="Martial Artist" >
             <ptr addr="0x2494dc" />
         </translate>
-        <translate text="Lucky Charm">
+        <translate text="Lucky Charm" >
             <ptr addr="0x2494e4" />
         </translate>
-        <translate text="Guang School">
+        <translate text="Guang School" >
             <ptr addr="0x2494ec" />
         </translate>
-        <translate text="St. Performer">
+        <translate text="St. Performer" >
             <ptr addr="0x2494f4" />
         </translate>
-        <translate text="Sushi Shop">
+        <translate text="Sushi Shop" >
             <ptr addr="0x2494fc" />
         </translate>
-        <translate text="Lotus Park">
+        <translate text="Lotus Park" >
             <ptr addr="0x249504" />
         </translate>
-        <translate text="Jianmin">
+        <translate text="Jianmin" >
             <ptr addr="0x24950c" />
         </translate>
-        <translate text="Zhangyu&apos;s Shop">
+        <translate text="Zhangyu&apos;s Shop" >
             <ptr addr="0x249514" />
         </translate>
-        <translate text="Three Blades">
+        <translate text="Three Blades" >
             <ptr addr="0x24951c" />
             <ptr addr="0x2498f4" />
         </translate>
-        <translate text="=@">
+        <translate text="=@" >
             <ptr addr="0x249524" />
         </translate>
-        <translate text="Make Money">
+        <translate text="Make Money" >
             <ptr addr="0x249534" />
         </translate>
-        <translate text="River">
+        <translate text="River" >
             <ptr addr="0x249544" />
         </translate>
-        <translate text="Water">
+        <translate text="Water" >
             <ptr addr="0x24954c" />
         </translate>
-        <translate text="Ocean">
+        <translate text="Ocean" >
             <ptr addr="0x249554" />
         </translate>
-        <translate text="Poison Bros.">
+        <translate text="Poison Bros." >
             <ptr addr="0x24955c" />
         </translate>
-        <translate text="Porridge Shop">
+        <translate text="Porridge Shop" >
             <ptr addr="0x249564" />
         </translate>
-        <translate text="Fighting">
+        <translate text="Fighting" >
             <ptr addr="0x249574" />
         </translate>
-        <translate text="Gambling">
+        <translate text="Gambling" >
             <ptr addr="0x24957c" />
         </translate>
-        <translate text="Pawnshop">
+        <translate text="Pawnshop" >
             <ptr addr="0x249584" />
         </translate>
-        <translate text="Part-time Job">
+        <translate text="Part-time Job" >
             <ptr addr="0x24958c" />
         </translate>
-        <translate text="Darts">
+        <translate text="Darts" >
             <ptr addr="0x249594" />
         </translate>
-        <translate text="Arm Wrestling">
+        <translate text="Arm Wrestling" >
             <ptr addr="0x24959c" />
         </translate>
-        <translate text="Street Fight">
+        <translate text="Street Fight" >
             <ptr addr="0x2495a4" />
         </translate>
-        <translate text="Dice Gambling">
+        <translate text="Dice Gambling" >
             <ptr addr="0x2495ac" />
         </translate>
-        <translate text="Lucky Hit">
+        <translate text="Lucky Hit" >
             <ptr addr="0x2495b4" />
         </translate>
-        <translate text="Carry Crates">
+        <translate text="Carry Crates" >
             <ptr addr="0x2495bc" />
         </translate>
-        <translate text="Shopkeeping">
+        <translate text="Shopkeeping" >
             <ptr addr="0x2495c4" />
         </translate>
-        <translate text="Shopping Mall">
+        <translate text="Shopping Mall" >
             <ptr addr="0x2495cc" />
         </translate>
-        <translate text="Antique Shop">
+        <translate text="Antique Shop" >
             <ptr addr="0x2495d4" />
         </translate>
-        <translate text="Collect">
+        <translate text="Collect" >
             <ptr addr="0x2495dc" />
         </translate>
-        <translate text="King&apos;s Ransom">
+        <translate text="King&apos;s Ransom" >
             <ptr addr="0x2495e4" />
         </translate>
-        <translate text="ManMo Antiques">
+        <translate text="ManMo Antiques" >
             <ptr addr="0x2495ec" />
         </translate>
-        <translate text="Bistro">
+        <translate text="Bistro" >
             <ptr addr="0x2495f4" />
         </translate>
-        <translate text="Restaurant">
+        <translate text="Restaurant" >
             <ptr addr="0x2495fc" />
         </translate>
-        <translate text="Lai Lai Eatery">
+        <translate text="Lai Lai Eatery" >
             <ptr addr="0x249604" />
         </translate>
-        <translate text="Ling Ling">
+        <translate text="Ling Ling" >
             <ptr addr="0x24960c" />
         </translate>
-        <translate text="Fu Hoi Diner">
+        <translate text="Fu Hoi Diner" >
             <ptr addr="0x249614" />
         </translate>
-        <translate text="Fortune&apos;s">
+        <translate text="Fortune&apos;s" >
             <ptr addr="0x24961c" />
         </translate>
-        <translate text="Canton Cafe">
+        <translate text="Canton Cafe" >
             <ptr addr="0x249624" />
         </translate>
-        <translate text="Heavenly Tea">
+        <translate text="Heavenly Tea" >
             <ptr addr="0x24962c" />
         </translate>
-        <translate text="Bright Tea">
+        <translate text="Bright Tea" >
             <ptr addr="0x249634" />
         </translate>
-        <translate text="Man Mo Restnt.">
+        <translate text="Man Mo Restnt." >
             <ptr addr="0x24963c" />
         </translate>
-        <translate text="Nihao Teahouse">
+        <translate text="Nihao Teahouse" >
             <ptr addr="0x24964c" />
         </translate>
-        <translate text="Everyone&apos;s">
+        <translate text="Everyone&apos;s" >
             <ptr addr="0x249654" />
         </translate>
-        <translate text="Apricot">
+        <translate text="Apricot" >
             <ptr addr="0x24965c" />
         </translate>
-        <translate text="Dragon Spring">
+        <translate text="Dragon Spring" >
             <ptr addr="0x249664" />
         </translate>
-        <translate text="Thousand White">
+        <translate text="Thousand White" >
             <ptr addr="0x24966c" />
             <ptr addr="0x249784" />
         </translate>
-        <translate text="Open Table">
+        <translate text="Open Table" >
             <ptr addr="0x249674" />
         </translate>
-        <translate text="Tea Shop St.">
+        <translate text="Tea Shop St." >
             <ptr addr="0x24967c" />
         </translate>
-        <translate text="Tea Break">
+        <translate text="Tea Break" >
             <ptr addr="0x249684" />
         </translate>
-        <translate text="Moon Child">
+        <translate text="Moon Child" >
             <ptr addr="0x249694" />
         </translate>
-        <translate text="Heavens">
+        <translate text="Heavens" >
             <ptr addr="0x24969c" />
         </translate>
-        <translate text="Gambling House">
+        <translate text="Gambling House" >
             <ptr addr="0x2496a4" />
         </translate>
-        <translate text="Blue Marine">
+        <translate text="Blue Marine" >
             <ptr addr="0x2496ac" />
         </translate>
-        <translate text="Warehouse 8">
+        <translate text="Warehouse 8" >
             <ptr addr="0x2496b4" />
         </translate>
-        <translate text="Cool Z">
+        <translate text="Cool Z" >
             <ptr addr="0x2496c4" />
         </translate>
-        <translate text="Sam">
+        <translate text="Sam" >
             <ptr addr="0x2496cc" />
         </translate>
-        <translate text="Larry">
+        <translate text="Larry" >
             <ptr addr="0x2496d4" />
         </translate>
-        <translate text="Yuan">
+        <translate text="Yuan" >
             <ptr addr="0x2496dc" />
         </translate>
-        <translate text="Bell Ring">
+        <translate text="Bell Ring" >
             <ptr addr="0x2496e4" />
         </translate>
-        <translate text="Fu Jian Tea">
+        <translate text="Fu Jian Tea" >
             <ptr addr="0x2496ec" />
         </translate>
-        <translate text="Earnest Tea">
+        <translate text="Earnest Tea" >
             <ptr addr="0x2496f4" />
         </translate>
-        <translate text="Hong Kong Tea">
+        <translate text="Hong Kong Tea" >
             <ptr addr="0x2496fc" />
             <ptr addr="0x2498e4" />
         </translate>
-        <translate text="Golden Tea">
+        <translate text="Golden Tea" >
             <ptr addr="0x249704" />
         </translate>
-        <translate text="Got used to">
+        <translate text="Got used to" >
             <ptr addr="0x24970c" />
         </translate>
-        <translate text="Don&apos;t Talk">
+        <translate text="Don&apos;t Talk" >
             <ptr addr="0x24971c" />
         </translate>
-        <translate text="Raw Fish">
+        <translate text="Raw Fish" >
             <ptr addr="0x249724" />
         </translate>
-        <translate text="Mt. Fuji">
+        <translate text="Mt. Fuji" >
             <ptr addr="0x24972c" />
         </translate>
-        <translate text="Samurai">
+        <translate text="Samurai" >
             <ptr addr="0x249734" />
         </translate>
-        <translate text="Negotiate">
+        <translate text="Negotiate" >
             <ptr addr="0x24973c" />
         </translate>
-        <translate text="Intrude">
+        <translate text="Intrude" >
             <ptr addr="0x249744" />
         </translate>
-        <translate text="Hide-and-Seek">
+        <translate text="Hide-and-Seek" >
             <ptr addr="0x24974c" />
         </translate>
-        <translate text="Arcade">
+        <translate text="Arcade" >
             <ptr addr="0x249754" />
         </translate>
-        <translate text="Baseball">
+        <translate text="Baseball" >
             <ptr addr="0x24975c" />
         </translate>
-        <translate text="Thief">
+        <translate text="Thief" >
             <ptr addr="0x249764" />
         </translate>
-        <translate text="Pride">
+        <translate text="Pride" >
             <ptr addr="0x24976c" />
         </translate>
-        <translate text="Luck">
+        <translate text="Luck" >
             <ptr addr="0x249774" />
         </translate>
-        <translate text="Off Guard">
+        <translate text="Off Guard" >
             <ptr addr="0x24977c" />
         </translate>
-        <translate text="Knife Shop">
+        <translate text="Knife Shop" >
             <ptr addr="0x24978c" />
         </translate>
-        <translate text="Orphanage">
+        <translate text="Orphanage" >
             <ptr addr="0x249794" />
         </translate>
-        <translate text="Happy Tea Shop">
+        <translate text="Happy Tea Shop" >
             <ptr addr="0x2497a4" />
             <ptr addr="0x2498dc" />
         </translate>
-        <translate text="Strong">
+        <translate text="Strong" >
             <ptr addr="0x2497cc" />
         </translate>
-        <translate text="Difficult">
+        <translate text="Difficult" >
             <ptr addr="0x2497d4" />
         </translate>
-        <translate text="That is=@">
+        <translate text="That is=@" >
             <ptr addr="0x2497dc" />
         </translate>
-        <translate text="You can">
+        <translate text="You can" >
             <ptr addr="0x2497e4" />
         </translate>
-        <translate text="Air">
+        <translate text="Air" >
             <ptr addr="0x2497ec" />
         </translate>
-        <translate text="Street">
+        <translate text="Street" >
             <ptr addr="0x2497f4" />
         </translate>
-        <translate text="Martial Arts">
+        <translate text="Martial Arts" >
             <ptr addr="0x2497fc" />
         </translate>
-        <translate text="Person">
+        <translate text="Person" >
             <ptr addr="0x249804" />
         </translate>
-        <translate text="Meal">
+        <translate text="Meal" >
             <ptr addr="0x24980c" />
         </translate>
-        <translate text="Room">
+        <translate text="Room" >
             <ptr addr="0x249814" />
         </translate>
-        <translate text="Vegetables">
+        <translate text="Vegetables" >
             <ptr addr="0x249824" />
         </translate>
-        <translate text="Strength">
+        <translate text="Strength" >
             <ptr addr="0x24982c" />
         </translate>
-        <translate text="Enemy">
+        <translate text="Enemy" >
             <ptr addr="0x249834" />
         </translate>
-        <translate text="So-so">
+        <translate text="So-so" >
             <ptr addr="0x24983c" />
         </translate>
-        <translate text="Nice Color">
+        <translate text="Nice Color" >
             <ptr addr="0x249844" />
         </translate>
-        <translate text="Pork Cutlet">
+        <translate text="Pork Cutlet" >
             <ptr addr="0x24984c" />
         </translate>
-        <translate text="Steak Meat">
+        <translate text="Steak Meat" >
             <ptr addr="0x249854" />
         </translate>
-        <translate text="Rule">
+        <translate text="Rule" >
             <ptr addr="0x24985c" />
         </translate>
-        <translate text="Treasure Hunt">
+        <translate text="Treasure Hunt" >
             <ptr addr="0x249864" />
         </translate>
-        <translate text="Ammon">
+        <translate text="Ammon" >
             <ptr addr="0x249874" />
         </translate>
-        <translate text="Yuanda Zhu">
+        <translate text="Yuanda Zhu" >
             <ptr addr="0x24987c" />
         </translate>
-        <translate text="Wulinshu">
+        <translate text="Wulinshu" >
             <ptr addr="0x249884" />
         </translate>
-        <translate text="Kappa">
+        <translate text="Kappa" >
             <ptr addr="0x24988c" />
         </translate>
-        <translate text="Raccoon">
+        <translate text="Raccoon" >
             <ptr addr="0x249894" />
         </translate>
-        <translate text="Inari God">
+        <translate text="Inari God" >
             <ptr addr="0x24989c" />
         </translate>
-        <translate text="Old Friend">
+        <translate text="Old Friend" >
             <ptr addr="0x2498a4" />
         </translate>
-        <translate text="Woman">
+        <translate text="Woman" >
             <ptr addr="0x2498ac" />
         </translate>
-        <translate text="Florist">
+        <translate text="Florist" >
             <ptr addr="0x2498b4" />
         </translate>
-        <translate text="Capsule Toy ">
+        <translate text="Capsule Toy " >
             <ptr addr="0x2498bc" />
         </translate>
-        <translate text="Bai Jiu Stand">
+        <translate text="Bai Jiu Stand" >
             <ptr addr="0x2498d4" />
         </translate>
-        <translate text="Shenhua">
+        <translate text="Shenhua" >
             <ptr addr="0x249904" />
         </translate>
-        <translate text="Ahead">
+        <translate text="Ahead" >
             <ptr addr="0x24990c" />
         </translate>
-        <translate text="Animal">
+        <translate text="Animal" >
             <ptr addr="0x249914" />
         </translate>
-        <translate text="Danger">
+        <translate text="Danger" >
             <ptr addr="0x24991c" />
         </translate>
-        <translate text="Hurry On">
+        <translate text="Hurry On" >
             <ptr addr="0x249924" />
         </translate>
-        <translate text="Yellow Flower">
+        <translate text="Yellow Flower" >
             <ptr addr="0x24992c" />
         </translate>
-        <translate text="Detour">
+        <translate text="Detour" >
             <ptr addr="0x249934" />
         </translate>
-        <translate text="Landscape">
+        <translate text="Landscape" >
             <ptr addr="0x24993c" />
         </translate>
-        <translate text="Go">
+        <translate text="Go" >
             <ptr addr="0x249944" />
         </translate>
-        <translate text="Don&apos;t Go">
+        <translate text="Don&apos;t Go" >
             <ptr addr="0x24994c" />
         </translate>
-        <translate text="W. M. Kung Fu">
+        <translate text="W. M. Kung Fu" >
             <ptr addr="0x24995c" />
         </translate>
-        <translate text="Other Stand">
+        <translate text="Other Stand" >
             <ptr addr="0x249964" />
         </translate>
-        <translate text="Legend">
+        <translate text="Legend" >
             <ptr addr="0x24996c" />
         </translate>
-        <translate text="Villager">
+        <translate text="Villager" >
             <ptr addr="0x249974" />
         </translate>
-        <translate text="Flower">
+        <translate text="Flower" >
             <ptr addr="0x24997c" />
             <ptr addr="0x249b24" />
         </translate>
-        <translate text="Mountain Path">
+        <translate text="Mountain Path" >
             <ptr addr="0x249984" />
         </translate>
-        <translate text="Shenhua&apos;s Dad">
+        <translate text="Shenhua&apos;s Dad" >
             <ptr addr="0x24998c" />
         </translate>
-        <translate text="Life">
+        <translate text="Life" >
             <ptr addr="0x249994" />
             <ptr addr="0x2499bc" />
         </translate>
-        <translate text="Family">
+        <translate text="Family" >
             <ptr addr="0x24999c" />
         </translate>
-        <translate text="Memory">
+        <translate text="Memory" >
             <ptr addr="0x2499a4" />
         </translate>
-        <translate text="God of Land">
+        <translate text="God of Land" >
             <ptr addr="0x2499ac" />
         </translate>
-        <translate text="The Village">
+        <translate text="The Village" >
             <ptr addr="0x2499c4" />
         </translate>
-        <translate text="Weather">
+        <translate text="Weather" >
             <ptr addr="0x2499cc" />
         </translate>
-        <translate text="Shenmue Tree">
+        <translate text="Shenmue Tree" >
             <ptr addr="0x2499d4" />
         </translate>
-        <translate text="How to">
+        <translate text="How to" >
             <ptr addr="0x2499dc" />
         </translate>
-        <translate text="Cafe Anna">
+        <translate text="Cafe Anna" >
             <ptr addr="0x2499e4" />
         </translate>
-        <translate text="Japanese Mtn.">
+        <translate text="Japanese Mtn." >
             <ptr addr="0x2499ec" />
         </translate>
-        <translate text="For One Night">
+        <translate text="For One Night" >
             <ptr addr="0x2499f4" />
         </translate>
-        <translate text="For Two Nights">
+        <translate text="For Two Nights" >
             <ptr addr="0x2499fc" />
         </translate>
-        <translate text="All Amount">
+        <translate text="All Amount" >
             <ptr addr="0x249a04" />
         </translate>
-        <translate text="Dragons">
+        <translate text="Dragons" >
             <ptr addr="0x249a0c" />
         </translate>
-        <translate text="Tigers">
+        <translate text="Tigers" >
             <ptr addr="0x249a14" />
         </translate>
-        <translate text="Birds">
+        <translate text="Birds" >
             <ptr addr="0x249a1c" />
         </translate>
-        <translate text="Turtles">
+        <translate text="Turtles" >
             <ptr addr="0x249a24" />
         </translate>
-        <translate text="Don&apos;t sleep">
+        <translate text="Don&apos;t sleep" >
             <ptr addr="0x249a2c" />
         </translate>
-        <translate text="Roar">
+        <translate text="Roar" >
             <ptr addr="0x249a3c" />
         </translate>
-        <translate text="Are blue">
+        <translate text="Are blue" >
             <ptr addr="0x249a44" />
         </translate>
-        <translate text="Can Make">
+        <translate text="Can Make" >
             <ptr addr="0x249a4c" />
         </translate>
-        <translate text="Promise">
+        <translate text="Promise" >
             <ptr addr="0x249a54" />
         </translate>
-        <translate text="Greengrocer&apos;s">
+        <translate text="Greengrocer&apos;s" >
             <ptr addr="0x249a5c" />
         </translate>
-        <translate text="Pigeon Park">
+        <translate text="Pigeon Park" >
             <ptr addr="0x249a7c" />
         </translate>
-        <translate text="Hide">
+        <translate text="Hide" >
             <ptr addr="0x249a84" />
         </translate>
-        <translate text="Don&apos;t Hide">
+        <translate text="Don&apos;t Hide" >
             <ptr addr="0x249a8c" />
         </translate>
-        <translate text="Don&apos;t Worry">
+        <translate text="Don&apos;t Worry" >
             <ptr addr="0x249a94" />
         </translate>
-        <translate text="Imagination">
+        <translate text="Imagination" >
             <ptr addr="0x249a9c" />
         </translate>
-        <translate text="Love">
+        <translate text="Love" >
             <ptr addr="0x249ab4" />
         </translate>
-        <translate text="Money">
+        <translate text="Money" >
             <ptr addr="0x249abc" />
         </translate>
-        <translate text="Try Hard">
+        <translate text="Try Hard" >
             <ptr addr="0x249ac4" />
         </translate>
-        <translate text="Defeat Ogres">
+        <translate text="Defeat Ogres" >
             <ptr addr="0x249acc" />
         </translate>
-        <translate text="Cute">
+        <translate text="Cute" >
             <ptr addr="0x249ad4" />
         </translate>
-        <translate text="Master">
+        <translate text="Master" >
             <ptr addr="0x249ae4" />
         </translate>
-        <translate text="I do">
+        <translate text="I do" >
             <ptr addr="0x249aec" />
         </translate>
-        <translate text="Think So">
+        <translate text="Think So" >
             <ptr addr="0x249afc" />
         </translate>
-        <translate text="Don&apos;t Think So">
+        <translate text="Don&apos;t Think So" >
             <ptr addr="0x249b04" />
         </translate>
-        <translate text="A While">
+        <translate text="A While" >
             <ptr addr="0x249b0c" />
         </translate>
-        <translate text="Forever">
+        <translate text="Forever" >
             <ptr addr="0x249b14" />
         </translate>
-        <translate text="Herb">
+        <translate text="Herb" >
             <ptr addr="0x249b1c" />
         </translate>
-        <translate text="Fragrant Wood">
+        <translate text="Fragrant Wood" >
             <ptr addr="0x249b2c" />
         </translate>
-        <translate text="Fragrant Stone">
+        <translate text="Fragrant Stone" >
             <ptr addr="0x249b34" />
         </translate>
-        <translate text="Catch">
+        <translate text="Catch" >
             <ptr addr="0x249b3c" />
         </translate>
-        <translate text="Compensate">
+        <translate text="Compensate" >
             <ptr addr="0x249b44" />
         </translate>
-        <translate text="This Path">
+        <translate text="This Path" >
             <ptr addr="0x249b4c" />
         </translate>
-        <translate text="Path">
+        <translate text="Path" >
             <ptr addr="0x249b54" />
         </translate>
-        <translate text="Other Animals">
+        <translate text="Other Animals" >
             <ptr addr="0x249b5c" />
         </translate>
-        <translate text="Fox">
+        <translate text="Fox" >
             <ptr addr="0x249b64" />
         </translate>
-        <translate text="Carp">
+        <translate text="Carp" >
             <ptr addr="0x249b6c" />
         </translate>
-        <translate text="Cockroach">
+        <translate text="Cockroach" >
             <ptr addr="0x249b74" />
         </translate>
-        <translate text="Landslide">
+        <translate text="Landslide" >
             <ptr addr="0x249b7c" />
         </translate>
-        <translate text="Downslope">
+        <translate text="Downslope" >
             <ptr addr="0x249b8c" />
         </translate>
-        <translate text="Wind">
+        <translate text="Wind" >
             <ptr addr="0x249b94" />
         </translate>
-        <translate text="Drinking Water">
+        <translate text="Drinking Water" >
             <ptr addr="0x249b9c" />
         </translate>
-        <translate text="Doctor">
+        <translate text="Doctor" >
             <ptr addr="0x249ba4" />
         </translate>
-        <translate text="Stone Lion">
+        <translate text="Stone Lion" >
             <ptr addr="0x249bac" />
         </translate>
-        <translate text="Fluff">
+        <translate text="Fluff" >
             <ptr addr="0x249bb4" />
         </translate>
-        <translate text="Waterfall">
+        <translate text="Waterfall" >
             <ptr addr="0x249bbc" />
         </translate>
-        <translate text="To Village">
+        <translate text="To Village" >
             <ptr addr="0x249bc4" />
         </translate>
-        <translate text="Tired?">
+        <translate text="Tired?" >
             <ptr addr="0x249bcc" />
         </translate>
-        <translate text="Paddock">
+        <translate text="Paddock" >
             <ptr addr="0x249bd4" />
         </translate>
     </section>
 
     <section name="Dates" >
-        <translate text="SUN">
+        <translate text="SUN" >
             <ptr addr="0x24ab24" />
         </translate>
-        <translate text="MON">
+        <translate text="MON" >
             <ptr addr="0x24ab28" />
         </translate>
-        <translate text="TUE">
+        <translate text="TUE" >
             <ptr addr="0x24ab2c" />
         </translate>
-        <translate text="WED">
+        <translate text="WED" >
             <ptr addr="0x24ab30" />
         </translate>
-        <translate text="THU">
+        <translate text="THU" >
             <ptr addr="0x24ab34" />
         </translate>
-        <translate text="FRI">
+        <translate text="FRI" >
             <ptr addr="0x24ab38" />
         </translate>
-        <translate text="SAT">
+        <translate text="SAT" >
             <ptr addr="0x24ab3c" />
         </translate>
     </section>
 
     <section name="Save help" >
-        <translate text="%%@1A minimum of ^ free memory blocks %is required to save game data.%%Insert a memory card in Expansion%Socket 1 of Control Port A.@2%">
+        <translate text="%%@1A minimum of ^ free memory blocks %is required to save game data.%%Insert a memory card in Expansion%Socket 1 of Control Port A.@2%" >
             <ptr addr="0x24e118" />
             <ptr addr="0x24e208" />
             <ptr addr="0x24e1b8" />
             <ptr addr="0x24e168" />
         </translate>
-        <translate text="%@1No memory card is inserted.%%Insert a memory card in Expansion%Socket 1 of Control Port A.%%%A minimum of ^ free memory blocks%is required to save game data.@2%">
+        <translate text="%@1No memory card is inserted.%%Insert a memory card in Expansion%Socket 1 of Control Port A.%%%A minimum of ^ free memory blocks%is required to save game data.@2%" >
             <ptr addr="0x24e11c" />
             <ptr addr="0x24e20c" />
             <ptr addr="0x24e1bc" />
             <ptr addr="0x24e16c" />
         </translate>
-        <translate text="%%%%@1No memory card or controller%is inserted, or now checking.@2%">
+        <translate text="%%%%@1No memory card or controller%is inserted, or now checking.@2%" >
             <ptr addr="0x24e120" />
             <ptr addr="0x24e210" />
             <ptr addr="0x24e1c0" />
             <ptr addr="0x24e170" />
         </translate>
-        <translate text="%%%@1This memory card has not been formatted.%%Format the memory card %from the File Menu.@2%">
+        <translate text="%%%@1This memory card has not been formatted.%%Format the memory card %from the File Menu.@2%" >
             <ptr addr="0x24e124" />
             <ptr addr="0x24e214" />
             <ptr addr="0x24e1c4" />
             <ptr addr="0x24e174" />
         </translate>
-        <translate text="%%%     @3Yes@4        @5N o@6%%%@1Cancel saving game data?@2%">
+        <translate text="%%%     @3Yes@4        @5N o@6%%%@1Cancel saving game data?@2%" >
             <ptr addr="0x24e128" />
             <ptr addr="0x24e218" />
             <ptr addr="0x24e1c8" />
             <ptr addr="0x24e178" />
         </translate>
-        <translate text="%%%%%@1Cancelled save.@2%">
+        <translate text="%%%%%@1Cancelled save.@2%" >
             <ptr addr="0x24e12c" />
             <ptr addr="0x24e21c" />
             <ptr addr="0x24e1cc" />
             <ptr addr="0x24e17c" />
         </translate>
-        <translate text="%@1Two types of files are required%in Shenmue II.%%%System File%  Saves system data.%%Game File%  Saves game progress data.@2%">
+        <translate text="%@1Two types of files are required%in Shenmue II.%%%System File%  Saves system data.%%Game File%  Saves game progress data.@2%" >
             <ptr addr="0x24e130" />
             <ptr addr="0x24e180" />
             <ptr addr="0x24e1d0" />
             <ptr addr="0x24e220" />
         </translate>
-        <translate text="%%@1There is not enough free memory.%%A minimum of ^ free memory blocks%is required to save the Game File.%%Insert a memory card in Expansion%Socket 1 of Control Port A.@2%">
+        <translate text="%%@1There is not enough free memory.%%A minimum of ^ free memory blocks%is required to save the Game File.%%Insert a memory card in Expansion%Socket 1 of Control Port A.@2%" >
             <ptr addr="0x24e134" />
             <ptr addr="0x24e224" />
             <ptr addr="0x24e184" />
             <ptr addr="0x24e1d4" />
         </translate>
-        <translate text="%@1Now saving.%%To avoid damaging the Game File,%do not turn the Dreamcast power OFF %or attempt to remove the memory card%or the controller.%%Doing so may damage the Game File.@2%">
+        <translate text="%@1Now saving.%%To avoid damaging the Game File,%do not turn the Dreamcast power OFF %or attempt to remove the memory card%or the controller.%%Doing so may damage the Game File.@2%" >
             <ptr addr="0x24e138" />
             <ptr addr="0x24e188" />
             <ptr addr="0x24e228" />
             <ptr addr="0x24e1d8" />
         </translate>
-        <translate text="%%%%%@1Attempt to save unsuccessful.@2%">
+        <translate text="%%%%%@1Attempt to save unsuccessful.@2%" >
             <ptr addr="0x24e13c" />
             <ptr addr="0x24e18c" />
             <ptr addr="0x24e1dc" />
             <ptr addr="0x24e22c" />
         </translate>
-        <translate text="%%%%%@1Game save completed.@2%">
+        <translate text="%%%%%@1Game save completed.@2%" >
             <ptr addr="0x24e140" />
             <ptr addr="0x24e230" />
             <ptr addr="0x24e1e0" />
             <ptr addr="0x24e190" />
         </translate>
-        <translate text="%%%@1Unable to locate System File.%%A System File is required %to play Shenmue II.@2%">
+        <translate text="%%%@1Unable to locate System File.%%A System File is required %to play Shenmue II.@2%" >
             <ptr addr="0x24e144" />
             <ptr addr="0x24e234" />
             <ptr addr="0x24e194" />
             <ptr addr="0x24e1e4" />
         </translate>
-        <translate text="%%%    @3Yes@4     @5N o@6%%%@1Create System File?@2%">
+        <translate text="%%%    @3Yes@4     @5N o@6%%%@1Create System File?@2%" >
             <ptr addr="0x24e148" />
             <ptr addr="0x24e198" />
             <ptr addr="0x24e1e8" />
             <ptr addr="0x24e238" />
         </translate>
-        <translate text="%%%           @3Yes@4        @5N o@6%%@1Overwrite the contents of this file?@2%">
+        <translate text="%%%           @3Yes@4        @5N o@6%%@1Overwrite the contents of this file?@2%" >
             <ptr addr="0x24e14c" />
             <ptr addr="0x24e19c" />
             <ptr addr="0x24e1ec" />
             <ptr addr="0x24e23c" />
         </translate>
-        <translate text="%%%@1Unable to locate Game File.%%A Game File is required %to save game progress data.@2%">
+        <translate text="%%%@1Unable to locate Game File.%%A Game File is required %to save game progress data.@2%" >
             <ptr addr="0x24e150" />
             <ptr addr="0x24e240" />
             <ptr addr="0x24e1a0" />
             <ptr addr="0x24e1f0" />
         </translate>
-        <translate text="%%%   @3Yes@4     @5N o@6%%%@1Create Game File?@2%">
+        <translate text="%%%   @3Yes@4     @5N o@6%%%@1Create Game File?@2%" >
             <ptr addr="0x24e154" />
             <ptr addr="0x24e244" />
             <ptr addr="0x24e1a4" />
             <ptr addr="0x24e1f4" />
         </translate>
-        <translate text="%%%         @3Yes@4     @5N o@6%%%@1Attempt to save unsuccessful.%Retry?@2%">
+        <translate text="%%%         @3Yes@4     @5N o@6%%%@1Attempt to save unsuccessful.%Retry?@2%" >
             <ptr addr="0x24e158" />
             <ptr addr="0x24e1a8" />
             <ptr addr="0x24e1f8" />
             <ptr addr="0x24e248" />
         </translate>
-        <translate text="%%%%@1No memory card is inserted in%Expansion Socket 1 of Control.@2%">
+        <translate text="%%%%@1No memory card is inserted in%Expansion Socket 1 of Control.@2%" >
             <ptr addr="0x24e15c" />
             <ptr addr="0x24e24c" />
             <ptr addr="0x24e1fc" />
             <ptr addr="0x24e1ac" />
         </translate>
-        <translate text="%%%%@1DISC^ is complete.%Press A Button.@2%">
+        <translate text="%%%%@1DISC^ is complete.%Press A Button.@2%" >
             <ptr addr="0x24e160" />
             <ptr addr="0x24e250" />
             <ptr addr="0x24e1b0" />
             <ptr addr="0x24e200" />
         </translate>
-        <translate text="%%%   @3Yes@4   @5N o@6%%%@1Save game data?@2%">
+        <translate text="%%%   @3Yes@4   @5N o@6%%%@1Save game data?@2%" >
             <ptr addr="0x24e164" />
             <ptr addr="0x24e254" />
             <ptr addr="0x24e204" />
@@ -3411,396 +3411,396 @@
     </section>
 
     <section name="Moves" >
-        <translate text="Special move">
+        <translate text="Special move" >
             <ptr addr="0x1a49ac" />
         </translate>
-        <translate text="has been mastered.">
+        <translate text="has been mastered." >
             <ptr addr="0x1a49dc" />
         </translate>
-        <translate text="has been taught.">
+        <translate text="has been taught." >
             <ptr addr="0x1a49e0" />
         </translate>
 
-        <translate text="Hand move">
+        <translate text="Hand move" >
             <ptr addr="0x24e25c" />
         </translate>
-        <translate text="Leg move">
+        <translate text="Leg move" >
             <ptr addr="0x24e260" />
         </translate>
-        <translate text="Throw move">
+        <translate text="Throw move" >
             <ptr addr="0x24e264" />
         </translate>
-        <translate text="Tiger Knuckle">
+        <translate text="Tiger Knuckle" >
             <ptr addr="0x24e39c" />
         </translate>
-        <translate text="Elbow Slam">
+        <translate text="Elbow Slam" >
             <ptr addr="0x24e3a8" />
         </translate>
-        <translate text="Rain Thrust">
+        <translate text="Rain Thrust" >
             <ptr addr="0x24e3b4" />
         </translate>
-        <translate text="Twist Knuckle">
+        <translate text="Twist Knuckle" >
             <ptr addr="0x24e3c0" />
         </translate>
-        <translate text="Upper Knuckle">
+        <translate text="Upper Knuckle" >
             <ptr addr="0x24e3cc" />
         </translate>
-        <translate text="Elbow Assault">
+        <translate text="Elbow Assault" >
             <ptr addr="0x24e3d8" />
         </translate>
-        <translate text="Katana Mist Slash">
+        <translate text="Katana Mist Slash" >
             <ptr addr="0x24e3e4" />
         </translate>
-        <translate text="Sleeve Strike">
+        <translate text="Sleeve Strike" >
             <ptr addr="0x24e3f0" />
         </translate>
-        <translate text="Big Wheel">
+        <translate text="Big Wheel" >
             <ptr addr="0x24e3fc" />
         </translate>
-        <translate text="Twin Hand Waves">
+        <translate text="Twin Hand Waves" >
             <ptr addr="0x24e408" />
         </translate>
-        <translate text="Backfist Willow">
+        <translate text="Backfist Willow" >
             <ptr addr="0x24e414" />
         </translate>
-        <translate text="Avalanche Lance">
+        <translate text="Avalanche Lance" >
             <ptr addr="0x24e420" />
         </translate>
-        <translate text="Mistral Flash">
+        <translate text="Mistral Flash" >
             <ptr addr="0x24e42c" />
         </translate>
-        <translate text="Pit Blow">
+        <translate text="Pit Blow" >
             <ptr addr="0x24e450" />
         </translate>
-        <translate text="Double Blow">
+        <translate text="Double Blow" >
             <ptr addr="0x24e468" />
         </translate>
-        <translate text="Swallow Flip">
+        <translate text="Swallow Flip" >
             <ptr addr="0x24e474" />
         </translate>
-        <translate text="Brawling Uppercut">
+        <translate text="Brawling Uppercut" >
             <ptr addr="0x24e48c" />
         </translate>
-        <translate text="Iron Palm">
+        <translate text="Iron Palm" >
             <ptr addr="0x24e498" />
         </translate>
-        <translate text="Lunging Strike">
+        <translate text="Lunging Strike" >
             <ptr addr="0x24e4a4" />
         </translate>
-        <translate text="CounterElbowAssault">
+        <translate text="CounterElbowAssault" >
             <ptr addr="0x24e4bc" />
         </translate>
-        <translate text="Crescent Kick">
+        <translate text="Crescent Kick" >
             <ptr addr="0x24e6c4" />
         </translate>
-        <translate text="Trample Kick">
+        <translate text="Trample Kick" >
             <ptr addr="0x24e6d0" />
         </translate>
-        <translate text="Hold Against Leg">
+        <translate text="Hold Against Leg" >
             <ptr addr="0x24e6dc" />
         </translate>
-        <translate text="Side Reaper Kick">
+        <translate text="Side Reaper Kick" >
             <ptr addr="0x24e6e8" />
         </translate>
-        <translate text="Thunder Kick">
+        <translate text="Thunder Kick" >
             <ptr addr="0x24e700" />
         </translate>
-        <translate text="Surplice Slash">
+        <translate text="Surplice Slash" >
             <ptr addr="0x24e70c" />
         </translate>
-        <translate text="Against Cascade">
+        <translate text="Against Cascade" >
             <ptr addr="0x24e718" />
         </translate>
-        <translate text="Brutal Tiger">
+        <translate text="Brutal Tiger" >
             <ptr addr="0x24e724" />
         </translate>
-        <translate text="Dark Moon">
+        <translate text="Dark Moon" >
             <ptr addr="0x24e730" />
         </translate>
-        <translate text="Cyclone Kick">
+        <translate text="Cyclone Kick" >
             <ptr addr="0x24e73c" />
         </translate>
-        <translate text="Windmill">
+        <translate text="Windmill" >
             <ptr addr="0x24e748" />
         </translate>
-        <translate text="Swallow Dive">
+        <translate text="Swallow Dive" >
             <ptr addr="0x24e754" />
         </translate>
-        <translate text="Tornado Kick">
+        <translate text="Tornado Kick" >
             <ptr addr="0x24e760" />
         </translate>
-        <translate text="Hook Kick">
+        <translate text="Hook Kick" >
             <ptr addr="0x24e784" />
         </translate>
-        <translate text="Overthrow">
+        <translate text="Overthrow" >
             <ptr addr="0x24e964" />
         </translate>
-        <translate text="Sweep Throw">
+        <translate text="Sweep Throw" >
             <ptr addr="0x24e970" />
         </translate>
-        <translate text="Vortex Throw">
+        <translate text="Vortex Throw" >
             <ptr addr="0x24e97c" />
         </translate>
-        <translate text="Mist Reaper">
+        <translate text="Mist Reaper" >
             <ptr addr="0x24e988" />
         </translate>
-        <translate text="Demon Drop">
+        <translate text="Demon Drop" >
             <ptr addr="0x24e994" />
         </translate>
-        <translate text="Shoulder Buster">
+        <translate text="Shoulder Buster" >
             <ptr addr="0x24e9a0" />
         </translate>
-        <translate text="Tengu Drop">
+        <translate text="Tengu Drop" >
             <ptr addr="0x24e9ac" />
         </translate>
-        <translate text="Darkside Hazuki">
+        <translate text="Darkside Hazuki" >
             <ptr addr="0x24e9b8" />
         </translate>
-        <translate text="Back Twist Drop">
+        <translate text="Back Twist Drop" >
             <ptr addr="0x24e9c4" />
         </translate>
-        <translate text="Shadow Step">
+        <translate text="Shadow Step" >
             <ptr addr="0x24e9d0" />
         </translate>
-        <translate text="Shadow Blade">
+        <translate text="Shadow Blade" >
             <ptr addr="0x24e9f4" />
         </translate>
-        <translate text="Cross Charge">
+        <translate text="Cross Charge" >
             <ptr addr="0x24ea00" />
         </translate>
-        <translate text="Hind Blow">
+        <translate text="Hind Blow" >
             <ptr addr="0x24ea0c" />
         </translate>
-        <translate text="Wild Throw">
+        <translate text="Wild Throw" >
             <ptr addr="0x24ea18" />
         </translate>
-        <translate text="Predictive Explosion">
+        <translate text="Predictive Explosion" >
             <ptr addr="0x24ea60" />
         </translate>
 
-        <translate text="A punch aimed at a point between the#nose and mouth">
+        <translate text="A punch aimed at a point between the#nose and mouth" >
             <ptr addr="0x24ebec" />
         </translate>
-        <translate text="A downward rotating blow aimed at#the opponent&apos;s collarbone">
+        <translate text="A downward rotating blow aimed at#the opponent&apos;s collarbone" >
             <ptr addr="0x24ebf0" />
         </translate>
-        <translate text="A straight punch aimed at a pressure#point on the opponent&apos;s side neck">
+        <translate text="A straight punch aimed at a pressure#point on the opponent&apos;s side neck" >
             <ptr addr="0x24ebf4" />
         </translate>
-        <translate text="Unlike the Elbow Slam, it is thrown#horizontally in a sweeping hook">
+        <translate text="Unlike the Elbow Slam, it is thrown#horizontally in a sweeping hook" >
             <ptr addr="0x24ebf8" />
         </translate>
-        <translate text="A strike on the jaw swung by#momentarily lowering and rising">
+        <translate text="A strike on the jaw swung by#momentarily lowering and rising" >
             <ptr addr="0x24ebfc" />
         </translate>
-        <translate text="A move targeted at the center of#the opponent&apos;s body with a rush">
+        <translate text="A move targeted at the center of#the opponent&apos;s body with a rush" >
             <ptr addr="0x24ec00" />
         </translate>
-        <translate text="A slashing blow with the side of the#palm with an advancing step">
+        <translate text="A slashing blow with the side of the#palm with an advancing step" >
             <ptr addr="0x24ec04" />
         </translate>
-        <translate text="A punch at a mid-level target while#taking a step forward">
+        <translate text="A punch at a mid-level target while#taking a step forward" >
             <ptr addr="0x24ec08" />
         </translate>
-        <translate text="A diagonal blow on the opponent&apos;s#collarbone while closing in">
+        <translate text="A diagonal blow on the opponent&apos;s#collarbone while closing in" >
             <ptr addr="0x24ec0c" />
         </translate>
-        <translate text="A strike on the jaw and chest by#using the palm and forearm">
+        <translate text="A strike on the jaw and chest by#using the palm and forearm" >
             <ptr addr="0x24ec10" />
         </translate>
-        <translate text="A powerful surprise attack with#a spinning backfist">
+        <translate text="A powerful surprise attack with#a spinning backfist" >
             <ptr addr="0x24ec14" />
         </translate>
-        <translate text="A strike on the pit of the stomach#by the elbow bent at an acute angle">
+        <translate text="A strike on the pit of the stomach#by the elbow bent at an acute angle" >
             <ptr addr="0x24ec18" />
         </translate>
-        <translate text="A diagonal blow to the area between#the shoulder and a nape of the neck">
+        <translate text="A diagonal blow to the area between#the shoulder and a nape of the neck" >
             <ptr addr="0x24ec1c" />
         </translate>
-        <translate text="A blow to the opponent&apos;s chin thrust#by lowering the body and springing">
+        <translate text="A blow to the opponent&apos;s chin thrust#by lowering the body and springing" >
             <ptr addr="0x24ec20" />
         </translate>
-        <translate text="A slashing blow thrusted by#swinging down the arm and up again">
+        <translate text="A slashing blow thrusted by#swinging down the arm and up again" >
             <ptr addr="0x24ec24" />
         </translate>
-        <translate text="A mid-level strike by a second#punch on the same target">
+        <translate text="A mid-level strike by a second#punch on the same target" >
             <ptr addr="0x24ec28" />
         </translate>
-        <translate text="A penetrating blow with the palms#using power from the back twist">
+        <translate text="A penetrating blow with the palms#using power from the back twist" >
             <ptr addr="0x24ec2c" />
         </translate>
-        <translate text="A blow by one hand on the opponent#and slamming it with the other">
+        <translate text="A blow by one hand on the opponent#and slamming it with the other" >
             <ptr addr="0x24ec30" />
         </translate>
-        <translate text="Deflecting the opponent&apos;s attack and#kicking his leg at the same time">
+        <translate text="Deflecting the opponent&apos;s attack and#kicking his leg at the same time" >
             <ptr addr="0x24ec34" />
         </translate>
-        <translate text="A thrust move delivered by stepping#out the same side of foot and arm">
+        <translate text="A thrust move delivered by stepping#out the same side of foot and arm" >
             <ptr addr="0x24ec38" />
         </translate>
-        <translate text="A big step backward and then a#forward create a powerful uppercut">
+        <translate text="A big step backward and then a#forward create a powerful uppercut" >
             <ptr addr="0x24ec3c" />
         </translate>
-        <translate text="A Tai Chi hand move with force#delivered from the legs and waist">
+        <translate text="A Tai Chi hand move with force#delivered from the legs and waist" >
             <ptr addr="0x24ec40" />
         </translate>
-        <translate text="A basic Baji Style move. The#twisting of the waist exerts force">
+        <translate text="A basic Baji Style move. The#twisting of the waist exerts force" >
             <ptr addr="0x24ec44" />
         </translate>
-        <translate text="While closing in, both palms are#used to strike the opponent&apos;s chest">
+        <translate text="While closing in, both palms are#used to strike the opponent&apos;s chest" >
             <ptr addr="0x24ec48" />
         </translate>
-        <translate text="The Elbow Attack thrusted on the#side while avoiding the attack">
+        <translate text="The Elbow Attack thrusted on the#side while avoiding the attack" >
             <ptr addr="0x24ec4c" />
         </translate>
-        <translate text="An upper blow on the chin and a#consecutive downward strike">
+        <translate text="An upper blow on the chin and a#consecutive downward strike" >
             <ptr addr="0x24ec50" />
         </translate>
-        <translate text="Striking the collarbone or the head#while moving to the opponent&apos;s side">
+        <translate text="Striking the collarbone or the head#while moving to the opponent&apos;s side" >
             <ptr addr="0x24ec54" />
         </translate>
-        <translate text="A mid-level strike on the stomack#while leaning toward the opponent">
+        <translate text="A mid-level strike on the stomack#while leaning toward the opponent" >
             <ptr addr="0x24ec58" />
         </translate>
-        <translate text="An upward sword-stroke kick, aimed#at the opponent&apos;s head">
+        <translate text="An upward sword-stroke kick, aimed#at the opponent&apos;s head" >
             <ptr addr="0x24ec5c" />
         </translate>
-        <translate text="A front kick aiming the front torso#of the opponent with the toes">
+        <translate text="A front kick aiming the front torso#of the opponent with the toes" >
             <ptr addr="0x24ec60" />
         </translate>
-        <translate text="A low to mid-level kick using the#power of the forward leg">
+        <translate text="A low to mid-level kick using the#power of the forward leg" >
             <ptr addr="0x24ec64" />
         </translate>
-        <translate text="A low, decisive kick aimed at the#outside of the opponent&apos;s knee">
+        <translate text="A low, decisive kick aimed at the#outside of the opponent&apos;s knee" >
             <ptr addr="0x24ec68" />
         </translate>
-        <translate text="A heel kick followed by another#using the other leg">
+        <translate text="A heel kick followed by another#using the other leg" >
             <ptr addr="0x24ec6c" />
         </translate>
-        <translate text="A middle rotating kick followed by#a heel drop">
+        <translate text="A middle rotating kick followed by#a heel drop" >
             <ptr addr="0x24ec70" />
         </translate>
-        <translate text="A back roundhouse kick striking#in a downward diagonal motion">
+        <translate text="A back roundhouse kick striking#in a downward diagonal motion" >
             <ptr addr="0x24ec74" />
         </translate>
-        <translate text="A flying knee move made by#leaping upward to kick">
+        <translate text="A flying knee move made by#leaping upward to kick" >
             <ptr addr="0x24ec78" />
         </translate>
-        <translate text="A powerful high-speed reverse#roundhouse kick">
+        <translate text="A powerful high-speed reverse#roundhouse kick" >
             <ptr addr="0x24ec7c" />
         </translate>
-        <translate text="A kick delivered while flipping#forward in mid-air">
+        <translate text="A kick delivered while flipping#forward in mid-air" >
             <ptr addr="0x24ec80" />
         </translate>
-        <translate text="A flying back roundhouse kick with#force by jump and rotation">
+        <translate text="A flying back roundhouse kick with#force by jump and rotation" >
             <ptr addr="0x24ec84" />
         </translate>
-        <translate text="A flying back kick, aiming#diagonally at the opponent&apos;s neck">
+        <translate text="A flying back kick, aiming#diagonally at the opponent&apos;s neck" >
             <ptr addr="0x24ec88" />
         </translate>
-        <translate text="After luring the opponent in,#a reaping kick is delivered">
+        <translate text="After luring the opponent in,#a reaping kick is delivered" >
             <ptr addr="0x24ec8c" />
         </translate>
-        <translate text="Using the spinning momentum of the#1st kick, a 2nd kick is delivered">
+        <translate text="Using the spinning momentum of the#1st kick, a 2nd kick is delivered" >
             <ptr addr="0x24ec90" />
         </translate>
-        <translate text="A kick on the chin by sliding toward#the opponent and making a handstand">
+        <translate text="A kick on the chin by sliding toward#the opponent and making a handstand" >
             <ptr addr="0x24ec94" />
         </translate>
-        <translate text="Sweeping out the opponent&apos;s leg#while spinning on the pivot leg">
+        <translate text="Sweeping out the opponent&apos;s leg#while spinning on the pivot leg" >
             <ptr addr="0x24ec98" />
         </translate>
-        <translate text="A Hook Kick by the heel, aiming#at the opponent&apos;s neck">
+        <translate text="A Hook Kick by the heel, aiming#at the opponent&apos;s neck" >
             <ptr addr="0x24ec9c" />
         </translate>
-        <translate text="A heel drop kick made#after a spinning kick">
+        <translate text="A heel drop kick made#after a spinning kick" >
             <ptr addr="0x24eca0" />
         </translate>
-        <translate text="Sliding the ground forward to sweep#the feet out">
+        <translate text="Sliding the ground forward to sweep#the feet out" >
             <ptr addr="0x24eca4" />
         </translate>
-        <translate text="A kick delivered on the chin while#turning the back on the opponent">
+        <translate text="A kick delivered on the chin while#turning the back on the opponent" >
             <ptr addr="0x24eca8" />
         </translate>
-        <translate text="A heel kick by lowering the body#suddenly in front of the opponent">
+        <translate text="A heel kick by lowering the body#suddenly in front of the opponent" >
             <ptr addr="0x24ecac" />
         </translate>
-        <translate text="A diagonal upward kick after#running and jumping to the opponent">
+        <translate text="A diagonal upward kick after#running and jumping to the opponent" >
             <ptr addr="0x24ecb0" />
         </translate>
-        <translate text="After a low, elbow strike, an upward#kick is delivered with a handstand">
+        <translate text="After a low, elbow strike, an upward#kick is delivered with a handstand" >
             <ptr addr="0x24ecb4" />
         </translate>
-        <translate text="The opponent is lifted over the back#and is thrown over">
+        <translate text="The opponent is lifted over the back#and is thrown over" >
             <ptr addr="0x24ecb8" />
         </translate>
-        <translate text="The opponent&apos;s inner thigh is#swept up to throw">
+        <translate text="The opponent&apos;s inner thigh is#swept up to throw" >
             <ptr addr="0x24ecbc" />
         </translate>
-        <translate text="The practitioner falls backward to#throw the opponent overhead to rear">
+        <translate text="The practitioner falls backward to#throw the opponent overhead to rear" >
             <ptr addr="0x24ecc0" />
         </translate>
-        <translate text="Grabbing the opponent&apos;s neck and#sweeping the opponent&apos;s pivot leg">
+        <translate text="Grabbing the opponent&apos;s neck and#sweeping the opponent&apos;s pivot leg" >
             <ptr addr="0x24ecc4" />
         </translate>
-        <translate text="While throwing the opponent, the#practioner flips and lands on him">
+        <translate text="While throwing the opponent, the#practioner flips and lands on him" >
             <ptr addr="0x24ecc8" />
         </translate>
-        <translate text="Grasping the arm and executing#an armlock to pin">
+        <translate text="Grasping the arm and executing#an armlock to pin" >
             <ptr addr="0x24eccc" />
         </translate>
-        <translate text="Lifting the opponent on the shoulder#and dropping him headfirst">
+        <translate text="Lifting the opponent on the shoulder#and dropping him headfirst" >
             <ptr addr="0x24ecd0" />
         </translate>
-        <translate text="Closing in on the opponent&apos;s side#to throw down while spinning">
+        <translate text="Closing in on the opponent&apos;s side#to throw down while spinning" >
             <ptr addr="0x24ecd4" />
         </translate>
-        <translate text="The throw is executed with#a twist toward the rear">
+        <translate text="The throw is executed with#a twist toward the rear" >
             <ptr addr="0x24ecd8" />
         </translate>
-        <translate text="Evading the opponent and moving#back into his blind spot to attack">
+        <translate text="Evading the opponent and moving#back into his blind spot to attack" >
             <ptr addr="0x24ecdc" />
         </translate>
-        <translate text="A complex move damaging the#opponent&apos;s arms in multiple areas">
+        <translate text="A complex move damaging the#opponent&apos;s arms in multiple areas" >
             <ptr addr="0x24ece0" />
         </translate>
-        <translate text="Crouching momentarily and lunging#headfirst into the opponent">
+        <translate text="Crouching momentarily and lunging#headfirst into the opponent" >
             <ptr addr="0x24ece4" />
         </translate>
-        <translate text="Striking the back of the neck after#moving into opponent&apos;s blind spot">
+        <translate text="Striking the back of the neck after#moving into opponent&apos;s blind spot" >
             <ptr addr="0x24ece8" />
         </translate>
-        <translate text="Evading the opponent&apos;s attack#diagonally to make body attack">
+        <translate text="Evading the opponent&apos;s attack#diagonally to make body attack" >
             <ptr addr="0x24ecec" />
         </translate>
-        <translate text="A strike on the chin delivered while#moving to the rear of the opponent">
+        <translate text="A strike on the chin delivered while#moving to the rear of the opponent" >
             <ptr addr="0x24ecf0" />
         </translate>
-        <translate text="An advanced throw move. The#direction of the throw is unlimited">
+        <translate text="An advanced throw move. The#direction of the throw is unlimited" >
             <ptr addr="0x24ecf4" />
         </translate>
-        <translate text="While reaping both legs of the#opponent, the torso is thrusted">
+        <translate text="While reaping both legs of the#opponent, the torso is thrusted" >
             <ptr addr="0x24ecf8" />
         </translate>
-        <translate text="A top and middle-level thrust#and blow delivered consecutively">
+        <translate text="A top and middle-level thrust#and blow delivered consecutively" >
             <ptr addr="0x24ecfc" />
         </translate>
-        <translate text="A strike on the side followed by a#throw after a quick move">
+        <translate text="A strike on the side followed by a#throw after a quick move" >
             <ptr addr="0x24ed00" />
         </translate>
-        <translate text="A strike on the head by making the#opponent fall as jumping on to him">
+        <translate text="A strike on the head by making the#opponent fall as jumping on to him" >
             <ptr addr="0x24ed04" />
         </translate>
-        <translate text="Three rapid strikes on the eyes#and the throat of the opponent">
+        <translate text="Three rapid strikes on the eyes#and the throat of the opponent" >
             <ptr addr="0x24ed08" />
         </translate>
-        <translate text="A technique to feel the opponent&apos;s#move using all senses">
+        <translate text="A technique to feel the opponent&apos;s#move using all senses" >
             <ptr addr="0x24ed0c" />
         </translate>
     </section>
 
     <section name="Special" >
-        <translate text="us_help.bin">
+        <translate text="us_help.bin" >
             <ptr addr="0xa4e24" />
             <ptr addr="0xa4e28" />
             <ptr addr="0xa4e2c" />
@@ -3816,34 +3816,32 @@
         <ptr addr="0x2e780" />
     </insert>
 
-<!-- "sprite" -->
-<patch addr="0x21bc54" >
-    <ptr addr="0x46acc" />
-    <ptr addr="0x46c48" />
-    <ptr addr="0x70a70" />
-    <ptr addr="0xaecc8" />
-    <ptr addr="0xed300" />
-    <ptr addr="0x163870" />
-    <ptr addr="0x164074" />
-    <ptr addr="0x1643f8" />
-    <ptr addr="0x167628" />
-    <ptr addr="0x18e74c" />
-    <ptr addr="0x1a091c" />
-    <ptr addr="0x1a099c" />
-    <ptr addr="0x1a5a7c" />
-    <ptr addr="0x1a6564" />
-    <ptr addr="0x1b0d80" />
-</patch>
+    <insert text="sprite" >
+        <ptr addr="0x46acc" />
+        <ptr addr="0x46c48" />
+        <ptr addr="0x70a70" />
+        <ptr addr="0xaecc8" />
+        <ptr addr="0xed300" />
+        <ptr addr="0x163870" />
+        <ptr addr="0x164074" />
+        <ptr addr="0x1643f8" />
+        <ptr addr="0x167628" />
+        <ptr addr="0x18e74c" />
+        <ptr addr="0x1a091c" />
+        <ptr addr="0x1a099c" />
+        <ptr addr="0x1a5a7c" />
+        <ptr addr="0x1a6564" />
+        <ptr addr="0x1b0d80" />
+    </insert>
 
-<!-- "DC_KANJI.FON" -->
-<patch addr="0x21bda8" >
-    <ptr addr="0x45324" />
-    <ptr addr="0xa50b4" />
-    <ptr addr="0xbad34" />
-    <ptr addr="0x1a3ca8" />
-    <ptr addr="0x1b4df4" />
-    <ptr addr="0x1b4e34" />
-</patch>
+    <insert text="DC_KANJI.FON" >
+        <ptr addr="0x45324" />
+        <ptr addr="0xa50b4" />
+        <ptr addr="0xbad34" />
+        <ptr addr="0x1a3ca8" />
+        <ptr addr="0x1b4df4" />
+        <ptr addr="0x1b4e34" />
+    </insert>
 
 </script>
 
