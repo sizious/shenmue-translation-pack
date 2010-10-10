@@ -4,7 +4,7 @@ TARGET=dc_patcher
 XMLINC=-I/usr/include/libxml2
 LIBS=-lxml2
 
-OBJS=main.o block.o iohandler.o memorymanager.o insert.o ptr.o
+OBJS=main.o block.o iohandler.o memorymanager.o insert.o ptr.o xmlfilereader.o
 
 
 all: $(OBJS)
