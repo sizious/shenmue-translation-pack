@@ -825,16 +825,11 @@
             <ptr addr="0x23a280" />
         </translate>
 
-
+        <!-- TODO: Add the "german" pointer... -->
         <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMove cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;" >
             <ptr addr="0x23a1f0" />
-        </translate>
-        <translate text="sur ^A pour augmenter le nombre d&apos;objets&amp;�� vendre. Appuyez sur ^B pour diminuer&amp;le nombre d&apos;objets �� vendre. Apr��s avoir&amp;s��lectionn�� la quantit�� d&apos;objets, placez&amp;le curseur sur Valider et appuyez sur ^A.&amp;&amp;&#9;^CD��placer curseur&#9;^LRemonter&amp;&#9;&#9;^RDescendre" >
             <ptr addr="0x23a258" />
-        </translate>
-        <translate text="and press^Ato increase the number of&amp;items to sell. Press^Bto decrease the&amp;number of items to sell. After&amp;selecting the quantity of items to sell,&amp;move the cursor to |Enter| and press^A.&amp;&amp;&#9;^CMueve el cursor&#9;^LScroll up&amp;&#9;&#9;^RScroll down&amp;" >
             <ptr addr="0x23a328" />
-        </translate>
     </section>
 
     <section name="In-game menu" >
@@ -3799,7 +3794,7 @@
         </translate>
     </section>
 
-    <section name="Special" >
+    <section name="Files" >
         <translate text="us_help.bin" >
             <ptr addr="0xa4e24" />
             <ptr addr="0xa4e28" />
