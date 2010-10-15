@@ -10,6 +10,9 @@ OBJS=main.o block.o iohandler.o memorymanager.o insert.o ptr.o xmlfilereader.o
 all: $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LDFLAGS) $(LIBS) -o $(TARGET)
 
+release: all
+	objcopy -S $(TARGET)
+
 clean:
 	-rm -rf $(OBJS) $(TARGET)
 
