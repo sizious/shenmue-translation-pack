@@ -60,7 +60,8 @@ type
     GroupBox4: TGroupBox;
     lbStrings: TListBox;
     N8: TMenuItem;
-    New1: TMenuItem;
+    miNewProject: TMenuItem;
+    tbNewProject: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -83,6 +84,8 @@ type
     procedure miAboutClick(Sender: TObject);
     procedure cbSectionsSelect(Sender: TObject);
     procedure lbStringsClick(Sender: TObject);
+    procedure miNewProjectClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }
     fDebugLogVisible: Boolean;
@@ -140,7 +143,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, About, FileSpec;
+  Config, UITools, SysTools, About, FileSpec, NewProj;
 
 procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
 begin
@@ -264,6 +267,14 @@ begin
   ModulesFree;
 end;
 
+procedure TfrmMain.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then begin
+    Key := #0;
+    Close;
+  end;
+end;
+
 procedure TfrmMain.ModulesFree;
 begin
   // Disabling the Close button
@@ -301,6 +312,24 @@ end;
 function TfrmMain.MsgBox(Text, Caption: string; Flags: Integer): Integer;
 begin
   Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
+end;
+
+procedure TfrmMain.miNewProjectClick(Sender: TObject);
+begin
+  if not SaveFileOnDemand(True) then Exit;
+  
+  frmNewProject := TfrmNewProject.Create(Self);
+  with frmNewProject do begin
+    if ShowModal = mrOK then begin
+      Clear;
+      if CreationResult then begin
+        Debug.AddLine(ltInformation, 'New script created!');
+        LoadFile(NewFileName);
+      end else
+        Debug.Report(ltWarning, 'New script creation failed!');
+    end;
+    Free;        
+  end;
 end;
 
 procedure TfrmMain.ProjectHome1Click(Sender: TObject);
@@ -359,7 +388,6 @@ end;
 procedure TfrmMain.LoadFile(FileName: TFileName);
 var
   i: Integer;
-  S: string;
 
 begin
   // Extending filenames
@@ -367,8 +395,8 @@ begin
 
   // Checking the file
   if not FileExists(FileName) then begin
-    Debug.Report(ltWarning, 'The file "' + FileName + '" doesn''t exists.',
-      'FullFileName: ' + FileName);
+    Debug.Report(ltWarning, 'The file selected doesn''t exists.',
+      'FullFileName: "' + FileName + '"');
     Exit;
   end;
 
@@ -376,17 +404,15 @@ begin
   Clear;  
   StatusText := 'Loading file...';
 
-  S := ' [FileName: "' + FileName + '"';
   if BinaryScriptEditor.LoadFromFile(FileName) then begin
     // Debug msg
-    Debug.AddLine(ltInformation, 'Binary Script loaded successfully.' + S
+    Debug.AddLine(ltInformation, 'Binary Script loaded successfully.'
+      + ' [FullFileName: "' + FileName + '"'
       + ', Game: "' + GameVersionToString(BinaryScriptEditor.Header.Version)
       + '", Region: "' + GameRegionToString(BinaryScriptEditor.Header.Region)
       + '", Platform: "' + PlatformVersionToString(BinaryScriptEditor.Header.PlatformKind)
-      + '"'
+      + '"]'
     );
-
-    
 
     // Adding each section
     for i := 0 to BinaryScriptEditor.Sections.Count - 1 do
@@ -401,7 +427,8 @@ begin
     end;
 
   end else
-    Debug.AddLine(ltWarning, 'Unable to load Binary Script !' + S + ']');
+    Debug.Report(ltWarning, 'Unable to load Binary Script !',
+      'FullFileName: "' + FileName + '"');
 
   StatusText := '';
 end;

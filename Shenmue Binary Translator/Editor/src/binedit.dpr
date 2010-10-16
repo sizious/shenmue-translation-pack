@@ -1,6 +1,7 @@
 program binedit;
 
 {$R 'about\credits.res' 'about\credits.rc'}
+{$R 'engine\lzmabin.res' 'engine\lzmabin.rc'}
 
 uses
   Windows,
@@ -15,7 +16,9 @@ uses
   uitools in '..\..\..\Common\uitools.pas',
   about in '..\..\..\Common\About\about.pas' {frmAbout},
   filespec in '..\..\..\Common\filespec.pas',
-  newproj in 'newproj.pas' {frmNewProject};
+  newproj in 'newproj.pas' {frmNewProject},
+  lzmadec in '..\..\..\Common\lzmadec.pas',
+  workdir in '..\..\..\Common\workdir.pas';
 
 {$R *.res}
 
