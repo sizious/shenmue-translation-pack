@@ -93,20 +93,14 @@ object frmMain: TfrmMain
       Caption = 'tbDebugLog'
       ImageIndex = 7
     end
-    object tbOriginal: TToolButton
-      Left = 108
-      Top = 0
-      Caption = 'tbOriginal'
-      ImageIndex = 9
-    end
     object tbCharset: TToolButton
-      Left = 131
+      Left = 108
       Top = 0
       Caption = 'tbCharset'
       ImageIndex = 10
     end
     object ToolButton2: TToolButton
-      Left = 154
+      Left = 131
       Top = 0
       Width = 8
       Caption = 'ToolButton2'
@@ -114,7 +108,7 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object tbAbout: TToolButton
-      Left = 162
+      Left = 139
       Top = 0
       Caption = 'tbAbout'
       ImageIndex = 11
@@ -290,17 +284,6 @@ object frmMain: TfrmMain
         Hint = 'Show/hide the Debug Log window.'
         ShortCut = 16452
         OnClick = miDebugLogClick
-      end
-      object N5: TMenuItem
-        Caption = '-'
-      end
-      object miOriginal: TMenuItem
-        Caption = 'Original text in field'
-        Hint = 
-          'Show untouched subtitles extracted from the game in the old text' +
-          ' field.'
-        ShortCut = 122
-        OnClick = miOriginalClick
       end
       object N6: TMenuItem
         Caption = '-'

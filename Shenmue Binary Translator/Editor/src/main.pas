@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, Menus, ImgList, ToolWin, JvExComCtrls,
   JvToolBar, DebugLog, AppEvnts, BugsMgr, JvListView, ExtCtrls, MkXmlBin,
-  JvExStdCtrls, JvListComb;
+  JvExStdCtrls, JvListComb, JvComponentBase, JvAppCommand;
 
 type
   TfrmMain = class(TForm)
@@ -44,11 +44,8 @@ type
     aeMain: TApplicationEvents;
     miDEBUG_TEST2: TMenuItem;
     miCharset: TMenuItem;
-    N5: TMenuItem;
-    miOriginal: TMenuItem;
     N6: TMenuItem;
     tbCharset: TToolButton;
-    tbOriginal: TToolButton;
     ProjectHome1: TMenuItem;
     N7: TMenuItem;
     Checkforupdate1: TMenuItem;
@@ -84,29 +81,19 @@ type
     procedure ProjectHome1Click(Sender: TObject);
     procedure Checkforupdate1Click(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
-    procedure miOriginalClick(Sender: TObject);
     procedure cbSectionsSelect(Sender: TObject);
     procedure lbStringsClick(Sender: TObject);
   private
-    { Déclarations privées }  
-    fSelectedSubtitleUI: TListItem;
-//    fSelectedSubtitle: TNozomiMotorcycleSequenceSubtitleItem;
+    { Déclarations privées }
     fDebugLogVisible: Boolean;
     fFileModified: Boolean;
-//    fSelectedSubtitlePrevInfo: TSubtitlesTextManagerListItem;
     fQuitOnFailure: Boolean;
-    fPreviewerVisible: Boolean;
     fDecodeSubtitles: Boolean;
-    fOriginalSubtitleField: Boolean;
-    fOriginalSubtitleColumn: Boolean;
-    fOriginalSubtitlesColumnObject: TListColumn;
-    fOriginalSubtitlesColumnObjectWidth: Integer;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
     procedure BugsHandlerQuitRequest(Sender: TObject);
-    procedure Clear(const UpdateOnlyUI: Boolean); overload;
-    procedure Clear; overload;
+    procedure Clear;
     procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
     procedure DebugLogMainFormToFront(Sender: TObject);
     procedure DebugLogVisibilityChange(Sender: TObject; const Visible: Boolean);
@@ -117,22 +104,19 @@ type
     procedure InitBugsHandler;
     procedure InitDebugLog;
     procedure LoadFile(FileName: TFileName);
+    procedure LoadSectionStrings;
+    procedure LoadSelectedString;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
-    procedure SetSelectedSubtitle(const Value: string);
+    function GetSelectedBinaryString: string;
+    procedure SetSelectedBinaryString(const Value: string);
+    property SelectedBinaryString: string read GetSelectedBinaryString
+      write SetSelectedBinaryString;    
     procedure SetStatusText(const Value: string);
     procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
     procedure SetFileModified(const Value: Boolean);
-    procedure UpdateFileModifiedState;
-    procedure SetPreviewerVisible(const Value: Boolean);
     procedure SetDecodeSubtitles(const Value: Boolean);
-    procedure SetOriginalSubtitleField(const Value: Boolean);
-    procedure SetOriginalSubtitleColumn(const Value: Boolean);
-    property OriginalSubtitlesColumnObject: TListColumn
-      read fOriginalSubtitlesColumnObject write fOriginalSubtitlesColumnObject;
-    property OriginalSubtitlesColumnObjectWidth: Integer
-      read fOriginalSubtitlesColumnObjectWidth write fOriginalSubtitlesColumnObjectWidth;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
@@ -142,14 +126,12 @@ type
     property DecodeSubtitles: Boolean read fDecodeSubtitles
       write SetDecodeSubtitles;
     property FileModified: Boolean read fFileModified write SetFileModified;
-    property OriginalSubtitleField: Boolean read fOriginalSubtitleField
-      write SetOriginalSubtitleField;
     property StatusText: string read GetStatusText write SetStatusText;
   end;
 
 var
   frmMain: TfrmMain;
-  DebugLog: TDebugLogHandlerInterface;
+  Debug: TDebugLogHandlerInterface;
   BugsHandler: TBugsHandlerInterface;
   BinaryScriptEditor: TBinaryScriptEditor;
 
@@ -158,21 +140,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, About;
-
-procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
-begin
-  if not UpdateOnlyUI then begin
-    cbSections.Clear;
-  end;
-
-//  UpdateFileModifiedState;
-  SetControlsStateFileOperations(False);
-  SetControlsStateSaveOperation(False);
-
-  StatusText := '';
-  FileModified := False;
-end;
+  Config, UITools, SysTools, About, FileSpec;
 
 procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
 begin
@@ -189,7 +157,7 @@ end;
 procedure TfrmMain.BugsHandlerExceptionCallBack(Sender: TObject;
   ExceptionMessage: string);
 begin
-  DebugLog.AddLine(ltCritical, ExceptionMessage);
+  Debug.AddLine(ltCritical, ExceptionMessage);
 end;
 
 procedure TfrmMain.BugsHandlerQuitRequest(Sender: TObject);
@@ -200,21 +168,12 @@ end;
 
 procedure TfrmMain.BugsHandlerSaveLogRequest(Sender: TObject);
 begin
-  DebugLog.SaveLogFile;
+  Debug.SaveLogFile;
 end;
 
 procedure TfrmMain.cbSectionsSelect(Sender: TObject);
-var
-  Index: Integer;
-  Element: TStringTable;
-  i: Integer;
-
 begin
-  Index := Integer(cbSections.Items.Objects[cbSections.ItemIndex]);
-  Element := BinaryScriptEditor.Sections[Index].Table;
-  lbStrings.Clear;
-  for i := 0 to Element.Count - 1 do
-    lbStrings.Items.Add(Element[i].Text);
+  LoadSectionStrings;
 end;
 
 procedure TfrmMain.Checkforupdate1Click(Sender: TObject);
@@ -224,7 +183,13 @@ end;
 
 procedure TfrmMain.Clear;
 begin
-  Clear(False);
+  cbSections.Clear;
+  SetControlsStateFileOperations(False);
+  SetControlsStateSaveOperation(False);
+  StatusText := '';
+  FileModified := False;
+  mNewString.Clear;
+  mOldString.Clear;
 end;
 
 procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
@@ -273,6 +238,8 @@ begin
   aeMain.OnException := nil;
 
   // Init UI
+  DoubleBuffered := True;
+//  lbStrings.DoubleBuffered := True;
   Caption := Application.Title + ' v' + GetApplicationVersion;
   ToolBarInitControl(Self, tbMain);
   Constraints.MinHeight := Height;
@@ -307,7 +274,7 @@ begin
   BinaryScriptEditor.Free;
 
   // Destroying Debug Log
-  DebugLog.Free;
+  Debug.Free;
 
   // Cleaning Bugs Handler
   BugsHandler.Free;
@@ -341,6 +308,14 @@ begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
+function TfrmMain.GetSelectedBinaryString: string;
+begin
+  Result := '';
+  if (lbStrings.ItemIndex <> -1) and (lbStrings.ItemIndex <> -1) then begin
+    Result := BinaryScriptEditor.Sections[cbSections.ItemIndex].Table[lbStrings.ItemIndex].Text;
+  end;
+end;
+
 function TfrmMain.GetStatusText: string;
 begin
   Result := sbMain.Panels[2].Text;
@@ -356,15 +331,15 @@ begin
     BugsHandler.OnQuitRequest := BugsHandlerQuitRequest;
   except
     on E: Exception do
-      DebugLog.Report(ltWarning, 'Unable to initialize the Bugs Handler!',
+      Debug.Report(ltWarning, 'Unable to initialize the Bugs Handler!',
         'Reason: "' + E.Message + '"');
   end;
 end;
 
 procedure TfrmMain.InitDebugLog;
 begin
-  DebugLog := TDebugLogHandlerInterface.Create;
-  with DebugLog do begin
+  Debug := TDebugLogHandlerInterface.Create;
+  with Debug do begin
     // Setting up events
     OnException := DebugLogExceptionEvent;
     OnMainWindowBringToFront := DebugLogMainFormToFront;
@@ -373,19 +348,18 @@ begin
   end;
 
   // Setting up the properties
-  DebugLog.Configuration := Configuration; // in this order!
+  Debug.Configuration := Configuration; // in this order!
 end;
 
 procedure TfrmMain.lbStringsClick(Sender: TObject);
 begin
-  mOldString.Text := lbStrings.Items[lbStrings.ItemIndex];
-  mNewString.Text := mOldString.Text;
+  LoadSelectedString;
 end;
 
 procedure TfrmMain.LoadFile(FileName: TFileName);
 var
   i: Integer;
-  UpdateUI: Boolean;
+  S: string;
 
 begin
   // Extending filenames
@@ -393,20 +367,74 @@ begin
 
   // Checking the file
   if not FileExists(FileName) then begin
-    DebugLog.Report(ltWarning, 'The file "' + FileName + '" doesn''t exists.',
+    Debug.Report(ltWarning, 'The file "' + FileName + '" doesn''t exists.',
       'FullFileName: ' + FileName);
     Exit;
   end;
 
   // Updating UI
+  Clear;  
   StatusText := 'Loading file...';
-//  Clear(UpdateUI);
 
-  BinaryScriptEditor.LoadFromFile(FileName);
+  S := ' [FileName: "' + FileName + '"';
+  if BinaryScriptEditor.LoadFromFile(FileName) then begin
+    // Debug msg
+    Debug.AddLine(ltInformation, 'Binary Script loaded successfully.' + S
+      + ', Game: "' + GameVersionToString(BinaryScriptEditor.Header.Version)
+      + '", Region: "' + GameRegionToString(BinaryScriptEditor.Header.Region)
+      + '", Platform: "' + PlatformVersionToString(BinaryScriptEditor.Header.PlatformKind)
+      + '"'
+    );
 
-  for i := 0 to BinaryScriptEditor.Sections.Count - 1 do begin
-    cbSections.Items.AddObject(BinaryScriptEditor.Sections[i].Name, Pointer(i));
+    
+
+    // Adding each section
+    for i := 0 to BinaryScriptEditor.Sections.Count - 1 do
+      cbSections.Items.AddObject(BinaryScriptEditor.Sections[i].Name, Pointer(i));
+
+    // Selecting the first item
+    try
+      // select the first section
+      cbSections.ItemIndex := 0;
+      LoadSectionStrings;
+    except
+    end;
+
+  end else
+    Debug.AddLine(ltWarning, 'Unable to load Binary Script !' + S + ']');
+
+  StatusText := '';
+end;
+
+procedure TfrmMain.LoadSectionStrings;
+var
+  Index: Integer;
+  Element: TStringTable;
+  i: Integer;
+
+begin
+  Index := Integer(cbSections.Items.Objects[cbSections.ItemIndex]);
+  Element := BinaryScriptEditor.Sections[Index].Table;
+
+  // Adding each string to the listbox control
+  lbStrings.Clear;  
+  for i := 0 to Element.Count - 1 do
+    lbStrings.Items.Add(Element[i].Text);
+
+  // select the first string
+  try
+    lbStrings.ItemIndex := 0;
+    LoadSelectedString;
+  except
   end;
+end;
+
+procedure TfrmMain.LoadSelectedString;
+begin
+  mOldString.Text := lbStrings.Items[lbStrings.ItemIndex];
+  mNewString.OnChange := nil;
+  mNewString.Text := mOldString.Text;
+  mNewString.OnChange := mNewStringChange;
 end;
 
 procedure TfrmMain.miAboutClick(Sender: TObject);
@@ -437,11 +465,6 @@ begin
       LoadFile(FileName);
 end;
 
-procedure TfrmMain.miOriginalClick(Sender: TObject);
-begin
-  OriginalSubtitleField := not OriginalSubtitleField;
-end;
-
 procedure TfrmMain.miQuitClick(Sender: TObject);
 begin
   Close;
@@ -461,29 +484,29 @@ var
   ReloadFromDisk: Boolean;
 
 begin
-(*  with sdSave do begin
-    FileName := ExtractFileName(SequenceEditor.SourceFileName);
-    Buf := ExtractFileExt(SequenceEditor.SourceFileName);
+  with sdSave do begin
+    FileName := ExtractFileName(BinaryScriptEditor.SourceFileName);
+    Buf := ExtractFileExt(BinaryScriptEditor.SourceFileName);
     DefaultExt := Copy(Buf, 2, Length(Buf) - 1);
 
     // Executing dialog
     if Execute then begin
       StatusText := 'Saving file...';
-      ReloadFromDisk := FileName = SequenceEditor.SourceFileName;
+      ReloadFromDisk := FileName = BinaryScriptEditor.SourceFileName;
 
       // Saving on the disk
-      Buf := ' for "' + SequenceEditor.SourceFileName + '" to "' + FileName + '".';
-      if SequenceEditor.SaveToFile(FileName) then
-        DebugLog.AddLine(ltInformation, 'Save successfully done' + Buf)
+      Buf := ' for "' + BinaryScriptEditor.SourceFileName + '" to "' + FileName + '".';
+      if BinaryScriptEditor.SaveToFile(FileName) then
+        Debug.AddLine(ltInformation, 'Save successfully done' + Buf)
       else
-        DebugLog.Report(ltWarning, 'Unable to do the save !', 'Unable to save' + Buf);
+        Debug.Report(ltWarning, 'Unable to do the save !', 'Unable to save' + Buf);
 
       // Reloading the view if needed
       if ReloadFromDisk then
-        LoadFile(SequenceEditor.SourceFileName);
+        LoadFile(BinaryScriptEditor.SourceFileName);
       StatusText := '';
     end;
-  end;*)
+  end;
 end;
 
 procedure TfrmMain.miSaveClick(Sender: TObject);
@@ -502,14 +525,18 @@ end;
 
 procedure TfrmMain.mNewStringChange(Sender: TObject);
 begin
+  FileModified := True;
+
+  SelectedBinaryString := mNewString.Text;
+
 (*  // Update the subtitle
-  SelectedSubtitle := mNewSub.Text;
+  SelectedSubtitle := mNewSub.Text; *)
 
   // Update the modified state
-  UpdateFileModifiedState;
+//  UpdateFileModifiedState;
 
   // Update Previewer
-  Previewer.Update(SelectedSubtitle);
+(*  Previewer.Update(SelectedSubtitle);
 
   // Update the subtitle length count
   UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);*)
@@ -565,7 +592,7 @@ end;
 
 procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);
 begin
-  DebugLog.Active := Value;
+  Debug.Active := Value;
 end;
 
 procedure TfrmMain.SetDecodeSubtitles(const Value: Boolean);
@@ -605,52 +632,12 @@ begin
   SetControlsStateSaveOperation(fFileModified);
 end;
 
-procedure TfrmMain.SetOriginalSubtitleColumn(const Value: Boolean);
+procedure TfrmMain.SetSelectedBinaryString(const Value: string);
 begin
-(*  fOriginalSubtitleColumn := Value;
-  miOriginalColumn.Checked := Value;
-
-  // Preparing Original Subtitles Column
-  if fOriginalSubtitleColumn then begin
-    if not Assigned(OriginalSubtitlesColumnObject) then begin
-      OriginalSubtitlesColumnObject := lvSubs.Columns.Add;
-      OriginalSubtitlesColumnObject.Caption := 'Original';
-      OriginalSubtitlesColumnObject.Width := OriginalSubtitlesColumnObjectWidth;
-    end;
-  end else
-    if Assigned(OriginalSubtitlesColumnObject) then begin
-      OriginalSubtitlesColumnObjectWidth := OriginalSubtitlesColumnObject.Width;
-      lvSubs.Columns.Delete(OriginalSubtitlesColumnObject.Index);
-      OriginalSubtitlesColumnObject := nil;
-    end;*)
-end;
-
-procedure TfrmMain.SetOriginalSubtitleField(const Value: Boolean);
-begin
-  fOriginalSubtitleField := Value;
-  miOriginal.Checked := Value;
-  tbOriginal.Down := Value;
-end;
-
-procedure TfrmMain.SetPreviewerVisible(const Value: Boolean);
-begin
-(*  fPreviewerVisible := Value;
-  miPreview.Checked := fPreviewerVisible;
-  tbPreview.Down := fPreviewerVisible;
-
-  // Change the previewer state
-  if fPreviewerVisible then
-    Previewer.Show(SelectedSubtitle)
-  else
-    Previewer.Hide;*)
-end;
-
-procedure TfrmMain.SetSelectedSubtitle(const Value: string);
-begin
-(*  if IsSubtitleSelected then begin
-    fSelectedSubtitleUI.SubItems[0] := BR(Value);
-    fSelectedSubtitle.Text := Value;
-  end;*)
+  if (lbStrings.ItemIndex <> -1) and (lbStrings.ItemIndex <> -1) then begin
+    lbStrings.Items[lbStrings.ItemIndex] := Value;
+    BinaryScriptEditor.Sections[cbSections.ItemIndex].Table[lbStrings.ItemIndex].Text := Value;
+  end;
 end;
 
 procedure TfrmMain.SetStatusText(const Value: string);
@@ -666,25 +653,6 @@ procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
   var DefaultDraw: Boolean);
 begin
   ToolBarCustomDraw(Sender);
-end;
-
-procedure TfrmMain.UpdateFileModifiedState;
-var
-  i: Integer;
-  Modified: Boolean;
-  OldSubtitle, NewSubtitle: string;
-
-begin
-(*  Modified := False;
-  for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
-    OldSubtitle := SubtitlesTextManager.Subtitles[i].OriginalText;
-    NewSubtitle := SequenceEditor.Subtitles[i].RawText;
-(*{$IFDEF DEBUG}
-    WriteLn(i, ' Old: "', OldSubtitle, '"', sLineBreak, i, ' New: "', NewSubtitle, '"');
-{$ENDIF}*)
-(*    Modified := Modified or (OldSubtitle <> NewSubtitle);
-  end;
-  FileModified := Modified;*)
 end;
 
 end.
