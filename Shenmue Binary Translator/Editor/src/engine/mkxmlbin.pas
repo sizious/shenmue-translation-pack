@@ -212,6 +212,7 @@ type
     fFileLoaded: Boolean;
     fHeader: TBinaryHeader;
     fDocType: string;
+    fSourceFileName: TFileName;
   protected
     procedure Clear;
     property DocType: string read fDocType;
@@ -219,12 +220,13 @@ type
     constructor Create;
     destructor Destroy; override;
     function LoadFromFile(const FileName: TFileName): Boolean;
-    procedure SaveToFile(const FileName: TFileName);
+    function SaveToFile(const FileName: TFileName): Boolean;
     property Allocations: TAllocationTable read fAllocations;
     property Constants: TFixedStringTable read fReserved;
     property Header: TBinaryHeader read fHeader;
     property Loaded: Boolean read fFileLoaded;
     property Sections: TSectionTable read fSections;
+    property SourceFileName: TFileName read fSourceFileName;
     property Pointers: TPointerTable read fPointers;
   end;
 
@@ -283,6 +285,7 @@ var
 begin
   for i := 0 to Count - 1 do
     Items[i].Free;
+  fPointerTableList.Clear;
 end;
 
 constructor TPointerTable.Create;
@@ -335,6 +338,7 @@ var
 begin
   for i := 0 to Count - 1 do
     Items[i].Free;
+  fStringTableList.Clear;
 end;
 
 constructor TStringTable.Create;
@@ -374,6 +378,7 @@ var
 begin
   for i := 0 to Count - 1 do
     Items[i].Free;
+  fSectionTableList.Clear;
 end;
 
 constructor TSectionTable.Create;
@@ -420,6 +425,7 @@ var
 begin
   for i := 0 to Count - 1 do
     Items[i].Free;
+  fBlocksList.Clear;
 end;
 
 constructor TAllocationTable.Create;
@@ -448,6 +454,7 @@ end;
 
 procedure TBinaryScriptEditor.Clear;
 begin
+  fSourceFileName := '';
   fFileLoaded := False;
   Allocations.Clear;
   Sections.Clear;
@@ -596,13 +603,15 @@ begin
 
         // Allocation Node
         AllocationsNode := RootNode.ChildNodes.FindNode('allocation_table');
-        for i := 0 to AllocationsNode.ChildNodes.Count - 1 do
-          with AllocationsNode.ChildNodes[i] do
-            Allocations.Add(Attributes['addr'], Attributes['size']);
+        if Assigned(AllocationsNode) then        
+          for i := 0 to AllocationsNode.ChildNodes.Count - 1 do
+            with AllocationsNode.ChildNodes[i] do
+              Allocations.Add(Attributes['addr'], Attributes['size']);
 
       end; // IsValidScriptFile
 
       Result := True;
+      fSourceFileName := FileName;
       
     except
       on E:Exception do begin
@@ -619,7 +628,7 @@ begin
   end;
 end;
 
-procedure TBinaryScriptEditor.SaveToFile(const FileName: TFileName);
+function TBinaryScriptEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
   ScriptDocument: IXMLDocument;
   HeaderNode, ScriptNode, SectionNode,
@@ -636,6 +645,7 @@ var
   end;
 
 begin
+//  Result := False;
   ScriptDocument := TXMLDocument.Create(nil);
   try
     try
@@ -755,6 +765,7 @@ begin
   finally
     ScriptDocument.Active := False;
     ScriptDocument := nil;
+    Result := FileExists(FileName);
   end;
 end;
 
@@ -799,6 +810,7 @@ var
 begin
   for i := 0 to Count - 1 do
     Items[i].Free;
+  fFixedStringTableList.Clear;
 end;
 
 constructor TFixedStringTable.Create;
