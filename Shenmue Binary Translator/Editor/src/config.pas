@@ -18,7 +18,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  Forms, SysTools, UITools, Main;
+  Forms, SysTools, UITools, Main, LZMADec;
 
 const
   CONFIG_FILENAME = 'config.xml';
@@ -86,6 +86,7 @@ end;
 
 initialization
 // (nothing)
+
 
 finalization
   Configuration.Free;
