@@ -18,15 +18,39 @@ type
 function CodeStringToGameVersion(S: string): TGameVersion;
 function CodeStringToGameRegion(S: string): TGameRegion;
 function CodeStringToPlatformVersion(S: string): TPlatformVersion;
+function GameRegionCodeStringToString(S: string): string;
 function GameRegionToCodeString(GameRegion: TGameRegion): string;
 function GameRegionToString(GameRegion: TGameRegion): string;
+function GameVersionCodeStringToString(S: string): string;
 function GameVersionToCodeString(GameVersion: TGameVersion; Short: Boolean = False): string;
 function GameVersionToString(GameVersion: TGameVersion): string;
+function PlatformVersionCodeStringToString(S: string): string;
 function PlatformVersionToCodeString(PlatformVersion: TPlatformVersion): string;
 function PlatformVersionToString(PlateformVersion: TPlatformVersion): string;
 
 //------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
+
+function GameVersionCodeStringToString(S: string): string;
+begin
+  Result := GameVersionToString(CodeStringToGameVersion(S));
+end;
+
+//------------------------------------------------------------------------------
+
+function GameRegionCodeStringToString(S: string): string;
+begin
+  Result := GameRegionToString(CodeStringToGameRegion(S));
+end;
+
+//------------------------------------------------------------------------------
+
+function PlatformVersionCodeStringToString(S: string): string;
+begin
+  Result := PlatformVersionToString(CodeStringToPlatformVersion(S));
+end;
+
 //------------------------------------------------------------------------------
 
 function CodeStringToGameVersion(S: string): TGameVersion;
