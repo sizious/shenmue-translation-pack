@@ -9,6 +9,7 @@
     <Projects Include="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" />
     <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
+    <Projects Include="Binary Translator\Editor\src\binedit.dproj" />
     <Projects Include="Font Utility\src\fontutil.dproj" />
     <Projects Include="IDX Creator\src\idxmaker.dproj" />
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
@@ -16,7 +17,6 @@
     <Projects Include="Models Textures Editor\src\mteditor.dproj" />
     <Projects Include="Notebook Editor\src\notebked.dproj" />
     <Projects Include="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" />
-    <Projects Include="Shenmue Binary Translator\Editor\src\binedit.dproj" />
     <Projects Include="SPR Utils\src\sprutils.dproj" />
     <Projects Include="VMU Screen Editor\src\vmulcded.dproj" />
   </ItemGroup>
@@ -153,13 +153,13 @@
     <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
   <Target Name="binedit">
-    <MSBuild Projects="Shenmue Binary Translator\Editor\src\binedit.dproj" Targets="" />
+    <MSBuild Projects="Binary Translator\Editor\src\binedit.dproj" Targets="" />
   </Target>
   <Target Name="binedit:Clean">
-    <MSBuild Projects="Shenmue Binary Translator\Editor\src\binedit.dproj" Targets="Clean" />
+    <MSBuild Projects="Binary Translator\Editor\src\binedit.dproj" Targets="Clean" />
   </Target>
   <Target Name="binedit:Make">
-    <MSBuild Projects="Shenmue Binary Translator\Editor\src\binedit.dproj" Targets="Make" />
+    <MSBuild Projects="Binary Translator\Editor\src\binedit.dproj" Targets="Make" />
   </Target>
   <Target Name="Build">
     <CallTarget Targets="idxwrite;idxmaker;sfqsubed;mteditor;convert;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;hdissect;fontutil;notebked;scinsube;binedit" />
