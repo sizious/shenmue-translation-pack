@@ -21,6 +21,7 @@
 		switch ($page_type) {
 			case "home":
 				$current_photo = "both";
+				$include_css = "<link href=\"styles/home.css\" rel=\"stylesheet\" type=\"text/css\" media=\"screen\" />\n";							
 				$home_active = true;
 				break;
 			case "download":
@@ -124,7 +125,7 @@ if ($page_title !== "") {
 					<li><strong>Shenmue</strong> (ALL) (Dreamcast)</li>
 					<li><strong>Shenmue II</strong> (ALL) (Dreamcast) (Xbox)</li>
 				</ul>
-				<p>Enjoy this cool project!</p>
+				<p>Enjoy this cool project!</p>				
 			</div><!-- Fin Colonne Gauche -->
 		</td>
 		<td class="centre"><div id="separation"></div></td>

@@ -3,6 +3,15 @@
 	include_once("./engine/footer.php");	
 	print_header("home");
 ?>
+
+<div id="fbjoin">
+	<a target="_blank" href="http://www.facebook.com/group.php?gid=120232288011603" title="Join the official Facebook Shenmue Translation Pack group !">
+		<img src="./images/buttons/fbjoin.png" 
+			onmouseover="javascript:this.src='./images/buttons/fbjoindw.png';"
+			onmouseout="javascript:this.src='./images/buttons/fbjoin.png';" />
+	</a>
+</div>
+
 <h1>What's Shenmue ?</h1>
 
 <p>Shenmue is a 1999 adventure game developed by SEGA-AM2 and published by Sega for the Sega Dreamcast, produced and directed by Yu Suzuki.

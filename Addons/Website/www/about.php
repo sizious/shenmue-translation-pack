@@ -8,7 +8,8 @@
 
 <p>Here is the About page... Thanks to visiting us!</p>
 
-<p>So you want to learn more about everything around the project? Keep reading! Please stay in mind that we do all this voluntarily!</p>
+<p>So you want to learn more about everything around the project? Keep reading! Please stay in mind that we do all this voluntarily ! 
+We don't want to make money with this project, and we don't have any delay to complete it. Thank you for your understanding !</p>
 
 <p>We would like to thanks the <a target="_blank" href="http://www.metagames-eu.com/">Metagames</a> community and many other french sites for their support. 
 Also, the international fans of Shenmue who were interested in this project!</p>
@@ -16,7 +17,7 @@ Also, the international fans of Shenmue who were interested in this project!</p>
 <!-- Disclamer -->
 <a name="disclamer"></a><h2>Disclamer</h2>
 
-<p>This project is not here to spread piracy or related methods.</p>
+<p>This project is not here to spread piracy or related methods. We are fans people that would like to have <strong>Shenmue</strong> in our language, the French language. Nothing more.</p>
 
 <div id="warning-wrap" align="center">
 <table cellspacing="0" cellpadding="0" class="warning">
@@ -27,33 +28,32 @@ Also, the international fans of Shenmue who were interested in this project!</p>
 </table>
 </div>
 
-<p>We are fans people that would like to have <strong>Shenmue</strong> in our language, the French language. Nothing more.</p>
-
-<p>If you see here any piracy act or something you don't like, please <a href="#contact">contact us</a>.</p>
+<p>If you see here any piracy act or something you don't like, please <a href="#contact">contact us</a> immediately (please be indulgent... oh, and by the way, we want <strong>Shenmue III</strong> on next-gen hardware !).</p>
 
 <p>This project is not affilated with <a href="http://www.sega.com/" target="_blank">Sega</a> or <strong>AM2</strong> in any way. 
-If you are from these societies and you don't approve this project, please <a href="#content">contact us</a> (please be indulgent! Oh, and by the way, 
-we want <strong>Shenmue III</strong> !).</p>
+If you are from these societies and you don't approve this project, please <a href="#content">contact us</a>. 
+We understand that this project can be considered illegal by copyright laws. We know that modifying copyright materials such games files are illegal. 
+We are doing this only because we are fans people, we don't want to make money with this project. 
+<strong>But if you want to immediately stop this project, just write an <a href="#contact">e-mail</a> and everything will be destroyed (source code, website, everything) as soon as possible</strong>. 
+But, please, we asking you to understand why we are doing this !</p>
 
 <?php print_set_to_top(); ?>
 
-<!-- Credits -->
-<a name="credits"></a><h2>Credits</h2>
+<!-- Contact -->
+<a name="contact"></a><h2>Contact</h2>
 
-<p>Most of the main tools were initially created by <strong>Manic</strong>, the project founder.</p>
+<p>If you want to contact us, please send a mail to:</p>
 
-<p>The <strong>AiO Free Quest Subtitles Editor</strong> and <strong>IDX Creator [console version]</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> with the support of <strong>Manic</strong>.</p>
+<ul id="contact">
+	<li><strong>Manic:</strong> <em>(not affiliated to this project anymore)</em></li>
+	<li><strong>SiZiOUS:</strong> 
+	<a href="javascript:allYourBaseAreBelongToUs('[big_fury]SiZiOUS', 'gm', 'com', 'ail', 'sizious');">
+	sizious <img src="images/logos/kikoolol.png" alt="at"/> gmail d<img src="images/logos/aybabtu.png" alt="o" />t c<img src="images/logos/aybabtu.png" alt="o" />m</li>
+	</a>
+</ul>
 
-<p><strong>Models Textures Editor</strong> was created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
-
-<p><strong>Dreamcast Test Environment</strong> was created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>, based on the
-<a href="download.php#addons">Selfboot DATA Pack</a> by <strong>FamilyGuy</strong>.</p>
-
-<p>Special thanks to 
-<strong>Shendream</strong>, <strong>Sadako</strong>, <strong>Hiei-</strong>, <strong>kogami-san</strong>, <strong>Dark_Neo</strong>, 
-<strong>mimix</strong>, <strong>Sunmingzhao</strong>, <strong>MagicSeb</strong>, <strong>Ayla</strong>, <strong>L@Cible</strong>, <strong>Ti Dragon</strong>,
-<strong>alphaphoenix55</strong>, <strong>FamilyGuy</strong>, <strong>Ryo Suzuki</strong>, <strong>IlDucci</strong>, <strong>PlusTuta</strong> 
-and everyone who supporting us. If we forgot you, <a href="#contact">contact us</a>!</p>
+<p>Click on the mail address or rewrite it on your favorite e-mail client.</p>
+<p>The delay to get an answer is usually very short. If you have written but you got no answer, please resend your e-mail again.</p>
 
 <?php print_set_to_top(); ?>
 
@@ -67,23 +67,35 @@ and everyone who supporting us. If we forgot you, <a href="#contact">contact us<
 <p>The GPL license grants the recipients of a computer program the rights of the free software definition and uses copyleft to ensure the freedoms are preserved, 
 even when the work is changed or added to (Thanks <a target="_blank" href="http://en.wikipedia.org/wiki/GPL">Wikipedia</a> for the English definition).</p>
 
+<p>In clear, do what you want to this tools pack, but don't make money with it.</p>
+
+<p><strong>THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</strong></p>
+
 <?php print_set_to_top(); ?>
 
-<!-- Contact -->
-<a name="contact"></a><h2>Contact</h2>
+<!-- Credits -->
+<a name="credits"></a><h2>Credits</h2>
 
-<p>If you want to contact us, please send a mail to:</p>
+<p>The first versions of this project were initially created by <strong>Manic</strong>, the project founder. All of them were rewritten or updated by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
 
-<ul id="contact">
-	<li><strong>Manic:</strong> <em>(hidden)</em></li>
-	<li><strong>SiZiOUS:</strong> 
-	<a href="javascript:allYourBaseAreBelongToUs('[big_fury]SiZiOUS', 'gm', 'com', 'ail', 'sizious');">
-	sizious <img src="images/logos/kikoolol.png" alt="at"/> gmail d<img src="images/logos/aybabtu.png" alt="o" />t c<img src="images/logos/aybabtu.png" alt="o" />m</li>
-	</a>
-</ul>
+<p><strong>ADPCM Streaming Toolkit</strong> was written by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> using the <a target="_blank" href="http://hcs64.com/vgmstream.html">vgmstream</a> SDK, originally written by <strong>hcs64</strong>.</p>
 
-<p>Click on the mail address or rewrite it on your favorite e-mail client.</p>
+<p>The <strong>Free Quest Subtitles Editor</strong> and <strong>IDX Creator (Console version)</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> with <strong>Manic</strong>'s support.</p>
 
+<p><strong>Models Textures Editor</strong>, <strong>Font Utility</strong>, <strong>VMU Screen Editor</strong>, <strong>IPAC Browser</strong>, <strong>Notebook Editor</strong> and <strong>Nozomi Motorcycle Subtitles Editor</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
+
+<p><strong>Dreamcast Test Environment</strong> was created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>, based on the
+<a href="download.php#addons">Selfboot DATA Pack</a> by <strong>FamilyGuy</strong>.</p>
+
+<p><strong>Binary Translator</strong> was written by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> for the GUI and <strong>Ayla</strong> for the engine.</p>
+
+<p>Special thanks to 
+<strong>Ayla</strong>, <strong>Shendream</strong>, <strong>Sadako</strong>, <strong>Hiei-</strong>, <strong>kogami-san</strong>, <strong>Dark_Neo</strong>, 
+<strong>mimix</strong>, <strong>Sunmingzhao</strong>, <strong>MagicSeb</strong>, <strong>L@Cible</strong>, <strong>Ti Dragon</strong>,
+<strong>alphaphoenix55</strong>, <strong>FamilyGuy</strong>, <strong>Ryo Suzuki</strong>, <strong>IlDucci</strong>, <strong>PlusTuta</strong> 
+and everyone who supporting us. If we forgot you, feel free to <a href="#contact">contact us</a> today !</p>
+	
 <?php 
 	print_set_to_top();
 	print_footer();
