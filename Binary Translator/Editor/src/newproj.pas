@@ -18,6 +18,7 @@ type
     bOK: TButton;
     bCancel: TButton;
     sdNewScript: TSaveDialog;
+    cbCreateDTD: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure bBrowseClick(Sender: TObject);
     procedure bOKClick(Sender: TObject);
@@ -25,10 +26,12 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     fCreationResult: Boolean;
+    fDTDFile: TFileName;
     { Déclarations privées }
     procedure LoadGameVersionList;
     function GetNewFileName: TFileName;
     function GetSelectedSourceScriptFileName: TFileName;
+    property DTDFile: TFileName read fDTDFile;
   public
     { Déclarations publiques }
     function MsgBox(Text, Title: string; Flags: Integer): Integer;
@@ -47,7 +50,10 @@ implementation
 
 uses
   SysTools, LZMADec, XMLDom, XMLIntf, MSXMLDom, XMLDoc, ActiveX, FileSpec,
-  WorkDir, Main, DebugLog;
+  WorkDir, Main, DebugLog, Config;
+
+const
+  BINARY_SCRIPT_DB_DTD = 'binedit.dtd';
 
 type
   TScriptFileNameObject = class(TObject)
@@ -86,11 +92,14 @@ begin
   end;
 
   if LowerCase(ExtractFileExt(NewFileName)) <> '.xml' then
-    eNewFileName.Text := eNewFileName.Text + '.xml';  
+    eNewFileName.Text := eNewFileName.Text + '.xml';
 
   // copy the xml file!
   fCreationResult := CopyFile(GetSelectedSourceScriptFileName, NewFileName, False);
-  
+  if cbCreateDTD.Checked then
+    fCreationResult := fCreationResult and
+      CopyFile(DTDFile, ExtractFilePath(NewFileName) + BINARY_SCRIPT_DB_DTD, False);
+
 {$IFDEF DEBUG}
   WriteLn('GetSelectedSourceScriptFileName: ', GetSelectedSourceScriptFileName,
     sLineBreak, 'NewFileName: ', NewFileName,
@@ -104,6 +113,14 @@ procedure TfrmNewProject.FormCreate(Sender: TObject);
 begin
   LoadGameVersionList;
   eNewFileName.Text := ExtractFilePath(GetApplicationDirectory) + 'new.xml';
+
+  // Reading configuration...
+  with Configuration do begin
+    eNewFileName.Text := ReadString('newproj', 'filename', eNewFileName.Text);
+    cbGameVersionSelect.ItemIndex := ReadInteger('newproj', 'gameversionselected',
+      cbGameVersionSelect.ItemIndex);
+    cbCreateDTD.Checked := ReadBool('newproj', 'createdtd', cbCreateDTD.Checked);
+  end;
   eNewFileName.SelectAll;
 end;
 
@@ -116,6 +133,13 @@ var
 begin
   for i := 0 to cbGameVersionSelect.Items.Count - 1 do
     cbGameVersionSelect.Items.Objects[i].Free;
+
+  // Saving configuration..
+  with Configuration do begin
+    WriteString('newproj', 'filename', eNewFileName.Text);
+    WriteInteger('newproj', 'gameversionselected', cbGameVersionSelect.ItemIndex);
+    WriteBool('newproj', 'createdtd', cbCreateDTD.Checked);    
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -159,10 +183,18 @@ var
   DBExtracted: Boolean;
   
 begin
-  DBExtracted := SevenZipExtract(GetApplicationDataDirectory
-    + BINARY_SCRIPT_DB, GetWorkingTempDirectory);
+  IndexFile := GetWorkingTempDirectory + BINARY_SCRIPT_DB_INDEX;
+
+  // Extracting if needed
+  DBExtracted := FileExists(IndexFile);
+  if not DBExtracted then  
+    DBExtracted := SevenZipExtract(GetApplicationDataDirectory
+      + BINARY_SCRIPT_DB, GetWorkingTempDirectory);
+
+  // Go working
   if DBExtracted then begin
-    IndexFile := GetWorkingTempDirectory + BINARY_SCRIPT_DB_INDEX;
+
+    fDTDFile := GetWorkingTempDirectory + BINARY_SCRIPT_DB_DTD;
     XmlIndex := TXMLDocument.Create(nil);
     try
       try

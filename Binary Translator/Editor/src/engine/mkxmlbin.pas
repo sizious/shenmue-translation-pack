@@ -213,15 +213,19 @@ type
     fHeader: TBinaryHeader;
     fDocType: string;
     fSourceFileName: TFileName;
+    fBinaryStartAddress: LongWord;
   protected
-    procedure Clear;
     property DocType: string read fDocType;
   public
     constructor Create;
     destructor Destroy; override;
+    procedure Clear;    
     function LoadFromFile(const FileName: TFileName): Boolean;
+    function Reload: Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
+    function Save: Boolean;
     property Allocations: TAllocationTable read fAllocations;
+    property BinaryStartAddress: LongWord read fBinaryStartAddress;    
     property Constants: TFixedStringTable read fReserved;
     property Header: TBinaryHeader read fHeader;
     property Loaded: Boolean read fFileLoaded;
@@ -558,6 +562,7 @@ begin
           fPlatformKind :=
             CodeStringToPlatformVersion(HeaderNode.Attributes['platform']);
           fRegion := CodeStringToGameRegion(HeaderNode.Attributes['region']);
+          fBinaryStartAddress := HeaderNode.Attributes['addrbase'];
         end;
 
         // Parsing script
@@ -628,6 +633,16 @@ begin
   end;
 end;
 
+function TBinaryScriptEditor.Reload: Boolean;
+begin
+  Result := LoadFromFile(SourceFileName);
+end;
+
+function TBinaryScriptEditor.Save: Boolean;
+begin
+  Result := SaveToFile(SourceFileName);
+end;
+
 function TBinaryScriptEditor.SaveToFile(const FileName: TFileName): Boolean;
 var
   ScriptDocument: IXMLDocument;
@@ -668,6 +683,8 @@ begin
           PlatformVersionToCodeString(Header.PlatformKind);
         HeaderNode.Attributes['region'] :=
           GameRegionToCodeString(Header.Region);
+        HeaderNode.Attributes['addrbase'] :=
+          IntelHex(BinaryStartAddress);
         DocumentElement.ChildNodes.Add(HeaderNode);
 
         // Writing the script node

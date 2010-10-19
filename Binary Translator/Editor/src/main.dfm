@@ -146,7 +146,6 @@ object frmMain: TfrmMain
       Lines.Strings = (
         '## LINE_1 ##'
         '## LINE_2 ##')
-      MaxLength = 90
       ParentFont = False
       ReadOnly = True
       ScrollBars = ssBoth
@@ -177,7 +176,6 @@ object frmMain: TfrmMain
       Lines.Strings = (
         '## LINE_1 ##'
         '## LINE_2 ##')
-      MaxLength = 90
       ParentFont = False
       ScrollBars = ssBoth
       TabOrder = 0
@@ -252,6 +250,7 @@ object frmMain: TfrmMain
       object miReload: TMenuItem
         Caption = '&Reload...'
         Hint = 'Reload the current selected file from the disk.'
+        ShortCut = 116
         OnClick = miReloadClick
       end
       object N2: TMenuItem
@@ -330,17 +329,8 @@ object frmMain: TfrmMain
     end
     object miDEBUG: TMenuItem
       Caption = 'DEBUG'
-      object miDEBUG_TEST1: TMenuItem
-        Caption = 'SequenceEditor'
-      end
       object miDEBUG_TEST2: TMenuItem
         Caption = 'Exception'
-      end
-      object miDEBUG_TEST3: TMenuItem
-        Caption = 'Charset'
-      end
-      object miDEBUG_TEST4: TMenuItem
-        Caption = 'Strong Test SeqEdit'
       end
     end
   end

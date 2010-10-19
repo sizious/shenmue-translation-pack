@@ -16,6 +16,7 @@ const
   
 function BR(const Text: string): string;
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);
+// procedure ChangeMemoEnabledState(Memo: TMemo; Enable: Boolean);
 procedure CopyMenuItem(SourceItem, DestinationItem: TMenuItem);
 procedure DoRightClickSelection;
 procedure EditSetCaretEndPosition(const EditHandle: THandle);
@@ -114,6 +115,17 @@ begin
   GetWindowLong(Handle, GWL_STYLE) or ES_NUMBER);
 end;
 
+//------------------------------------------------------------------------------
+(*
+procedure ChangeMemoEnabledState(Memo: TMemo; Enable: Boolean);
+begin
+  Memo.Enabled := Enable;
+  if Enable then
+    Memo.Color := clWindow
+  else
+    Memo.Color := clBtnFace;
+end;
+*)
 //------------------------------------------------------------------------------
 
 procedure ChangeEditEnabledState(Edit: TEdit; Enable: Boolean);

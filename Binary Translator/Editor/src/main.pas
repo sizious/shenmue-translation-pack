@@ -28,7 +28,6 @@ type
     miView: TMenuItem;
     miHelp: TMenuItem;
     miDEBUG: TMenuItem;
-    miDEBUG_TEST1: TMenuItem;
     miSave: TMenuItem;
     odOpen: TOpenDialog;
     sdSave: TSaveDialog;
@@ -49,8 +48,6 @@ type
     ProjectHome1: TMenuItem;
     N7: TMenuItem;
     Checkforupdate1: TMenuItem;
-    miDEBUG_TEST3: TMenuItem;
-    miDEBUG_TEST4: TMenuItem;
     GroupBox1: TGroupBox;
     mOldString: TMemo;
     GroupBox2: TGroupBox;
@@ -112,12 +109,14 @@ type
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     function GetSelectedBinaryString: string;
     procedure SetSelectedBinaryString(const Value: string);
+    function GetSectionIndex: Integer;
     property SelectedBinaryString: string read GetSelectedBinaryString
       write SetSelectedBinaryString;    
     procedure SetStatusText(const Value: string);
     procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
+    procedure SetControlsStateInterface(State: Boolean);
     procedure SetFileModified(const Value: Boolean);
     procedure SetDecodeSubtitles(const Value: Boolean);
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
@@ -129,6 +128,7 @@ type
     property DecodeSubtitles: Boolean read fDecodeSubtitles
       write SetDecodeSubtitles;
     property FileModified: Boolean read fFileModified write SetFileModified;
+    property SelectedSectionIndex: Integer read GetSectionIndex;
     property StatusText: string read GetStatusText write SetStatusText;
   end;
 
@@ -186,13 +186,15 @@ end;
 
 procedure TfrmMain.Clear;
 begin
+  SetControlsStateInterface(False);
+  BinaryScriptEditor.Clear;
   cbSections.Clear;
-  SetControlsStateFileOperations(False);
-  SetControlsStateSaveOperation(False);
-  StatusText := '';
-  FileModified := False;
+  lbStrings.Clear;
   mNewString.Clear;
   mOldString.Clear;
+  FileModified := False;
+  StatusText := '';
+  SetControlsStateFileOperations(False);
 end;
 
 procedure TfrmMain.DebugLogExceptionEvent(Sender: TObject; E: Exception);
@@ -337,11 +339,20 @@ begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
 end;
 
+function TfrmMain.GetSectionIndex: Integer;
+begin
+  try
+    Result := Integer(cbSections.Items.Objects[cbSections.ItemIndex]);
+  except
+    Result := -1;
+  end;
+end;
+
 function TfrmMain.GetSelectedBinaryString: string;
 begin
   Result := '';
-  if (lbStrings.ItemIndex <> -1) and (lbStrings.ItemIndex <> -1) then begin
-    Result := BinaryScriptEditor.Sections[cbSections.ItemIndex].Table[lbStrings.ItemIndex].Text;
+  if (SelectedSectionIndex <> -1) and (lbStrings.ItemIndex <> -1) then begin
+    Result := BinaryScriptEditor.Sections[SelectedSectionIndex].Table[lbStrings.ItemIndex].Text;
   end;
 end;
 
@@ -388,10 +399,12 @@ end;
 procedure TfrmMain.LoadFile(FileName: TFileName);
 var
   i: Integer;
-
+  UpdateUI: Boolean;
+  
 begin
   // Extending filenames
   FileName := ExpandFileName(FileName);
+  UpdateUI := SameText(FileName, BinaryScriptEditor.SourceFileName);
 
   // Checking the file
   if not FileExists(FileName) then begin
@@ -401,47 +414,54 @@ begin
   end;
 
   // Updating UI
-  Clear;  
-  StatusText := 'Loading file...';
+  if not UpdateUI then begin
+    Clear;
+    
+    // Loading the file
+    StatusText := 'Loading file...';
+    if BinaryScriptEditor.LoadFromFile(FileName) then begin
+      // Debug msg
+      Debug.AddLine(ltInformation, 'Binary Script loaded successfully.'
+        + ' [FullFileName: "' + FileName + '"'
+        + ', Game: "' + GameVersionToString(BinaryScriptEditor.Header.Version)
+        + '", Region: "' + GameRegionToString(BinaryScriptEditor.Header.Region)
+        + '", Platform: "' + PlatformVersionToString(BinaryScriptEditor.Header.PlatformKind)
+        + '"]'
+      );
 
-  if BinaryScriptEditor.LoadFromFile(FileName) then begin
-    // Debug msg
-    Debug.AddLine(ltInformation, 'Binary Script loaded successfully.'
-      + ' [FullFileName: "' + FileName + '"'
-      + ', Game: "' + GameVersionToString(BinaryScriptEditor.Header.Version)
-      + '", Region: "' + GameRegionToString(BinaryScriptEditor.Header.Region)
-      + '", Platform: "' + PlatformVersionToString(BinaryScriptEditor.Header.PlatformKind)
-      + '"]'
-    );
+      // Adding each section
+      for i := 0 to BinaryScriptEditor.Sections.Count - 1 do
+        cbSections.Items.AddObject(BinaryScriptEditor.Sections[i].Name, Pointer(i));
 
-    // Adding each section
-    for i := 0 to BinaryScriptEditor.Sections.Count - 1 do
-      cbSections.Items.AddObject(BinaryScriptEditor.Sections[i].Name, Pointer(i));
+      // Selecting the first item
+      try
+        // select the first section
+        cbSections.ItemIndex := 0;
+        LoadSectionStrings;
+      except
+      end;
 
-    // Selecting the first item
-    try
-      // select the first section
-      cbSections.ItemIndex := 0;
-      LoadSectionStrings;
-    except
-    end;
+    end else // unable to load!
+      Debug.Report(ltWarning, 'Unable to load Binary Script !',
+        'FullFileName: "' + FileName + '"');
 
   end else
-    Debug.Report(ltWarning, 'Unable to load Binary Script !',
-      'FullFileName: "' + FileName + '"');
+    FileModified := False;
+
+  // Updating UI
+  SetControlsStateFileOperations(BinaryScriptEditor.Loaded);
+  SetControlsStateInterface(BinaryScriptEditor.Loaded);
 
   StatusText := '';
 end;
 
 procedure TfrmMain.LoadSectionStrings;
 var
-  Index: Integer;
   Element: TStringTable;
   i: Integer;
 
 begin
-  Index := Integer(cbSections.Items.Objects[cbSections.ItemIndex]);
-  Element := BinaryScriptEditor.Sections[Index].Table;
+  Element := BinaryScriptEditor.Sections[SelectedSectionIndex].Table;
 
   // Adding each string to the listbox control
   lbStrings.Clear;  
@@ -500,9 +520,11 @@ end;
 procedure TfrmMain.miReloadClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
-(*  LoadFile(SequenceEditor.SourceFileName);
-  DebugLog.AddLine(ltInformation, 'Successfully reloaded the file "'
-    + SequenceEditor.SourceFileName + '".');*)
+  StatusText := 'Reloading...';
+  Sleep(200);
+  LoadFile(BinaryScriptEditor.SourceFileName);
+  Debug.AddLine(ltInformation, 'Successfully reloaded the file "'
+    + BinaryScriptEditor.SourceFileName + '".');
 end;
 
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
@@ -519,7 +541,7 @@ begin
     // Executing dialog
     if Execute then begin
       StatusText := 'Saving file...';
-      ReloadFromDisk := FileName = BinaryScriptEditor.SourceFileName;
+      ReloadFromDisk := (FileName = BinaryScriptEditor.SourceFileName);
 
       // Saving on the disk
       Buf := ' for "' + BinaryScriptEditor.SourceFileName + '" to "' + FileName + '".';
@@ -538,35 +560,22 @@ end;
 
 procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
-(*  StatusText := 'Saving file...';
-  if SequenceEditor.Save then
-    DebugLog.AddLine(ltInformation, Format('Save successfully done on the ' +
-      'disk for "%s".', [SequenceEditor.SourceFileName])
+  StatusText := 'Saving file...';
+  if BinaryScriptEditor.Save then
+    Debug.AddLine(ltInformation, Format('Save successfully done on the ' +
+      'disk for "%s".', [BinaryScriptEditor.SourceFileName])
     )
   else
-    DebugLog.Report(ltWarning, 'Unable to save the file on the disk!',
-      Format('Unable to save on disk for "%s".', [SequenceEditor.SourceFileName])
+    Debug.Report(ltWarning, 'Unable to save the file on the disk!',
+      Format('Unable to save on disk for "%s".', [BinaryScriptEditor.SourceFileName])
     );
-  LoadFile(SequenceEditor.SourceFileName);*)
+  LoadFile(BinaryScriptEditor.SourceFileName);
 end;
 
 procedure TfrmMain.mNewStringChange(Sender: TObject);
 begin
   FileModified := True;
-
   SelectedBinaryString := mNewString.Text;
-
-(*  // Update the subtitle
-  SelectedSubtitle := mNewSub.Text; *)
-
-  // Update the modified state
-//  UpdateFileModifiedState;
-
-  // Update Previewer
-(*  Previewer.Update(SelectedSubtitle);
-
-  // Update the subtitle length count
-  UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);*)
 end;
 
 function TfrmMain.SaveFileOnDemand(CancelButton: Boolean): Boolean;
@@ -600,14 +609,16 @@ end;
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
 begin
   miClose.Enabled := State;
-(*  miImport.Enabled := State;
-  miImport2.Enabled := State;
-  tbImport.Enabled := State;
-  miExport.Enabled := State;
-  miExport2.Enabled := State;
-  tbExport.Enabled := State; *)
   miReload.Enabled := State;
   tbReload.Enabled := State;
+end;
+
+procedure TfrmMain.SetControlsStateInterface(State: Boolean);
+begin
+  cbSections.Enabled := State;
+  lbStrings.Enabled := State;
+  mNewString.Enabled := State;
+  mOldString.Enabled := State;
 end;
 
 procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);
@@ -623,30 +634,10 @@ begin
 end;
 
 procedure TfrmMain.SetDecodeSubtitles(const Value: Boolean);
-var
-  i: Integer;
-  ListItem: TListItem;
-
 begin
   fDecodeSubtitles := Value;
   tbCharset.Down := fDecodeSubtitles;
   miCharset.Checked := fDecodeSubtitles;
-
-  // Update the SequenceEditor
-(*  SequenceEditor.Subtitles.DecodeText := fDecodeSubtitles;
-
-  // Update the GUI: ListView
-  for i := 0 to lvSubs.Items.Count - 1 do begin
-    ListItem := lvSubs.FindData(0, Pointer(i), True, False);
-    if Assigned(ListItem) then begin
-      ListItem.SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
-      ListItem.SubItems[1] := BR(SequenceEditor.Subtitles.TransformText(SubtitlesTextManager.Subtitles[i].InitialText));
-    end;
-  end;
-
-  // Update the GUI: Memos
-  mOldSub.Text := SequenceEditor.Subtitles.TransformText(mOldSub.Text);
-  mNewSub.Text := SequenceEditor.Subtitles.TransformText(mNewSub.Text);*)
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);
@@ -663,7 +654,7 @@ procedure TfrmMain.SetSelectedBinaryString(const Value: string);
 begin
   if (lbStrings.ItemIndex <> -1) and (lbStrings.ItemIndex <> -1) then begin
     lbStrings.Items[lbStrings.ItemIndex] := Value;
-    BinaryScriptEditor.Sections[cbSections.ItemIndex].Table[lbStrings.ItemIndex].Text := Value;
+    BinaryScriptEditor.Sections[SelectedSectionIndex].Table[lbStrings.ItemIndex].Text := Value;
   end;
 end;
 
