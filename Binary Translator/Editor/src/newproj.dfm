@@ -3,7 +3,7 @@ object frmNewProject: TfrmNewProject
   Top = 0
   BorderStyle = bsDialog
   Caption = 'New Project'
-  ClientHeight = 171
+  ClientHeight = 188
   ClientWidth = 369
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -26,12 +26,12 @@ object frmNewProject: TfrmNewProject
     Height = 26
     Caption = 
       'Please select the Game version in the list below and the locatio' +
-      'n where the new translation script will be saved.'
+      'n where the new translation script will be created.'
     WordWrap = True
   end
   object Bevel1: TBevel
     Left = 7
-    Top = 138
+    Top = 156
     Width = 354
     Height = 2
   end
@@ -39,7 +39,7 @@ object frmNewProject: TfrmNewProject
     Left = 7
     Top = 87
     Width = 354
-    Height = 45
+    Height = 63
     Caption = ' New script location : '
     TabOrder = 0
     object bBrowse: TButton
@@ -57,6 +57,16 @@ object frmNewProject: TfrmNewProject
       Width = 301
       Height = 21
       TabOrder = 1
+    end
+    object cbCreateDTD: TCheckBox
+      Left = 8
+      Top = 43
+      Width = 334
+      Height = 14
+      Caption = 'Generate Document Type Definition (DTD) with the XML Script'
+      Checked = True
+      State = cbChecked
+      TabOrder = 2
     end
   end
   object GroupBox2: TGroupBox
@@ -78,7 +88,7 @@ object frmNewProject: TfrmNewProject
   end
   object bOK: TButton
     Left = 172
-    Top = 142
+    Top = 160
     Width = 93
     Height = 25
     Caption = '&OK'
@@ -89,7 +99,7 @@ object frmNewProject: TfrmNewProject
   end
   object bCancel: TButton
     Left = 268
-    Top = 142
+    Top = 160
     Width = 93
     Height = 25
     Caption = '&Cancel'
