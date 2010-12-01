@@ -298,7 +298,7 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object miCharset: TMenuItem
-        Caption = 'D&ecode subtitles'
+        Caption = 'D&ecode strings'
         Hint = 'Translate the Shenmue charset to Windows charset and vice-versa.'
         ShortCut = 117
         OnClick = miCharsetClick

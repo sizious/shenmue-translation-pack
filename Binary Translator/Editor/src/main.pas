@@ -89,10 +89,21 @@ type
     fFileModified: Boolean;
     fQuitOnFailure: Boolean;
     fDecodeSubtitles: Boolean;
+    fCharsetFileShenmue2: TFileName;
+    fCharsetFileShenmue: TFileName;
+    fCharsetCanEnableShenmue2: Boolean;
+    fCharsetCanEnableShenmue: Boolean;
+    fSaveCommandRequest: Boolean;
     procedure BugsHandlerExceptionCallBack(Sender: TObject;
       ExceptionMessage: string);
     procedure BugsHandlerSaveLogRequest(Sender: TObject);
     procedure BugsHandlerQuitRequest(Sender: TObject);
+    property CharsetCanEnableShenmue: Boolean read fCharsetCanEnableShenmue;
+    property CharsetCanEnableShenmue2: Boolean read fCharsetCanEnableShenmue2;
+    property CharsetFileShenmue: TFileName read fCharsetFileShenmue
+      write fCharsetFileShenmue;
+    property CharsetFileShenmue2: TFileName read fCharsetFileShenmue2
+      write fCharsetFileShenmue2;
     procedure Clear;
     procedure DebugLogExceptionEvent(Sender: TObject; E: Exception);
     procedure DebugLogMainFormToFront(Sender: TObject);
@@ -106,12 +117,16 @@ type
     procedure LoadFile(FileName: TFileName);
     procedure LoadSectionStrings;
     procedure LoadSelectedString;
+    procedure LoadShenmueCharset;
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     function GetSelectedBinaryString: string;
     procedure SetSelectedBinaryString(const Value: string);
     function GetSectionIndex: Integer;
+    function GetSelectedSectionItem: TSectionTableItem;
+    procedure SetControlsStateCharsetOperations(State: Boolean);
+    procedure SetControlsStateCharsetOperationsChecked(Checked: Boolean);
     property SelectedBinaryString: string read GetSelectedBinaryString
-      write SetSelectedBinaryString;    
+      write SetSelectedBinaryString;
     procedure SetStatusText(const Value: string);
     procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
@@ -119,6 +134,9 @@ type
     procedure SetControlsStateInterface(State: Boolean);
     procedure SetFileModified(const Value: Boolean);
     procedure SetDecodeSubtitles(const Value: Boolean);
+    function TransformText(const S: string): string;
+    property SaveCommandRequest: Boolean read fSaveCommandRequest write
+      fSaveCommandRequest;
     property QuitOnFailure: Boolean read fQuitOnFailure write fQuitOnFailure;
   public
     { Déclarations publiques }
@@ -129,6 +147,7 @@ type
       write SetDecodeSubtitles;
     property FileModified: Boolean read fFileModified write SetFileModified;
     property SelectedSectionIndex: Integer read GetSectionIndex;
+    property SelectedSectionItem: TSectionTableItem read GetSelectedSectionItem;
     property StatusText: string read GetStatusText write SetStatusText;
   end;
 
@@ -294,6 +313,17 @@ begin
 end;
 
 procedure TfrmMain.ModulesInit;
+
+  function CheckCharsetExists(FileName: TFileName; Version: TGameVersion): Boolean;
+  begin
+    Result := FileExists(FileName);
+    if not Result then
+      Debug.Report(ltWarning, 'Sorry, the ' + GameVersionToString(Version)
+        + ' Charset list wasn''t found! The '
+        + 'Shenmue Decode subtitle function won''t be available.',
+        'FileName: "' + FileName + '".');
+  end;
+  
 begin
   // Init Bugs Handler
   InitBugsHandler;
@@ -301,14 +331,21 @@ begin
   // Init Debug Log
   InitDebugLog;
 
+  // Init the Binary Script Editor Engine
   BinaryScriptEditor := TBinaryScriptEditor.Create;
 
   // Init the About Box
   InitAboutBox(
     Application.Title,
-    GetApplicationVersion,
-    'Binary Editor'
-  );  
+    GetApplicationVersion
+  );
+
+  // Prepare Charset Functionality
+  CharsetFileShenmue := GetApplicationDataDirectory + 'chrlist1.csv';
+  fCharsetCanEnableShenmue := CheckCharsetExists(CharsetFileShenmue, gvShenmue);
+  CharsetFileShenmue2 := GetapplicationDataDirectory + 'chrlist2.csv';
+  fCharsetCanEnableShenmue2 := CheckCharsetExists(CharsetFileShenmue2, gvShenmue2);
+  DecodeSubtitles := CharsetCanEnableShenmue or CharsetCanEnableShenmue2;  
 end;
 
 function TfrmMain.MsgBox(Text, Caption: string; Flags: Integer): Integer;
@@ -354,6 +391,11 @@ begin
   if (SelectedSectionIndex <> -1) and (lbStrings.ItemIndex <> -1) then begin
     Result := BinaryScriptEditor.Sections[SelectedSectionIndex].Table[lbStrings.ItemIndex].Text;
   end;
+end;
+
+function TfrmMain.GetSelectedSectionItem: TSectionTableItem;
+begin
+  Result := BinaryScriptEditor.Sections[SelectedSectionIndex];
 end;
 
 function TfrmMain.GetStatusText: string;
@@ -408,7 +450,7 @@ begin
 
   // Checking the file
   if not FileExists(FileName) then begin
-    Debug.Report(ltWarning, 'The file selected doesn''t exists.',
+    Debug.Report(ltWarning, 'The specified script file doesn''t exists !',
       'FullFileName: "' + FileName + '"');
     Exit;
   end;
@@ -420,6 +462,9 @@ begin
     // Loading the file
     StatusText := 'Loading file...';
     if BinaryScriptEditor.LoadFromFile(FileName) then begin
+      // Loading the charset
+      LoadShenmueCharset;
+
       // Debug msg
       Debug.AddLine(ltInformation, 'Binary Script loaded successfully.'
         + ' [FullFileName: "' + FileName + '"'
@@ -445,8 +490,23 @@ begin
       Debug.Report(ltWarning, 'Unable to load Binary Script !',
         'FullFileName: "' + FileName + '"');
 
-  end else
+  end else begin
+
+    if BinaryScriptEditor.Reload then begin
+      if not SaveCommandRequest then
+        Debug.AddLine(ltInformation, 'Successfully reloaded the file "'
+          + BinaryScriptEditor.SourceFileName + '".')
+    end else
+      Debug.Report(ltWarning, 'Failed when reloading the file !',
+        'FullFileName: ' + BinaryScriptEditor.SourceFileName);
+    
+    // Reload current selected section strings
+    for i := 0 to SelectedSectionItem.Table.Count - 1 do
+      lbStrings.Items[i] := SelectedSectionItem.Table[i].Text;
+
+    // Disable save command
     FileModified := False;
+  end;
 
   // Updating UI
   SetControlsStateFileOperations(BinaryScriptEditor.Loaded);
@@ -521,10 +581,8 @@ procedure TfrmMain.miReloadClick(Sender: TObject);
 begin
   if not SaveFileOnDemand(True) then Exit;
   StatusText := 'Reloading...';
-  Sleep(200);
+  Sleep(100);
   LoadFile(BinaryScriptEditor.SourceFileName);
-  Debug.AddLine(ltInformation, 'Successfully reloaded the file "'
-    + BinaryScriptEditor.SourceFileName + '".');
 end;
 
 procedure TfrmMain.miSaveAsClick(Sender: TObject);
@@ -560,6 +618,7 @@ end;
 
 procedure TfrmMain.miSaveClick(Sender: TObject);
 begin
+  SaveCommandRequest := True;
   StatusText := 'Saving file...';
   if BinaryScriptEditor.Save then
     Debug.AddLine(ltInformation, Format('Save successfully done on the ' +
@@ -626,6 +685,7 @@ begin
   tbSave.Enabled := State;
   miSave.Enabled := State;
   miSaveAs.Enabled := State;
+  SaveCommandRequest := False;
 end;
 
 procedure TfrmMain.SetDebugLogVisible(const Value: Boolean);
@@ -634,10 +694,31 @@ begin
 end;
 
 procedure TfrmMain.SetDecodeSubtitles(const Value: Boolean);
+var
+  i: Integer;
+
 begin
   fDecodeSubtitles := Value;
-  tbCharset.Down := fDecodeSubtitles;
-  miCharset.Checked := fDecodeSubtitles;
+
+  // Update the GUI options controls
+  SetControlsStateCharsetOperationsChecked(DecodeSubtitles);
+
+  // Update the Binary Script Editor
+  BinaryScriptEditor.Sections.DecodeText := DecodeSubtitles;
+
+  // Update the GUI
+  if BinaryScriptEditor.Loaded then begin
+
+    // ListBox
+    for i := 0 to SelectedSectionItem.Table.Count - 1 do
+      lbStrings.Items[i] := SelectedSectionItem.Table[i].Text;
+
+    // Memos
+    mNewString.OnChange := nil;
+    mOldString.Text := TransformText(mOldString.Text);
+    mNewString.Text := TransformText(mNewString.Text);
+    mNewString.OnChange := mNewStringChange;
+  end;
 end;
 
 procedure TfrmMain.SetFileModified(const Value: Boolean);
@@ -671,6 +752,59 @@ procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
   var DefaultDraw: Boolean);
 begin
   ToolBarCustomDraw(Sender);
+end;
+
+function TfrmMain.TransformText(const S: string): string;
+begin
+  if DecodeSubtitles then
+    Result := BinaryScriptEditor.Charset.Decode(S)
+  else
+    Result := BinaryScriptEditor.Charset.Encode(S);
+end;
+
+procedure TfrmMain.LoadShenmueCharset;
+var
+  CharsetFile: TFileName;
+  CharsetCanEnable: Boolean;
+
+begin
+  CharsetCanEnable := False;
+  CharsetFile := '';
+  
+  // Determine the right charset to use
+  case BinaryScriptEditor.Header.Version of
+    gvShenmue: // or gvUSShenmue
+      begin
+        CharsetFile := CharsetFileShenmue;
+        CharsetCanEnable := CharsetCanEnableShenmue;
+      end;
+    gvShenmue2:
+      begin
+        CharsetFile := CharsetFileShenmue2;
+        CharsetCanEnable := CharsetCanEnableShenmue2;
+      end;
+  end;
+
+  // Change the buttons state
+  SetControlsStateCharsetOperations(CharsetCanEnable);
+
+  // Apply the charset
+  if CharsetCanEnable then
+    BinaryScriptEditor.Charset.LoadFromFile(CharsetFile);
+end;
+
+procedure TfrmMain.SetControlsStateCharsetOperations(State: Boolean);
+begin
+  tbCharset.Enabled := State;
+  miCharset.Enabled := tbCharset.Enabled;
+  SetControlsStateCharsetOperationsChecked(State and DecodeSubtitles);
+  BinaryScriptEditor.Sections.DecodeText := State and DecodeSubtitles;
+end;
+
+procedure TfrmMain.SetControlsStateCharsetOperationsChecked(Checked: Boolean);
+begin
+  tbCharset.Down := Checked;
+  miCharset.Checked := Checked;
 end;
 
 end.

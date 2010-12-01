@@ -3,7 +3,7 @@ unit MkXmlBin;
 interface
 
 uses
-  Windows, SysUtils, Classes, FileSpec;
+  Windows, SysUtils, Classes, FileSpec, ChrCodec;
   
 type
   TBinaryScriptEditor = class;
@@ -63,32 +63,46 @@ type
 //------------------------------------------------------------------------------
 // STRINGS MANAGER
 // -----------------------------------------------------------------------------
+  TSectionTableItem = class;
+  TStringTable = class;
 
   // Generic object containg a string and its associated pointers list
   TStringTableItem = class(TObject)
   private
     fText: string;
     fAddresses: TAddressList;
+    fOwner: TStringTable;
+    function GetText: string;
+    procedure SetText(const Value: string);
+    function GetCharsetMainObject: TShenmueCharsetCodec;
+    function GetDecodeText: Boolean;
+  protected
+    property Charset: TShenmueCharsetCodec read GetCharsetMainObject;
+    property DecodeText: Boolean read GetDecodeText;
   public
-    constructor Create;
+    constructor Create(AOwner: TStringTable);
     destructor Destroy; override;
     property Addresses: TAddressList read fAddresses;
-    property Text: string read fText write fText;
+    property RawText: string read fText;
+    property Text: string read GetText write SetText;
+    property Owner: TStringTable read fOwner;
   end;
 
   TStringTable = class(TObject)
   private
     fStringTableList: TList;
+    fOwner: TSectionTableItem;
     function GetCount: Integer;
     function GetItem(Index: Integer): TStringTableItem;
   protected
     function Add: TStringTableItem;
     procedure Clear;
   public
-    constructor Create;
+    constructor Create(AOwner: TSectionTableItem);
     destructor Destroy; override;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TStringTableItem read GetItem; default;
+    property Owner: TSectionTableItem read fOwner;
   end;
 
 //------------------------------------------------------------------------------
@@ -125,31 +139,39 @@ type
 // SECTIONS TABLE
 // -----------------------------------------------------------------------------
 
+  TSectionTable = class;
+  
   TSectionTableItem = class(TObject)
   private
     fStringTable: TStringTable;
     fName: string;
+    fOwner: TSectionTable;
   public
-    constructor Create;
+    constructor Create(AOwner: TSectionTable);
     destructor Destroy; override;
     property Name: string read fName;
     property Table: TStringTable read fStringTable;
+    property Owner: TSectionTable read fOwner;
   end;
 
   // Object containing every string can be translated by the tool
   TSectionTable = class(TObject)
   private
     fSectionTableList: TList;
+    fDecodeText: Boolean;
+    fOwner: TBinaryScriptEditor;
     function GetCount: Integer;
     function GetItem(Index: Integer): TSectionTableItem;
-  protected    
+  protected
     function Add: TSectionTableItem;
     procedure Clear;
   public
-    constructor Create;
+    constructor Create(AOwner: TBinaryScriptEditor);
     destructor Destroy; override;
     property Count: Integer read GetCount;
+    property DecodeText: Boolean read fDecodeText write fDecodeText;
     property Items[Index: Integer]: TSectionTableItem read GetItem; default;
+    property Owner: TBinaryScriptEditor read fOwner;
   end;
 
 //------------------------------------------------------------------------------
@@ -214,20 +236,24 @@ type
     fDocType: string;
     fSourceFileName: TFileName;
     fBinaryStartAddress: LongWord;
+    fCharset: TShenmueCharsetCodec;
+    fIncludeDocType: Boolean;
   protected
     property DocType: string read fDocType;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Clear;    
+    procedure Clear;
     function LoadFromFile(const FileName: TFileName): Boolean;
     function Reload: Boolean;
     function SaveToFile(const FileName: TFileName): Boolean;
     function Save: Boolean;
     property Allocations: TAllocationTable read fAllocations;
-    property BinaryStartAddress: LongWord read fBinaryStartAddress;    
+    property BinaryStartAddress: LongWord read fBinaryStartAddress;
+    property Charset: TShenmueCharsetCodec read fCharset;
     property Constants: TFixedStringTable read fReserved;
     property Header: TBinaryHeader read fHeader;
+    property IncludeDocType: Boolean read fIncludeDocType write fIncludeDocType;
     property Loaded: Boolean read fFileLoaded;
     property Sections: TSectionTable read fSections;
     property SourceFileName: TFileName read fSourceFileName;
@@ -316,8 +342,9 @@ end;
 
 { TStringTableItem }
 
-constructor TStringTableItem.Create;
+constructor TStringTableItem.Create(AOwner: TStringTable);
 begin
+  fOwner := AOwner;
   fAddresses := TAddressList.Create;
 end;
 
@@ -327,11 +354,37 @@ begin
   inherited;
 end;
 
+function TStringTableItem.GetCharsetMainObject: TShenmueCharsetCodec;
+begin
+  Result := Owner.Owner.Owner.Owner.Charset; // funky !! but it's correct.
+end;
+
+function TStringTableItem.GetDecodeText: Boolean;
+begin
+  Result := Owner.Owner.Owner.DecodeText; // funky too...
+end;
+
+function TStringTableItem.GetText: string;
+begin
+  if DecodeText then
+    Result := Charset.Decode(fText)
+  else
+    Result := fText;
+end;
+
+procedure TStringTableItem.SetText(const Value: string);
+begin
+  if DecodeText then
+    fText := Charset.Encode(Value)
+  else
+    fText := Value;
+end;
+
 { TStringTable }
 
 function TStringTable.Add: TStringTableItem;
 begin
-  Result := TStringTableItem.Create;
+  Result := TStringTableItem.Create(Self);
   fStringTableList.Add(Result);
 end;
 
@@ -345,8 +398,9 @@ begin
   fStringTableList.Clear;
 end;
 
-constructor TStringTable.Create;
+constructor TStringTable.Create(AOwner: TSectionTableItem);
 begin
+  fOwner := AOwner;
   fStringTableList := TList.Create;
 end;
 
@@ -371,7 +425,7 @@ end;
 
 function TSectionTable.Add: TSectionTableItem;
 begin
-  Result := TSectionTableItem.Create;
+  Result := TSectionTableItem.Create(Self);
   fSectionTableList.Add(Result);
 end;
 
@@ -385,8 +439,9 @@ begin
   fSectionTableList.Clear;
 end;
 
-constructor TSectionTable.Create;
+constructor TSectionTable.Create(AOwner: TBinaryScriptEditor);
 begin
+  fOwner := AOwner;
   fSectionTableList := TList.Create;
 end;
 
@@ -458,27 +513,30 @@ end;
 
 procedure TBinaryScriptEditor.Clear;
 begin
-  fSourceFileName := '';
   fFileLoaded := False;
   Allocations.Clear;
   Sections.Clear;
   Pointers.Clear;
   Constants.Clear;
   Header.Clear;
+  fSourceFileName := '';  
 end;
 
 constructor TBinaryScriptEditor.Create;
 begin
+  fCharset := TShenmueCharsetCodec.Create;
   fAllocations := TAllocationTable.Create;
-  fSections := TSectionTable.Create;
+  fSections := TSectionTable.Create(Self);
   fPointers := TPointerTable.Create;
   fReserved := TFixedStringTable.Create;
   fHeader := TBinaryHeader.Create;
-  Header.Clear;  
+  Header.Clear;
+  IncludeDocType := True;  
 end;
 
 destructor TBinaryScriptEditor.Destroy;
 begin
+  fCharset.Free;
   fAllocations.Free;
   fSections.Free;
   fPointers.Free;
@@ -492,6 +550,7 @@ type
   TScriptNodeType = (sntUndef, sntSection, sntInsert, sntPatch);
   
 var
+  _tempSourceFile: TFileName;
   ScriptDocument: IXMLDocument;
   RootNode, ScriptNode,
   WorkingNode, TranslateNode,
@@ -529,6 +588,7 @@ end;
 // Main
 begin
   Result := False;
+  _tempSourceFile := FileName;   // DELPHI MEMORY POINTER BUG FIX ??!
   if not FileExists(FileName) then Exit;
   Clear;
 
@@ -616,8 +676,10 @@ begin
       end; // IsValidScriptFile
 
       Result := True;
-      fSourceFileName := FileName;
-      
+      fSourceFileName := _tempSourceFile; // FileName;
+      // MEMORY POINTER BUG FIX... I don't know why, but the "const" keyword
+      // will destroy the FileName parameters and an Invalid Pointer Exception will occur ???
+
     except
       on E:Exception do begin
 {$IFDEF DEBUG}
@@ -706,7 +768,7 @@ begin
 
             // creating the string entry in the xml
             TranslateNode := CreateNode('translate');
-            TranslateNode.Attributes['text'] := WorkingStringItem.Text;
+            TranslateNode.Attributes['text'] := WorkingStringItem.RawText;
             SectionNode.ChildNodes.Add(TranslateNode);
 
             // writing addresses of that string
@@ -766,7 +828,8 @@ begin
         DocumentElement.ChildNodes.Add(ScriptNode);
 
         // adding the DOCTYPE
-        SetXMLDocType(ScriptDocument, DocType);
+        if IncludeDocType then        
+          SetXMLDocType(ScriptDocument, DocType);
       end; // ScriptDocument
 
       // Saving the file!
@@ -788,9 +851,10 @@ end;
 
 { TSectionTableItem }
 
-constructor TSectionTableItem.Create;
+constructor TSectionTableItem.Create(AOwner: TSectionTable);
 begin
-  fStringTable := TStringTable.Create;
+  fOwner := AOwner;
+  fStringTable := TStringTable.Create(Self);
 end;
 
 destructor TSectionTableItem.Destroy;

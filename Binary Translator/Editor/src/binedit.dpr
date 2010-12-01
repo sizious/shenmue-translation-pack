@@ -18,7 +18,9 @@ uses
   filespec in '..\..\..\Common\filespec.pas',
   newproj in 'newproj.pas' {frmNewProject},
   lzmadec in '..\..\..\Common\lzmadec.pas',
-  workdir in '..\..\..\Common\workdir.pas';
+  workdir in '..\..\..\Common\workdir.pas',
+  chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
+  hashidx in '..\..\..\Common\hashidx.pas';
 
 {$R *.res}
 
