@@ -84,6 +84,9 @@ end;
 //------------------------------------------------------------------------------
 
 procedure TfrmNewProject.bOKClick(Sender: TObject);
+var
+  CanDo: Integer;
+  
 begin
   if eNewFileName.Text = '' then begin
     MsgBox('Please entry a valid filename.', 'Warning', MB_ICONWARNING);
@@ -91,12 +94,27 @@ begin
     Exit;
   end;
 
+  // add the .xml extension if needed
   if LowerCase(ExtractFileExt(NewFileName)) <> '.xml' then
     eNewFileName.Text := eNewFileName.Text + '.xml';
 
+  // check if the file already exists
+  if FileExists(NewFileName) then begin
+    CanDo := MsgBox('The file already exists. Overwrite ?', 'Warning', MB_ICONWARNING + MB_YESNO);
+    if CanDo = IDNO then begin
+      ModalResult := mrNone;
+      Exit;
+    end;
+  end;
+  
+  // create directories if needed
+  if not DirectoryExists(ExtractFilePath(NewFileName)) then
+    ForceDirectories(ExtractFilePath(NewFileName));
+
   // copy the xml file!
   fCreationResult := CopyFile(GetSelectedSourceScriptFileName, NewFileName, False);
-  if cbCreateDTD.Checked then
+  BinaryScriptEditor.IncludeDocType := cbCreateDTD.Checked;
+  if BinaryScriptEditor.IncludeDocType then
     fCreationResult := fCreationResult and
       CopyFile(DTDFile, ExtractFilePath(NewFileName) + BINARY_SCRIPT_DB_DTD, False);
 

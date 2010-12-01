@@ -109,7 +109,6 @@ object frmNewProject: TfrmNewProject
   object sdNewScript: TSaveDialog
     DefaultExt = 'xml'
     Filter = 'XML Files (*.XML)|*.xml|All Files (*.*)|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save the new project to...'
     Left = 284
     Top = 88
