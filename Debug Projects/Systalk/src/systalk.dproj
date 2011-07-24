@@ -1,11 +1,11 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{6d8ac424-d891-4318-853e-9d99063ef8bb}</ProjectGuid>
+    <ProjectGuid>{cfbc2d7f-9f36-47f1-bfa0-437e23f13cfe}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-    <DCC_DependencyCheckOutputName>..\bin\dbgbin.exe</DCC_DependencyCheckOutputName>
-    <MainSource>dbgbin.dpr</MainSource>
+    <DCC_DependencyCheckOutputName>..\bin\systalk.exe</DCC_DependencyCheckOutputName>
+    <MainSource>systalk.dpr</MainSource>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Version>7.0</Version>
@@ -37,19 +37,206 @@
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
-    </Excluded_Packages><Source><Source Name="MainSource">dbgbin.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
+    </Excluded_Packages><Source><Source Name="MainSource">systalk.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
-    <DelphiCompile Include="dbgbin.dpr">
+    <DelphiCompile Include="systalk.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\..\Binary Translator\Editor\src\engine\mkxmlbin.pas" />
-    <DCCReference Include="..\..\..\Common\filespec.pas" />
-    <DCCReference Include="..\..\..\Common\hashidx.pas" />
-    <DCCReference Include="..\..\..\Common\SubsUtil\chrcodec.pas" />
     <DCCReference Include="..\..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\System Talk Subtitles Editor\src\engine\sncfedit.pas" />
   </ItemGroup>
 </Project>

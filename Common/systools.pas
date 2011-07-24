@@ -6,10 +6,11 @@ uses
   Windows, SysUtils, Classes, XMLIntf;
 
 const
-  UINT16_SIZE = 2;
-  UINT32_SIZE = 4;
-  GAME_BLOCK_SIZE = 2048;
-
+  UINT16_SIZE       = 2;
+  UINT32_SIZE       = 4;
+  GAME_BLOCK_SIZE   = 2048;
+  MAX_DWORD         = $FFFFFFFF;
+  
 type
   ESystemTools = class(Exception);
   EDataDirectoryNotFound = class(ESystemTools);
@@ -20,6 +21,9 @@ type
     Name: array[0..3] of Char;
     Size: LongWord;
   end;
+
+  // Padding modes
+  TPaddingMode = (pm32b, pm4b, pm2b);
 
 // Functions
 //function ByteToStr(T: array of Byte): string; overload;
@@ -71,6 +75,8 @@ function VariantToString(V: Variant): string;
 procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
 procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
   const WriteNullEndChar: Boolean = True);
+function WritePaddingSection(F: TFileStream; DataSize: LongWord;
+  PaddingMode: TPaddingMode = pm32b): LongWord;
 
 const
   SECTIONENTRY_SIZE = SizeOf(TSectionEntry);
@@ -850,6 +856,7 @@ end; *)
 
 //------------------------------------------------------------------------------
 
+// to be fixed
 function IsJapaneseString(const S: string): Boolean;
 var
   i: Integer;
@@ -859,6 +866,37 @@ begin
   if S <> '' then
     for i := 1 to Length(S) do
       Result := Result or (S[i] in [#$A4, #$B6, #$A5, #$BB]);
+end;
+
+//------------------------------------------------------------------------------
+
+function WritePaddingSection(F: TFileStream; DataSize: LongWord;
+  PaddingMode: TPaddingMode = pm32b): LongWord;
+const
+  PADDING_MAX_SIZE  = 32;
+  
+var
+  Padding: array[0..PADDING_MAX_SIZE - 1] of Byte;
+  PaddingOperator: LongWord;
+  
+begin
+  PaddingOperator := PADDING_MAX_SIZE; // dummy value
+  case PaddingMode of
+    pm32b: PaddingOperator := 32;
+    pm4b:  PaddingOperator := 4;
+    pm2b:  PaddingOperator := 2;
+  end;
+
+  // Compute padding size (= Result)
+  Result := DataSize mod PaddingOperator;
+  if Result <> 0 then  
+    Result := PaddingOperator - Result;
+
+  // Writing padding in the file
+  if Result <> 0 then begin
+    ZeroMemory(@Padding, Result);
+    F.Write(Padding, Result);
+  end;
 end;
 
 //------------------------------------------------------------------------------
