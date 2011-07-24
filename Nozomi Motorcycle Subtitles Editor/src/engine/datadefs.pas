@@ -8,7 +8,7 @@ const
 type
   TSequenceDataHeader = record
     NameID: array[0..3] of Char;  // SCN3
-    Size: Integer;
+    Size: Integer; // SCN3 section size
     Unknow: Integer;
     UnknowPtr1: Integer;
     UnknowPtr2: Integer;
@@ -82,19 +82,19 @@ const
     $14BC, // $9A $99 $99 $3E $9A $99 $99 $3E $9A $99 $99 $3E $9A $99 $99 $3E
     $1600, // $00 $00 $20 $41 $00 $00 $48 $43 $00 $00 $40 $3F $12 $06 $00 $FF
     $1612, // $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-    $161D,
-    $1622,
-    $162E,
-    $163C,
-    $1660,
-    $1665,
-    $1674,
-    $171B,
-    $1720,
-    $172F,
-    $1754,
-    $1759,
-    $1768
+    $161D, // SCROLL27.SPR
+    $1622, // sprite
+    $162E, // 01BIKEB
+    $163C, // a1_nbike.snd
+    $1660, // SCROLL25.SPR
+    $1665, // sprite
+    $1674, // M_01BIKE.BIN
+    $171B, // SCROLL25.SPR
+    $1720, // sprite
+    $172F, // M_01BIKE.BIN
+    $1754, // SCROLL25.SPR
+    $1759, // sprite
+    $1768  // M_01BIKE.BIN
   );
 
   // DISC4: Subtitles offset where to update

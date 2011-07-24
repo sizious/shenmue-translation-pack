@@ -9,8 +9,10 @@
     <Projects Include="DirScan\src\dbgscan.dproj" />
     <Projects Include="HashMap\src\dbghash.dproj" />
     <Projects Include="MD5\src\md5debug.dproj" />
+    <Projects Include="Padding\src\padding.dproj" />
     <Projects Include="Progress\src\dbgprog.dproj" />
     <Projects Include="SRF\src\srfdebug.dproj" />
+    <Projects Include="Systalk\src\systalk.dproj" />
     <Projects Include="TextDB\src\dbgtxtdb.dproj" />
     <Projects Include="Viewer\src\preview.dproj" />
   </ItemGroup>
@@ -101,14 +103,32 @@
   <Target Name="dbgbin:Make">
     <MSBuild Projects="Binary\src\dbgbin.dproj" Targets="Make" />
   </Target>
+  <Target Name="padding">
+    <MSBuild Projects="Padding\src\padding.dproj" Targets="" />
+  </Target>
+  <Target Name="padding:Clean">
+    <MSBuild Projects="Padding\src\padding.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="padding:Make">
+    <MSBuild Projects="Padding\src\padding.dproj" Targets="Make" />
+  </Target>
+  <Target Name="systalk">
+    <MSBuild Projects="Systalk\src\systalk.dproj" Targets="" />
+  </Target>
+  <Target Name="systalk:Clean">
+    <MSBuild Projects="Systalk\src\systalk.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="systalk:Make">
+    <MSBuild Projects="Systalk\src\systalk.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin" />
+    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin;padding;systalk" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean" />
+    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean;padding:Clean;systalk:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make" />
+    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make;padding:Make;systalk:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

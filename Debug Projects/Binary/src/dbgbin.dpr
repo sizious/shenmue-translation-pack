@@ -4,9 +4,11 @@ program dbgbin;
 
 uses
   SysUtils,
-  binedit in '..\..\..\Shenmue Binary Translator\Editor\src\engine\binedit.pas',
   systools in '..\..\..\Common\systools.pas',
-  filespec in '..\..\..\Common\filespec.pas';
+  filespec in '..\..\..\Common\filespec.pas',
+  mkxmlbin in '..\..\..\Binary Translator\Editor\src\engine\mkxmlbin.pas',
+  chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
+  hashidx in '..\..\..\Common\hashidx.pas';
 
 var
   BinaryEditor: TBinaryScriptEditor;

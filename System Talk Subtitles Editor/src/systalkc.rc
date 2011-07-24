@@ -1,0 +1,30 @@
+1 VERSIONINFO
+FILEVERSION 1,0,1,53
+PRODUCTVERSION 1,0,1,53
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+
+BEGIN
+
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040C04E4"
+		BEGIN
+			VALUE "Comments", "Shenmue System Talk Subtitles Editor - Console Version - From SHENTRAD Team\0"
+			VALUE "CompanyName", "(C)reated by [big_fury]SiZiOUS\0"
+			VALUE "FileDescription", "Shenmue System Talk Subtitles Editor - Console Version\0"
+			VALUE "FileVersion", "1.0.1.53\0"
+			VALUE "InternalName", "systalkc\0"
+			VALUE "LegalCopyright", "© Copyleft 2006-2011\0"
+			VALUE "OriginalFilename", "systalkc.exe\0"
+			VALUE "ProductName", "Shenmue System Talk Subtitles Editor - Console Version\0"
+			VALUE "ProductVersion", "1.0.1.53\0"
+		END
+	END
+
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 1036, 1252
+	END
+
+END
