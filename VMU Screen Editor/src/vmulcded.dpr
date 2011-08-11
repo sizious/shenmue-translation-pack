@@ -14,7 +14,8 @@ uses
   uitools in '..\..\Common\uitools.pas',
   utils in 'utils.pas',
   about in '..\..\Common\About\about.pas' {frmAbout},
-  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler};
+  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  appver in '..\..\Common\appver.pas';
 
 {$R *.res}
 

@@ -8,7 +8,7 @@ uses
   SysUtils,
   sncfedit in 'engine\sncfedit.pas',
   systools in '..\..\Common\systools.pas',
-  appver in 'engine\appver.pas';
+  appver in '..\..\Common\appver.pas';
 
 procedure PrintUsage;
 var

@@ -21,8 +21,8 @@ procedure CopyMenuItem(SourceItem, DestinationItem: TMenuItem);
 procedure DoRightClickSelection;
 procedure EditSetCaretEndPosition(const EditHandle: THandle);
 function FindNode(Node: TTreeNode; Text: string): TTreeNode;
-function GetApplicationVersion: string; overload;
-function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
+// function GetApplicationVersion: string; overload;
+// function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
 function GetApplicationCodeName: string;
 function GetApplicationShortTitle: string;
 function IsWindowsVista: Boolean;
@@ -171,7 +171,7 @@ end;
   Thanks to Olivier Lance:
         http://delphi.developpez.com/faq/?page=systemedivers#langidcquoi
 *)
-function ExtractApplicationVersion(const wLanguage: LANGID): string;
+(*function ExtractApplicationVersion(const wLanguage: LANGID): string;
 const
   VERSION_INFO_VALUE = '04E4';
 
@@ -209,27 +209,27 @@ begin
       FreeMem(Buffer, InfoSize);
     end;
 end;
-
+*)
 //------------------------------------------------------------------------------
 
-function MakeLangID(LangID, SubLangID: Byte): Word;
+(*function MakeLangID(LangID, SubLangID: Byte): Word;
 begin
   Result := (SubLangID shl 10) or LangID;
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 
-function GetApplicationVersion(LangID, SubLangID: Byte): string;
+(*function GetApplicationVersion(LangID, SubLangID: Byte): string;
 begin
   Result := ExtractApplicationVersion(MakeLangID(LangID, SubLangID));
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 
-function GetApplicationVersion: string;
+(*function GetApplicationVersion: string;
 begin
   Result := GetApplicationVersion(LANG_FRENCH, SUBLANG_FRENCH);
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 

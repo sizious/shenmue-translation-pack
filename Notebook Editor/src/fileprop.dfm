@@ -29,6 +29,10 @@ object frmProperties: TfrmProperties
     TabOrder = 0
     object tsGeneral: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lvGeneral: TJvListView
         Left = 0
         Top = 0
@@ -65,6 +69,10 @@ object frmProperties: TfrmProperties
     object tsSections: TTabSheet
       Caption = 'Sections'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lvSections: TJvListView
         Left = 0
         Top = 0

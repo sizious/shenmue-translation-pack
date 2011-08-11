@@ -23,7 +23,8 @@ uses
   about in '..\..\Common\About\about.pas' {frmAbout},
   chrcodec in '..\..\Common\SubsUtil\chrcodec.pas',
   chrcount in '..\..\Common\SubsUtil\chrcount.pas',
-  hashidx in '..\..\Common\hashidx.pas';
+  hashidx in '..\..\Common\hashidx.pas',
+  appver in '..\..\Common\appver.pas';
 
 {$R *.res}
 

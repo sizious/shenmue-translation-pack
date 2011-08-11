@@ -1,4 +1,4 @@
-unit main;
+unit Main;
 
 interface
 
@@ -171,7 +171,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Themes, Preview, UITools, Utils, About;
+  Themes, Preview, UITools, Utils, About, AppVer;
   
 procedure TfrmMain.AddDebug(LineType: TDebugLineType; Text: string);
 begin
@@ -281,11 +281,11 @@ begin
   // Init the About Box
   InitAboutBox(
     Application.Title,
-    GetAppVersion
+    GetApplicationVersion
   );
 
   // Init the Main Form
-  Caption := Application.Title + ' v' + GetAppVersion;
+  Caption := Application.Title + ' v' + GetApplicationVersion;
   StoredCaption := Caption;
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;

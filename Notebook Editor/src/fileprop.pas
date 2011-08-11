@@ -33,7 +33,7 @@ var
 implementation
 
 uses
-  Main, MemoEdit, SysTools, Config;
+  Main, MemoEdit, SysTools, Config, FileSpec;
 
 {$R *.dfm}
 
@@ -103,7 +103,7 @@ begin
     // General Info
     AddGeneralInfo('Data Source File', DataSourceFileName);
     AddGeneralInfo('Flag Source File', FlagSourceFileName);
-    AddGeneralInfo('Plateform', PlateformVersionToString(PlatformVersion));
+    AddGeneralInfo('Plateform', PlatformVersionToString(PlatformVersion));
 
     // Xbox
     with XboxMemoFlagInfo do begin

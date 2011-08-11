@@ -44,6 +44,10 @@ unit DebugLog;
 // Define this to debug this module
 // {$DEFINE DEBUG_DEBUGLOG}
 
+// Define this to enable the thread bug fix code...
+// I DON'T REMEMBER WHAT IS IT !!! (SHIT!)
+// {$DEFINE DEBUG_THREAD_BUG_FIX}
+
 interface
 
 uses
@@ -271,6 +275,9 @@ end;
 
 procedure TfrmDebugLog.FormCreate(Sender: TObject);
 begin
+{$IFDEF DEBUG_DEBUGLOG}
+  WriteLn('DebugLog.Create');
+{$ENDIF}
   aeDebug.OnException := nil;
 
   Constraints.MinHeight := Height;
@@ -515,6 +522,8 @@ begin
   MessageBox(Application.Handle, PChar(MsgText), PChar(MsgCaption), MsgIcon + MB_OK);
 end;
 
+//------------------------------------------------------------------------------
+
 procedure TfrmDebugLog.ResetStatus;
 begin
   sbDebug.SimpleText := '';
@@ -533,9 +542,11 @@ end;
 //------------------------------------------------------------------------------
 
 constructor TDebugLogHandlerInterface.Create;
+{$IFDEF DEBUG_THREAD_BUG_FIX}
 var
   L, T: Integer;
-  
+{$ENDIF}
+
 begin
 {$IFDEF DEBUG}
   if Assigned(DebugLogWindow) then
@@ -553,6 +564,7 @@ begin
   fFormDebugLog := TfrmDebugLog.Create(nil);
   DebugLogWindow.fOwnerHandler := Self;
 
+{$IFDEF DEBUG_THREAD_BUG_FIX}
   // Thread Freeze Bug Fix (FUCK!!!)
   with DebugLogWindow do begin
     L := Left; T := Top;
@@ -560,6 +572,9 @@ begin
     Show; Hide;
     Left := L; Top := T;
   end;
+  // Update of the 10/08/2011: SHIT, I DON'T REMEMBER WHAT IS IT !!!
+  // So I introduced a new compilation directive : DEBUG_THREAD_BUG_FIX.
+{$ENDIF}
 end;
 
 //------------------------------------------------------------------------------
@@ -582,11 +597,17 @@ begin
   Result := DebugLogWindow.Configuration;
 end;
 
+//------------------------------------------------------------------------------
+
+
 procedure TDebugLogHandlerInterface.Report(LineType: TDebugLineType;
   MsgText: string);
 begin
   DebugLogWindow.Report(LineType, MsgText, '');
 end;
+
+//------------------------------------------------------------------------------
+
 
 procedure TDebugLogHandlerInterface.Report(LineType: TDebugLineType; MsgText,
   AdditionalDebugText: string);

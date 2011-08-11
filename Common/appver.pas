@@ -1,4 +1,4 @@
-(* Ripped from UITools - We don't need Forms unit and everything related... *)
+(* Retrieve Windows Application Version *)
 unit AppVer;
 
 interface
@@ -7,6 +7,7 @@ uses
   Windows, SysUtils;
 
 function GetApplicationVersion: string; overload;
+function GetApplicationVersion(LangID, SubLangID: Byte): string; overload;
 
 implementation
 

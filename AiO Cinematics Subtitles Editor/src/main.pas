@@ -311,7 +311,7 @@ implementation
 
 uses
   Config, UITools, SysTools, ChrCount, About, DirScan, SubsExp, MassImp,
-  UTextDB, FileSpec;
+  UTextDB, FileSpec, AppVer;
 
 const
   SUBS_COLINDEX = 1;

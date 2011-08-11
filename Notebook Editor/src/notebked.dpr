@@ -18,7 +18,9 @@ uses
   xmlconf in '..\..\Common\xmlconf.pas',
   about in '..\..\Common\About\about.pas' {frmAbout},
   config in 'config.pas',
-  fileprop in 'fileprop.pas' {frmProperties};
+  fileprop in 'fileprop.pas' {frmProperties},
+  filespec in '..\..\Common\filespec.pas',
+  appver in '..\..\Common\appver.pas';
 
 {$R *.res}
 

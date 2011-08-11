@@ -162,7 +162,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, About, FileSpec, NewProj;
+  Config, UITools, SysTools, About, FileSpec, NewProj, AppVer;
 
 procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
 begin
