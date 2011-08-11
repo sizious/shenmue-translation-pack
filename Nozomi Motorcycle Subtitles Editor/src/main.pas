@@ -183,7 +183,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Config, UITools, SysTools, ChrCount, About;
+  Config, UITools, SysTools, ChrCount, About, AppVer;
 
 var
   SubtitlesTextManager: TSubtitlesTextManager;

@@ -32,89 +32,7 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType>VCLApplication</Borland.ProjectType>
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">2</VersionInfo><VersionInfo Name="MinorVer">1</VersionInfo><VersionInfo Name="Release">8</VersionInfo><VersionInfo Name="Build">267</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue Cinematics Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="FileVersion">2.1.8.267</VersionInfoKeys><VersionInfoKeys Name="InternalName">scinsube.exe</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2007-2010</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">scinsube.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue Cinematics Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">2.1</VersionInfoKeys><VersionInfoKeys Name="Comments">http://shenmuesubs.sourceforge.net/</VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">2</VersionInfo><VersionInfo Name="MinorVer">1</VersionInfo><VersionInfo Name="Release">8</VersionInfo><VersionInfo Name="Build">271</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue Cinematics Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="FileVersion">2.1.8.271</VersionInfoKeys><VersionInfoKeys Name="InternalName">scinsube.exe</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2007-2010</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">scinsube.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue Cinematics Subtitles Editor</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">2.1</VersionInfoKeys><VersionInfoKeys Name="Comments">http://shenmuesubs.sourceforge.net/</VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
       
       
       
@@ -141,6 +59,7 @@
     <DCCReference Include="..\..\Common\About\about.pas">
       <Form>frmAbout</Form>
     </DCCReference>
+    <DCCReference Include="..\..\Common\appver.pas" />
     <DCCReference Include="..\..\Common\batchexe.pas" />
     <DCCReference Include="..\..\Common\BugsMan\bugsmgr.pas">
       <Form>frmBugsHandler</Form>

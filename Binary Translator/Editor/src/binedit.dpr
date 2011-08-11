@@ -20,7 +20,8 @@ uses
   lzmadec in '..\..\..\Common\lzmadec.pas',
   workdir in '..\..\..\Common\workdir.pas',
   chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
-  hashidx in '..\..\..\Common\hashidx.pas';
+  hashidx in '..\..\..\Common\hashidx.pas',
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 

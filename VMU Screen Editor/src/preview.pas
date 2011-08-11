@@ -1,10 +1,10 @@
-unit preview;
+unit Preview;
 
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, GraphicEx;
+  Dialogs, ExtCtrls; //, GraphicEx;
 
 type
   TfrmPreview = class(TForm)

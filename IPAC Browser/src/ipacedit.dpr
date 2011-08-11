@@ -1,4 +1,4 @@
-program ipacedit;
+program IPACEdit;
 
 {$R 'engine\gzipbin.res' 'engine\gzipbin.rc'}
 {$R 'about\credits.res' 'about\credits.rc'}
@@ -21,7 +21,8 @@ uses
   shell in 'shell.pas',
   shellext in '..\..\Common\ShellExt\shellext.pas',
   regshell in '..\..\Common\ShellExt\regshell.pas',
-  debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog};
+  debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
+  appver in '..\..\Common\appver.pas';
 
 {$R *.res}
 
@@ -47,7 +48,8 @@ begin
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
-  if ConsoleCreated then SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
+  if ConsoleCreated then
+    SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));
 {$ENDIF}
 
   // Load the file passed in parameter if we have any
@@ -58,6 +60,7 @@ begin
   Application.Run;
 
 {$IFDEF DEBUG}
-  FreeConsole;
+  if ConsoleCreated then
+    FreeConsole;
 {$ENDIF}
 end.

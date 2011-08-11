@@ -1,11 +1,11 @@
-unit utils;
+unit Utils;
 
 interface
 
 uses
   Windows, SysUtils, XmlConf;
 
-function GetAppVersion: string;
+// function GetAppVersion: string;
 function GetConfigurationObject: TXMLConfigurationFile;
 function GetWorkingTempDirectory: TFileName;
 procedure LoadConfigMain;
@@ -35,10 +35,10 @@ end;
 
 //------------------------------------------------------------------------------
 
-function GetAppVersion: string;
+(*function GetAppVersion: string;
 begin
   Result := GetApplicationVersion(LANG_FRENCH, SUBLANG_FRENCH);
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 

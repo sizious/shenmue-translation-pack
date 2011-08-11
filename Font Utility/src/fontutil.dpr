@@ -6,7 +6,8 @@ uses
   fontmgr in 'engine\fontmgr.pas',
   systools in '..\..\Common\systools.pas',
   fontexec in 'fontexec.pas',
-  uitools in '..\..\Common\uitools.pas';
+  uitools in '..\..\Common\uitools.pas',
+  appver in '..\..\Common\appver.pas';
 
 {$R *.res}
 

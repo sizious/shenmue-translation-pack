@@ -89,7 +89,7 @@ implementation
 {$R *.dfm}
 
 uses
-  FontMgr, SysTools, FontExec, UITools;
+  FontMgr, SysTools, FontExec, UITools, AppVer;
 
 procedure TfrmMain.bExecuteClick(Sender: TObject);
 var

@@ -40,7 +40,8 @@ uses
   lzmadec in '..\..\Common\lzmadec.pas',
   workdir in '..\..\Common\workdir.pas',
   filespec in '..\..\Common\filespec.pas',
-  srfkeydb in 'engine\srfkeydb.pas';
+  srfkeydb in 'engine\srfkeydb.pas',
+  appver in '..\..\Common\appver.pas';
 
 {$R *.res}
 

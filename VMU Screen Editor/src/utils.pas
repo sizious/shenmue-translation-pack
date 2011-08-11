@@ -8,7 +8,7 @@ uses
 var
   Configuration: TXMLConfigurationFile;
 
-function GetAppVersion: string;
+// function GetAppVersion: string;
 procedure InitConfigurationFile;
 
 implementation
@@ -21,10 +21,10 @@ const
 
 //------------------------------------------------------------------------------
 
-function GetAppVersion: string;
+(*function GetAppVersion: string;
 begin
   Result := GetApplicationVersion(LANG_FRENCH, SUBLANG_FRENCH);
-end;
+end;*)
 
 //------------------------------------------------------------------------------
 

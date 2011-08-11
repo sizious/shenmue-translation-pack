@@ -8,7 +8,7 @@ unit MemoEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes, FSParser, StrDeps, SysTools;
+  Windows, SysUtils, Classes, FSParser, StrDeps, SysTools, FileSpec;
 
 type
   EDiaryEditor = class(Exception);

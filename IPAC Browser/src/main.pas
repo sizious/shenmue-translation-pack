@@ -1,4 +1,4 @@
-unit main;
+unit Main;
    
 interface
 
@@ -204,7 +204,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GZipMgr, Utils, FileProp, About, Shell, UiTools;
+  GZipMgr, Utils, FileProp, About, Shell, UiTools, AppVer;
 
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
@@ -461,7 +461,7 @@ begin
   // Init the About Box
   InitAboutBox(
     Application.Title,
-    GetAppVersion
+    GetApplicationVersion
   );
 
 {$IFNDEF DEBUG}
@@ -469,7 +469,7 @@ begin
 {$ENDIF}
 
   // Init the Main Form
-  Caption := Application.Title + ' v' + GetAppVersion;
+  Caption := Application.Title + ' v' + GetApplicationVersion;
   StoredCaption := Caption;
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;

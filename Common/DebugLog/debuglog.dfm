@@ -110,7 +110,6 @@ object frmDebugLog: TfrmDebugLog
     Width = 486
     Height = 221
     Align = alClient
-    AutoSize = False
     Color = clWhite
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText

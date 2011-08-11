@@ -238,7 +238,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UITools, SysTools, FileSel, Config, About, FileProp;
+  UITools, SysTools, FileSel, Config, About, FileProp, AppVer;
   
 procedure TfrmMain.bGoClick(Sender: TObject);
 begin
