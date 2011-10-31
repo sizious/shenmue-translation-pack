@@ -1,2 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<systalk><filecode>DOOR</filecode><gameversion>3</gameversion><subtitles count="50"><subtitle charid="AKIR" code="A001">Um=@</subtitle><subtitle charid="AKIR" code="A002">Excuse me.</subtitle><subtitle charid="DOOR" code="B001">Who is it?</subtitle><subtitle charid="DOOR" code="B002">What?</subtitle><subtitle charid="DOOR" code="B003">I'm sleeping.</subtitle><subtitle charid="DOOR" code="B004">I'm resting.</subtitle><subtitle charid="DOOR" code="B005">Let me sleep.</subtitle><subtitle charid="DOOR" code="B006">If you got no business here=@</subtitle><subtitle charid="DOOR" code="B007">Sorry, but=@</subtitle><subtitle charid="DOOR" code="B008">I'd like you to go away.</subtitle><subtitle charid="DOOR" code="B009">won't you go on home?</subtitle><subtitle charid="AKIR" code="A003">Sorry. I'll try again later.</subtitle><subtitle charid="DOOR" code="B010">Who is it=@?</subtitle><subtitle charid="DOOR" code="B011">What=@?</subtitle><subtitle charid="DOOR" code="B012">I'm sleeping=@</subtitle><subtitle charid="DOOR" code="B013">I'm napping.</subtitle><subtitle charid="DOOR" code="B014">Let me sleep in peace.</subtitle><subtitle charid="DOOR" code="B015">If you don't have a reason to be here=@</subtitle><subtitle charid="DOOR" code="B016">Sorry=@but,</subtitle><subtitle charid="DOOR" code="B017">go away.</subtitle><subtitle charid="DOOR" code="B018">gotta ask you to leave.</subtitle><subtitle charid="DOOR" code="B019">Whoever you are, you just come¡õon by tomorrow, ya' hear?</subtitle><subtitle charid="AKIR" code="A004">=@pardon me.</subtitle><subtitle charid="DOOR" code="B020">Yes?</subtitle><subtitle charid="DOOR" code="B021">Who is it=@?</subtitle><subtitle charid="AKIR" code="A005">Ryo Hazuki from Yamanose.</subtitle><subtitle charid="DOOR" code="B022">Ah. It's Ryo!</subtitle><subtitle charid="DOOR" code="B023">Sorry. Mama says she's busy now¡õand asked if you'd come tomorrow.</subtitle><subtitle charid="DOOR" code="B024">Sorry. Mama'd get real mad if¡õI unlock the door.</subtitle><subtitle charid="AKIR" code="A006">I see. Sorry to have bothered you.</subtitle><subtitle charid="AKIR" code="A007">OK. I'll come back later.</subtitle><subtitle charid="DOOR" code="B025">Bye bye.</subtitle><subtitle charid="DOOR" code="B026">Yes=@?</subtitle><subtitle charid="DOOR" code="B027">=@Who is it=@?</subtitle><subtitle charid="DOOR" code="B028">Oh. Hello Ryo!</subtitle><subtitle charid="DOOR" code="B029">Sorry. But, mama says she's busy and that¡õyou should come back tomorrow.</subtitle><subtitle charid="DOOR" code="B030">Sorry. But, I am not allowed¡õto unlock the door.</subtitle><subtitle charid="DOOR" code="B031">Bye bye=@</subtitle><subtitle charid="DOOR" code="B032">Who is it?¡¡</subtitle><subtitle charid="AKIR" code="A008">I'm Ryo Hazuki from Yamanose.¡õI need to ask you something.</subtitle><subtitle charid="DOOR" code="B033">I'm sorry.¡õBut I am not free now.</subtitle><subtitle charid="DOOR" code="B034">I'm sorry.¡õI am too busy right now.</subtitle><subtitle charid="DOOR" code="B035">I'm sorry.¡õI am in the middle of cooking right now.</subtitle><subtitle charid="AKIR" code="A009">I see=@Terribly sorry.</subtitle><subtitle charid="AKIR" code="A010">I understand.¡õI'll come by again.</subtitle><subtitle charid="AKIR" code="A011">I see. Well, it's no big deal.</subtitle><subtitle charid="DOOR" code="B036">Who's there?</subtitle><subtitle charid="DOOR" code="B037">I'm sorry.¡õI'm not free just now.</subtitle><subtitle charid="DOOR" code="B038">I'm sorry but I am¡õa little busy now.</subtitle><subtitle charid="DOOR" code="B039">I'm sorry. I am just about¡õto get in the bath.</subtitle></subtitles></systalk>
+<systalk>
+  <filecode>DOOR</filecode>
+  <gameversion>3</gameversion>
+  <subtitles count="50">
+    <subtitle charid="AKIR" code="A001">Um=@</subtitle>
+    <subtitle charid="AKIR" code="A002">Excuse me.</subtitle>
+    <subtitle charid="DOOR" code="B001">Who is it?</subtitle>
+    <subtitle charid="DOOR" code="B002">What?</subtitle>
+    <subtitle charid="DOOR" code="B003">I'm sleeping.</subtitle>
+    <subtitle charid="DOOR" code="B004">I'm resting.</subtitle>
+    <subtitle charid="DOOR" code="B005">Let me sleep.</subtitle>
+    <subtitle charid="DOOR" code="B006">If you got no business here=@</subtitle>
+    <subtitle charid="DOOR" code="B007">Sorry, but=@</subtitle>
+    <subtitle charid="DOOR" code="B008">I'd like you to go away.</subtitle>
+    <subtitle charid="DOOR" code="B009">won't you go on home?</subtitle>
+    <subtitle charid="AKIR" code="A003">Sorry. I'll try again later.</subtitle>
+    <subtitle charid="DOOR" code="B010">Who is it=@?</subtitle>
+    <subtitle charid="DOOR" code="B011">What=@?</subtitle>
+    <subtitle charid="DOOR" code="B012">I'm sleeping=@</subtitle>
+    <subtitle charid="DOOR" code="B013">I'm napping.</subtitle>
+    <subtitle charid="DOOR" code="B014">Let me sleep in peace.</subtitle>
+    <subtitle charid="DOOR" code="B015">If you don't have a reason to be here=@</subtitle>
+    <subtitle charid="DOOR" code="B016">Sorry=@but,</subtitle>
+    <subtitle charid="DOOR" code="B017">go away.</subtitle>
+    <subtitle charid="DOOR" code="B018">gotta ask you to leave.</subtitle>
+    <subtitle charid="DOOR" code="B019">Whoever you are, you just come¡õon by tomorrow, ya' hear?</subtitle>
+    <subtitle charid="AKIR" code="A004">=@pardon me.</subtitle>
+    <subtitle charid="DOOR" code="B020">Yes?</subtitle>
+    <subtitle charid="DOOR" code="B021">Who is it=@?</subtitle>
+    <subtitle charid="AKIR" code="A005">Ryo Hazuki from Yamanose.</subtitle>
+    <subtitle charid="DOOR" code="B022">Ah. It's Ryo!</subtitle>
+    <subtitle charid="DOOR" code="B023">Sorry. Mama says she's busy now¡õand asked if you'd come tomorrow.</subtitle>
+    <subtitle charid="DOOR" code="B024">Sorry. Mama'd get real mad if¡õI unlock the door.</subtitle>
+    <subtitle charid="AKIR" code="A006">I see. Sorry to have bothered you.</subtitle>
+    <subtitle charid="AKIR" code="A007">OK. I'll come back later.</subtitle>
+    <subtitle charid="DOOR" code="B025">Bye bye.</subtitle>
+    <subtitle charid="DOOR" code="B026">Yes=@?</subtitle>
+    <subtitle charid="DOOR" code="B027">=@Who is it=@?</subtitle>
+    <subtitle charid="DOOR" code="B028">Oh. Hello Ryo!</subtitle>
+    <subtitle charid="DOOR" code="B029">Sorry. But, mama says she's busy and that¡õyou should come back tomorrow.</subtitle>
+    <subtitle charid="DOOR" code="B030">Sorry. But, I am not allowed¡õto unlock the door.</subtitle>
+    <subtitle charid="DOOR" code="B031">Bye bye=@</subtitle>
+    <subtitle charid="DOOR" code="B032">Who is it?¡¡</subtitle>
+    <subtitle charid="AKIR" code="A008">I'm Ryo Hazuki from Yamanose.¡õI need to ask you something.</subtitle>
+    <subtitle charid="DOOR" code="B033">I'm sorry.¡õBut I am not free now.</subtitle>
+    <subtitle charid="DOOR" code="B034">I'm sorry.¡õI am too busy right now.</subtitle>
+    <subtitle charid="DOOR" code="B035">I'm sorry.¡õI am in the middle of cooking right now.</subtitle>
+    <subtitle charid="AKIR" code="A009">I see=@Terribly sorry.</subtitle>
+    <subtitle charid="AKIR" code="A010">I understand.¡õI'll come by again.</subtitle>
+    <subtitle charid="AKIR" code="A011">I see. Well, it's no big deal.</subtitle>
+    <subtitle charid="DOOR" code="B036">Who's there?</subtitle>
+    <subtitle charid="DOOR" code="B037">I'm sorry.¡õI'm not free just now.</subtitle>
+    <subtitle charid="DOOR" code="B038">I'm sorry but I am¡õa little busy now.</subtitle>
+    <subtitle charid="DOOR" code="B039">I'm sorry. I am just about¡õto get in the bath.</subtitle>
+  </subtitles>
+</systalk>

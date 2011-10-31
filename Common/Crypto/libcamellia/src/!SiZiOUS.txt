@@ -1,0 +1,3 @@
+- Just renamed all t_*.pas tests programs to t_*.dpr files.
+- libcamellia.groupproj created under Delphi 2007.
+- Check all projects properties to change the output directories if necessary (default: "..\..\..\..\*").

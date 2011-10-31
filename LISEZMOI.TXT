@@ -16,7 +16,7 @@
  __                            ________________________________________________
  __| SHENMUE TRANSLATION PACK |________________________________________________
  
- Shenmue Translation Pack est un ensemble d'outil permettant de traduire la 
+ Shenmue Translation Pack est un ensemble d'outils permettant de traduire la 
  série des jeux Shenmue dans la langue de votre choix.
  
  Les jeux actuellement supportés sont :
@@ -89,7 +89,7 @@
  
  Le langage utilisé est Delphi.
  
- Ouvrez-le fichier situé à la racine "srcpack.groupproj" dans Delphi 2007.
+ Ouvrez le fichier situé à la racine "srcpack.groupproj" dans Delphi 2007.
  
  Composants additionnels requis pour la compilation:
 

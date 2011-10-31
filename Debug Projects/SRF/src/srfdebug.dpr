@@ -12,7 +12,8 @@ uses
   chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
   systools in '..\..\..\Common\systools.pas',
   MD5Api in '..\..\..\Common\MD5\MD5Api.pas',
-  MD5Core in '..\..\..\Common\MD5\MD5Core.pas';
+  MD5Core in '..\..\..\Common\MD5\MD5Core.pas',
+  srfkeydb in '..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfkeydb.pas';
 
 const
   sTab = Chr(9);
