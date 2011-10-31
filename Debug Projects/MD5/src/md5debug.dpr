@@ -9,7 +9,8 @@ uses
   srfedit in '..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas',
   systools in '..\..\..\Common\systools.pas',
   chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
-  hashidx in '..\..\..\Common\hashidx.pas';
+  hashidx in '..\..\..\Common\hashidx.pas',
+  srfkeydb in '..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfkeydb.pas';
 
 var
   SRFEditor: TSRFEditor;

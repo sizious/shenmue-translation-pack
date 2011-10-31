@@ -1,0 +1,134 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{34a43ea3-54d1-4072-88eb-449cd0beeefd}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="cam_dll.dproj" />
+    <Projects Include="t_cam_as.dproj" />
+    <Projects Include="t_cam_cs.dproj" />
+    <Projects Include="t_cam_ws.dproj" />
+    <Projects Include="t_cam_xl.dproj" />
+    <Projects Include="t_caomac.dproj" />
+    <Projects Include="t_ca_bas.dproj" />
+    <Projects Include="t_ca_ccm.dproj" />
+    <Projects Include="t_ca_cyc.dproj" />
+    <Projects Include="t_ca_eax.dproj" />
+    <Projects Include="t_cprf.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="cam_dll">
+    <MSBuild Projects="cam_dll.dproj" Targets="" />
+  </Target>
+  <Target Name="cam_dll:Clean">
+    <MSBuild Projects="cam_dll.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="cam_dll:Make">
+    <MSBuild Projects="cam_dll.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_ca_bas">
+    <MSBuild Projects="t_ca_bas.dproj" Targets="" />
+  </Target>
+  <Target Name="t_ca_bas:Clean">
+    <MSBuild Projects="t_ca_bas.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_ca_bas:Make">
+    <MSBuild Projects="t_ca_bas.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_ca_ccm">
+    <MSBuild Projects="t_ca_ccm.dproj" Targets="" />
+  </Target>
+  <Target Name="t_ca_ccm:Clean">
+    <MSBuild Projects="t_ca_ccm.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_ca_ccm:Make">
+    <MSBuild Projects="t_ca_ccm.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_ca_cyc">
+    <MSBuild Projects="t_ca_cyc.dproj" Targets="" />
+  </Target>
+  <Target Name="t_ca_cyc:Clean">
+    <MSBuild Projects="t_ca_cyc.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_ca_cyc:Make">
+    <MSBuild Projects="t_ca_cyc.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_ca_eax">
+    <MSBuild Projects="t_ca_eax.dproj" Targets="" />
+  </Target>
+  <Target Name="t_ca_eax:Clean">
+    <MSBuild Projects="t_ca_eax.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_ca_eax:Make">
+    <MSBuild Projects="t_ca_eax.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_cam_as">
+    <MSBuild Projects="t_cam_as.dproj" Targets="" />
+  </Target>
+  <Target Name="t_cam_as:Clean">
+    <MSBuild Projects="t_cam_as.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_cam_as:Make">
+    <MSBuild Projects="t_cam_as.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_cam_cs">
+    <MSBuild Projects="t_cam_cs.dproj" Targets="" />
+  </Target>
+  <Target Name="t_cam_cs:Clean">
+    <MSBuild Projects="t_cam_cs.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_cam_cs:Make">
+    <MSBuild Projects="t_cam_cs.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_cam_ws">
+    <MSBuild Projects="t_cam_ws.dproj" Targets="" />
+  </Target>
+  <Target Name="t_cam_ws:Clean">
+    <MSBuild Projects="t_cam_ws.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_cam_ws:Make">
+    <MSBuild Projects="t_cam_ws.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_cam_xl">
+    <MSBuild Projects="t_cam_xl.dproj" Targets="" />
+  </Target>
+  <Target Name="t_cam_xl:Clean">
+    <MSBuild Projects="t_cam_xl.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_cam_xl:Make">
+    <MSBuild Projects="t_cam_xl.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_caomac">
+    <MSBuild Projects="t_caomac.dproj" Targets="" />
+  </Target>
+  <Target Name="t_caomac:Clean">
+    <MSBuild Projects="t_caomac.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_caomac:Make">
+    <MSBuild Projects="t_caomac.dproj" Targets="Make" />
+  </Target>
+  <Target Name="t_cprf">
+    <MSBuild Projects="t_cprf.dproj" Targets="" />
+  </Target>
+  <Target Name="t_cprf:Clean">
+    <MSBuild Projects="t_cprf.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="t_cprf:Make">
+    <MSBuild Projects="t_cprf.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="cam_dll;t_ca_bas;t_ca_ccm;t_ca_cyc;t_ca_eax;t_cam_as;t_cam_cs;t_cam_ws;t_cam_xl;t_caomac;t_cprf" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="cam_dll:Clean;t_ca_bas:Clean;t_ca_ccm:Clean;t_ca_cyc:Clean;t_ca_eax:Clean;t_cam_as:Clean;t_cam_cs:Clean;t_cam_ws:Clean;t_cam_xl:Clean;t_caomac:Clean;t_cprf:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="cam_dll:Make;t_ca_bas:Make;t_ca_ccm:Make;t_ca_cyc:Make;t_ca_eax:Make;t_cam_as:Make;t_cam_cs:Make;t_cam_ws:Make;t_cam_xl:Make;t_caomac:Make;t_cprf:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

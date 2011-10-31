@@ -25,6 +25,9 @@ type
   // Padding modes
   TPaddingMode = (pm32b, pm4b, pm2b);
 
+  // Unit sizes
+  TSizeUnit = (suByte, suKiloByte, suMegaByte, suGigaByte);
+
 // Functions
 //function ByteToStr(T: array of Byte): string; overload;
 function CopyFile(SourceFileName, DestFileName: TFileName;
@@ -37,15 +40,20 @@ function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractRadicalFileName(const FullPathFileName: TFileName): TFileName;
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
-function EOFS(var F: TFileStream): Boolean; overload;
+function EOS(Stream: TStream): Boolean;
+function EOFS(FileStream: TFileStream): Boolean; // y'avais "var" avant... et "overload"???
+function FormatByteSize(const Bytes: LongInt; var SizeUnit: TSizeUnit): string;
 function GetApplicationDirectory: TFileName;
 function GetApplicationRadicalName: string;
 function GetApplicationInstancesCount: Integer;
 function GetApplicationDataDirectory: TFileName;
+function GetDirectorySize(Directory: TFileName): Int64;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetRandomString(const StringMaxLength: Integer): string;
+function GetStreamBlockReadSize(Stream: TStream;
+  const WishedBlockSize: Int64): Int64;
 function GetTempDir: TFileName;
-function GetTempFileName: TFileName;
+function GetTempFileName(FullPath: Boolean = True): TFileName;
 function GetXMLDocType(const XMLBuffer: string): string;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
@@ -75,6 +83,9 @@ function VariantToString(V: Variant): string;
 procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
 procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
   const WriteNullEndChar: Boolean = True);
+{$IFDEF DEBUG}
+procedure WriteMemoryStreamToConsole(MS: TMemoryStream);
+{$ENDIF}
 function WritePaddingSection(F: TFileStream; DataSize: LongWord;
   PaddingMode: TPaddingMode = pm32b): LongWord;
 
@@ -94,6 +105,50 @@ const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
   NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+// Format file byte size
+function FormatByteSize(const Bytes: LongInt; var SizeUnit: TSizeUnit): string;
+const
+  B   = 1;          // byte
+  KB  = 1024 * B;   // kilobyte
+  MB  = 1024 * KB;  // megabyte
+  GB  = 1024 * MB;  // gigabyte
+
+begin
+  if bytes > GB then begin
+    Result := FormatFloat('0.00', Bytes / GB);
+    SizeUnit := suGigaByte;
+  end else if bytes > MB then begin
+    Result := FormatFloat('0.00', Bytes / MB);
+    SizeUnit := suMegaByte;
+  end else if Bytes > KB then begin
+    Result := FormatFloat('0.00', Bytes / KB);
+    SizeUnit := suKiloByte;
+  end else begin
+    Result := FormatFloat('0.00', Bytes);
+    SizeUnit := suByte;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+{$IFDEF DEBUG}
+procedure WriteMemoryStreamToConsole(MS: TMemoryStream);
+var
+  i: Integer;
+  C: Char;
+
+begin
+  MS.Seek(0, soFromBeginning);
+  for i := 0 to MS.Size - 1 do
+  begin
+    MS.Read(C, 1);
+    Write(C);
+  end;
+end;
+{$ENDIF}
 
 //------------------------------------------------------------------------------
 
@@ -198,9 +253,10 @@ end;
 
 //------------------------------------------------------------------------------
 
-function EOFS(var F: TFileStream): Boolean;
+function EOFS(FileStream: TFileStream): Boolean;
 begin
-  Result := F.Position >= F.Size
+//  Result := F.Position >= F.Size
+  Result := EOS(FileStream);
 end;
 
 //------------------------------------------------------------------------------
@@ -494,10 +550,17 @@ end;
 
 //------------------------------------------------------------------------------
 
-function GetTempFileName: TFileName;
+function GetTempFileName(FullPath: Boolean = True): TFileName;
+var
+  Dir: TFileName;
+
 begin
+  Dir := '';
+  if FullPath then
+    Dir := GetTempDir;
+    
   repeat
-    Result := GetTempDir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
+    Result := Dir + IntToHex(Random($FFFFFFF), 8) + '.SiZ';
   until not FileExists(Result);
 end;
 
@@ -897,6 +960,57 @@ begin
     ZeroMemory(@Padding, Result);
     F.Write(Padding, Result);
   end;
+end;
+
+//------------------------------------------------------------------------------
+
+function EOS(Stream: TStream): Boolean;
+begin
+  Result := Stream.Position >= Stream.Size;
+end;
+
+//------------------------------------------------------------------------------
+
+function GetStreamBlockReadSize(Stream: TStream;
+  const WishedBlockSize: Int64): Int64;
+var
+  RemainingBytes: Int64;
+
+begin
+  Result := WishedBlockSize;
+
+  // If the Wished BlockSize is more than the Stream Size...
+  if WishedBlockSize > Stream.Size then
+    Result := Stream.Size; // ... return the stream size
+
+  // If the Wished BlockSize is more larger than the bytes remaining to read...
+  RemainingBytes := Stream.Size - Stream.Position;
+  if WishedBlockSize > RemainingBytes then
+    Result := RemainingBytes; // ... return the remaining bytes count.
+end;
+
+//------------------------------------------------------------------------------
+
+function GetDirectorySize(Directory: TFileName): Int64;
+var
+  aResult : Integer;
+  aSearchRec : TSearchRec;
+
+begin
+  Result := 0;
+  if Directory = '' then Exit;
+  Directory := IncludeTrailingPathDelimiter(Directory);
+  aResult := FindFirst(Directory + '*.*', faAnyFile, aSearchRec);
+  while aResult = 0 do
+  begin
+    if ((aSearchRec.Attr and faDirectory) <= 0) then
+      Result := Result + aSearchRec.Size //GetFileSize(Directory + aSearchRec.Name)
+    else
+      if aSearchRec.Name[1] <> '.' then   // pas le repertoire '.' et '..'sinon on tourne en rond
+        Result := Result + GetDirectorySize(Directory + aSearchRec.Name);
+    aResult := FindNext(aSearchRec);
+  end;
+  FindClose(aSearchRec); // libération de aSearchRec
 end;
 
 //------------------------------------------------------------------------------

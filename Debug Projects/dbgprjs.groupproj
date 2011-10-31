@@ -7,10 +7,14 @@
     <Projects Include="Binary\src\dbgbin.dproj" />
     <Projects Include="ChrCodec\src\dbgcodec.dproj" />
     <Projects Include="DirScan\src\dbgscan.dproj" />
+    <Projects Include="DiscAuth\src\dbgcrypt.dproj" />
+    <Projects Include="DiscAuth\src\dbgdchk.dproj" />
+    <Projects Include="DiscAuth\src\readdisc.dproj" />
     <Projects Include="HashMap\src\dbghash.dproj" />
     <Projects Include="MD5\src\md5debug.dproj" />
     <Projects Include="Padding\src\padding.dproj" />
     <Projects Include="Progress\src\dbgprog.dproj" />
+    <Projects Include="SevenLib\src\sevenlib.dproj" />
     <Projects Include="SRF\src\srfdebug.dproj" />
     <Projects Include="Systalk\src\systalk.dproj" />
     <Projects Include="TextDB\src\dbgtxtdb.dproj" />
@@ -121,14 +125,50 @@
   <Target Name="systalk:Make">
     <MSBuild Projects="Systalk\src\systalk.dproj" Targets="Make" />
   </Target>
+  <Target Name="dbgcrypt">
+    <MSBuild Projects="DiscAuth\src\dbgcrypt.dproj" Targets="" />
+  </Target>
+  <Target Name="dbgcrypt:Clean">
+    <MSBuild Projects="DiscAuth\src\dbgcrypt.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="dbgcrypt:Make">
+    <MSBuild Projects="DiscAuth\src\dbgcrypt.dproj" Targets="Make" />
+  </Target>
+  <Target Name="dbgdchk">
+    <MSBuild Projects="DiscAuth\src\dbgdchk.dproj" Targets="" />
+  </Target>
+  <Target Name="dbgdchk:Clean">
+    <MSBuild Projects="DiscAuth\src\dbgdchk.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="dbgdchk:Make">
+    <MSBuild Projects="DiscAuth\src\dbgdchk.dproj" Targets="Make" />
+  </Target>
+  <Target Name="readdisc">
+    <MSBuild Projects="DiscAuth\src\readdisc.dproj" Targets="" />
+  </Target>
+  <Target Name="readdisc:Clean">
+    <MSBuild Projects="DiscAuth\src\readdisc.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="readdisc:Make">
+    <MSBuild Projects="DiscAuth\src\readdisc.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sevenlib">
+    <MSBuild Projects="SevenLib\src\sevenlib.dproj" Targets="" />
+  </Target>
+  <Target Name="sevenlib:Clean">
+    <MSBuild Projects="SevenLib\src\sevenlib.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sevenlib:Make">
+    <MSBuild Projects="SevenLib\src\sevenlib.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin;padding;systalk" />
+    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin;padding;systalk;dbgcrypt;dbgdchk;readdisc;sevenlib" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean;padding:Clean;systalk:Clean" />
+    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean;padding:Clean;systalk:Clean;dbgcrypt:Clean;dbgdchk:Clean;readdisc:Clean;sevenlib:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make;padding:Make;systalk:Make" />
+    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make;padding:Make;systalk:Make;dbgcrypt:Make;dbgdchk:Make;readdisc:Make;sevenlib:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
