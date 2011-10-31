@@ -180,6 +180,10 @@ object frmMain: TfrmMain
     object tsOptions: TTabSheet
       Caption = 'Config'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox2: TGroupBox
         Left = 3
         Top = 3
@@ -337,6 +341,10 @@ object frmMain: TfrmMain
     object tsDiscAuth: TTabSheet
       Caption = 'Unlock'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbxDiscKeys: TGroupBox
         Left = 3
         Top = 74
@@ -431,6 +439,10 @@ object frmMain: TfrmMain
     object tsSkin: TTabSheet
       Caption = 'Skin'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -548,6 +560,10 @@ object frmMain: TfrmMain
       Caption = 'EULA'
       ImageIndex = 3
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox3: TGroupBox
         Left = 3
         Top = 3
