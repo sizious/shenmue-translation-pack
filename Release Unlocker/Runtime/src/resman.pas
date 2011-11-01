@@ -74,7 +74,11 @@ begin
   frmMain.btnAbout.Caption := GetStringUI('Buttons', 'About');
   frmMain.btnCancel.Caption := GetStringUI('Buttons', 'Cancel');
   GameName := GetStringUI('General', 'GameName');
-end;
+
+  // BrowseForDialog for the OutputDirectory
+  frmMain.bfdOutput.StatusText := GetStringUI('Params', 'bfdStatusText');
+  frmMain.bfdOutput.Title := GetStringUI('Params', 'bfdTitle');  
+end;                                             
 
 //------------------------------------------------------------------------------
 
@@ -91,12 +95,10 @@ begin
 {$ENDIF}
 
   // Load image
-  try
-    i := frmMain.pcWizard.ActivePageIndex;
+  i := frmMain.pcWizard.ActivePageIndex;
+  if FileExists(GetWorkingTempDirectory + SKIN_IMAGES_LEFT_ORDER[i]) then
     frmMain.imgLeft.Picture.LoadFromFile(GetWorkingTempDirectory
       + SKIN_IMAGES_LEFT_ORDER[i]);
-  except
-  end;
 
   // Load strings...
   CtrlsList := TStringList.Create;
@@ -105,7 +107,7 @@ begin
     for i := 0 to CtrlsList.Count - 1 do
     begin
       C := frmMain.FindComponent(CtrlsList[i]);
-
+      
       // Store the string...
       S := StringLocalizer.Get(Section, CtrlsList[i]);
 
@@ -128,10 +130,10 @@ end;
 function SizeUnitToString(SizeUnit: TSizeUnit): string;
 begin
   case SizeUnit of
-    suByte: Result := 'o';
-    suKiloByte: Result := 'Ko';
-    suMegaByte: Result := 'Mo';
-    suGigaByte: Result := 'Go';
+    suByte:     Result := StringLocalizer.Get('SizeUnits', 'Byte');
+    suKiloByte: Result := StringLocalizer.Get('SizeUnits', 'KiloByte');
+    suMegaByte: Result := StringLocalizer.Get('SizeUnits', 'MegaByte');
+    suGigaByte: Result := StringLocalizer.Get('SizeUnits', 'GigaByte');
   end;
 end;
 
@@ -213,15 +215,22 @@ function InitializeSkin: Boolean;
 var
   _DIR: TFileName;
 
+  procedure _Load(SkinFile: TFileName; Image: TImage);
+  begin
+    Result := Result and FileExists(_DIR + SkinFile);
+    if Result then
+      Image.Picture.LoadFromFile(_DIR + SkinFile);
+  end;
+  
 begin
   Result := True;
   try
     _DIR := GetWorkingTempDirectory;
     with frmMain do
     begin
-      imgTop.Picture.LoadFromFile(_DIR + SKIN_IMAGE_TOP);
-      imgBottom.Picture.LoadFromFile(_DIR + SKIN_IMAGE_BOTTOM);
-      imgLeft.Picture.LoadFromFile(_DIR + SKIN_IMAGE_LEFT_HOME);
+      _Load(SKIN_IMAGE_TOP, imgTop);
+      _Load(SKIN_IMAGE_BOTTOM, imgBottom);      
+      _Load(SKIN_IMAGE_LEFT_HOME, imgLeft);
     end;
   except
     Result := False;
