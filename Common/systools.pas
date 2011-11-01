@@ -35,6 +35,7 @@ function CopyFile(SourceFileName, DestFileName: TFileName;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
+function DriveCharToInteger(Drive: Char): Integer;
 function ExtractDirectoryName(const FullDirectoryPath: TFileName): TFileName;
 function ExtractFile(ResourceName: string; OutputFileName: TFileName): Boolean;
 function ExtractRadicalFileName(const FullPathFileName: TFileName): TFileName;
@@ -42,7 +43,7 @@ function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 function ExtremeRight(SubStr: string; S: string): string;
 function EOS(Stream: TStream): Boolean;
 function EOFS(FileStream: TFileStream): Boolean; // y'avais "var" avant... et "overload"???
-function FormatByteSize(const Bytes: LongInt; var SizeUnit: TSizeUnit): string;
+function FormatByteSize(Bytes: Int64; var SizeUnit: TSizeUnit): string;
 function GetApplicationDirectory: TFileName;
 function GetApplicationRadicalName: string;
 function GetApplicationInstancesCount: Integer;
@@ -108,8 +109,18 @@ const
 
 //------------------------------------------------------------------------------
 
+function DriveCharToInteger(Drive: Char): Integer;
+begin
+  Result := -1;
+  Drive := UpCase(Drive);
+  if Drive in ['A'..'Z'] then
+    Result := (Ord(Drive) - Ord('A')) + 1;
+end;
+
+//------------------------------------------------------------------------------
+
 // Format file byte size
-function FormatByteSize(const Bytes: LongInt; var SizeUnit: TSizeUnit): string;
+function FormatByteSize(Bytes: Int64; var SizeUnit: TSizeUnit): string;
 const
   B   = 1;          // byte
   KB  = 1024 * B;   // kilobyte
@@ -117,10 +128,11 @@ const
   GB  = 1024 * MB;  // gigabyte
 
 begin
-  if bytes > GB then begin
+  Bytes := Abs(Bytes);
+  if Bytes > GB then begin
     Result := FormatFloat('0.00', Bytes / GB);
     SizeUnit := suGigaByte;
-  end else if bytes > MB then begin
+  end else if Bytes > MB then begin
     Result := FormatFloat('0.00', Bytes / MB);
     SizeUnit := suMegaByte;
   end else if Bytes > KB then begin

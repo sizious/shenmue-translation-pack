@@ -280,7 +280,7 @@ begin
     on E:Exception do
     begin
       Result := False;
-      fErrorMessage := 'TPackageExtractorThread.ReadPackage: ' + E.ClassName + ', ' + E.Message;
+      fErrorMessage := 'TPackageExtractorThread.ReadPackage: ' + E.ClassName + ' - ' + E.Message;
     end;
   end;
 end;

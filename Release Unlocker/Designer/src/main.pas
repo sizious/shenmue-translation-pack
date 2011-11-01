@@ -443,14 +443,14 @@ begin
   edtPC1.Text := '________________________________';
   edtCamellia.Text := '________________________________';
   edtAES.Text := '________________________________';
-  edtAppConfig.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\ui\ui.ini';
-  edtEULA.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\ui\eula.rtf';
-  edtSkinTop.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\ui\top.bmp';
-  edtSkinBottom.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\ui\bottom.bmp';
+  edtAppConfig.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\ui_french.ini';
+  edtEULA.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\eula.rtf';
+  edtSkinTop.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\top.bmp';
+  edtSkinBottom.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\bottom.bmp';
   for i := 0 to 9 do
   begin
     lvwSkinLeft.Items[i].SubItems[0] := 'center' + IntToStr(i+1) + '.bmp';
-    lvwSkinLeft.Items[i].SubItems[1] := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\ui\';
+    lvwSkinLeft.Items[i].SubItems[1] := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\';
   end;
 {$ENDIF}
 end;

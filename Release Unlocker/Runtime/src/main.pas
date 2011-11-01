@@ -5,7 +5,7 @@ interface
 uses
   Windows, SysUtils, Forms, Graphics, Classes, Controls, StdCtrls, ComCtrls,
   ExtCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls, OpThBase, Unpacker, Common,
-  GraphicEx, AppEvnts;
+  GraphicEx, AppEvnts, Dialogs, JvBaseDlg, JvBrowseFolder;
 
 type
   TfrmMain = class(TForm)
@@ -69,6 +69,10 @@ type
     grpDoneFailErrorMessage: TGroupBox;
     memDoneFail: TMemo;
     ApplicationEvents: TApplicationEvents;
+    bfdOutput: TJvBrowseForFolderDialog;
+    imgError: TImage;
+    imgWarn: TImage;
+    lblDoneFailGroupMessage: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure pcWizardChanging(Sender: TObject; var AllowChange: Boolean);
     procedure btnNextClick(Sender: TObject);
@@ -79,6 +83,8 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
+    procedure btnParamsBrowseClick(Sender: TObject);
+    procedure btnAboutClick(Sender: TObject);
   private
     { Déclarations privées }
     fCanceledByClosingWindow: Boolean;
@@ -87,6 +93,8 @@ type
     fWorkingThread: TOperationThread;
     fUnlockPasswords: TPackagePasswords;
     fUnpackedSize: Int64;
+
+    procedure AddDebug(Msg: string);
 
     procedure DiscValidatorFailed(Sender: TObject);
     procedure DiscValidatorProgress(Sender: TObject; Current, Total: Int64);
@@ -100,6 +108,7 @@ type
     procedure WorkingThreadTerminateHandler(Sender: TObject);
 
     procedure DoIdentificationProcess;
+    procedure DoCheckExtractParams;
     procedure DoUnlockPackage;
 
     procedure InitWizard;
@@ -153,14 +162,25 @@ const
   BUTTON_ACTION_FINISH = 2;
   BUTTON_ACTION_SHOW_CHECKDISC = 3;
   BUTTON_ACTION_DO_UNLOCK_PACKAGE = 4;
+  BUTTON_ACTION_CHECK_EXTRACT_PARAMS = 5;
 
 {$R *.dfm}
 
+procedure TfrmMain.AddDebug(Msg: string);
+begin
+  memDoneFail.Lines.Add(DateToStr(Now) + ' ' + TimeToStr(Now) + ': ' + Msg);
+end;
+
 procedure TfrmMain.ApplicationEventsException(Sender: TObject; E: Exception);
 begin
-  memDoneFail.Lines.Add(E.ClassName + ': ' + E.Message);
+  AddDebug('UNCAUGHT EXCEPTION: ' + E.ClassName + ' - ' + E.Message);
   LoadWizardUI('DoneFail');
   PageIndex := SCREEN_FINISH_FAILED;
+end;
+
+procedure TfrmMain.btnAboutClick(Sender: TObject);
+begin
+  raise Exception.Create('test');
 end;
 
 procedure TfrmMain.btnCancelClick(Sender: TObject);
@@ -172,6 +192,13 @@ end;
 procedure TfrmMain.btnNextClick(Sender: TObject);
 begin
   Next;
+end;
+
+procedure TfrmMain.btnParamsBrowseClick(Sender: TObject);
+begin
+  with bfdOutput do
+    if Execute then
+      edtOutputDir.Text := Directory;
 end;
 
 procedure TfrmMain.btnPrevClick(Sender: TObject);
@@ -224,6 +251,60 @@ begin
     PageIndex := SCREEN_CHECKDISC_FAILED;
 
   cbxDrives.Enabled := True;
+end;
+
+procedure TfrmMain.DoCheckExtractParams;
+var
+  Drive: TFileName;
+  i: Integer;
+  Space: Int64;
+  S: string;
+  SU: TSizeUnit;
+
+  function _GetMsgText(Code: string): string;
+  begin
+    Result := GetStringUI('MsgText', Code);
+    Result := StringReplace(Result, '<%OUTPUTDRIVE%>', Drive, [rfReplaceAll]);
+  end;
+
+begin
+  // if the path is empty can't continue.
+  Drive := UpperCase(ExtractFileDrive(edtOutputDir.Text));
+  if Length(Drive) < 2 then
+  begin
+    MsgBox(_GetMsgText('OutputDirectoryNotSpecified'), GetStringUI('MsgTitle', 'Error'), MB_ICONERROR);
+    Exit;
+  end;
+
+  // Getting the drive index
+  i := DriveCharToInteger(Drive[1]);
+  if i = -1 then
+  begin
+    MsgBox(_GetMsgText('DriveInvalid'), GetStringUI('MsgTitle', 'Error'), MB_ICONERROR);
+    Exit;
+  end;
+
+  // Getting free space
+  Space := DiskFree(i);
+  if Space = -1 then
+  begin
+    MsgBox(_GetMsgText('DriveDoesntExists'), GetStringUI('MsgTitle', 'Error'), MB_ICONERROR);
+    Exit;
+  end;
+
+  // Calculating if we can extract the files here...
+  Space := Space - UnpackedSize;
+  if Space < 0 then
+  begin
+    S := _GetMsgText('DriveNoMuchSpace');
+    S := StringReplace(S, '<%NEEDEDSPACE%>', FormatByteSize(Space, SU) + ' '
+      + SizeUnitToString(SU), [rfReplaceAll]);
+    MsgBox(S, GetStringUI('MsgTitle', 'Warning'), MB_ICONWARNING);
+    Exit;
+  end;
+
+  // OK, go to the next page.
+  PageIndex := SCREEN_READY_TO_EXTRACT;
 end;
 
 procedure TfrmMain.DoIdentificationProcess;
@@ -304,6 +385,8 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
 {$IFDEF DEBUG}
   edtOutputDir.Text := 'C:\Temp\~rlzout\';
+{$ELSE}
+  edtOutputDir.Text := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 {$ENDIF}
 
   DoubleBuffered := True;
@@ -334,12 +417,15 @@ begin
 end;
 
 procedure TfrmMain.InitWizard;
-{$IFDEF RELEASE}
 var
+  S: string;
+{$IFDEF RELEASE}
   i: Integer;
 {$ENDIF}
 
 begin
+  pcWizard.ActivePage := tsHome;
+
   // Loading message file
   InitializeStringUI;
   LoadWizardUI('Home');
@@ -348,11 +434,13 @@ begin
   InitializeSkin;
 
   // Load the EULA
-  try
+  if FileExists(GetWorkingTempDirectory + APPCONFIG_EULA) then  
     reEula.Lines.LoadFromFile(GetWorkingTempDirectory + APPCONFIG_EULA);
-  except
-  end;
 
+  // Modify the Wizard Title
+  S := GetStringUI('General', 'WizardTitle');
+  if S <> '' then Caption := S + ' - ' + Caption;
+  
 {$IFDEF RELEASE}
   // There is a memory leak in the JvDriveCtrl and it's really anonying...
   cbxDrives.ImageSize := isLarge;
@@ -361,9 +449,7 @@ begin
   for i := 0 to pcWizard.PageCount - 1 do
     pcWizard.Pages[i].TabVisible := False;
 {$ENDIF}
-                                                     
-  pcWizard.ActivePage := tsHome;
-  
+
   // Color of the Wizard TPageControl
   pcWizard.Brush.Color := clCream;
   pcWizard.Brush.Style := bsSolid;
@@ -394,6 +480,10 @@ begin
     // Launch Identification process
     BUTTON_ACTION_DO_IDENTIFICATION:
       DoIdentificationProcess;
+
+    // Check the extract params.
+    BUTTON_ACTION_CHECK_EXTRACT_PARAMS:
+      DoCheckExtractParams;
 
     // Launch the unpack process
     BUTTON_ACTION_DO_UNLOCK_PACKAGE:
@@ -443,6 +533,7 @@ begin
     SCREEN_EXTRACT_PARAMETERS:
       begin
         btnPrev.Tag := BUTTON_ACTION_SHOW_CHECKDISC;
+        btnNext.Tag := BUTTON_ACTION_CHECK_EXTRACT_PARAMS;
       end;
 
     // Ready to extract
@@ -498,16 +589,33 @@ var
 
 begin
 {$IFDEF DEBUG}
-  WriteLn('Finish');
+  Write('Finish: ');
 {$ENDIF}
+
   Thread := Sender as TPackageExtractorThread;
-  if Thread.Aborted or (not Thread.Success) then
+  if Thread.Aborted then
   begin
+    // Aborted
+    AddDebug(GetStringUI('MsgText', 'OperationCanceled'));
     PageIndex := SCREEN_FINISH_FAILED;
-    memDoneFail.Lines.Add(Thread.ErrorMessage);
+{$IFDEF DEBUG}
+  WriteLn('Aborted');
+{$ENDIF}
+  end else if (not Thread.Success) then
+  begin
+    // Error
+    AddDebug(Thread.ErrorMessage);
+    PageIndex := SCREEN_FINISH_FAILED;
+{$IFDEF DEBUG}
+  WriteLn('Errpr');
+{$ENDIF}
   end else begin
+    // Success
     SetStatusProgress(MaxDouble);
     PageIndex := SCREEN_FINISH;
+{$IFDEF DEBUG}
+  WriteLn('Success');
+{$ENDIF}
   end;
 end;
 
