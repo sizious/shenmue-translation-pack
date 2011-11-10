@@ -6,6 +6,8 @@ uses
   Windows, SysUtils, Classes, OpThBase, D7zipAPI, Common;
 
 type
+  EPackageExtractorThread = class(Exception);
+  
   TPackageExtractorThread = class(TOperationThread)
   private
     fPasswords: TPackagePasswords;
@@ -42,6 +44,7 @@ var
   MediaHashKeyFiles: TStringList;
   WorkingThread: TPackageExtractorThread;
   szLzmaLib: TFileName;
+  PackageBinaryOffset: Int64;
 
 // CompileRuntimePackage is located in the PackMan.pas unit (multi-threaded)
 // Decompile is here because it must be run only 1 time at the Runtime initialization
@@ -88,27 +91,45 @@ begin
       // Read the size...
       SourceStream.Read(Size, UINT32_SIZE);
 
-      // Copy the stream
-      MemoryStream.CopyFrom(SourceStream, Size);
-
-      // Save it to a file
-      FileName := GetWorkingTempFileName;
-      MemoryStream.SaveToFile(FileName);
-      MemoryStream.Clear;
-
 {$IFDEF DEBUG}
-      Write('  #', i, ': ');
+      Write('  #', i, ': ResType= ', ResType);
 {$ENDIF}
 
-      // Save the discfile to the array
-      case ResType of
-        RESTYPE_DISCAUTH:
-          begin
-            MediaHashKeyFiles.Add(FileName);
+      if ResType <> RESTYPE_PACKAGE then
+      begin
+        // Copy the stream
+        MemoryStream.CopyFrom(SourceStream, Size);
+
+        // Save it to a file
+        FileName := GetWorkingTempFileName;
+        MemoryStream.SaveToFile(FileName);
+        MemoryStream.Clear;
+
 {$IFDEF DEBUG}
-            WriteLn('RESTYPE_DISCAUTH', sLineBreak, '    FileName: "', FileName, '"');
+        WriteLn(sLineBreak, '    FileName= "', FileName, '"');
+{$ENDIF}
+      end else begin
+        SourceStream.Seek(Size, soFromCurrent);
+{$IFDEF DEBUG}
+        WriteLn('');
+{$ENDIF}
+      end;
+
+      case ResType of
+        // The result package...
+        RESTYPE_PACKAGE:
+          begin
+            PackageBinaryOffset := SourceStream.Position - Size;
+{$IFDEF DEBUG}
+            WriteLn('    PackageBinaryOffset= ', PackageBinaryOffset);
 {$ENDIF}
           end;
+
+        // DiscAuth files...
+        RESTYPE_DISCAUTH:
+          MediaHashKeyFiles.Add(FileName);
+
+        // AppConfigs...
         RESTYPE_APPCONFIG:
           begin
             with CreateInArchive(CLSID_CFormat7z) do
@@ -116,11 +137,9 @@ begin
               SetPassword(RUNTIME_EXTRA_RESOURCE_PASSWORD);
               OpenFile(FileName);
               ExtractTo(GetWorkingTempDirectory);
-//              DeleteFile(FileName);
+              Close;
             end;
-{$IFDEF DEBUG}
-            WriteLn('RESTYPE_APPCONFIG', sLineBreak, '    FileName: "', FileName, '"');
-{$ENDIF}
+            DeleteFile(FileName);
           end;
       end;
 
@@ -239,7 +258,12 @@ end;
 constructor TPackageExtractorThread.Create;
 begin
   inherited;
-  fInputPackageFileName := ExtractFilePath(ParamStr(0)) + 'PACKAGE.BIN';
+  fInputPackageFileName := ParamStr(0);
+  
+  (*fInputPackageFileName := szInputPackageFileName; //ExtractFilePath(ParamStr(0)) + 'PACKAGE.BIN';
+  if not FileExists(szInputPackageFileName) then
+    raise EPackageExtractorThread.Create('Package file doesn''t exists! FileName: "' + InputPackageFileName + '"');*)
+
   fPasswords := TPackagePasswords.Create;
 end;
 
@@ -249,8 +273,10 @@ begin
   begin
     SetProgressCallback(nil, ProgressCallback);
     SetPassword(Passwords.AES);
-    OpenFile(InputPackageFileName);
+//    OpenFile(InputPackageFileName);
+    OpenFileSFX(InputPackageFileName, PackageBinaryOffset);
     ExtractTo(OutputDirectory);
+    Close;
   end;
 end;
 

@@ -1,10 +1,14 @@
 unit ResMan;
 
+//{$DEFINE USE_DCL}
+
 interface
 
 uses
-  Windows, SysUtils, Classes, Controls, StdCtrls, ComCtrls, ExtCtrls, SysTools,
-  HashIdx;
+  Windows, SysUtils, Classes, Controls, StdCtrls, ComCtrls, ExtCtrls, SysTools
+{$IFDEF USE_DCL}
+  , HashIdx
+{$ENDIF};
 
 // Resource Strings Manager
 procedure InitializeStringUI;
@@ -14,6 +18,10 @@ procedure LoadWizardUI(Section: string);
 
 // Resource Images Manager
 function InitializeSkin: Boolean;
+
+// Misc
+procedure FillReleaseInfo;
+function ShowAppName: Boolean;
 
 implementation
 
@@ -34,7 +42,9 @@ type
 
   TStringLocalizer = class(TObject)
   private
+{$IFDEF USE_DCL}
     fHashIdx: THashIndexOptimizer;
+{$ENDIF}
     fList: TList;
     procedure Clear;
     function GetCount: Integer;
@@ -58,6 +68,40 @@ var
 
 //------------------------------------------------------------------------------
 
+function ShowAppName: Boolean;
+begin
+  Result := IniUiFile.ReadBool('Title', 'ShowAppName', True);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure FillReleaseInfo;
+var
+  SL: TStringList;
+  i: Integer;
+
+  procedure _Add(Key: string);
+  begin
+    with frmMain.lvwInfos.Items.Add do
+    begin
+      Caption := GetStringUI('HomeInfos', Key);
+      SubItems.Add(GetStringUI('General', Key));
+    end;
+  end;
+
+begin
+  SL := TStringList.Create;
+  try
+    IniUiFile.ReadSection('General', SL);
+    for i := 0 to SL.Count - 1 do
+      _Add(SL[i]);
+  finally
+    SL.Free;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
 function GetStringUI(Section, Code: string): string;
 begin
   Result := StringLocalizer.Get(Section, Code);
@@ -66,18 +110,30 @@ end;
 //------------------------------------------------------------------------------
 
 procedure InitializeStringUI;
+var
+  DefSize: Integer;
+  
 begin
   IniUiFile := TIniFile.Create(GetWorkingTempDirectory + APPCONFIG_UI_MESSAGES);
   StringLocalizer := TStringLocalizer.Create;
 
-  // Generic
-  frmMain.btnAbout.Caption := GetStringUI('Buttons', 'About');
-  frmMain.btnCancel.Caption := GetStringUI('Buttons', 'Cancel');
-  GameName := GetStringUI('General', 'GameName');
+  with frmMain do
+  begin
+    // Generic
+    btnAbout.Caption := GetStringUI('Buttons', 'About');
+    btnCancel.Caption := GetStringUI('Buttons', 'Cancel');
+    GameName := GetStringUI('General', 'GameName');
 
-  // BrowseForDialog for the OutputDirectory
-  frmMain.bfdOutput.StatusText := GetStringUI('Params', 'bfdStatusText');
-  frmMain.bfdOutput.Title := GetStringUI('Params', 'bfdTitle');  
+    // BrowseForDialog for the OutputDirectory
+    bfdOutput.StatusText := GetStringUI('Params', 'bfdStatusText');
+    bfdOutput.Title := GetStringUI('Params', 'bfdTitle');
+
+    // Info on the home
+    lvwInfos.Columns[0].Caption := GetStringUI('HomeInfos', 'KeysCol');
+    DefSize := lvwInfos.Columns[0].Width;
+    lvwInfos.Columns[0].Width := IniUiFile.ReadInteger('HomeInfos', 'KeysColSize', DefSize);
+    lvwInfos.Columns[1].Caption := GetStringUI('HomeInfos', 'ValuesCol');
+  end;
 end;                                             
 
 //------------------------------------------------------------------------------
@@ -95,11 +151,14 @@ begin
 {$ENDIF}
 
   // Load image
-  i := frmMain.pcWizard.ActivePageIndex;
-  if FileExists(GetWorkingTempDirectory + SKIN_IMAGES_LEFT_ORDER[i]) then
-    frmMain.imgLeft.Picture.LoadFromFile(GetWorkingTempDirectory
-      + SKIN_IMAGES_LEFT_ORDER[i]);
-
+  try
+    i := frmMain.pcWizard.ActivePageIndex;
+    if FileExists(GetWorkingTempDirectory + SKIN_IMAGES_LEFT_ORDER[i]) then
+      frmMain.imgLeft.Picture.LoadFromFile(GetWorkingTempDirectory
+        + SKIN_IMAGES_LEFT_ORDER[i]);
+  except
+  end;
+  
   // Load strings...
   CtrlsList := TStringList.Create;
   try
@@ -107,9 +166,7 @@ begin
     for i := 0 to CtrlsList.Count - 1 do
     begin
       C := frmMain.FindComponent(CtrlsList[i]);
-      
-      // Store the string...
-      S := StringLocalizer.Get(Section, CtrlsList[i]);
+      S := StringLocalizer.Get(Section, CtrlsList[i]); // Store the string...
 
       if Assigned(C) and (S <> '') then
       begin
@@ -144,6 +201,9 @@ end;
 function TStringLocalizer.Add;
 var
   Item: TStringLocalizerItem;
+{$IFDEF USE_DCL}
+  i: Integer;
+{$ENDIF}
 
 begin
   Item := TStringLocalizerItem.Create;
@@ -156,7 +216,13 @@ begin
     fText := StringReplace(fText, '<%GAMENAME%>', GameName, [rfReplaceAll]);
     Result := fText;
   end;
-  fHashIdx.Add(ASection + ACode, fList.Add(Item));
+{$IFDEF USE_DCL}
+  i :=
+{$ENDIF}
+  fList.Add(Item);
+{$IFDEF USE_DCL}
+  fHashIdx.Add(ASection + ACode, i);
+{$ENDIF}
 end;
 
 procedure TStringLocalizer.Clear;
@@ -172,25 +238,48 @@ end;
 constructor TStringLocalizer.Create;
 begin
   fList := TList.Create;
+{$IFDEF USE_DCL}
   fHashIdx := THashIndexOptimizer.Create;
+{$ENDIF}
 end;
 
 destructor TStringLocalizer.Destroy;
 begin
   Clear;
   fList.Free;
+{$IFDEF USE_DCL}
   fHashIdx.Free;
+{$ENDIF}
   inherited;
 end;
 
 function TStringLocalizer.Get;
 var
   i: Integer;
+{$IFNDEF USE_DCL}
+  Max: Integer;
+  Done: Boolean;
+{$ENDIF}
 
 begin
   Result := '';
+
+{$IFDEF USE_DCL}
   i := fHashIdx.IndexOf(ASection + ACode);
-  if i <> -1 then  
+{$ELSE}
+  i := -1;    
+  Done := False;
+  Max := Count - 1;
+  while (not Done) and (i < Max) do
+  begin
+    Inc(i);
+    Done := (Items[i].Section = ASection) and (Items[i].Code = ACode);
+  end;
+  if not Done then
+    i := -1;  
+{$ENDIF}
+
+  if i <> -1 then
     Result := Items[i].Text
   else begin
     Result := IniUiFile.ReadString(ASection, ACode, INVALID_STRING);

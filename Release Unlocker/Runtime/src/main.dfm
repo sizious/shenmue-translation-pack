@@ -1,8 +1,10 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = '<%GENERATED_TITLE%>'
-  ClientHeight = 496
+  ClientHeight = 497
   ClientWidth = 691
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +23,7 @@ object frmMain: TfrmMain
     Left = 173
     Top = 61
     Width = 518
-    Height = 384
+    Height = 385
     ActivePage = tsHome
     Align = alClient
     MultiLine = True
@@ -48,15 +50,58 @@ object frmMain: TfrmMain
         Left = 12
         Top = 41
         Width = 485
-        Height = 96
+        Height = 104
         AutoSize = False
         Caption = '<%HOME_MESSAGE%>'
         WordWrap = True
+      end
+      object grpInfos: TGroupBox
+        Left = 12
+        Top = 151
+        Width = 489
+        Height = 200
+        Caption = ' <%RELEASE_INFOS%> '
+        TabOrder = 0
+        object lvwInfos: TJvListView
+          Left = 12
+          Top = 20
+          Width = 465
+          Height = 169
+          Color = clCream
+          Columns = <
+            item
+              Caption = '<%NAME%>'
+              Width = 100
+            end
+            item
+              AutoSize = True
+              Caption = '<%VALUE%>'
+            end>
+          ColumnClick = False
+          ReadOnly = True
+          RowSelect = True
+          TabOrder = 0
+          ViewStyle = vsReport
+          OnAdvancedCustomDrawSubItem = lvwInfosAdvancedCustomDrawSubItem
+          OnDblClick = lvwInfosDblClick
+          OnMouseMove = lvwInfosMouseMove
+          ColumnsOrder = '0=100,1=361'
+          Groups = <>
+          ExtendedColumns = <
+            item
+            end
+            item
+            end>
+        end
       end
     end
     object tsDisclamer: TTabSheet
       Caption = 'Warn'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDisclamerTitle: TLabel
         Left = 12
         Top = 12
@@ -83,6 +128,10 @@ object frmMain: TfrmMain
     object tsLicense: TTabSheet
       Caption = 'Eula'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblLicenseTitle: TLabel
         Left = 12
         Top = 12
@@ -103,21 +152,13 @@ object frmMain: TfrmMain
         Height = 13
         Caption = '<%PRESS_PAGE_DOWN_TO_READ_THE_NEXT%>'
       end
-      object reEula: TRichEdit
-        Left = 12
-        Top = 68
-        Width = 489
-        Height = 254
-        ScrollBars = ssBoth
-        TabOrder = 0
-      end
       object rbnLicenseAccept: TRadioButton
         Left = 12
         Top = 328
         Width = 489
         Height = 17
         Caption = '<%LICENSE_ACCEPT%>'
-        TabOrder = 1
+        TabOrder = 0
         OnClick = rbnLicenseAcceptClick
       end
       object rbnLicenseDecline: TRadioButton
@@ -127,16 +168,27 @@ object frmMain: TfrmMain
         Height = 17
         Caption = '<%LICENCE_DECLINE%>'
         Checked = True
-        TabOrder = 2
+        TabOrder = 1
         TabStop = True
         OnClick = rbnLicenseAcceptClick
+      end
+      object reEula: TJvRichEdit
+        Left = 12
+        Top = 68
+        Width = 489
+        Height = 254
+        ReadOnly = True
+        TabOrder = 2
+        OnURLClick = reEulaURLClick
       end
     end
     object tsDiscAuth: TTabSheet
       Caption = 'Auth'
       ImageIndex = 2
-      ExplicitLeft = 6
-      ExplicitTop = 25
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDiscAuthTitle: TLabel
         Left = 12
         Top = 12
@@ -10438,6 +10490,10 @@ object frmMain: TfrmMain
     object tsAuthFail: TTabSheet
       Caption = 'AFail'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblAuthFailTitle: TLabel
         Left = 12
         Top = 12
@@ -10537,6 +10593,10 @@ object frmMain: TfrmMain
     object tsReady: TTabSheet
       Caption = 'Ready'
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblReadyTitle: TLabel
         Left = 12
         Top = 12
@@ -10563,6 +10623,10 @@ object frmMain: TfrmMain
     object tsWorking: TTabSheet
       Caption = 'Work'
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblWorkingTitle: TLabel
         Left = 12
         Top = 12
@@ -10620,6 +10684,10 @@ object frmMain: TfrmMain
     object tsDone: TTabSheet
       Caption = 'Done'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDoneTitle: TLabel
         Left = 12
         Top = 12
@@ -10646,6 +10714,10 @@ object frmMain: TfrmMain
     object tsDoneFail: TTabSheet
       Caption = 'DFail'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDoneFailTitle: TLabel
         Left = 12
         Top = 12
@@ -10872,7 +10944,7 @@ object frmMain: TfrmMain
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 445
+    Top = 446
     Width = 691
     Height = 51
     Align = alBottom
@@ -10930,7 +11002,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 61
     Width = 173
-    Height = 384
+    Height = 385
     Align = alLeft
     BevelOuter = bvNone
     Color = clMaroon
@@ -10940,9 +11012,11 @@ object frmMain: TfrmMain
       Left = 0
       Top = 0
       Width = 173
-      Height = 384
+      Height = 385
       Align = alClient
-      ExplicitHeight = 385
+      ExplicitLeft = 4
+      ExplicitTop = -20
+      ExplicitHeight = 384
     end
   end
   object ApplicationEvents: TApplicationEvents

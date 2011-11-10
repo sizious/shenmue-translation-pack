@@ -475,6 +475,8 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
   I7zInArchive = interface
   ['{022CF785-3ECE-46EF-9755-291FA84CC6C9}']
     procedure OpenFile(const filename: string); stdcall;
+    {SiZ! : SFX Version for Shenmue Unlocker...}
+    procedure OpenFileSFX(const FileName: TFileName; Offset: Int64); stdcall;
     procedure OpenStream(stream: IInStream); stdcall;
     procedure Close; stdcall;
     function GetNumberOfItems: Cardinal; stdcall;
@@ -821,6 +823,8 @@ type
   protected
     // I7zInArchive
     procedure OpenFile(const filename: string); stdcall;
+    {SiZ! : SFX Version for Shenmue Unlocker...}
+    procedure OpenFileSFX(const FileName: TFileName; Offset: Int64); stdcall;
     procedure OpenStream(stream: IInStream); stdcall;
     procedure Close; stdcall;
     function GetNumberOfItems: Cardinal; stdcall;
@@ -1075,6 +1079,27 @@ var
   strm: IInStream;
 begin
   strm := T7zStream.Create(TFileStream.Create(filename, fmOpenRead or fmShareDenyNone), soOwned);
+  try
+    RINOK(
+      InArchive.Open(
+        strm,
+          @MAXCHECK, self as IArchiveOpenCallBack
+        )
+      );
+  finally
+    strm := nil;
+  end;
+end;
+
+procedure T7zInArchive.OpenFileSFX; stdcall;
+var
+  strm: IInStream;
+  FS: TFileStream;
+
+begin
+  FS := TFileStream.Create(filename, fmOpenRead or fmShareDenyNone);
+  FS.Seek(Offset, soFromBeginning);
+  strm := T7zStream.Create(FS, soOwned);
   try
     RINOK(
       InArchive.Open(

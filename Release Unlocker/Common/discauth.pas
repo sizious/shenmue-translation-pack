@@ -28,6 +28,7 @@ type
     procedure EventTrackReadBegin(Sender: TObject; Total: Int64);
     procedure EventTrackRead(Sender: TObject; Remaining, Total: Int64);
     procedure EventTrackReadEnd(Sender: TObject);
+    function GetVolumeLabel: string;
     property DriveUnitController: TDriveUnitController read
       fDriveUnitController write fDriveUnitController;
   protected
@@ -36,6 +37,7 @@ type
   public
     procedure Abort; override;
     property Drive: Char read fDrive write fDrive;
+    property VolumeLabel: string read GetVolumeLabel;
     property OnFail: TNotifyEvent read fOnFail write fOnFail;
     property OnSuccess: TDiscValidatorSuccessEvent read fOnSuccess
       write fOnSuccess;
@@ -203,5 +205,14 @@ begin
   end;
 end;
 
+
+function TDiscValidatorThread.GetVolumeLabel: string;
+begin
+  try
+    Result := DriveUnitController.VolumeLabel;
+  except
+    Result := '';
+  end;
+end;
 
 end.
