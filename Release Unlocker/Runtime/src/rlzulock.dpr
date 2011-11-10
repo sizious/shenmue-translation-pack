@@ -34,6 +34,24 @@ var
   AppTitle: string;
 {$ENDIF}
 
+//==============================================================================
+
+function MsgBox(Text, Caption: string; Flags: Integer): Integer; overload;
+begin
+  Result := MessageBoxA(0, PChar(Text), PChar(Caption), Flags);
+end;
+
+//------------------------------------------------------------------------------
+
+{$IFDEF DEBUG}
+function MsgBox(Text: string): Integer; overload;
+begin
+  Result := MsgBox(Text, 'Information', MB_OK);
+end;
+{$ENDIF}
+
+//==============================================================================
+
 begin
 {$IFDEF DEBUG}
   ConsoleCreated := AllocConsole;
@@ -48,7 +66,7 @@ begin
 {$IFDEF RELEASE}
   if not DecompileOK then
   begin
-    MessageBoxA(0, 'Package is corrupted!', 'Error', MB_ICONERROR);
+    MsgBox('Package is corrupted!', 'Error', MB_ICONERROR);
     Halt(0);
   end;
 {$ENDIF}
@@ -58,7 +76,8 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'Shenmue Release Unlocker';
   Application.CreateForm(TfrmMain, frmMain);
-  {$IFDEF DEBUG}
+  
+{$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then
     SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

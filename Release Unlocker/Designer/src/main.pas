@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls,
-  OpThBase, DiscAuth, Packer, JvBaseDlg, JvBrowseFolder, ExtDlgs;
+  OpThBase, DiscAuth, Packer, JvBaseDlg, JvBrowseFolder, ExtDlgs, JvDialogs;
 
 type
   TfrmMain = class(TForm)
@@ -81,6 +81,12 @@ type
     btnCamellia: TButton;
     edtAES: TEdit;
     btnAES: TButton;
+    btnLoadMediaKeys: TButton;
+    odMediaKey: TJvOpenDialog;
+    btnSaveMediaKeys: TButton;
+    sdMediaKey: TJvSaveDialog;
+    lblAppTitle: TLabel;
+    Image1: TImage;
     procedure btnQuitClick(Sender: TObject);
     procedure btnAddKeyClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -97,6 +103,10 @@ type
     procedure btnAppConfigClick(Sender: TObject);
     procedure btnEULAClick(Sender: TObject);
     procedure lvwSkinLeftDblClick(Sender: TObject);
+    procedure btnAboutClick(Sender: TObject);
+    procedure btnLoadMediaKeysClick(Sender: TObject);
+    procedure btnSaveMediaKeysClick(Sender: TObject);
+    procedure btnDelKeyClick(Sender: TObject);
   private
     { Déclarations privées }
     fWorkingThread: TOperationThread;
@@ -106,18 +116,24 @@ type
     fMediaHashKeys: TStringList;
     procedure InitProgressBar;
     procedure CheckPasswordLength(Name: string);
+    function CheckInputs: Boolean;
     procedure DiscValidatorStart(Sender: TObject; Total: Int64);
     procedure DiscValidatorProgress(Sender: TObject; Current, Total: Int64);
     procedure DiscValidatorSuccess(Sender: TObject; const MediaKey: string);
     procedure DiscValidatorFailed(Sender: TObject);
     function GetStatus: string;
+    procedure GeneratePasswords;
     function IsThreadRunning: Boolean;
+    function AddMediaKey(const MediaKey, Source: string): Boolean;
+    procedure DeleteMediaKey(const KeyIndex: Integer);
+    procedure LoadMediaKeys(const FileName: TFileName);
+    procedure SaveMediaKeys(const FileName: TFileName);
     procedure MakePackage;
     procedure PackageManagerStart(Sender: TObject; Total: Int64);
-    procedure PackageManagerStartCrypto(Sender: TObject; Total: Int64);
+//    procedure PackageManagerStartCrypto(Sender: TObject; Total: Int64);
     procedure PackageManagerProgress(Sender: TObject; Current, Total: Int64);
-    procedure PackageManagerProgressCrypto(Sender: TObject; Current,
-      Total: Int64);
+//    procedure PackageManagerProgressCrypto(Sender: TObject; Current,
+//      Total: Int64);
     procedure PackageManagerFinish(Sender: TObject);
     procedure SetStatus(const Value: string);
     procedure SetControlsState(State: Boolean);
@@ -125,6 +141,8 @@ type
     procedure SetStatusProgress(const Value: Double);
     procedure SetStatusProgressMax(const MaxValue: Double);
     procedure WorkingThreadTerminateHandler(Sender: TObject);
+    function GetLeftImage(Index: Integer): TFileName;
+    procedure SetLeftImage(Index: Integer; const Value: TFileName);
     property WorkingThread: TOperationThread read fWorkingThread
       write fWorkingThread;
   public
@@ -134,6 +152,8 @@ type
     property Status: string read GetStatus write SetStatus;
     property MediaHashKeys: TStringList read fMediaHashKeys
       write fMediaHashKeys;
+    property LeftImages[Index: Integer]: TFileName read GetLeftImage
+      write SetLeftImage;
   end;
 
 var
@@ -142,7 +162,7 @@ var
 implementation
 
 uses
-  SysTools, UITools, Math, DateUtils, WorkDir;
+  SysTools, UITools, Math, DateUtils, WorkDir, About, AppVer, IniFiles;
   
 {$R *.dfm}
 
@@ -150,6 +170,13 @@ procedure TfrmMain.btnQuitClick(Sender: TObject);
 begin
   fCanceledByClosingWindow := False;
   Close;
+end;
+
+procedure TfrmMain.btnSaveMediaKeysClick(Sender: TObject);
+begin
+  with sdMediaKey do
+    if Execute then
+      SaveMediaKeys(FileName);
 end;
 
 procedure TfrmMain.btnSkinBottomClick(Sender: TObject);
@@ -175,11 +202,7 @@ begin
     Title := 'Please select the Left Banner (173 x 385) for the #'
       + IntToStr(lvwSkinLeft.ItemIndex + 1) + ' wizard page :';
     if Execute then
-      with lvwSkinLeft.ItemFocused do
-      begin
-        SubItems[0] := ExtractFileName(FileName);
-        SubItems[1] := ExtractFilePath(FileName);
-      end;
+      LeftImages[lvwSkinLeft.ItemIndex] := FileName;
   end;
 end;
 
@@ -196,11 +219,7 @@ begin
 
   CanDo := MsgBox('Sure to clean this wizard image ?', 'Question', MB_ICONQUESTION + MB_DEFBUTTON2 + MB_YESNO);
   if CanDo = IDYES then
-    with lvwSkinLeft.ItemFocused do
-    begin
-      SubItems[0] := '';
-      SubItems[1] := '';
-    end;
+    LeftImages[lvwSkinLeft.ItemIndex] := '';
 end;
 
 procedure TfrmMain.btnSkinTopClick(Sender: TObject);
@@ -225,6 +244,81 @@ begin
 end;
 
 // Check passwords length and fill the missing characters with random ones.
+function TfrmMain.CheckInputs: Boolean;
+const
+  FILES_EDIT: array[0..3] of string = ('edtAppConfig', 'edtEULA', 'edtSkinTop', 'edtSkinBottom');
+  FOLDER_EDIT: array[0..1] of string = ('edtSourceDir', 'edtDestDir');
+
+var
+  i: Integer;
+  E: TEdit;
+
+  function _CHK(Folder: Boolean): Boolean;
+  var
+    S: string;
+
+  begin
+    S := 'file';
+    if Folder then
+    begin
+      S := 'folder';
+      Result := DirectoryExists(E.Text);
+    end else begin
+      S := 'file';
+      Result := FileExists(E.Text);
+    end;
+
+    if not Result then
+    begin
+      MsgBox('The specified ' + S + ' doesn''t exists.', 'Warning', MB_ICONWARNING);
+      (E.Parent.Parent as TTabSheet).Show;
+      E.SetFocus;
+    end;
+  end;
+
+begin
+  // Check passwords
+  GeneratePasswords;
+
+  // Check folders
+  for i := Low(FOLDER_EDIT) to High(FOLDER_EDIT) do
+  begin
+    E := FindComponent(FOLDER_EDIT[i]) as TEdit;
+    Result := _CHK(True);
+    if not Result then Exit;
+  end;
+
+  // Check files
+  for i := Low(FILES_EDIT) to High(FILES_EDIT) do
+  begin
+    E := FindComponent(FILES_EDIT[i]) as TEdit;
+    Result := _CHK(False);
+    if not Result then Exit;
+  end;
+
+  for i := 0 to lvwSkinLeft.Items.Count - 1 do
+  begin
+    Result := FileExists(LeftImages[i]);
+    if not Result then
+    begin
+      MsgBox('The left skin image #' + IntToStr(i+1)
+        + ' doesn''t exists.', 'Warning', MB_ICONWARNING);
+      tsSkin.Show;
+      lvwSkinLeft.ItemIndex := i;
+      lvwSkinLeft.SetFocus;
+      Exit;
+    end;
+  end;
+
+  // Check media keys
+  Result := lvDiscKeys.Items.Count > 0;
+  if not Result then
+  begin
+    MsgBox('Please extract at least one media key from an original disc.', 'Warning', MB_ICONWARNING);
+    Exit;
+  end;
+end;
+
 procedure TfrmMain.CheckPasswordLength;
 var
   _e: TEdit;
@@ -237,6 +331,11 @@ begin
     _s := 32 - Length(_e.Text);
     _e.Text := _e.Text + GetRandomPassword(_s);
   end;
+end;
+
+procedure TfrmMain.btnAboutClick(Sender: TObject);
+begin
+  RunAboutBox;
 end;
 
 procedure TfrmMain.btnAddKeyClick(Sender: TObject);
@@ -267,6 +366,21 @@ begin
   end;
 end;
 
+procedure TfrmMain.btnDelKeyClick(Sender: TObject);
+var
+  CanDo: Integer;
+
+begin
+  if lvDiscKeys.ItemIndex = -1 then
+    MsgBox('Please select an entry in the list.', 'Warning', MB_ICONWARNING)
+  else begin
+    CanDo := MsgBox('Are you sure to delete this media key ?', 'Question',
+      MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION);
+    if CanDo = IDYES then
+      DeleteMediaKey(lvDiscKeys.ItemIndex);
+  end;
+end;
+
 procedure TfrmMain.btnDestDirClick(Sender: TObject);
 begin
   with bfd do
@@ -290,20 +404,18 @@ begin
   end;
 end;
 
-procedure TfrmMain.btnMakeClick(Sender: TObject);
-const
-  EDIT_PASSWORDS: array[0..2] of string = ('AES', 'Camellia', 'PC1');
-
-var
-  i: Integer;
-
+procedure TfrmMain.btnLoadMediaKeysClick(Sender: TObject);
 begin
-  // Check passwords length...
-  for i := Low(EDIT_PASSWORDS) to High(EDIT_PASSWORDS) do
-    CheckPasswordLength(EDIT_PASSWORDS[i]);
+  with odMediaKey do
+    if Execute then
+      LoadMediaKeys(FileName);
+end;
 
+procedure TfrmMain.btnMakeClick(Sender: TObject);
+begin
   // Create the package!
-  MakePackage;
+  if CheckInputs then
+    MakePackage;
 end;
 
 procedure TfrmMain.btnPC1Click(Sender: TObject);
@@ -318,6 +430,17 @@ begin
     _e := FindComponent('edt' + Copy(_n, 4, Length(_n) - 3)) as TEdit;
     if Assigned(_e) then
       _e.Text := GetRandomPassword;
+  end;
+end;
+
+procedure TfrmMain.DeleteMediaKey(const KeyIndex: Integer);
+begin
+  MediaHashKeys.Delete(KeyIndex);
+  lvDiscKeys.Items[KeyIndex].Delete;
+  if MediaHashKeys.Count > 0 then
+  begin
+    lvDiscKeys.ItemIndex := MediaHashKeys.Count - 1;
+    lvDiscKeys.SetFocus;
   end;
 end;
 
@@ -342,22 +465,17 @@ begin
 end;
 
 procedure TfrmMain.DiscValidatorSuccess;
+var
+  DiscLabelName: string;
+
 begin
 {$IFDEF DEBUG}
   WriteLn('Success! Hash Key = ', MediaKey);
 {$ENDIF}
 
-  // Add the key
-  if MediaHashKeys.IndexOf(MediaKey) = -1 then
+  DiscLabelName := (WorkingThread as TDiscValidatorThread).VolumeLabel;
+  if not AddMediaKey(MediaKey, DiscLabelName) then
   begin
-    with lvDiscKeys.Items.Add do
-    begin
-      Caption := IntToStr(lvDiscKeys.Items.Count);
-      SubItems.Add(cbxDrives.DisplayName);
-      SubItems.Add(MediaKey);
-    end;
-    MediaHashKeys.Add(MediaKey);
-  end else begin
     Status := 'The key was already in list.';
     MsgBox('The key was already in list.' + sLineBreak +
       'Please insert another media in your drive.',
@@ -397,7 +515,7 @@ begin
     // Disable buttons...
     SetCloseControlsState(False);
     
-    CanDo := MsgBox('Are you sure to Exit ?', 'Please confirm',
+    CanDo := MsgBox('Are you sure to cancel ?', 'Please confirm',
       MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2);
 
     if CanDo = IDYES then begin
@@ -415,21 +533,38 @@ begin
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+const
+  WIZARD_PAGE_NAMES: array[1..10] of string = (
+    'Home',     'Disclamer',  'License',    'DiscAuth',   'AuthFail',
+    'Params',   'Ready',      'Working',    'Done',       'DoneFail'
+  );
+
 var
   i: Integer;
 
 begin
-  Caption := Application.Title;
+  // Init the Main Form
+  Caption := Application.Title + ' v' + GetApplicationVersion;
+  lblAppTitle.Caption := Application.Title;
+
+  // Init the About Box
+  InitAboutBox(
+    Application.Title,
+    GetApplicationVersion
+  );
+
   pcMain.ActivePageIndex := 0;
   InitProgressBar;
   MediaHashKeys := TStringList.Create;
   sbMain.DoubleBuffered := True;
+  DoubleBuffered := True;
 
   //init banner list
   for i := 1 to 10 do
     with lvwSkinLeft.Items.Add do
     begin
       Caption := IntToStr(i);
+      SubItems.Add(WIZARD_PAGE_NAMES[i]);
       SubItems.Add('');
       SubItems.Add('');  
     end;
@@ -438,8 +573,9 @@ begin
 {$IFDEF DEBUG}
   edtSourceDir.Text := 'C:\Temp\~shenin\';
   edtDestDir.Text := 'C:\Temp\~shenout\';
-  DiscValidatorSuccess(Self, 'b17ca3a8cb686ec9689c938271ed4fbd');
-  DiscValidatorSuccess(Self, '35406f2bbb712b8102c5620ac4725a2f');
+
+  LoadMediaKeys('M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Designer\bin\keyslist.mkl');
+
   edtPC1.Text := '________________________________';
   edtCamellia.Text := '________________________________';
   edtAES.Text := '________________________________';
@@ -449,9 +585,11 @@ begin
   edtSkinBottom.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\bottom.bmp';
   for i := 0 to 9 do
   begin
-    lvwSkinLeft.Items[i].SubItems[0] := 'center' + IntToStr(i+1) + '.bmp';
-    lvwSkinLeft.Items[i].SubItems[1] := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\';
+    LeftImages[i] := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\'
+      + 'center' + Format('%0.2d', [i+1]) + '.bmp';
   end;
+{$ELSE}
+  GeneratePasswords;
 {$ENDIF}
 end;
 
@@ -459,6 +597,25 @@ procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   WorkingThread.Free;
   MediaHashKeys.Free;
+end;
+
+procedure TfrmMain.GeneratePasswords;
+const
+  EDIT_PASSWORDS: array[0..2] of string = ('AES', 'Camellia', 'PC1');
+
+var
+  i: Integer;
+
+begin
+  // Check passwords length...
+  for i := Low(EDIT_PASSWORDS) to High(EDIT_PASSWORDS) do
+    CheckPasswordLength(EDIT_PASSWORDS[i]);
+end;
+
+function TfrmMain.GetLeftImage(Index: Integer): TFileName;
+begin
+  Result := IncludeTrailingPathDelimiter(lvwSkinLeft.Items[Index].SubItems[2]) +
+    lvwSkinLeft.Items[Index].SubItems[1];
 end;
 
 function TfrmMain.GetRandomPassword;
@@ -520,6 +677,41 @@ begin
   Result := Assigned(WorkingThread) and (not WorkingThread.Terminated);
 end;
 
+procedure TfrmMain.LoadMediaKeys(const FileName: TFileName);
+var
+  Ini: TIniFile;
+  SL: TStringList;
+  i: Integer;
+  
+begin
+  Ini := TIniFile.Create(FileName);
+  SL := TStringList.Create;
+  try
+    Ini.ReadSection('MEDIAKEYS', SL);
+    for i := 0 to SL.Count - 1 do
+      AddMediaKey(SL[i], Ini.ReadString('MEDIAKEYS', SL[i], ''));
+  finally
+    SL.Free;
+    Ini.Free;
+  end;
+end;
+
+function TfrmMain.AddMediaKey;
+begin
+  Result := False;
+  if MediaHashKeys.IndexOf(MediaKey) = -1 then
+  begin
+    with lvDiscKeys.Items.Add do
+    begin
+      Caption := IntToStr(lvDiscKeys.Items.Count);
+      SubItems.Add(Source);
+      SubItems.Add(MediaKey);
+    end;
+    MediaHashKeys.Add(MediaKey);
+    Result := True;
+  end;
+end;
+
 procedure TfrmMain.lvwSkinLeftDblClick(Sender: TObject);
 begin
   btnSkinLeftAdd.Click;
@@ -539,8 +731,8 @@ begin
     OnStart := PackageManagerStart;
     OnProgress := PackageManagerProgress;
     OnFinish := PackageManagerFinish;
-    OnStartCrypto := PackageManagerStartCrypto;
-    OnProgressCrypto := PackageManagerProgressCrypto;
+//    OnStartCrypto := PackageManagerStartCrypto;
+//    OnProgressCrypto := PackageManagerProgressCrypto;
     InputDirectory := edtSourceDir.Text;
     OutputDirectory := edtDestDir.Text;
     with Passwords do
@@ -554,7 +746,7 @@ begin
       Top := edtSkinTop.Text;
       Bottom := edtSkinBottom.Text;
       for i := 0 to 9 do
-        Left.Add(lvwSkinLeft.Items[i].SubItems[1] + lvwSkinLeft.Items[i].SubItems[0]);
+        Left.Add(LeftImages[i]);
     end;
     Eula := edtEULA.Text;
     AppConfig := edtAppConfig.Text; // Ui
@@ -603,13 +795,13 @@ begin
   SetStatusProgress(Current);
 end;
 
-procedure TfrmMain.PackageManagerProgressCrypto;
+(*procedure TfrmMain.PackageManagerProgressCrypto;
 begin
 {$IFDEF DEBUG}
   Write('  Crypto = ', Current, '/', Total, #13);
 {$ENDIF}
   SetStatusProgress(Current);
-end;
+end;*)
 
 procedure TfrmMain.PackageManagerStart;
 begin
@@ -622,7 +814,7 @@ begin
   Status := 'Building package... please wait.';
 end;
 
-procedure TfrmMain.PackageManagerStartCrypto;
+(*procedure TfrmMain.PackageManagerStartCrypto;
 begin
 {$IFDEF DEBUG}
   WriteLn('Total: ', Total);
@@ -631,6 +823,22 @@ begin
   SetStatusProgress(0);
   SetControlsState(False);
   Status := 'Encrypting package...';
+end;*)
+
+procedure TfrmMain.SaveMediaKeys(const FileName: TFileName);
+var
+  Ini: TIniFile;
+  i: Integer;
+  
+begin
+  Ini := TIniFile.Create(FileName);
+  try
+    for i := 0 to lvDiscKeys.Items.Count - 1 do
+      with lvDiscKeys.Items[i] do
+        Ini.WriteString('MEDIAKEYS', SubItems[1], SubItems[0]);
+  finally
+    Ini.Free;
+  end;
 end;
 
 procedure TfrmMain.SetCloseControlsState;
@@ -659,10 +867,27 @@ begin
   btnDestDir.Enabled := State;
   edtAppConfig.Enabled := State;
   btnAppConfig.Enabled := State;
+  edtEULA.Enabled := State;
+  btnEULA.Enabled := State;
+  btnSkinTop.Enabled := State;
+  btnSkinBottom.Enabled := State;
+  btnSkinLeftAdd.Enabled := State;
+  btnSkinLeftDel.Enabled := State;
+  lvwSkinLeft.Enabled := State;
+  edtSkinTop.Enabled := State;
+  edtSkinBottom.Enabled := State;
+  btnLoadMediaKeys.Enabled := State;
+  btnSaveMediaKeys.Enabled := State;
   if not State then
     btnQuit.Caption := '&Cancel'
   else
     btnQuit.Caption := '&Quit';
+end;
+
+procedure TfrmMain.SetLeftImage(Index: Integer; const Value: TFileName);
+begin
+  lvwSkinLeft.Items[Index].SubItems[1] := ExtractFileName(Value);
+  lvwSkinLeft.Items[Index].SubItems[2] := ExtractFilePath(Value);
 end;
 
 procedure TfrmMain.SetStatus;

@@ -5,7 +5,8 @@ interface
 uses
   Windows, SysUtils, Forms, Graphics, Classes, Controls, StdCtrls, ComCtrls,
   ExtCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls, OpThBase, Unpacker, Common,
-  GraphicEx, AppEvnts, Dialogs, JvBaseDlg, JvBrowseFolder;
+  GraphicEx, AppEvnts, Dialogs, JvBaseDlg, JvBrowseFolder, JvRichEdit,
+  JvExComCtrls, JvListView;
 
 type
   TfrmMain = class(TForm)
@@ -30,7 +31,6 @@ type
     tsWorking: TTabSheet;
     lblHomeTitle: TLabel;
     lblLicenseTitle: TLabel;
-    reEula: TRichEdit;
     lblLicenseMessage: TLabel;
     rbnLicenseAccept: TRadioButton;
     rbnLicenseDecline: TRadioButton;
@@ -73,6 +73,9 @@ type
     imgError: TImage;
     imgWarn: TImage;
     lblDoneFailGroupMessage: TLabel;
+    reEula: TJvRichEdit;
+    grpInfos: TGroupBox;
+    lvwInfos: TJvListView;
     procedure FormCreate(Sender: TObject);
     procedure pcWizardChanging(Sender: TObject; var AllowChange: Boolean);
     procedure btnNextClick(Sender: TObject);
@@ -84,7 +87,15 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure btnParamsBrowseClick(Sender: TObject);
+    procedure reEulaURLClick(Sender: TObject; const URLText: string;
+      Button: TMouseButton);
     procedure btnAboutClick(Sender: TObject);
+    procedure lvwInfosAdvancedCustomDrawSubItem(Sender: TCustomListView;
+      Item: TListItem; SubItem: Integer; State: TCustomDrawState;
+      Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+    procedure lvwInfosMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure lvwInfosDblClick(Sender: TObject);
   private
     { Déclarations privées }
     fCanceledByClosingWindow: Boolean;
@@ -180,7 +191,7 @@ end;
 
 procedure TfrmMain.btnAboutClick(Sender: TObject);
 begin
-  raise Exception.Create('test');
+  ShowMessage(inttostr(pcWizard.ActivePageIndex));
 end;
 
 procedure TfrmMain.btnCancelClick(Sender: TObject);
@@ -197,8 +208,12 @@ end;
 procedure TfrmMain.btnParamsBrowseClick(Sender: TObject);
 begin
   with bfdOutput do
+  begin
+    if DirectoryExists(edtOutputDir.Text) then
+      Directory := edtOutputDir.Text;
     if Execute then
       edtOutputDir.Text := Directory;
+  end;
 end;
 
 procedure TfrmMain.btnPrevClick(Sender: TObject);
@@ -388,6 +403,7 @@ begin
 {$ELSE}
   edtOutputDir.Text := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
 {$ENDIF}
+  edtOutputDir.SelectAll;
 
   DoubleBuffered := True;
   pbValidator.DoubleBuffered := True;
@@ -424,6 +440,16 @@ var
 {$ENDIF}
 
 begin
+{$IFDEF RELEASE}
+  // There is a memory leak in the JvDriveCtrl and it's really anonying...
+  cbxDrives.ImageSize := isLarge;
+
+  // Hide PageControl Tabs
+  for i := 0 to pcWizard.PageCount - 1 do
+    pcWizard.Pages[i].TabVisible := False;
+{$ENDIF}
+
+  // Select the home.
   pcWizard.ActivePage := tsHome;
 
   // Loading message file
@@ -436,19 +462,15 @@ begin
   // Load the EULA
   if FileExists(GetWorkingTempDirectory + APPCONFIG_EULA) then  
     reEula.Lines.LoadFromFile(GetWorkingTempDirectory + APPCONFIG_EULA);
-
-  // Modify the Wizard Title
-  S := GetStringUI('General', 'WizardTitle');
-  if S <> '' then Caption := S + ' - ' + Caption;
   
-{$IFDEF RELEASE}
-  // There is a memory leak in the JvDriveCtrl and it's really anonying...
-  cbxDrives.ImageSize := isLarge;
-
-  // Hide PageControl Tabs
-  for i := 0 to pcWizard.PageCount - 1 do
-    pcWizard.Pages[i].TabVisible := False;
-{$ENDIF}
+  // Modify the Wizard Title
+  S := GetStringUI('Title', 'WizardTitle');
+  if S <> '' then Caption := S;
+  if ShowAppName then
+    Caption := Caption + ' - ' + Application.Title;
+      
+  // Fill the home infos
+  FillReleaseInfo;
 
   // Color of the Wizard TPageControl
   pcWizard.Brush.Color := clCream;
@@ -459,6 +481,38 @@ begin
 
   // Set if the button must be disabled or not.
   OnWizardAfterPageChange;
+end;
+
+procedure TfrmMain.lvwInfosAdvancedCustomDrawSubItem(Sender: TCustomListView;
+  Item: TListItem; SubItem: Integer; State: TCustomDrawState;
+  Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+begin
+  if (SubItem > 0) and IsInString('://', Item.SubItems[0]) then
+  begin
+    Sender.Canvas.Font.Color := clBlue;
+    Sender.Canvas.Font.Style := [fsUnderline];
+  end;
+end;
+
+procedure TfrmMain.lvwInfosDblClick(Sender: TObject);
+begin
+  if IsInString('://', lvwInfos.ItemFocused.SubItems[0]) then
+    OpenLink(lvwInfos.ItemFocused.SubItems[0]);
+end;
+
+procedure TfrmMain.lvwInfosMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+var
+  HoverItem: TListItem;
+
+begin
+  HoverItem := lvwInfos.GetItemAt(X,  Y);
+  if Assigned(HoverItem) and (HoverItem.SubItems.Count > 0) then
+  begin
+    lvwInfos.Cursor := crDefault;
+    if IsInString('://', HoverItem.SubItems[0]) then
+      lvwInfos.Cursor := crHandPoint;
+  end;
 end;
 
 function TfrmMain.MsgBox(Text, Title: string; Flags: Integer): Integer;
@@ -534,6 +588,7 @@ begin
       begin
         btnPrev.Tag := BUTTON_ACTION_SHOW_CHECKDISC;
         btnNext.Tag := BUTTON_ACTION_CHECK_EXTRACT_PARAMS;
+        edtOutputDir.SetFocus;
       end;
 
     // Ready to extract
@@ -665,6 +720,12 @@ procedure TfrmMain.rbnLicenseAcceptClick(Sender: TObject);
 begin
   if PageIndex = SCREEN_LICENSE then
     btnNext.Enabled := rbnLicenseAccept.Checked;
+end;
+
+procedure TfrmMain.reEulaURLClick(Sender: TObject; const URLText: string;
+  Button: TMouseButton);
+begin
+  OpenLink(URLText);
 end;
 
 procedure TfrmMain.SetPageIndex(const Value: Integer);

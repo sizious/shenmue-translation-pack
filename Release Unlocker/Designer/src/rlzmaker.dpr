@@ -2,6 +2,7 @@ program rlzmaker;
 
 {$R 'runtime.res' 'runtime.rc'}
 {$R '..\..\Common\d7zip\d7z.res' '..\..\Common\d7zip\d7z.rc'}
+{$R 'about\credits.res' 'about\credits.rc'}
 
 uses
   Windows,
@@ -23,7 +24,9 @@ uses
   Base64 in '..\..\..\Common\Crypto\Base64.pas',
   common in '..\..\Common\common.pas',
   fileslst in '..\..\..\Common\fileslst.pas',
-  hashidx in '..\..\..\Common\hashidx.pas';
+  hashidx in '..\..\..\Common\hashidx.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 

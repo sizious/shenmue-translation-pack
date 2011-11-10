@@ -13,8 +13,8 @@ type
   private
     { Déclarations privées }
     fPasswords: TPackagePasswords;
-    fOnStartCrypto: TOperationStartEvent;
-    fOnProgressCrypto: TOperationProgressEvent;
+//    fOnStartCrypto: TOperationStartEvent;
+//    fOnProgressCrypto: TOperationProgressEvent;
     fOutputDirectory: TFileName;
     fInputDirectory: TFileName;
     fDirectorySize: Int64;
@@ -23,11 +23,11 @@ type
     fAppConfig: TFileName;
     fEula: TFileName;
 
-    procedure StartCryptoEvent;
-    procedure ProgressCryptoEvent;
+//    procedure StartCryptoEvent;
+//    procedure ProgressCryptoEvent;
 
     procedure CompressSourcePackage;
-    procedure EncryptPackage;
+//    procedure EncryptPackage;
     procedure CompileRuntimePackage;
     procedure CompileExtraFiles;
     function WriteDiscAuthentification: TFileName;
@@ -54,10 +54,10 @@ type
 
     property SkinImages: TSkinImages read fSkinImages;
 
-    property OnStartCrypto: TOperationStartEvent read fOnStartCrypto
+(*    property OnStartCrypto: TOperationStartEvent read fOnStartCrypto
       write fOnStartCrypto;
     property OnProgressCrypto: TOperationProgressEvent read fOnProgressCrypto
-      write fOnProgressCrypto;
+      write fOnProgressCrypto;*)
   end;
 
 //------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ uses
 const
   COMPRESSION_LEVEL_MAX = 9;
 
-  RUNTIME_PACKAGE_RELEASE_FILENAME  = 'package.bin';
+  RUNTIME_PACKAGE_RELEASE_FILENAME  = 'package.tmp';
 
   RUNTIME_PACKAGE_RESOURCE_NAME     = 'RUNTIME';
   RUNTIME_PACKAGE_FINAL_OUTPUT      = 'unpacker.exe'; //'rlzulock.exe';
@@ -115,11 +115,11 @@ begin
   end;
 end;
 
-procedure TPackageMakerThread.ProgressCryptoEvent;
+(*procedure TPackageMakerThread.ProgressCryptoEvent;
 begin
   if Assigned(OnProgressCrypto) then
     OnProgressCrypto(Self, fCurrent, fTotal);
-end;
+end;*)
 
 procedure TPackageMakerThread.SetInputDirectory;
 begin
@@ -131,11 +131,11 @@ begin
   fOutputDirectory := IncludeTrailingPathDelimiter(Value);
 end;
 
-procedure TPackageMakerThread.StartCryptoEvent;
+(*procedure TPackageMakerThread.StartCryptoEvent;
 begin
   if Assigned(OnStartCrypto) then
     OnStartCrypto(Self, fTotal);
-end;
+end;*)
 
 procedure TPackageMakerThread.CompressSourcePackage;
 var
@@ -171,11 +171,11 @@ begin
     if FileExists(OutputPackage) then
       DeleteFile(OutputPackage);
     SaveToFile(OutputPackage);
-
-    // When done, wait a bit...
-    if not Aborted then
-      Sleep(500);
   end;
+
+  // When done, wait a bit...
+  if not Aborted then
+    Sleep(500);
 end;
 
 constructor TPackageMakerThread.Create;
@@ -194,6 +194,7 @@ begin
   inherited;
 end;
 
+(*
 procedure TPackageMakerThread.EncryptPackage;
 const
   CODEC_BLOCK_SIZE = 16777216; // 16 MB
@@ -244,6 +245,7 @@ begin
     Memory2.Free;
   end;
 end;
+*)
 
 procedure TPackageMakerThread.CompileExtraFiles;
 var
@@ -295,18 +297,19 @@ begin
     if FileExists(ExtraOutputPackage) then
       DeleteFile(ExtraOutputPackage);
     SaveToFile(ExtraOutputPackage);
-
-    // When done, wait a bit...
-    if not Aborted then
-      Sleep(500);
   end;
+
+  // When done, wait a bit...
+  if not Aborted then
+    Sleep(500);
 end;
 
 procedure TPackageMakerThread.CompileRuntimePackage;
 var
   i: Integer;
-  WorkFileName, RuntimeFileName, DiscAuthFileName, ExtraOutputPackage: TFileName;
-  DiscAuthInStream, ExtraResInStream, OutStream: TFileStream;
+  WorkFileName, RuntimeFileName, DiscAuthFileName, ExtraOutputPackage,
+  ReleasePackage: TFileName;
+  PackageInStream, DiscAuthInStream, ExtraResInStream, OutStream: TFileStream;
   CryptedStream: TMemoryStream;
   Offset, ResCount: LongWord;
   Passwords: TPackagePasswords;
@@ -326,6 +329,9 @@ var
     // Write datas to the final runtime file
     OutStream.CopyFrom(SourceStream, Size);
     SourceStream.Seek(0, soFromBeginning);
+
+    // Add a new resource
+    Inc(ResCount, 1);
   end;
 
 begin
@@ -333,8 +339,7 @@ begin
   WriteLn('CompileRuntimePackage');
 {$ENDIF}
 
-  // At least for the resource...
-  ResCount := 1;
+  ResCount := 0;
 
   // Extracting the Runtime Setup Application.
   RuntimeFileName := GetWorkingTempDirectory + RUNTIME_PACKAGE_RESOURCE_NAME + '.BIN';
@@ -349,6 +354,9 @@ begin
   begin
     Passwords := TPackagePasswords.Create;
 
+    ReleasePackage := OutputDirectory + RUNTIME_PACKAGE_RELEASE_FILENAME;
+    PackageInStream := TFileStream.Create(ReleasePackage, fmOpenRead);
+
     ExtraResInStream := TFileStream.Create(ExtraOutputPackage, fmOpenRead);
     DiscAuthInStream := TFileStream.Create(DiscAuthFileName, fmOpenRead);
     OutStream := TFileStream.Create(RuntimeFileName, fmOpenWrite);
@@ -356,6 +364,12 @@ begin
       // Move to the end in the Runtime binary...
       OutStream.Seek(0, soFromEnd);
       Offset := OutStream.Position;
+
+      //------------------------------------------------------------------------
+      // WRITING PACKAGE.BIN TO RUNTIME
+      //------------------------------------------------------------------------
+
+      BindResource(PackageInStream, RESTYPE_PACKAGE);
 
       //------------------------------------------------------------------------
       // WRITING RESOURCE FILES
@@ -399,7 +413,6 @@ begin
 
         Inc(i);
       end; // for
-      Inc(ResCount, i);
 
       //------------------------------------------------------------------------
       // FINALIZE RUNTIME
@@ -413,10 +426,14 @@ begin
       OutStream.Write(ResCount, UINT32_SIZE);
     finally
       Passwords.Free;
+      PackageInStream.Free;
       ExtraResInStream.Free;
       DiscAuthInStream.Free;
       OutStream.Free;
+
+      // Cleaning temp files
       DeleteFile(DiscAuthFileName);
+      DeleteFile(ReleasePackage);
 
       // Move the final runtime binary to the output directory...
       WorkFileName := OutputDirectory + RUNTIME_PACKAGE_FINAL_OUTPUT;
@@ -463,7 +480,7 @@ begin
     CompressSourcePackage;
 
     // Encrypt the result compressed package source file with Camellia.
-    EncryptPackage;
+//    EncryptPackage;
 
     // Compile extra resource (gui, images, etc...)
     CompileExtraFiles;
