@@ -41,7 +41,7 @@ function WrapStr: string;
 implementation
 
 uses
-  Themes, ShellApi, Graphics;
+  Themes, ShellApi, Graphics, Registry, Controls;
 
 var
   sWrapStr: string; // used for MsgBox
@@ -397,8 +397,79 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks to ronchon_sama
+// http://www.delphifr.com/codes/CHARGEMENT-CURSEUR-MAIN-WINDOWS-RESOLUTION-VARIABLES-ENVIRONNEMENT_22587.aspx
+function LoadWindowsHand: Boolean;
+
+  // Retourne un nom de fichier avec résolution des variables d'environnement
+  function ExpandEnvironmentVariable(S: string): string;
+  var
+    Res: Cardinal;
+    Name: PChar;
+
+  begin
+    // Alloue la mémoire
+    GetMem(Name, MAX_PATH);
+
+    // Appel de la fonction de résolution de variables
+    Res := ExpandEnvironmentStrings(PChar(s), Name, MAX_PATH);
+
+    // Si la mémoire allouée n'est pas assez grande, le résultat est la taille
+    // nécessaire devant être allouée
+    if Res > MAX_PATH then
+    begin
+      // Réallocation de la mémoire et nouvel appel
+      GetMem(Name, Res);
+      ExpandEnvironmentStrings(PChar(s), Name, Res);
+    end;
+    
+    Result := Name;
+    // Libération de la mémoire
+    FreeMem(Name);
+  end;
+
+var
+    s: string;
+    Res: HCURSOR;
+begin
+    // Initialise les variables
+    Result := true;
+    s := '';
+
+    // Vérifie si un fichier est définit dans la base de registre
+    with TRegistry.Create do
+    try
+        RootKey := HKEY_CURRENT_USER;
+        if Openkey('\Control Panel\Cursors', false) then
+        begin
+            s := ExpandEnvironmentVariable(ReadString('Hand'));
+            CloseKey;
+        end;
+    finally
+        Free;
+    end;
+    // Vérifie si le fichier existe
+    if (s <> '') and FileExists(s) then
+        // Essaie de charger le fichier
+        Res := LoadCursorFromFile(Pchar(s))
+    else
+        // Essaie de charger le curseur Windows par défaut
+        Res := LoadCursor(0, IDC_HAND);
+
+    // Un curseur a été chargé si Res n'est pas nul
+    if Res <> 0 then
+        // Remplace le curseur Delphi 'crHandPoint'
+        Screen.Cursors[crHandPoint] := Res
+    else
+        // Aucun curseur n'a été chargé
+        Result := false;
+end;
+
+//------------------------------------------------------------------------------
+
 initialization
   InitWrapStr;
+  LoadWindowsHand;
 
 //------------------------------------------------------------------------------
 

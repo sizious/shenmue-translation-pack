@@ -270,7 +270,8 @@ var
 
     if not Result then
     begin
-      MsgBox('The specified ' + S + ' doesn''t exists.', 'Warning', MB_ICONWARNING);
+      MsgBox('The specified ' + S + ' doesn''t exists.' + WrapStr
+        + 'FileName: "' + E.Text + '".', 'Warning', MB_ICONWARNING);
       (E.Parent.Parent as TTabSheet).Show;
       E.SetFocus;
     end;
@@ -302,7 +303,8 @@ begin
     if not Result then
     begin
       MsgBox('The left skin image #' + IntToStr(i+1)
-        + ' doesn''t exists.', 'Warning', MB_ICONWARNING);
+        + ' doesn''t exists.' + WrapStr
+        + 'FileName: "' + LeftImages[i] + '".', 'Warning', MB_ICONWARNING);
       tsSkin.Show;
       lvwSkinLeft.ItemIndex := i;
       lvwSkinLeft.SetFocus;
@@ -314,7 +316,8 @@ begin
   Result := lvDiscKeys.Items.Count > 0;
   if not Result then
   begin
-    MsgBox('Please extract at least one media key from an original disc.', 'Warning', MB_ICONWARNING);
+    MsgBox('Please extract at least one media key'
+      + 'from an original disc.', 'Warning', MB_ICONWARNING);
     Exit;
   end;
 end;
@@ -477,7 +480,7 @@ begin
   if not AddMediaKey(MediaKey, DiscLabelName) then
   begin
     Status := 'The key was already in list.';
-    MsgBox('The key was already in list.' + sLineBreak +
+    MsgBox('The key was already in list.' + WrapStr +
       'Please insert another media in your drive.',
       'Information', MB_ICONINFORMATION);
   end;
@@ -569,7 +572,7 @@ begin
       SubItems.Add('');  
     end;
   lvwSkinLeft.ItemIndex := 0;
-
+  
 {$IFDEF DEBUG}
   edtSourceDir.Text := 'C:\Temp\~shenin\';
   edtDestDir.Text := 'C:\Temp\~shenout\';
@@ -772,7 +775,7 @@ begin
   end else begin
     Status := 'Done !';
     SetStatusProgress(MaxDouble);
-    MsgBox('All the files were packaged successfully.' + sLineBreak +
+    MsgBox('All the files were packaged successfully.' + WrapStr +
       'Your production is now ready to be released!', 'Congrats!',
       MB_ICONINFORMATION); 
   end;
