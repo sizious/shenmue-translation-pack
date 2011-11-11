@@ -238,6 +238,7 @@ begin
   Thread := WorkingThread as TDiscValidatorThread;
   if Thread.Aborted then
     PageIndex := SCREEN_CHECKDISC_FAILED;
+  cbxDrives.Enabled := True;    
 end;
 
 procedure TfrmMain.DiscValidatorProgress;
@@ -264,8 +265,6 @@ begin
     PageIndex := SCREEN_EXTRACT_PARAMETERS;
   end else
     PageIndex := SCREEN_CHECKDISC_FAILED;
-
-  cbxDrives.Enabled := True;
 end;
 
 procedure TfrmMain.DoCheckExtractParams;

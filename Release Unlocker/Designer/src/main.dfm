@@ -348,6 +348,10 @@ object frmMain: TfrmMain
     TabOrder = 1
     object tsGeneral: TTabSheet
       Caption = 'Main'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbxSource: TGroupBox
         Left = 3
         Top = 3
@@ -394,8 +398,8 @@ object frmMain: TfrmMain
         object Label5: TLabel
           Left = 8
           Top = 17
-          Width = 361
-          Height = 20
+          Width = 338
+          Height = 13
           Caption = 
             'Specify here the folder where the result of this process will be' +
             ' written.'
@@ -422,6 +426,10 @@ object frmMain: TfrmMain
     object tsOptions: TTabSheet
       Caption = 'Config'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox2: TGroupBox
         Left = 3
         Top = 3
@@ -693,6 +701,10 @@ object frmMain: TfrmMain
     object tsSkin: TTabSheet
       Caption = 'Skin'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -814,6 +826,10 @@ object frmMain: TfrmMain
       Caption = 'EULA'
       ImageIndex = 3
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox3: TGroupBox
         Left = 3
         Top = 3

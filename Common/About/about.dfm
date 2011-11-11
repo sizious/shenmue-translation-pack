@@ -19,7 +19,7 @@ object frmAbout: TfrmAbout
   TextHeight = 13
   object lProductNameShadow: TLabel
     Left = 313
-    Top = 20
+    Top = 22
     Width = 192
     Height = 19
     Alignment = taCenter
@@ -35,8 +35,8 @@ object frmAbout: TfrmAbout
   end
   object lAppVersion: TLabel
     Left = 313
-    Top = 58
-    Width = 183
+    Top = 60
+    Width = 190
     Height = 13
     Alignment = taCenter
     AutoSize = False
@@ -44,8 +44,8 @@ object frmAbout: TfrmAbout
   end
   object lProductName: TLabel
     Left = 311
-    Top = 18
-    Width = 192
+    Top = 20
+    Width = 190
     Height = 19
     Alignment = taCenter
     AutoSize = False
@@ -66,7 +66,7 @@ object frmAbout: TfrmAbout
   end
   object bvMiddle: TBevel
     Left = 311
-    Top = 77
+    Top = 76
     Width = 190
     Height = 2
   end
@@ -84,11 +84,14 @@ object frmAbout: TfrmAbout
     Font.Name = 'Tahoma'
     Font.Style = [fsItalic]
     ParentFont = False
+    OnClick = lShenTradClick
+    OnMouseEnter = lShenTradMouseEnter
+    OnMouseLeave = lShenTradMouseLeave
   end
   object lAppVersionTitle: TLabel
     Left = 313
     Top = 45
-    Width = 183
+    Width = 190
     Height = 13
     Alignment = taCenter
     AutoSize = False
@@ -102,9 +105,29 @@ object frmAbout: TfrmAbout
   end
   object bvUp: TBevel
     Left = 313
-    Top = 42
+    Top = 43
     Width = 188
     Height = 2
+  end
+  object Label1: TLabel
+    Left = 311
+    Top = 200
+    Width = 192
+    Height = 13
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'http://shenmuesubs.sourceforge.net/'
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clHotLight
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentColor = False
+    ParentFont = False
+    OnClick = lShenTradClick
+    OnMouseEnter = lShenTradMouseEnter
+    OnMouseLeave = lShenTradMouseLeave
   end
   object pImage: TPanel
     Left = 3
@@ -1520,6 +1543,16 @@ object frmAbout: TfrmAbout
         5FDD0F9664388DE2A5BEC710808A1FEF2C1F4E055AFD310944C3FEF22E62E4FA
         9CEC5F4AC93ECE00992A69FF006C7CF0CD8C39A7FF00EEFF00F9E7988E5BFFD9}
     end
+    object Label2: TLabel
+      Left = 32
+      Top = 78
+      Width = 93
+      Height = 75
+      AutoSize = False
+      Caption = ' '
+      ShowAccelChar = False
+      OnDblClick = Label2DblClick
+    end
   end
   object bClose: TButton
     Left = 190
@@ -1532,9 +1565,9 @@ object frmAbout: TfrmAbout
   end
   object mCredits: TMemo
     Left = 311
-    Top = 82
+    Top = 80
     Width = 190
-    Height = 134
+    Height = 117
     Alignment = taCenter
     Color = clBtnFace
     Lines.Strings = (
