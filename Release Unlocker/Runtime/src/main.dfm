@@ -36,9 +36,9 @@ object frmMain: TfrmMain
       object lblHomeTitle: TLabel
         Left = 12
         Top = 12
-        Width = 112
+        Width = 119
         Height = 19
-        Caption = '<%HOME%>'
+        Caption = '(lblHomeTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -46,36 +46,50 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblHomeMessage: TLabel
+      object lklHomeMessage: TJvLinkLabel
         Left = 12
         Top = 41
-        Width = 485
+        Width = 489
         Height = 104
-        AutoSize = False
-        Caption = '<%HOME_MESSAGE%>'
-        WordWrap = True
+        Caption = '(lklHomeMessage)'
+        Text.Strings = (
+          '(lklHomeMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
       object grpInfos: TGroupBox
         Left = 12
         Top = 151
         Width = 489
         Height = 200
-        Caption = ' <%RELEASE_INFOS%> '
+        Caption = '(grpInfos)'
         TabOrder = 0
+        object lklReleaseInfosDblClick: TJvLinkLabel
+          Left = 12
+          Top = 180
+          Width = 465
+          Height = 13
+          Caption = '(lklReleaseInfosDblClick)'
+          Text.Strings = (
+            '(lklReleaseInfosDblClick)')
+          Transparent = True
+          AutoHeight = False
+          OnLinkClick = lklHomeMessageLinkClick
+        end
         object lvwInfos: TJvListView
           Left = 12
           Top = 20
           Width = 465
-          Height = 169
-          Color = clCream
+          Height = 157
           Columns = <
             item
-              Caption = '<%NAME%>'
+              Caption = '(colName)'
               Width = 100
             end
             item
               AutoSize = True
-              Caption = '<%VALUE%>'
+              Caption = '(colValue)'
             end>
           ColumnClick = False
           ReadOnly = True
@@ -101,9 +115,9 @@ object frmMain: TfrmMain
       object lblDisclamerTitle: TLabel
         Left = 12
         Top = 12
-        Width = 161
+        Width = 152
         Height = 19
-        Caption = '<%DISCLAMER%>'
+        Caption = '(lblDisclamerTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -111,14 +125,26 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblDisclamerMessage: TLabel
+      object lklDisclamerMessage: TJvLinkLabel
         Left = 12
         Top = 41
+        Width = 489
+        Height = 287
+        Caption = '(lklDisclamerMessage)'
+        Text.Strings = (
+          '(lklDisclamerMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
+      end
+      object chkDisclamerRead: TCheckBox
+        Left = 12
+        Top = 335
         Width = 485
-        Height = 300
-        AutoSize = False
-        Caption = '<%DISCLAMER_SHENTRAD_MESSAGE%>'
-        WordWrap = True
+        Height = 17
+        Caption = '(chkDisclamerRead)'
+        TabOrder = 0
+        OnClick = chkDisclamerReadClick
       end
     end
     object tsLicense: TTabSheet
@@ -127,9 +153,9 @@ object frmMain: TfrmMain
       object lblLicenseTitle: TLabel
         Left = 12
         Top = 12
-        Width = 133
+        Width = 132
         Height = 19
-        Caption = '<%LICENSE%>'
+        Caption = '(lblLicenseTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -137,12 +163,17 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblLicenseMessage: TLabel
+      object lklLicenseMessage: TJvLinkLabel
         Left = 12
         Top = 41
-        Width = 248
+        Width = 489
         Height = 13
-        Caption = '<%PRESS_PAGE_DOWN_TO_READ_THE_NEXT%>'
+        Caption = '(lklLicenseMessage)'
+        Text.Strings = (
+          '(lklLicenseMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
       object rbnLicenseAccept: TRadioButton
         Left = 12
@@ -180,39 +211,15 @@ object frmMain: TfrmMain
       object lblDiscAuthTitle: TLabel
         Left = 12
         Top = 12
-        Width = 151
+        Width = 144
         Height = 19
-        Caption = '<%DISCAUTH%>'
+        Caption = '(lblDiscAuthTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-      end
-      object lblDiscAuthMessage: TLabel
-        Left = 12
-        Top = 41
-        Width = 485
-        Height = 88
-        AutoSize = False
-        Caption = '<%DISCAUTH_DESCRIPTION%>'
-        WordWrap = True
-      end
-      object lblDiscAuthWarning: TLabel
-        Left = 50
-        Top = 319
-        Width = 447
-        Height = 32
-        AutoSize = False
-        Caption = '<%DISCAUTH_WARNING%>'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        WordWrap = True
       end
       object imgWarn: TImage
         Left = 12
@@ -10441,12 +10448,36 @@ object frmMain: TfrmMain
           C0030000E0070000E0070000F00F0000F00F0000F81F0000FC3F0000FC3F0000
           FE7F0000FFFF0000FFFF0000}
       end
+      object lklDiscAuthMessage: TJvLinkLabel
+        Left = 12
+        Top = 41
+        Width = 485
+        Height = 88
+        Caption = '(lklDiscAuthMessage)'
+        Text.Strings = (
+          '(lklDiscAuthMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
+      end
+      object lklDiscAuthWarning: TJvLinkLabel
+        Left = 50
+        Top = 325
+        Width = 447
+        Height = 32
+        Caption = '(lklDiscAuthWarning)'
+        Text.Strings = (
+          '(lklDiscAuthWarning)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
+      end
       object grpDiscAuthSelectDrive: TGroupBox
         Left = 12
         Top = 147
         Width = 485
         Height = 68
-        Caption = ' <%PLEASE_SELECT_DRIVE%> '
+        Caption = '(grpDiscAuthSelectDrive)'
         TabOrder = 0
         object cbxDrives: TJvDriveCombo
           Left = 8
@@ -10464,7 +10495,7 @@ object frmMain: TfrmMain
         Top = 231
         Width = 485
         Height = 62
-        Caption = ' <%DISCAUTH_PROGRESS%> '
+        Caption = '(grpDiscAuthProgress)'
         TabOrder = 1
         object pbValidator: TProgressBar
           Left = 8
@@ -10481,9 +10512,9 @@ object frmMain: TfrmMain
       object lblAuthFailTitle: TLabel
         Left = 12
         Top = 12
-        Width = 220
+        Width = 140
         Height = 19
-        Caption = '<%DISCAUTH_FAILED%>'
+        Caption = '(lblAuthFailTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -10491,14 +10522,17 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblAuthFailMessage: TLabel
+      object lklAuthFailMessage: TJvLinkLabel
         Left = 12
         Top = 41
-        Width = 489
+        Width = 485
         Height = 296
-        AutoSize = False
-        Caption = '<%DISCAUTH_REASONS%>'
-        WordWrap = True
+        Caption = '(lklAuthFailMessage)'
+        Text.Strings = (
+          '(lklAuthFailMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
     end
     object tsParams: TTabSheet
@@ -10510,7 +10544,7 @@ object frmMain: TfrmMain
         Width = 489
         Height = 19
         AutoSize = False
-        Caption = '<%EXTRACT_PARAMS%>'
+        Caption = '(lblParamsTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -10518,43 +10552,48 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblParamsMessage: TLabel
+      object lklParamsMessage: TJvLinkLabel
         Left = 12
         Top = 41
-        Width = 489
+        Width = 485
         Height = 108
-        AutoSize = False
-        Caption = '<%EXTRACT_PARAMS_MESSAGE%>'
-        WordWrap = True
+        Caption = '(lklParamsMessage)'
+        Text.Strings = (
+          '(lklParamsMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
       object grpParamsExtract: TGroupBox
         Left = 12
         Top = 159
         Width = 489
         Height = 90
-        Caption = ' <%EXTRACT_PARAMS_OUTPUT_DIR%> '
+        Caption = '(grpParamsExtract)'
         TabOrder = 0
-        object lblParamsUnpackedSize: TLabel
+        object lklParamsUnpackedSize: TJvLinkLabel
           Left = 8
-          Top = 71
-          Width = 127
-          Height = 13
-          Caption = '<%NEEDED_SPACE%>'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
-        object lblParamsExtractToOutputDir: TLabel
-          Left = 8
-          Top = 17
+          Top = 68
           Width = 473
-          Height = 25
-          AutoSize = False
-          Caption = '<%EXTRACT_PARAMS_OUTPUT_DIR_MESSAGE%>'
-          WordWrap = True
+          Height = 15
+          Caption = '(lklParamsUnpackedSize)'
+          Text.Strings = (
+            '(lklParamsUnpackedSize)')
+          Transparent = True
+          AutoHeight = False
+          OnLinkClick = lklHomeMessageLinkClick
+        end
+        object lklParamsExtractToOutputDir: TJvLinkLabel
+          Left = 8
+          Top = 19
+          Width = 473
+          Height = 19
+          Caption = '(lklParamsExtractToOutputDir)'
+          Text.Strings = (
+            '(lklParamsExtractToOutputDir)')
+          Transparent = True
+          AutoHeight = False
+          OnLinkClick = lklHomeMessageLinkClick
         end
         object edtOutputDir: TEdit
           Left = 8
@@ -10580,9 +10619,9 @@ object frmMain: TfrmMain
       object lblReadyTitle: TLabel
         Left = 12
         Top = 12
-        Width = 233
+        Width = 123
         Height = 19
-        Caption = '<%READY_TO_UNPACK%>'
+        Caption = '(lblReadyTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -10590,14 +10629,17 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblReadyMessage: TLabel
+      object lklReadyMessage: TJvLinkLabel
         Left = 12
         Top = 41
         Width = 485
-        Height = 276
-        AutoSize = False
-        Caption = '<%READY_TO_UNPACK_MESSAGE%>'
-        WordWrap = True
+        Height = 310
+        Caption = '(lklReadyMessage)'
+        Text.Strings = (
+          '(lklReadyMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
     end
     object tsWorking: TTabSheet
@@ -10606,9 +10648,9 @@ object frmMain: TfrmMain
       object lblWorkingTitle: TLabel
         Left = 12
         Top = 12
-        Width = 146
+        Width = 140
         Height = 19
-        Caption = '<%WORKING%>'
+        Caption = '(lblWorkingTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -10616,21 +10658,24 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblWorkingMessage: TLabel
+      object lklWorkingMessage: TJvLinkLabel
         Left = 12
         Top = 41
         Width = 485
-        Height = 88
-        AutoSize = False
-        Caption = '<%READY_TO_UNPACK_MESSAGE%>'
-        WordWrap = True
+        Height = 108
+        Caption = '(lklWorkingMessage)'
+        Text.Strings = (
+          '(lklWorkingMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
       object grpWorkingProgress: TGroupBox
         Left = 12
         Top = 155
         Width = 485
         Height = 62
-        Caption = ' <%WORKING_PROGRESS%> '
+        Caption = '(grpWorkingProgress)'
         TabOrder = 0
         object lblUnpackProgress: TLabel
           Left = 415
@@ -10663,9 +10708,9 @@ object frmMain: TfrmMain
       object lblDoneTitle: TLabel
         Left = 12
         Top = 12
-        Width = 110
+        Width = 114
         Height = 19
-        Caption = '<%DONE%>'
+        Caption = '(lblDoneTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -10673,14 +10718,17 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblDoneMessage: TLabel
+      object lklDoneMessage: TJvLinkLabel
         Left = 12
         Top = 41
         Width = 485
         Height = 300
-        AutoSize = False
-        Caption = '<%READY_TO_UNPACK_MESSAGE%>'
-        WordWrap = True
+        Caption = '(lklDoneMessage)'
+        Text.Strings = (
+          '(lklDoneMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
     end
     object tsDoneFail: TTabSheet
@@ -10689,9 +10737,9 @@ object frmMain: TfrmMain
       object lblDoneFailTitle: TLabel
         Left = 12
         Top = 12
-        Width = 205
+        Width = 143
         Height = 19
-        Caption = '<%DONEFAIL_TITLE%>'
+        Caption = '(lblDoneFailTitle)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
@@ -10699,21 +10747,24 @@ object frmMain: TfrmMain
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object lblDoneFailMessage: TLabel
+      object lklDoneFailMessage: TJvLinkLabel
         Left = 12
         Top = 41
-        Width = 489
-        Height = 72
-        AutoSize = False
-        Caption = '<%DONEFAIL_MESSAGE%>'
-        WordWrap = True
+        Width = 485
+        Height = 108
+        Caption = '(lklDoneFailMessage)'
+        Text.Strings = (
+          '(lklDoneFailMessage)')
+        Transparent = True
+        AutoHeight = False
+        OnLinkClick = lklHomeMessageLinkClick
       end
       object grpDoneFailErrorMessage: TGroupBox
         Left = 12
         Top = 160
         Width = 489
         Height = 191
-        Caption = ' <%GRP_DONEFAIL%> '
+        Caption = '(grpDoneFailErrorMessage)'
         TabOrder = 0
         object imgError: TImage
           Left = 12
@@ -10858,20 +10909,17 @@ object frmMain: TfrmMain
             C0000003E0000003E0000007F000000FF800001FFC00003FFF0000FFFFC003FF
             FFF81FFF}
         end
-        object lblDoneFailGroupMessage: TLabel
+        object lklDoneFailGroupMessage: TJvLinkLabel
           Left = 50
-          Top = 20
+          Top = 23
           Width = 427
           Height = 32
-          AutoSize = False
-          Caption = '<%DONEFAIL_GROUP_MESSAGE%>'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = [fsBold]
-          ParentFont = False
-          WordWrap = True
+          Caption = '(lklDoneFailGroupMessage)'
+          Text.Strings = (
+            '(lklDoneFailGroupMessage)')
+          Transparent = True
+          AutoHeight = False
+          OnLinkClick = lklHomeMessageLinkClick
         end
         object memDoneFail: TMemo
           Left = 12
@@ -10934,7 +10982,7 @@ object frmMain: TfrmMain
       Top = 16
       Width = 90
       Height = 25
-      Caption = '<%PREV%>'
+      Caption = '(btnPrev)'
       TabOrder = 1
       OnClick = btnPrevClick
     end
@@ -10943,7 +10991,7 @@ object frmMain: TfrmMain
       Top = 16
       Width = 90
       Height = 25
-      Caption = '<%NEXT%>'
+      Caption = '(btnNext)'
       TabOrder = 2
       OnClick = btnNextClick
     end
@@ -10952,7 +11000,7 @@ object frmMain: TfrmMain
       Top = 16
       Width = 90
       Height = 25
-      Caption = '<%CANCEL%>'
+      Caption = '(btnCancel)'
       TabOrder = 3
       OnClick = btnCancelClick
     end
@@ -10961,7 +11009,7 @@ object frmMain: TfrmMain
       Top = 16
       Width = 90
       Height = 25
-      Caption = '<%ABOUT%>'
+      Caption = '(btnAbout)'
       TabOrder = 0
       OnClick = btnAboutClick
     end
@@ -10990,12 +11038,18 @@ object frmMain: TfrmMain
   object ApplicationEvents: TApplicationEvents
     OnException = ApplicationEventsException
     Left = 656
-    Top = 88
+    Top = 152
   end
   object bfdOutput: TJvBrowseForFolderDialog
     Title = '<%TITLE%>'
     StatusText = '<%STATUSTEXT%>'
     Left = 656
-    Top = 120
+    Top = 184
+  end
+  object tmrLoadRes: TTimer
+    Interval = 500
+    OnTimer = tmrLoadResTimer
+    Left = 136
+    Top = 12
   end
 end

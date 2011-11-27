@@ -9,10 +9,6 @@ uses
   Windows, SysUtils, Classes, FilesLst;
   
 const
-  RESTYPE_DISCAUTH = 0;
-  RESTYPE_APPCONFIG = 1;
-  RESTYPE_PACKAGE = 2;
-
   RUNTIME_EXTRA_RESOURCE_PASSWORD = 'MessageBoxW';
 
   APPCONFIG_UI_MESSAGES       = 'ui.ini';
@@ -40,6 +36,8 @@ const
   );
 
 type
+  TResourceType = (rtDiscAuth, rtResPrimary, rtResSecondary, rtPackage);
+
   TSkinImages = class(TObject)
   private
     fLeftImages: TFilesList;

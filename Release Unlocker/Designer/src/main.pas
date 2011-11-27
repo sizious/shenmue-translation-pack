@@ -163,7 +163,7 @@ implementation
 
 uses
   SysTools, UITools, Math, DateUtils, WorkDir, About, AppVer, IniFiles;
-  
+
 {$R *.dfm}
 
 procedure TfrmMain.btnQuitClick(Sender: TObject);
@@ -574,21 +574,21 @@ begin
   lvwSkinLeft.ItemIndex := 0;
   
 {$IFDEF DEBUG}
-  edtSourceDir.Text := 'C:\Temp\~shenin\';
+  edtSourceDir.Text := 'L:\TEMP\'; //'C:\Temp\~shenin\';
   edtDestDir.Text := 'C:\Temp\~shenout\';
 
-  LoadMediaKeys('M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Designer\bin\keyslist.mkl');
+  LoadMediaKeys('.\keyslist.mkl');
 
   edtPC1.Text := '________________________________';
   edtCamellia.Text := '________________________________';
   edtAES.Text := '________________________________';
-  edtAppConfig.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\ui_french.ini';
-  edtEULA.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\eula.rtf';
-  edtSkinTop.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\top.bmp';
-  edtSkinBottom.Text := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\bottom.bmp';
+  edtAppConfig.Text := '.\template\config\ui_french.ini';
+  edtEULA.Text := '.\template\config\eula.rtf';
+  edtSkinTop.Text := '.\template\skin\top.bmp';
+  edtSkinBottom.Text := '.\template\skin\bottom.bmp';
   for i := 0 to 9 do
   begin
-    LeftImages[i] := 'M:\Sources\Delphi\Projets\Shenmue Translation Pack\Source\Release Unlocker\Runtime\bin\template\'
+    LeftImages[i] := '.\template\skin\'
       + 'center' + Format('%0.2d', [i+1]) + '.bmp';
   end;
 {$ELSE}

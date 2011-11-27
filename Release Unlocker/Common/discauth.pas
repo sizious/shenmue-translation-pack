@@ -65,7 +65,7 @@ end;
 
 procedure TDiscValidatorThread.EventFailed;
 begin
-  DriveUnitController.Eject;
+//  DriveUnitController.Eject;
   if Assigned(OnFail) then
     OnFail(Self);
 end;

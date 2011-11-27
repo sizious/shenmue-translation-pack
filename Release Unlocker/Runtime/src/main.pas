@@ -6,7 +6,7 @@ uses
   Windows, SysUtils, Forms, Graphics, Classes, Controls, StdCtrls, ComCtrls,
   ExtCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls, OpThBase, Unpacker, Common,
   GraphicEx, AppEvnts, Dialogs, JvBaseDlg, JvBrowseFolder, JvRichEdit,
-  JvExComCtrls, JvListView;
+  JvExComCtrls, JvListView, JvExControls, JvLinkLabel;
 
 type
   TfrmMain = class(TForm)
@@ -31,7 +31,6 @@ type
     tsWorking: TTabSheet;
     lblHomeTitle: TLabel;
     lblLicenseTitle: TLabel;
-    lblLicenseMessage: TLabel;
     rbnLicenseAccept: TRadioButton;
     rbnLicenseDecline: TRadioButton;
     lblDiscAuthTitle: TLabel;
@@ -40,42 +39,46 @@ type
     lblParamsTitle: TLabel;
     lblWorkingTitle: TLabel;
     lblDoneTitle: TLabel;
-    lblDiscAuthMessage: TLabel;
-    lblDiscAuthWarning: TLabel;
     grpDiscAuthSelectDrive: TGroupBox;
     grpDiscAuthProgress: TGroupBox;
     pbValidator: TProgressBar;
     cbxDrives: TJvDriveCombo;
-    lblParamsMessage: TLabel;
-    lblAuthFailMessage: TLabel;
     grpWorkingProgress: TGroupBox;
     pbTotal: TProgressBar;
     grpParamsExtract: TGroupBox;
     edtOutputDir: TEdit;
     btnParamsBrowse: TButton;
-    lblParamsUnpackedSize: TLabel;
-    lblParamsExtractToOutputDir: TLabel;
     tsReady: TTabSheet;
     tsDoneFail: TTabSheet;
-    lblHomeMessage: TLabel;
-    lblDisclamerMessage: TLabel;
     lblReadyTitle: TLabel;
-    lblReadyMessage: TLabel;
     lblDoneFailTitle: TLabel;
-    lblDoneFailMessage: TLabel;
     lblUnpackProgress: TLabel;
-    lblWorkingMessage: TLabel;
-    lblDoneMessage: TLabel;
     grpDoneFailErrorMessage: TGroupBox;
     memDoneFail: TMemo;
     ApplicationEvents: TApplicationEvents;
     bfdOutput: TJvBrowseForFolderDialog;
     imgError: TImage;
     imgWarn: TImage;
-    lblDoneFailGroupMessage: TLabel;
     reEula: TJvRichEdit;
     grpInfos: TGroupBox;
     lvwInfos: TJvListView;
+    chkDisclamerRead: TCheckBox;
+    lklHomeMessage: TJvLinkLabel;
+    lklReleaseInfosDblClick: TJvLinkLabel;
+    lklDisclamerMessage: TJvLinkLabel;
+    lklLicenseMessage: TJvLinkLabel;
+    lklDiscAuthMessage: TJvLinkLabel;
+    lklAuthFailMessage: TJvLinkLabel;
+    lklParamsMessage: TJvLinkLabel;
+    lklReadyMessage: TJvLinkLabel;
+    lklWorkingMessage: TJvLinkLabel;
+    lklDoneMessage: TJvLinkLabel;
+    lklDoneFailMessage: TJvLinkLabel;
+    lklDiscAuthWarning: TJvLinkLabel;
+    lklParamsUnpackedSize: TJvLinkLabel;
+    lklParamsExtractToOutputDir: TJvLinkLabel;
+    lklDoneFailGroupMessage: TJvLinkLabel;
+    tmrLoadRes: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure pcWizardChanging(Sender: TObject; var AllowChange: Boolean);
     procedure btnNextClick(Sender: TObject);
@@ -96,6 +99,10 @@ type
     procedure lvwInfosMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure lvwInfosDblClick(Sender: TObject);
+    procedure chkDisclamerReadClick(Sender: TObject);
+    procedure lklHomeMessageLinkClick(Sender: TObject; LinkNumber: Integer;
+      LinkText, LinkParam: string);
+    procedure tmrLoadResTimer(Sender: TObject);
   private
     { Déclarations privées }
     fCanceledByClosingWindow: Boolean;
@@ -104,6 +111,7 @@ type
     fWorkingThread: TOperationThread;
     fUnlockPasswords: TPackagePasswords;
     fUnpackedSize: Int64;
+    fSecondaryResourceExtracted: Boolean;
 
     procedure AddDebug(Msg: string);
 
@@ -123,6 +131,7 @@ type
     procedure DoUnlockPackage;
 
     procedure InitWizard;
+    procedure InitSecondaryExtraResources;
     function GetPageIndex: Integer;
     function GetPageIndexMax: Integer;
     function OnWizardBeforePageChange: Boolean;
@@ -133,6 +142,7 @@ type
     procedure SetStatusProgress(const Value: Double);
     procedure SetStatusProgressMax(const MaxValue: Double);
 
+    property SecondaryResourceExtracted: Boolean read fSecondaryResourceExtracted;
     property UnlockPasswords: TPackagePasswords read fUnlockPasswords;
     property UnpackedSize: Int64 read fUnpackedSize write SetUnpackedSize;
     property WorkingThread: TOperationThread read fWorkingThread
@@ -152,7 +162,7 @@ var
 implementation
 
 uses
-  SysTools, UITools, ResMan, JvTypes, DiscAuth, Math, WorkDir;
+  SysTools, UITools, ResMan, JvTypes, DiscAuth, Math, WorkDir, About, AppVer;
 
 const
   // Screen pages indexes
@@ -191,7 +201,7 @@ end;
 
 procedure TfrmMain.btnAboutClick(Sender: TObject);
 begin
-  ShowMessage(inttostr(pcWizard.ActivePageIndex));
+  RunAboutBox;
 end;
 
 procedure TfrmMain.btnCancelClick(Sender: TObject);
@@ -221,10 +231,14 @@ begin
   Previous;
 end;
 
+procedure TfrmMain.chkDisclamerReadClick(Sender: TObject);
+begin
+  btnNext.Enabled := chkDisclamerRead.Checked;
+end;
+
 procedure TfrmMain.DiscValidatorFailed(Sender: TObject);
 begin
   // Error when trying to get the media key !!
-  cbxDrives.Enabled := True;
   PageIndex := SCREEN_CHECKDISC_FAILED;
 end;
 
@@ -238,7 +252,7 @@ begin
   Thread := WorkingThread as TDiscValidatorThread;
   if Thread.Aborted then
     PageIndex := SCREEN_CHECKDISC_FAILED;
-  cbxDrives.Enabled := True;    
+  cbxDrives.Enabled := True;
 end;
 
 procedure TfrmMain.DiscValidatorProgress;
@@ -411,6 +425,12 @@ begin
   Caption := Application.Title;
   fUnlockPasswords := TPackagePasswords.Create;
 
+  // Init the About Box
+  InitAboutBox(
+    Application.Title,
+    GetApplicationVersion
+  );
+
   InitWizard;
 end;
 
@@ -429,6 +449,23 @@ end;
 function TfrmMain.GetPageIndexMax: Integer;
 begin
   Result := pcWizard.PageCount - 1;
+end;
+
+procedure TfrmMain.InitSecondaryExtraResources;
+begin
+  if not SecondaryResourceExtracted then
+  begin
+{$IFDEF DEBUG}
+  WriteLn('InitSecondaryExtraResources');
+{$ENDIF}
+  
+    // Decompress Secondary resource. Primary are ready.
+    fSecondaryResourceExtracted := DecompressSecondaryExtraResourcePackage;
+    
+    // Load the EULA
+    if FileExists(GetWorkingTempDirectory + APPCONFIG_EULA) then
+      reEula.Lines.LoadFromFile(GetWorkingTempDirectory + APPCONFIG_EULA);
+  end;
 end;
 
 procedure TfrmMain.InitWizard;
@@ -458,10 +495,6 @@ begin
   // Load images
   InitializeSkin;
 
-  // Load the EULA
-  if FileExists(GetWorkingTempDirectory + APPCONFIG_EULA) then  
-    reEula.Lines.LoadFromFile(GetWorkingTempDirectory + APPCONFIG_EULA);
-  
   // Modify the Wizard Title
   S := GetStringUI('Title', 'WizardTitle');
   if S <> '' then Caption := S;
@@ -495,7 +528,7 @@ end;
 
 procedure TfrmMain.lvwInfosDblClick(Sender: TObject);
 begin
-  if IsInString('://', lvwInfos.ItemFocused.SubItems[0]) then
+  if lvwInfos.Cursor = crHandPoint then
     OpenLink(lvwInfos.ItemFocused.SubItems[0]);
 end;
 
@@ -505,12 +538,13 @@ var
   HoverItem: TListItem;
 
 begin
-  HoverItem := lvwInfos.GetItemAt(X,  Y);
-  if Assigned(HoverItem) and (HoverItem.SubItems.Count > 0) then
+  lvwInfos.Cursor := crDefault;
+  if (X > lvwInfos.Columns[0].Width) then
   begin
-    lvwInfos.Cursor := crDefault;
-    if IsInString('://', HoverItem.SubItems[0]) then
-      lvwInfos.Cursor := crHandPoint;
+    HoverItem := lvwInfos.GetItemAt(X,  Y);
+    if Assigned(HoverItem) and (HoverItem.SubItems.Count > 0) then
+      if IsInString('://', HoverItem.SubItems[0]) then
+        lvwInfos.Cursor := crHandPoint;
   end;
 end;
 
@@ -563,9 +597,16 @@ begin
 
   // Do something special with the current page...
   case PageIndex of
+    // Disclamer
+    SCREEN_DISCLAMER:
+      btnNext.Enabled := chkDisclamerRead.Checked;
+
     // License
     SCREEN_LICENSE:
-      btnNext.Enabled := rbnLicenseAccept.Checked;
+      begin
+        chkDisclamerRead.Checked := False;
+        btnNext.Enabled := rbnLicenseAccept.Checked;
+      end;
 
     // Check disc
     SCREEN_CHECKDISC:
@@ -760,13 +801,23 @@ end;
 procedure TfrmMain.SetUnpackedSize(const Value: Int64);
 var
   SizeUnit: TSizeUnit;
+  SizeStr: string;
 
 begin
   fUnpackedSize := Value;
-  lblParamsUnpackedSize.Caption :=
-    GetStringUI('Params', 'lblparamsUnpackedSize') + ' '
-      + FormatByteSize(UnpackedSize, SizeUnit) + ' '
-      + SizeUnitToString(SizeUnit);
+  try
+    lklParamsUnpackedSize.Caption := GetStringUI('Params', 'lklparamsUnpackedSize');
+    SizeStr := FormatByteSize(UnpackedSize, SizeUnit) + ' ' + SizeUnitToString(SizeUnit);
+    lklParamsUnpackedSize.UpdateDynamicTag(0, SizeStr);
+  except
+    MsgBox('Please include the <dynamic> tag on the lklParamsUnpackedSize entry !', 'Error', MB_ICONERROR);
+  end;
+end;
+
+procedure TfrmMain.tmrLoadResTimer(Sender: TObject);
+begin
+  tmrLoadRes.Enabled := False;
+  InitSecondaryExtraResources;
 end;
 
 procedure TfrmMain.WorkingThreadTerminateHandler;
@@ -778,6 +829,24 @@ begin
     btnCancel.Enabled := True;
     SetCloseWindowButtonState(Self, True);
   end;
+end;
+
+procedure TfrmMain.lklHomeMessageLinkClick(Sender: TObject;
+  LinkNumber: Integer; LinkText, LinkParam: string);
+var
+  URL: string;
+  LinkSender: TJvLinkLabel;
+
+begin
+  LinkSender := (Sender as TJvLinkLabel);
+  URL := GetLink(LinkSender.Name, LinkNumber);
+{$IFDEF DEBUG}
+  WriteLn('LinkClick: ', LinkNumber, ', ', LinkText, sLineBreak,
+    '  URL = ', URL);
+{$ENDIF}
+  if URL <> '' then
+    OpenLink(URL);
+  LinkSender.Invalidate;
 end;
 
 end.

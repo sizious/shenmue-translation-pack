@@ -51,6 +51,7 @@ function GetApplicationDataDirectory: TFileName;
 function GetDirectorySize(Directory: TFileName): Int64;
 function GetFileSize(const FileName: TFileName): Int64;
 function GetRandomString(const StringMaxLength: Integer): string;
+function GetSubStrCount(SubStr, S: string): Integer;
 function GetStreamBlockReadSize(Stream: TStream;
   const WishedBlockSize: Int64): Int64;
 function GetTempDir: TFileName;
@@ -78,6 +79,7 @@ function StringArrayBinarySearch(SortedSource: array of string;
 function StringArraySequentialSearch(Source: array of string;
   SearchValue: string): Integer;
 function Left(SubStr: string; S: string): string;
+function LeftNRight(SubStr, S: string; N: Integer): string;
 function Right(SubStr: string; S: string): string;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
 function VariantToString(V: Variant): string;
@@ -687,6 +689,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel (Phidels.com)
 function ExtractStr(LeftSubStr, RightSubStr, S: string): string;
 begin
   Result := Left(RightSubStr, Right(LeftSubStr, S));
@@ -694,6 +697,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Thanks Michel (Phidels.com)
 function ExtremeRight(SubStr: string ; S: string): string;
 begin
   Repeat
@@ -1003,6 +1007,7 @@ end;
 
 //------------------------------------------------------------------------------
 
+// Author unknow
 function GetDirectorySize(Directory: TFileName): Int64;
 var
   aResult : Integer;
@@ -1023,6 +1028,42 @@ begin
     aResult := FindNext(aSearchRec);
   end;
   FindClose(aSearchRec); // libération de aSearchRec
+end;
+
+//------------------------------------------------------------------------------
+
+// Thanks Michel (Phidels.com)
+function GetSubStrCount(SubStr, S: string): Integer;
+{==================================================================================}
+{ renvoie le nombre de fois que la sous chaine substr est présente dans la chaine S}
+{==================================================================================}
+begin
+  result:=0;
+  while pos(substr,s)<>0 do
+  begin
+    S:=Right(substr,s);
+    inc(result);
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+// Thanks Michel (Phidels.com)
+function LeftNRight(SubStr, S: string; N: Integer): string;
+{==============================================================================}
+{ renvoie ce qui est à gauche de la droite de la n ieme sous chaine substr     }
+{ de la chaine S                                                               }
+{ ex : GaucheNDroite('/','c:machin\truc\essai.exe',1) renvoie 'truc'           }
+{ Permet d'extraire un à un les éléments d'une chaine séparés par un séparateur}
+{==============================================================================}
+var i:integer;
+begin
+  S:=S+substr;
+  for i:=1 to n do
+  begin
+    S:=copy(s, pos(substr, s)+length(substr), length(s)-pos(substr, s)+length(substr));
+  end;
+  result:=copy(s, 1, pos(substr, s)-1);
 end;
 
 //------------------------------------------------------------------------------
