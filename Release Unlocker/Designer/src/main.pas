@@ -680,7 +680,7 @@ begin
   Result := Assigned(WorkingThread) and (not WorkingThread.Terminated);
 end;
 
-procedure TfrmMain.LoadMediaKeys(const FileName: TFileName);
+procedure TfrmMain.LoadMediaKeys;
 var
   Ini: TIniFile;
   SL: TStringList;
