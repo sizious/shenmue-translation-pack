@@ -11,7 +11,7 @@ The SHENTRAD Team is Manic, from Québec, and SiZiOUS from France (and Portugal!)
 -- Powered by --
 
 Icons authors:
-Flameia Design (Main icon)
+Iconaholic (Main icon)
 
 Thanks to the authors of the following libraries...
 

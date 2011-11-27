@@ -627,6 +627,13 @@ const
 var
   SevenZipLibraryFilePath: TFileName; {SiZ! : Specify where to find the 7z.dll}
 
+//some Delphi veriosn do not take the Int64 overload
+function FileSeek(Handle: Integer; const Offset: Int64; Origin: Integer): Int64;
+begin
+  Result := Offset;
+  Int64Rec(Result).Lo := SetFilePointer(THandle(Handle), Int64Rec(Result).Lo,@Int64Rec(Result).Hi, Origin);
+end;
+
 function DateTimeToFileTime(dt: TDateTime): TFileTime;
 var
   st: TSystemTime;
