@@ -32,19 +32,45 @@ type
   end;
 
 function DecompileRuntimePackage: Boolean;
+function DecompressSecondaryExtraResourcePackage: Boolean;
 function GetUnlockKeys(MediaHashKey: string;
   ResultPasswords: TPackagePasswords; var UnpackedSize: Int64): Boolean;
 
 implementation
 
 uses
-  SysTools, WorkDir, LibCamellia, LibPC1, Base64, IniFiles;
+  SysTools, WorkDir, LibCamellia, LibPC1, Base64, IniFiles, Forms
+{$IFDEF DEBUG}
+  , TypInfo
+{$ENDIF}
+;
 
 var
   MediaHashKeyFiles: TStringList;
   WorkingThread: TPackageExtractorThread;
   szLzmaLib: TFileName;
-  PackageBinaryOffset: Int64;
+  PackageBinaryOffset, SecondaryExtraResourceOffset: Int64;
+
+// Decompress Extra Resource Package...
+procedure DecompressExtraResourcePackage(Offset: LongWord);
+begin
+  with CreateInArchive(CLSID_CFormat7z) do
+  begin
+    SetPassword(RUNTIME_EXTRA_RESOURCE_PASSWORD);
+    OpenFileSFX(ParamStr(0), Offset);
+    Application.ProcessMessages;
+    ExtractTo(GetWorkingTempDirectory);
+    Close;
+  end;
+end;
+
+// DecompressSecondaryExtraResourcePackage
+function DecompressSecondaryExtraResourcePackage: Boolean;
+begin
+  Result := SecondaryExtraResourceOffset > 0;
+  if Result then   
+    DecompressExtraResourcePackage(SecondaryExtraResourceOffset);
+end;
 
 // CompileRuntimePackage is located in the PackMan.pas unit (multi-threaded)
 // Decompile is here because it must be run only 1 time at the Runtime initialization
@@ -57,7 +83,7 @@ var
   Offset, Size,
   ResCount, i: LongWord;
   FileName: TFileName;
-  ResType: Byte;
+  ResType: TResourceType;
 
 begin
 {$IFDEF DEBUG}
@@ -82,69 +108,69 @@ begin
     );
 {$ENDIF}
 
+    // Parsing each binded resource
     i := 0;
     while i < ResCount do
     begin
+      FileName := '';
+      
       // Read the resource type
       SourceStream.Read(ResType, SizeOf(ResType));
-      
+
       // Read the size...
       SourceStream.Read(Size, UINT32_SIZE);
 
-{$IFDEF DEBUG}
-      Write('  #', i, ': ResType= ', ResType);
-{$ENDIF}
-
-      if ResType <> RESTYPE_PACKAGE then
-      begin
-        // Copy the stream
-        MemoryStream.CopyFrom(SourceStream, Size);
-
-        // Save it to a file
-        FileName := GetWorkingTempFileName;
-        MemoryStream.SaveToFile(FileName);
-        MemoryStream.Clear;
+      // Resource Offset
+      Offset := SourceStream.Position;      
 
 {$IFDEF DEBUG}
-        WriteLn(sLineBreak, '    FileName= "', FileName, '"');
+      WriteLn('  #', i, ': ResType= ',
+        GetEnumName(TypeInfo(TResourceType), Ord(ResType)),
+        ', Offset= ', Offset);
 {$ENDIF}
-      end else begin
-        SourceStream.Seek(Size, soFromCurrent);
-{$IFDEF DEBUG}
-        WriteLn('');
-{$ENDIF}
-      end;
 
       case ResType of
+
         // The result package...
-        RESTYPE_PACKAGE:
+        rtPackage:
+          PackageBinaryOffset := Offset;
+
+        // DiscAuth files...
+        rtDiscAuth:
           begin
-            PackageBinaryOffset := SourceStream.Position - Size;
+            // Copy the stream
+            MemoryStream.CopyFrom(SourceStream, Size);
+            SourceStream.Seek(-Size, soFromCurrent);
+
+            // Save it to a file
+            FileName := GetWorkingTempFileName;
+            MemoryStream.SaveToFile(FileName);
+            MemoryStream.Clear;
+
+            // Saving the reference to the file...
+            MediaHashKeyFiles.Add(FileName);
+            
 {$IFDEF DEBUG}
-            WriteLn('    PackageBinaryOffset= ', PackageBinaryOffset);
+            WriteLn('    FileName= "', FileName, '"');
 {$ENDIF}
           end;
 
-        // DiscAuth files...
-        RESTYPE_DISCAUTH:
-          MediaHashKeyFiles.Add(FileName);
+        // Primary resources...
+        rtResPrimary:
+          DecompressExtraResourcePackage(Offset);
 
-        // AppConfigs...
-        RESTYPE_APPCONFIG:
-          begin
-            with CreateInArchive(CLSID_CFormat7z) do
-            begin
-              SetPassword(RUNTIME_EXTRA_RESOURCE_PASSWORD);
-              OpenFile(FileName);
-              ExtractTo(GetWorkingTempDirectory);
-              Close;
-            end;
-            DeleteFile(FileName);
-          end;
-      end;
+        // Secondary resources...
+        rtResSecondary:
+          SecondaryExtraResourceOffset := Offset;
 
+      end; // case
+
+      // Skip to the next section...
+      SourceStream.Seek(Size, soFromCurrent);
+
+      // Next section
       Inc(i);
-    end;
+    end; // while
 
     Result := ResCount > 0;
   finally
@@ -317,9 +343,10 @@ begin
 end;
 
 initialization
+  SecondaryExtraResourceOffset := -1;
   MediaHashKeyFiles := TStringList.Create;
   // Extracting 7z library to the temp directory.
-  szLzmaLib := GetWorkingTempDirectory + '7z.dll';
+  szLzmaLib := GetWorkingTempDirectory + '7zxa.dll';
   ExtractFile('LZMALIB', szLzmaLib);
   SevenZipSetLibraryFilePath(szLzmaLib);
 

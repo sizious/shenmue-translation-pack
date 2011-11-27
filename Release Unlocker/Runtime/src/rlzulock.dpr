@@ -1,6 +1,7 @@
-program RlzUlock;
+program rlzulock;
 
 {$R '..\..\Common\d7zip\d7zlite.res' '..\..\Common\d7zip\d7zlite.rc'}
+{$R 'about\credits.res' 'about\credits.rc'}
 
 uses
   Windows,
@@ -23,7 +24,9 @@ uses
   common in '..\..\Common\common.pas',
   unpacker in '..\..\Common\unpacker.pas',
   hashidx in '..\..\..\Common\hashidx.pas',
-  fileslst in '..\..\..\Common\fileslst.pas';
+  fileslst in '..\..\..\Common\fileslst.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 
@@ -76,8 +79,7 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'Shenmue Release Unlocker';
   Application.CreateForm(TfrmMain, frmMain);
-  
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
   if ConsoleCreated then
     SetConsoleTitle(PChar(AppTitle + ' :: DEBUG CONSOLE'));

@@ -1,6 +1,6 @@
 unit ResMan;
 
-//{$DEFINE USE_DCL}
+{$DEFINE USE_DCL}
 
 interface
 
@@ -22,13 +22,36 @@ function InitializeSkin: Boolean;
 // Misc
 procedure FillReleaseInfo;
 function ShowAppName: Boolean;
+function GetLink(FieldName: string; LinkNumber: Integer): string;
 
 implementation
 
 uses
-  Main, IniFiles, WorkDir, Common;
+  Main, IniFiles, WorkDir, Common, Graphics, JvLinkLabel;
 
 type
+  //
+  // JvLinkLabel Link handlers
+  //
+  TJvLinkLabelHandler = class(TObject)
+  private
+    fLinksList: TList;
+    fFieldNamesList: TStringList;
+    procedure Add(FieldName, Link: string);
+    procedure Clear;
+    function GetItem(Index: string): TStringList;
+    function GetCount: Integer;
+    function GetIndexByString(FieldName: string): Integer;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property Count: Integer read GetCount;
+    property Items[Index: string]: TStringList read GetItem;
+  end;
+
+  //
+  // StringLocalizer
+  //
   TStringLocalizerItem = class(TObject)
   private
     fCode: string;
@@ -59,15 +82,17 @@ type
   end;
 
 const
-  INVALID_STRING = '<%INVALID%>';
+  INVALID_STRING = '(%INVALID%)';
 
 var
-  GameName: string;
+  GameName, WebURL: string;
   IniUiFile: TIniFile;
   StringLocalizer: TStringLocalizer;
+  IsFadingOut, AbortFadingOut: Boolean;
+  JvLinkLabelHandler: TJvLinkLabelHandler;
 
 //------------------------------------------------------------------------------
-
+                             
 function ShowAppName: Boolean;
 begin
   Result := IniUiFile.ReadBool('Title', 'ShowAppName', True);
@@ -123,6 +148,7 @@ begin
     btnAbout.Caption := GetStringUI('Buttons', 'About');
     btnCancel.Caption := GetStringUI('Buttons', 'Cancel');
     GameName := GetStringUI('General', 'GameName');
+    WebURL := GetStringUI('General', 'WebURL');
 
     // BrowseForDialog for the OutputDirectory
     bfdOutput.StatusText := GetStringUI('Params', 'bfdStatusText');
@@ -135,6 +161,95 @@ begin
     lvwInfos.Columns[1].Caption := GetStringUI('HomeInfos', 'ValuesCol');
   end;
 end;                                             
+
+//------------------------------------------------------------------------------
+
+// Thanks to JCA
+// http://jca.developpez.com/fondu.php
+procedure PlayFadeImages(ImageContainer: TImage; NewBitmapImage: TBitmap);
+var
+  L1, L2, L3: PByteArray;
+  i, x, y, px: Integer;
+  BitmapBuffer: TBitmap;
+
+begin
+  // Cancel the fading !
+  if IsFadingOut then
+    begin
+{$IFDEF DEBUG}
+      WriteLn('PlayFadeImages: CANCEL FADEOUT!');
+{$ENDIF}
+      AbortFadingOut := True;
+      ImageContainer.Picture.Bitmap.Assign(NewBitmapImage);
+    end
+  else
+    // Fading !
+    if (ImageContainer.Picture.Bitmap.HandleAllocated) then
+    begin
+      BitmapBuffer := TBitmap.Create;
+      try
+{$IFDEF DEBUG}
+      WriteLn('PlayFadeImages: Start FadeOut!');
+{$ENDIF}
+        IsFadingOut := True;
+        BitmapBuffer.Assign(ImageContainer.Picture.Bitmap);
+        i := 0;
+        while (i < 100) and (not AbortFadingOut) do
+        begin
+          for y := 0 to ImageContainer.Height - 1 do begin
+            l1 := BitmapBuffer.ScanLine[y];
+            l2 := NewBitmapImage.ScanLine[y];
+            l3 := ImageContainer.Picture.Bitmap.ScanLine[y];
+            for x := 0 to ImageContainer.width - 1 do begin
+              px := x * 3;
+              // Blue
+              l3[px] := muldiv (l2[px], i, 100) + muldiv(l1[px], 100-i, 100);
+              // Green
+              l3[px+1] := muldiv (l2[px+1], i, 100) + muldiv(l1[px+1], 100-i, 100);
+              // Red
+              l3[px+2] := muldiv (l2[px+2], i, 100) + muldiv(l1[px+2], 100-i, 100);
+            end;
+          end;
+          Delay(20);
+          ImageContainer.Repaint;
+          i := i + 8;
+        end;
+      finally
+{$IFDEF DEBUG}
+      WriteLn('PlayFadeImages: End FadeOut!');
+{$ENDIF}
+        BitmapBuffer.Free;
+        IsFadingOut := False;
+        AbortFadingOut := False;
+      end;
+    end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure DrawLeftImage;
+var
+  i: Integer;
+  Buffer: TBitmap;
+  ImageFile: TFileName;
+
+begin
+  Buffer := TBitmap.Create;
+  try
+    try
+      i := frmMain.pcWizard.ActivePageIndex;
+      ImageFile := GetWorkingTempDirectory + SKIN_IMAGES_LEFT_ORDER[i];
+      if FileExists(ImageFile) then
+      begin
+        Buffer.LoadFromFile(ImageFile);
+        PlayFadeImages(frmMain.imgLeft, Buffer);
+      end;
+    except
+    end;
+  finally
+    Buffer.Free;
+  end;
+end;
 
 //------------------------------------------------------------------------------
 
@@ -151,14 +266,8 @@ begin
 {$ENDIF}
 
   // Load image
-  try
-    i := frmMain.pcWizard.ActivePageIndex;
-    if FileExists(GetWorkingTempDirectory + SKIN_IMAGES_LEFT_ORDER[i]) then
-      frmMain.imgLeft.Picture.LoadFromFile(GetWorkingTempDirectory
-        + SKIN_IMAGES_LEFT_ORDER[i]);
-  except
-  end;
-  
+  DrawLeftImage;
+
   // Load strings...
   CtrlsList := TStringList.Create;
   try
@@ -174,7 +283,9 @@ begin
         if CC = 'lbl' then (C as TLabel).Caption := S
         else if CC = 'grp' then (C as TGroupBox).Caption := ' ' + S + ' '
         else if CC = 'btn' then (C as TButton).Caption := S
-        else if CC = 'rbn' then (C as TRadioButton).Caption := S;
+        else if CC = 'rbn' then (C as TRadioButton).Caption := S
+        else if CC = 'chk' then (C as TCheckBox).Caption := S
+        else if CC = 'lkl' then (C as TJvLinkLabel).Caption := S;            
       end;
     end;
   finally
@@ -201,9 +312,8 @@ end;
 function TStringLocalizer.Add;
 var
   Item: TStringLocalizerItem;
-{$IFDEF USE_DCL}
-  i: Integer;
-{$ENDIF}
+  i, LinksCount: Integer;
+  Temp, URL: string;
 
 begin
   Item := TStringLocalizerItem.Create;
@@ -211,9 +321,32 @@ begin
   begin
     fCode := ACode;
     fSection := ASection;
-    fText := StringReplace(AText, '\n', sLineBreak, [rfReplaceAll]);
-    fText := StringReplace(fText, '\t', '      ', [rfReplaceAll]);
-    fText := StringReplace(fText, '<%GAMENAME%>', GameName, [rfReplaceAll]);
+    fText := StringReplace(AText, '\n', '<br>', [rfReplaceAll, rfIgnoreCase]);
+    fText := StringReplace(fText, '\t', '      ', [rfReplaceAll, rfIgnoreCase]);
+    fText := StringReplace(fText, '<%GAMENAME>', GameName, [rfReplaceAll, rfIgnoreCase]);
+    fText := StringReplace(fText, '<%WEBURL>', WebURL, [rfReplaceAll, rfIgnoreCase]);
+
+    // Scanning for links
+    Temp := LowerCase(fText);
+    LinksCount := GetSubStrCount('<%link=', Temp);
+    i := 0;
+    while i < LinksCount do
+    begin
+      Inc(i);
+
+      // Parsing and getting the URL
+      URL := Left('>', LeftNRight('<%link=', Temp, i));
+      JvLinkLabelHandler.Add(ACode, URL);
+
+      // Cleaning the link tag
+      fText := StringReplace(fText, URL, '', []); // only the 1st occurence!
+      // by cleaning only the 1st occurence, we eliminates the 'proceeded' tag,
+      // so the same tag can be in the string after and it will proceeded as well.
+    end;
+
+    // Stripping every <%link= tags.
+    fText := StringReplace(fText, '<%link=', '<link', [rfReplaceAll, rfIgnoreCase]);
+
     Result := fText;
   end;
 {$IFDEF USE_DCL}
@@ -328,10 +461,102 @@ end;
 
 //------------------------------------------------------------------------------
 
+{ TJvLinkLabelHandler }
+
+procedure TJvLinkLabelHandler.Add(FieldName, Link: string);
+var
+  i: Integer;
+
+begin
+  // Retrieve the Link List for the FieldName
+  i := GetIndexByString(FieldName);
+  if i = -1 then
+  begin
+    // Create the list
+    i := fFieldNamesList.Add(FieldName);
+    fLinksList.Add(TStringList.Create);
+  end;
+
+  // Adding the link...
+  TStringList(fLinksList[i]).Add(Link);
+end;
+
+procedure TJvLinkLabelHandler.Clear;
+var
+  i: Integer;
+
+begin
+  for i := 0 to Count - 1 do
+    TStringList(fLinksList[i]).Free;
+  fLinksList.Clear;
+  fFieldNamesList.Clear;
+end;
+
+constructor TJvLinkLabelHandler.Create;
+begin
+  fLinksList := TList.Create;
+  fFieldNamesList := TStringList.Create;
+end;
+
+destructor TJvLinkLabelHandler.Destroy;
+begin
+  Clear;
+  fLinksList.Free;
+  fFieldNamesList.Free;
+  inherited;
+end;
+
+function TJvLinkLabelHandler.GetCount: Integer;
+begin
+  Result := fLinksList.Count;
+end;
+
+function TJvLinkLabelHandler.GetIndexByString;
+var
+  i: Integer;
+
+begin
+  FieldName := UpperCase(FieldName);
+  Result := -1;
+  for i := 0 to fFieldNamesList.Count - 1 do
+    if UpperCase(fFieldNamesList[i]) = FieldName then
+      Result := i;
+end;
+
+function TJvLinkLabelHandler.GetItem;
+var
+  i: Integer;
+
+begin
+  Result := nil;
+  i := GetIndexByString(Index);
+  if i <> -1 then
+    Result := TStringList(fLinksList[i]);
+end;
+
+//------------------------------------------------------------------------------
+
+function GetLink(FieldName: string; LinkNumber: Integer): string;
+var
+  Item: TStringList;
+
+begin
+  Result := '';
+  Item := JvLinkLabelHandler.Items[FieldName];
+  if Assigned(Item) then
+    Result := Item[LinkNumber];
+end;
+
+//------------------------------------------------------------------------------
+
 initialization
+  JvLinkLabelHandler := TJvLinkLabelHandler.Create;
+  IsFadingOut := False;
+  AbortFadingOut := False;
 
 finalization
   IniUiFile.Free;
   StringLocalizer.Free;
+  JvLinkLabelHandler.Free;
 
 end.

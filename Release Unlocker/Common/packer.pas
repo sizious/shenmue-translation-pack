@@ -70,12 +70,13 @@ uses
 const
   COMPRESSION_LEVEL_MAX = 9;
 
-  RUNTIME_PACKAGE_RELEASE_FILENAME  = 'package.tmp';
+  RUNTIME_PACKAGE_RELEASE_FILENAME            = 'package.tmp';
 
-  RUNTIME_PACKAGE_RESOURCE_NAME     = 'RUNTIME';
-  RUNTIME_PACKAGE_FINAL_OUTPUT      = 'unpacker.exe'; //'rlzulock.exe';
+  RUNTIME_PACKAGE_RESOURCE_NAME               = 'RUNTIME';
+  RUNTIME_PACKAGE_FINAL_OUTPUT                = 'unpacker.exe'; // rlzulock.exe
 
-  RUNTIME_EXTRA_RESOURCE_FILENAME   = 'extra.bin';
+  RUNTIME_PRIMARY_EXTRA_RESOURCE_FILENAME     = 'master.dat';
+  RUNTIME_SECONDARY_EXTRA_RESOURCE_FILENAME   = 'slave.dat';
 
 var
   WorkingThread: TPackageMakerThread;
@@ -98,7 +99,7 @@ begin
     // Trick to cancel the process...
     // This will crash the 7zAPI ("Incorrect Function"), but will stop the process!
     if Aborted then
-      Result := S_FALSE;
+      Result := E_ABORT;
   end;
 end;
 
@@ -157,10 +158,10 @@ begin
     SetProgressCallback(nil, ProgressCallback);
 
     // Solid Archive
-    SevenZipSetSolidSettings(OutArchive, True);
+    SevenZipSetSolidSettings(OutArchive, False);
 
     // Volume info !
-    SevenZipVolumeMode(OutArchive, True);
+    SevenZipVolumeMode(OutArchive, False);
 
     // Set a password
     SetPassword(Passwords.AES);
@@ -251,57 +252,64 @@ procedure TPackageMakerThread.CompileExtraFiles;
 var
   ExtraTempDir: TFileName;
   i: Integer;
-  OutArchive: I7zOutArchive;
-  ExtraOutputPackage: TFileName;
 
-begin
-  // Create temp directory
-  ExtraTempDir := GetWorkingTempDirectory + 'extra\';
-  ForceDirectories(ExtraTempDir);
+  procedure _Compress(OutputFileName: TFileName);
+  var
+    OutArchive: I7zOutArchive;
 
-  // Copy files to this directory...
-  CopyFile(AppConfig, ExtraTempDir + APPCONFIG_UI_MESSAGES, False);
-  CopyFile(Eula, ExtraTempDir + APPCONFIG_EULA, False);
-  CopyFile(SkinImages.Top, ExtraTempDir + SKIN_IMAGE_TOP, False);
-  CopyFile(SkinImages.Bottom, ExtraTempDir + SKIN_IMAGE_BOTTOM, False);
-  for i := 0 to SkinImages.Left.Count - 1 do
-    CopyFile(SkinImages.Left[i].FileName, ExtraTempDir
-      + SKIN_IMAGES_LEFT_ORDER[i], False);
-
-  // Compress the extra file...
-  OutArchive := CreateOutArchive(CLSID_CFormat7z);
-  with OutArchive do
   begin
-    // Add files using willcards and recursive search
-    AddFiles(ExtraTempDir, '', '*.*', True);
-
-    // Compression level
-    SetCompressionLevel(OutArchive, COMPRESSION_LEVEL_MAX);
-
-    // Handle a progress bar ...
-    SetProgressCallback(nil, ProgressCallback);
-
-    // Solid Archive
-    SevenZipSetSolidSettings(OutArchive, True);
-
-    // Volume info !
-    SevenZipVolumeMode(OutArchive, False);
-
-    // Set a password
-    SetPassword(RUNTIME_EXTRA_RESOURCE_PASSWORD);
-    SevenZipEncryptHeaders(OutArchive, True);
-
-    // Execute : Save to file
-    ExtraOutputPackage := GetWorkingTempDirectory
-      + RUNTIME_EXTRA_RESOURCE_FILENAME;
-    if FileExists(ExtraOutputPackage) then
-      DeleteFile(ExtraOutputPackage);
-    SaveToFile(ExtraOutputPackage);
+    OutputFileName := GetWorkingTempDirectory + OutputFileName;
+    OutArchive := CreateOutArchive(CLSID_CFormat7z);
+    with OutArchive do
+    begin
+      AddFiles(ExtraTempDir, '', '*.*', True);
+      SetCompressionLevel(OutArchive, COMPRESSION_LEVEL_MAX);
+      SetProgressCallback(nil, ProgressCallback);
+      SevenZipSetSolidSettings(OutArchive, True);
+      SevenZipVolumeMode(OutArchive, False);
+      SetPassword(RUNTIME_EXTRA_RESOURCE_PASSWORD);
+      SevenZipEncryptHeaders(OutArchive, True);
+      if FileExists(OutputFileName) then
+        DeleteFile(OutputFileName);
+      SaveToFile(OutputFileName);
+    end;
+    
+    // When done, wait a bit...
+    if not Aborted then
+      Sleep(500);
   end;
 
-  // When done, wait a bit...
-  if not Aborted then
-    Sleep(500);
+  function _CP(InF, OutF: TFileName): TFileName;
+  begin
+    CopyFile(InF, ExtraTempDir + OutF, False);
+  end;
+
+  procedure _Init();
+  begin
+    ExtraTempDir := GetWorkingTempDirectory + 'extra\';
+    if DirectoryExists(ExtraTempDir) then
+      DeleteDirectory(ExtraTempDir);
+    ForceDirectories(ExtraTempDir);
+  end;
+
+begin
+  // Compress the primary resource file...
+  _Init();
+  _CP(AppConfig, APPCONFIG_UI_MESSAGES);
+  _CP(SkinImages.Top, SKIN_IMAGE_TOP);
+  _CP(SkinImages.Bottom, SKIN_IMAGE_BOTTOM);
+  _CP(SkinImages.Left[0].FileName, SKIN_IMAGES_LEFT_ORDER[0]); // Home image
+  _Compress(RUNTIME_PRIMARY_EXTRA_RESOURCE_FILENAME);
+
+  // Compress the secondary resource file...
+  _Init();
+  _CP(Eula, APPCONFIG_EULA);
+  for i := 1 to SkinImages.Left.Count - 1 do
+    _CP(SkinImages.Left[i].FileName, SKIN_IMAGES_LEFT_ORDER[i]);
+  _Compress(RUNTIME_SECONDARY_EXTRA_RESOURCE_FILENAME);
+
+  // Cleaning directory...
+  DeleteDirectory(ExtraTempDir);
 end;
 
 procedure TPackageMakerThread.CompileRuntimePackage;
@@ -309,18 +317,25 @@ var
   i: Integer;
   WorkFileName, RuntimeFileName, DiscAuthFileName, ExtraOutputPackage,
   ReleasePackage: TFileName;
-  PackageInStream, DiscAuthInStream, ExtraResInStream, OutStream: TFileStream;
+  DiscAuthInStream, OutStream: TFileStream;
   CryptedStream: TMemoryStream;
   Offset, ResCount: LongWord;
-  Passwords: TPackagePasswords;
+  DiscAuthPasswords: TPackagePasswords;
 
-  procedure BindResource(SourceStream: TStream; ResourceType: Byte);
+  function _FP(FileName: TFileName): TFileName;
+  begin
+    Result := GetWorkingTempDirectory + FileName;
+  end;
+
+  procedure BindResource(SourceStream: TStream; ResType: TResourceType); overload;
   var
     Size: LongWord;
-    
+    R: Byte;
+
   begin
     // Write Stream Type
-    OutStream.Write(ResourceType, SizeOf(ResourceType));
+    R := Integer(ResType);
+    OutStream.Write(R, 1);
 
     // Write Stream Size
     Size := SourceStream.Size;   
@@ -334,6 +349,20 @@ var
     Inc(ResCount, 1);
   end;
 
+  procedure BindResource(FileName: TFileName; ResType: TResourceType); overload;
+  var
+    SourceStream: TFileStream;
+
+  begin
+    SourceStream := TFileStream.Create(FileName, fmOpenRead);
+    try
+      BindResource(SourceStream, ResType);
+    finally
+      SourceStream.Free;
+      DeleteFile(FileName);
+    end;
+  end;
+
 begin
 {$IFDEF DEBUG}
   WriteLn('CompileRuntimePackage');
@@ -341,24 +370,18 @@ begin
 
   ResCount := 0;
 
-  // Extracting the Runtime Setup Application.
-  RuntimeFileName := GetWorkingTempDirectory + RUNTIME_PACKAGE_RESOURCE_NAME + '.BIN';
-  ExtractFile(RUNTIME_PACKAGE_RESOURCE_NAME, RuntimeFileName);
-
   // Generate disc auth files / extra resource files
   DiscAuthFileName := WriteDiscAuthentification;
-  ExtraOutputPackage := GetWorkingTempDirectory + RUNTIME_EXTRA_RESOURCE_FILENAME;
 
   // Encrypt the DiscAuth.Inf file with each Media Key.
   if FileExists(DiscAuthFileName) then
   begin
-    Passwords := TPackagePasswords.Create;
+    // Extracting the Runtime Setup Application ('Shenmue Release Unlocker')
+    // Sure to be UPX ?
+    RuntimeFileName := _FP(RUNTIME_PACKAGE_RESOURCE_NAME + '.BIN');
+    ExtractFile(RUNTIME_PACKAGE_RESOURCE_NAME, RuntimeFileName);
 
-    ReleasePackage := OutputDirectory + RUNTIME_PACKAGE_RELEASE_FILENAME;
-    PackageInStream := TFileStream.Create(ReleasePackage, fmOpenRead);
-
-    ExtraResInStream := TFileStream.Create(ExtraOutputPackage, fmOpenRead);
-    DiscAuthInStream := TFileStream.Create(DiscAuthFileName, fmOpenRead);
+    // Opening Runtime to write the extra files inside it.
     OutStream := TFileStream.Create(RuntimeFileName, fmOpenWrite);
     try
       // Move to the end in the Runtime binary...
@@ -369,14 +392,20 @@ begin
       // WRITING PACKAGE.BIN TO RUNTIME
       //------------------------------------------------------------------------
 
-      BindResource(PackageInStream, RESTYPE_PACKAGE);
+      ReleasePackage := OutputDirectory + RUNTIME_PACKAGE_RELEASE_FILENAME;
+      BindResource(ReleasePackage, rtPackage);
 
       //------------------------------------------------------------------------
       // WRITING RESOURCE FILES
       //------------------------------------------------------------------------
 
-      // Write the extra files...
-      BindResource(ExtraResInStream, RESTYPE_APPCONFIG);
+      // Write the primary extra file...
+      ExtraOutputPackage := _FP(RUNTIME_PRIMARY_EXTRA_RESOURCE_FILENAME);
+      BindResource(ExtraOutputPackage, rtResPrimary);
+
+      // Write the secondary extra file...
+      ExtraOutputPackage := _FP(RUNTIME_SECONDARY_EXTRA_RESOURCE_FILENAME);
+      BindResource(ExtraOutputPackage, rtResSecondary);
 
       //------------------------------------------------------------------------
       // WRITING DISCAUTH.INF FILES
@@ -386,33 +415,40 @@ begin
       WriteLn(sLineBreak, 'Creating DiscAuth.xxx files...', sLineBreak);
 {$ENDIF}
 
-      // For each media key, create a DISCAUTH.xxx file, then write to final Runtime app.
-      i := 0;
-      while (i < MediaHashKeys.Count) and (not Aborted) do
-      begin
+      DiscAuthInStream := TFileStream.Create(DiscAuthFileName, fmOpenRead);
+      DiscAuthPasswords := TPackagePasswords.Create;
+      try
+        // For each media key, create a DISCAUTH.xxx file, then write to final Runtime app.
+        i := 0;
+        while (i < MediaHashKeys.Count) and (not Aborted) do
+        begin
 {$IFDEF DEBUG}
-        WriteLn('  Processing Key #', i, ': ', MediaHashKeys[i]);
+          WriteLn('  Processing Key #', i, ': ', MediaHashKeys[i]);
 {$ENDIF}
+          CryptedStream := TMemoryStream.Create;
+          try
+            // Encrypt Stream...
+            with DiscAuthPasswords do
+            begin
+              AES := MediaHashKeys[i];
+              PC1 := MediaHashKeys[i];
+              Camellia := MediaHashKeys[i];
+            end;
+            EncryptStream(DiscAuthPasswords, DiscAuthInStream, CryptedStream);
 
-        CryptedStream := TMemoryStream.Create;
-        try
-          // Encrypt Stream...
-          with Passwords do
-          begin
-            AES := MediaHashKeys[i];
-            PC1 := MediaHashKeys[i];
-            Camellia := MediaHashKeys[i];
+            // Write the crypted stream to the binary...
+            BindResource(CryptedStream, rtDiscAuth);
+          finally
+            CryptedStream.Free;
           end;
-          EncryptStream(Passwords, DiscAuthInStream, CryptedStream);
 
-          // Write the crypted stream to the binary...
-          BindResource(CryptedStream, RESTYPE_DISCAUTH);
-        finally
-          CryptedStream.Free;
-        end;
-
-        Inc(i);
-      end; // for
+          Inc(i);
+        end; // for
+      finally
+        DiscAuthPasswords.Free;
+        DiscAuthInStream.Free;        
+        DeleteFile(DiscAuthFileName);
+      end; // try
 
       //------------------------------------------------------------------------
       // FINALIZE RUNTIME
@@ -425,15 +461,7 @@ begin
       // Write the number of entry at the end of the file too.
       OutStream.Write(ResCount, UINT32_SIZE);
     finally
-      Passwords.Free;
-      PackageInStream.Free;
-      ExtraResInStream.Free;
-      DiscAuthInStream.Free;
       OutStream.Free;
-
-      // Cleaning temp files
-      DeleteFile(DiscAuthFileName);
-      DeleteFile(ReleasePackage);
 
       // Move the final runtime binary to the output directory...
       WorkFileName := OutputDirectory + RUNTIME_PACKAGE_FINAL_OUTPUT;

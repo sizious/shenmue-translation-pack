@@ -26,7 +26,9 @@ unit D7zipAPI; {SiZ! : Renamed sevenzip to D7zipAPI to avoid confusing with the 
 {$WARN SYMBOL_PLATFORM OFF}	
 
 interface
-uses SysUtils, Windows, ActiveX, Classes, Contnrs;
+
+uses
+  SysUtils, Windows, ActiveX, Classes, Contnrs;
 
 type
   PVarType = ^TVarType;
@@ -109,8 +111,8 @@ const
 type
   IProgress = interface(IUnknown)
   ['{23170F69-40C1-278A-0000-000000050000}']
-    function SetTotal(total: Int64): HRESULT; stdcall;
-    function SetCompleted(completeValue: PInt64): HRESULT; stdcall;
+    function SetTotal(Total: Int64): HRESULT; stdcall;
+    function SetCompleted(CompleteValue: PInt64): HRESULT; stdcall;
   end;
 
 //******************************************************************************
@@ -613,7 +615,9 @@ const
   CLSID_CFormatTar      : TGUID = '{23170F69-40C1-278A-1000-000110EE0000}'; // tar
   CLSID_CFormatGZip     : TGUID = '{23170F69-40C1-278A-1000-000110EF0000}'; // gz gzip tgz tpz
 
+//------------------------------------------------------------------------------
 implementation
+//------------------------------------------------------------------------------
 
 const
   MAXCHECK : int64 = (1 shl 20);
@@ -886,7 +890,7 @@ type
     procedure SetPassword(const password: UnicodeString); stdcall;
     procedure SetPropertie(name: UnicodeString; value: OleVariant); stdcall;
     // IProgress
-    function SetTotal(total: Int64): HRESULT; stdcall;
+    function SetTotal(Total: Int64): HRESULT; stdcall;
     function SetCompleted(completeValue: PInt64): HRESULT; stdcall;
     // IArchiveUpdateCallback
     function GetUpdateItemInfo(index: Cardinal;

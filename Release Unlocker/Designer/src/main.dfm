@@ -344,14 +344,10 @@ object frmMain: TfrmMain
     Top = 71
     Width = 618
     Height = 315
-    ActivePage = tsDiscAuth
+    ActivePage = tsGeneral
     TabOrder = 1
     object tsGeneral: TTabSheet
       Caption = 'Main'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbxSource: TGroupBox
         Left = 3
         Top = 3
@@ -589,6 +585,10 @@ object frmMain: TfrmMain
     object tsDiscAuth: TTabSheet
       Caption = 'Unlock'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbxDiscKeys: TGroupBox
         Left = 3
         Top = 74
