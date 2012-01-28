@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, Forms, Menus, Messages, ComCtrls, StdCtrls,
-  JvToolbar;
+  JvToolbar, JvRichEdit;
 
 type
   EUserInterface = class(Exception);
@@ -31,6 +31,7 @@ procedure ListViewSelectItem(ListView: TCustomListView; Index: Integer);
 procedure MakeNumericOnly(Handle: THandle);
 function OpenLink(const LinkURL: string): Boolean;
 procedure OpenWindowsExplorer(const Directory: TFileName);
+procedure RichEditClear(RichEdit: TJvRichEdit);
 function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
 procedure ToolBarCustomDraw(Toolbar: TToolBar);
@@ -45,6 +46,14 @@ uses
 
 var
   sWrapStr: string; // used for MsgBox
+
+//------------------------------------------------------------------------------
+
+procedure RichEditClear(RichEdit: TJvRichEdit);
+begin
+  RichEdit.Clear;
+  RichEdit.SelAttributes.CleanupInstance;
+end;
 
 //------------------------------------------------------------------------------
 

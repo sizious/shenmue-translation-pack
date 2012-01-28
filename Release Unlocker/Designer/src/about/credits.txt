@@ -19,6 +19,7 @@ Embedded binaries:
 AES-256
 7-zip
 PC1 Cipher
+UPX
 
 Delphi libraries:
 Camellia
@@ -29,7 +30,7 @@ PNGImage
 Project JEDI
 
 Thanks to them for their free useful code:
-Alexander Pukall, Mitsubishi/NTT, Gzav, Igor Pavlov, Jean-loup Gailly, Mark Adler, Brandon Staggs, rdm_30, DelphiForFun, David Butler, Gustavo Huffenbacher Daud, The Project JEDI Team, Marc Collin, Michel Bardou, Jean-Yves Quéinec, Zarko Gajic, Nono40, Columbo, JROD, ZeuS, ronchon_sama, J-C Armici, and everyone we forgot...
+Alexander Pukall, Mitsubishi/NTT, Gzav, Igor Pavlov, Jean-loup Gailly, Mark Adler, Brandon Staggs, rdm_30, DelphiForFun, David Butler, Gustavo Huffenbacher Daud, The Project JEDI Team, The UPX Team (Markus Oberhumer, Laszlo Molnar & John Reiser), Marc Collin, Michel Bardou, Jean-Yves Quéinec, Zarko Gajic, Nono40, Columbo, JROD, ZeuS, ronchon_sama, J-C Armici, and everyone we forgot...
 
 -- The End --
 

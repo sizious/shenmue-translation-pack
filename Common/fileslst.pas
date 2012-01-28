@@ -18,6 +18,7 @@ type
     fFileName: TFileName;
     function GetExtension: string;
     function GetIndex: Integer;
+    procedure SetFileName(const Value: TFileName);
   public
     constructor Create(const FileName: TFileName);
     function Exists: Boolean;
@@ -28,7 +29,7 @@ type
     function HasExtension: Boolean;
     function Remove: Boolean;
     property Extension: string read GetExtension;
-    property FileName: TFileName read fFileName write fFileName;
+    property FileName: TFileName read fFileName write SetFileName;
     property Index: Integer read GetIndex;
     property Owner: TFilesList read fOwner;
   end;
@@ -265,6 +266,11 @@ begin
   except
     Result := False;
   end;
+end;
+
+procedure TFileEntry.SetFileName(const Value: TFileName);
+begin
+  fFileName := ExpandFileName(Value);
 end;
 
 end.

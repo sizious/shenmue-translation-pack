@@ -79,6 +79,7 @@ type
     lklParamsExtractToOutputDir: TJvLinkLabel;
     lklDoneFailGroupMessage: TJvLinkLabel;
     tmrLoadRes: TTimer;
+    chkOpenOutputDir: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure pcWizardChanging(Sender: TObject; var AllowChange: Boolean);
     procedure btnNextClick(Sender: TObject);
@@ -103,6 +104,7 @@ type
     procedure lklHomeMessageLinkClick(Sender: TObject; LinkNumber: Integer;
       LinkText, LinkParam: string);
     procedure tmrLoadResTimer(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Déclarations privées }
     fCanceledByClosingWindow: Boolean;
@@ -441,6 +443,15 @@ begin
   cbxDrives.ImageSize := isSmall;
 end;
 
+procedure TfrmMain.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then
+  begin
+    Key := #0;
+    Close;
+  end;
+end;
+
 function TfrmMain.GetPageIndex: Integer;
 begin
   Result := pcWizard.ActivePageIndex;
@@ -489,16 +500,16 @@ begin
   pcWizard.ActivePage := tsHome;
 
   // Loading message file
-  InitializeStringUI;
+  InitializeResMan; // don't move this !
   LoadWizardUI('Home');
 
   // Load images
   InitializeSkin;
 
   // Modify the Wizard Title
-  S := GetStringUI('Title', 'WizardTitle');
+  S := AppNameWizardTitle;
   if S <> '' then Caption := S;
-  if ShowAppName then
+  if AppNameShow and (Caption <> Application.Title) then
     Caption := Caption + ' - ' + Application.Title;
       
   // Fill the home infos
@@ -519,7 +530,8 @@ procedure TfrmMain.lvwInfosAdvancedCustomDrawSubItem(Sender: TCustomListView;
   Item: TListItem; SubItem: Integer; State: TCustomDrawState;
   Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 begin
-  if (SubItem > 0) and IsInString('://', Item.SubItems[0]) then
+// Item.Data := LISTVIEW_RELEASE_INFO_ITEM_WEBURL;
+  if (SubItem > 0) and (Integer(Item.Data) = LISTVIEW_RELEASE_INFO_ITEM_WEBURL) then
   begin
     Sender.Canvas.Font.Color := clBlue;
     Sender.Canvas.Font.Style := [fsUnderline];
@@ -543,7 +555,7 @@ begin
   begin
     HoverItem := lvwInfos.GetItemAt(X,  Y);
     if Assigned(HoverItem) and (HoverItem.SubItems.Count > 0) then
-      if IsInString('://', HoverItem.SubItems[0]) then
+      if Integer(HoverItem.Data) = LISTVIEW_RELEASE_INFO_ITEM_WEBURL then
         lvwInfos.Cursor := crHandPoint;
   end;
 end;
@@ -562,7 +574,11 @@ begin
 
     // Finish
     BUTTON_ACTION_FINISH:
-      Close;
+      begin
+        if (PageIndex = SCREEN_FINISH) and chkOpenOutputDir.Checked then
+          OpenWindowsExplorer(edtOutputDir.Text);
+        Close;
+      end;
 
     // Launch Identification process
     BUTTON_ACTION_DO_IDENTIFICATION:

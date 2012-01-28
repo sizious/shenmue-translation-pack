@@ -5,7 +5,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls,
-  OpThBase, DiscAuth, Packer, JvBaseDlg, JvBrowseFolder, ExtDlgs, JvDialogs;
+  OpThBase, DiscAuth, Packer, JvBaseDlg, JvBrowseFolder, ExtDlgs, JvDialogs,
+  JvRichEdit, Mask, JvExMask, JvToolEdit, JvMaskEdit, JvCheckedMaskEdit,
+  JvDatePickerEdit, GraphicEx;
 
 type
   TfrmMain = class(TForm)
@@ -16,28 +18,23 @@ type
     btnQuit: TButton;
     pcMain: TPageControl;
     tsGeneral: TTabSheet;
-    tsDiscAuth: TTabSheet;
+    tsUnlock: TTabSheet;
     tsSkin: TTabSheet;
     gbxSource: TGroupBox;
     edtSourceDir: TEdit;
     btnSourceDir: TButton;
     Label1: TLabel;
     tsEula: TTabSheet;
-    GroupBox3: TGroupBox;
-    Label3: TLabel;
-    Edit3: TEdit;
-    Button4: TButton;
     GroupBox4: TGroupBox;
-    RichEdit1: TRichEdit;
     gbxDiscKeys: TGroupBox;
     sbMain: TStatusBar;
     pbMain: TProgressBar;
-    Shape1: TShape;
-    Bevel2: TBevel;
-    Label4: TLabel;
+    shpTop: TShape;
+    bvlTop: TBevel;
+    lblTitleHint: TLabel;
     lvDiscKeys: TListView;
-    tsOptions: TTabSheet;
-    GroupBox2: TGroupBox;
+    tsConfig: TTabSheet;
+    gbxUI: TGroupBox;
     Label2: TLabel;
     edtAppConfig: TEdit;
     btnAppConfig: TButton;
@@ -46,30 +43,26 @@ type
     edtDestDir: TEdit;
     btnDestDir: TButton;
     Label7: TLabel;
-    GroupBox6: TGroupBox;
+    gbxDiscKeysMgr: TGroupBox;
     cbxDrives: TJvDriveCombo;
     btnAddKey: TButton;
     btnDelKey: TButton;
     Label8: TLabel;
     bfd: TJvBrowseForFolderDialog;
-    GroupBox1: TGroupBox;
+    gbxGlobalSkin: TGroupBox;
     Label10: TLabel;
     edtSkinTop: TEdit;
     btnSkinTop: TButton;
     edtSkinBottom: TEdit;
     Label11: TLabel;
     btnSkinBottom: TButton;
-    GroupBox5: TGroupBox;
+    gbxCenterSkin: TGroupBox;
     Label12: TLabel;
     lvwSkinLeft: TListView;
     btnSkinLeftAdd: TButton;
     btnSkinLeftDel: TButton;
     od: TOpenDialog;
     opd: TOpenPictureDialog;
-    GroupBox7: TGroupBox;
-    Label9: TLabel;
-    edtEULA: TEdit;
-    btnEULA: TButton;
     gbxKeysAuth: TGroupBox;
     lblPC1: TLabel;
     lblCamellia: TLabel;
@@ -86,7 +79,36 @@ type
     btnSaveMediaKeys: TButton;
     sdMediaKey: TJvSaveDialog;
     lblAppTitle: TLabel;
-    Image1: TImage;
+    imgIcon: TImage;
+    tsLogger: TTabSheet;
+    mLog: TMemo;
+    reEula: TJvRichEdit;
+    btnOpenSourceDir: TButton;
+    btnOpenDestDir: TButton;
+    tsInfo: TTabSheet;
+    grpReleaseInfo: TGroupBox;
+    edtAuthor: TEdit;
+    edtWebURL: TEdit;
+    edtReleaseDate: TJvDatePickerEdit;
+    edtVersion: TEdit;
+    Label4: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    Label15: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    btnWebURL: TButton;
+    edtGameName: TComboBox;
+    grpWizardTitle: TGroupBox;
+    Label3: TLabel;
+    imgWizardTitleExample: TImage;
+    edtWizardTitle: TEdit;
+    cbxShowAppName: TCheckBox;
+    gbxEULA: TGroupBox;
+    Label9: TLabel;
+    edtEULA: TEdit;
+    btnEULA: TButton;
+    cbxProtocolWebURL: TComboBox;
     procedure btnQuitClick(Sender: TObject);
     procedure btnAddKeyClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -107,6 +129,16 @@ type
     procedure btnLoadMediaKeysClick(Sender: TObject);
     procedure btnSaveMediaKeysClick(Sender: TObject);
     procedure btnDelKeyClick(Sender: TObject);
+    procedure edtEULAChange(Sender: TObject);
+    procedure reEulaURLClick(Sender: TObject; const URLText: string;
+      Button: TMouseButton);
+    procedure btnOpenSourceDirClick(Sender: TObject);
+    procedure opdClose(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure btnWebURLClick(Sender: TObject);
+    procedure edtWebURLChange(Sender: TObject);
+    procedure edtSourceDirChange(Sender: TObject);
+    procedure edtWizardTitleChange(Sender: TObject);
   private
     { Déclarations privées }
     fWorkingThread: TOperationThread;
@@ -117,6 +149,7 @@ type
     procedure InitProgressBar;
     procedure CheckPasswordLength(Name: string);
     function CheckInputs: Boolean;
+    function ConvertToRelativePath(AbsolutePath: TFileName): TFileName;
     procedure DiscValidatorStart(Sender: TObject; Total: Int64);
     procedure DiscValidatorProgress(Sender: TObject; Current, Total: Int64);
     procedure DiscValidatorSuccess(Sender: TObject; const MediaKey: string);
@@ -124,7 +157,6 @@ type
     function GetStatus: string;
     procedure GeneratePasswords;
     function IsThreadRunning: Boolean;
-    function AddMediaKey(const MediaKey, Source: string): Boolean;
     procedure DeleteMediaKey(const KeyIndex: Integer);
     procedure LoadMediaKeys(const FileName: TFileName);
     procedure SaveMediaKeys(const FileName: TFileName);
@@ -134,6 +166,7 @@ type
     procedure PackageManagerProgress(Sender: TObject; Current, Total: Int64);
 //    procedure PackageManagerProgressCrypto(Sender: TObject; Current,
 //      Total: Int64);
+    procedure PackageManagerStatus(Sender: TObject; StatusText: string);
     procedure PackageManagerFinish(Sender: TObject);
     procedure SetStatus(const Value: string);
     procedure SetControlsState(State: Boolean);
@@ -143,12 +176,17 @@ type
     procedure WorkingThreadTerminateHandler(Sender: TObject);
     function GetLeftImage(Index: Integer): TFileName;
     procedure SetLeftImage(Index: Integer; const Value: TFileName);
+    function GetWebURL: string;
+    property WebURL: string read GetWebURL;
     property WorkingThread: TOperationThread read fWorkingThread
       write fWorkingThread;
   public
     { Déclarations publiques }
+    procedure AddLog(const MessageText: string);
+    function AddMediaKey(const MediaKey, Source: string): Boolean;
     function MsgBox(Text, Title: string; Flags: Integer): Integer;
     function GetRandomPassword(PasswordLength: Integer = 32): string;
+    procedure UpdateShowAppTitleCheckBox;
     property Status: string read GetStatus write SetStatus;
     property MediaHashKeys: TStringList read fMediaHashKeys
       write fMediaHashKeys;
@@ -162,7 +200,7 @@ var
 implementation
 
 uses
-  SysTools, UITools, Math, DateUtils, WorkDir, About, AppVer, IniFiles;
+  SysTools, UITools, Math, DateUtils, WorkDir, About, AppVer, IniFiles, Config;
 
 {$R *.dfm}
 
@@ -184,8 +222,10 @@ begin
   with opd do
   begin
     Title := 'Please select the Bottom Banner (691 x 51) :';
+    if FileExists(edtSkinBottom.Text) then
+      FileName := ConvertToRelativePath(edtSkinBottom.Text);
     if Execute then
-      edtSkinBottom.Text := FileName;
+      edtSkinBottom.Text := ConvertToRelativePath(FileName);
   end;
 end;
 
@@ -201,8 +241,10 @@ begin
   begin
     Title := 'Please select the Left Banner (173 x 385) for the #'
       + IntToStr(lvwSkinLeft.ItemIndex + 1) + ' wizard page :';
+    if FileExists(LeftImages[lvwSkinLeft.ItemIndex]) then
+      FileName := ConvertToRelativePath(LeftImages[lvwSkinLeft.ItemIndex]);
     if Execute then
-      LeftImages[lvwSkinLeft.ItemIndex] := FileName;
+      LeftImages[lvwSkinLeft.ItemIndex] := ConvertToRelativePath(FileName);
   end;
 end;
 
@@ -227,8 +269,10 @@ begin
   with opd do
   begin
     Title := 'Please select the Top Banner (691 x 61) :';
+    if FileExists(edtSkinTop.Text) then
+      FileName := ConvertToRelativePath(edtSkinTop.Text);
     if Execute then
-      edtSkinTop.Text := FileName;
+      edtSkinTop.Text := ConvertToRelativePath(FileName);
   end;
 end;
 
@@ -238,9 +282,16 @@ begin
   begin
     Title := 'Source Directory';
     StatusText := 'Select the directory that contains the files to release.';
+    if DirectoryExists(ConvertToRelativePath(edtSourceDir.Text)) then
+      Directory := ConvertToRelativePath(edtSourceDir.Text);
     if Execute then
-      edtSourceDir.Text := IncludeTrailingPathDelimiter(Directory);
+      edtSourceDir.Text := ConvertToRelativePath(IncludeTrailingPathDelimiter(Directory));
   end;
+end;
+
+procedure TfrmMain.btnWebURLClick(Sender: TObject);
+begin
+  OpenLink(WebURL);
 end;
 
 // Check passwords length and fill the missing characters with random ones.
@@ -248,10 +299,12 @@ function TfrmMain.CheckInputs: Boolean;
 const
   FILES_EDIT: array[0..3] of string = ('edtAppConfig', 'edtEULA', 'edtSkinTop', 'edtSkinBottom');
   FOLDER_EDIT: array[0..1] of string = ('edtSourceDir', 'edtDestDir');
+  INFOS_EDIT: array[0..3] of string = ('edtAuthor', 'edtGameName', 'edtWebURL', 'edtVersion');
 
 var
   i: Integer;
-  E: TEdit;
+  Edit: TEdit;
+  ComboBox: TComboBox;
 
   function _CHK(Folder: Boolean): Boolean;
   var
@@ -262,19 +315,24 @@ var
     if Folder then
     begin
       S := 'folder';
-      Result := DirectoryExists(E.Text);
+      Result := DirectoryExists(Edit.Text);
     end else begin
       S := 'file';
-      Result := FileExists(E.Text);
+      Result := FileExists(Edit.Text);
     end;
 
     if not Result then
     begin
+      (Edit.Parent.Parent as TTabSheet).Show;
+      Edit.SetFocus;
       MsgBox('The specified ' + S + ' doesn''t exists.' + WrapStr
-        + 'FileName: "' + E.Text + '".', 'Warning', MB_ICONWARNING);
-      (E.Parent.Parent as TTabSheet).Show;
-      E.SetFocus;
+        + 'FileName: "' + Edit.Text + '".', 'Warning', MB_ICONWARNING);
     end;
+  end;
+
+  procedure _MandatoryMsg();
+  begin
+    MsgBox('Please fill this mandatory field.', 'Warning', MB_ICONWARNING);
   end;
 
 begin
@@ -284,7 +342,7 @@ begin
   // Check folders
   for i := Low(FOLDER_EDIT) to High(FOLDER_EDIT) do
   begin
-    E := FindComponent(FOLDER_EDIT[i]) as TEdit;
+    Edit := FindComponent(FOLDER_EDIT[i]) as TEdit;
     Result := _CHK(True);
     if not Result then Exit;
   end;
@@ -292,33 +350,68 @@ begin
   // Check files
   for i := Low(FILES_EDIT) to High(FILES_EDIT) do
   begin
-    E := FindComponent(FILES_EDIT[i]) as TEdit;
+    Edit := FindComponent(FILES_EDIT[i]) as TEdit;
     Result := _CHK(False);
     if not Result then Exit;
   end;
 
+  // Left skins...
   for i := 0 to lvwSkinLeft.Items.Count - 1 do
   begin
     Result := FileExists(LeftImages[i]);
     if not Result then
     begin
-      MsgBox('The left skin image #' + IntToStr(i+1)
-        + ' doesn''t exists.' + WrapStr
-        + 'FileName: "' + LeftImages[i] + '".', 'Warning', MB_ICONWARNING);
       tsSkin.Show;
       lvwSkinLeft.ItemIndex := i;
       lvwSkinLeft.SetFocus;
+      MsgBox('The left skin image #' + IntToStr(i+1)
+        + ' doesn''t exists.' + WrapStr
+        + 'FileName: "' + LeftImages[i] + '".', 'Warning', MB_ICONWARNING);      
       Exit;
     end;
   end;
 
   // Check media keys
-  Result := lvDiscKeys.Items.Count > 0;
+  Result := MediaHashKeys.Count > 0;
   if not Result then
   begin
+    tsUnlock.Show;
     MsgBox('Please extract at least one media key'
       + 'from an original disc.', 'Warning', MB_ICONWARNING);
     Exit;
+  end;
+
+  // Release informations
+  for i := Low(INFOS_EDIT) to High(INFOS_EDIT) do
+  begin
+    try
+      // TEdit
+      Edit := FindComponent(INFOS_EDIT[i]) as TEdit;
+      Result := Edit.Text <> '';
+      if not Result then
+      begin
+        (Edit.Parent.Parent as TTabSheet).Show;
+        Edit.SelectAll;
+        Edit.SetFocus;
+        _MandatoryMsg();
+        Exit;
+      end;
+    except
+      on E:EInvalidCast do // If your Delphi breaks here, ignore it
+      begin
+        // TComboBox
+        ComboBox := FindComponent(INFOS_EDIT[i]) as TComboBox;
+        Result := ComboBox.Text <> '';
+        if not Result then
+        begin
+          (ComboBox.Parent.Parent as TTabSheet).Show;
+          ComboBox.SelectAll;
+          ComboBox.SetFocus;
+          _MandatoryMsg();
+          Exit;
+        end;
+      end; // EInvalidCast
+    end;
   end;
 end;
 
@@ -334,6 +427,14 @@ begin
     _s := 32 - Length(_e.Text);
     _e.Text := _e.Text + GetRandomPassword(_s);
   end;
+end;
+
+function TfrmMain.ConvertToRelativePath(AbsolutePath: TFileName): TFileName;
+begin
+  Result := AbsolutePath;
+  if IsInString(GetApplicationDirectory, AbsolutePath) then
+    Result := StringReplace(AbsolutePath, GetApplicationDirectory, '.\',
+      [rfReplaceAll, rfIgnoreCase]);
 end;
 
 procedure TfrmMain.btnAboutClick(Sender: TObject);
@@ -365,7 +466,7 @@ begin
     Filter := 'INI Files (*.ini)|*.ini|All Files (*.*)|*.*';
     DefaultExt := 'ini';
     if Execute then
-      edtAppConfig.Text := FileName;
+      edtAppConfig.Text := ConvertToRelativePath(FileName);
   end;
 end;
 
@@ -390,8 +491,10 @@ begin
   begin
     Title := 'Destination Directory';
     StatusText := 'Select the output directory where the files will be written.';
+    if DirectoryExists(ConvertToRelativePath(edtDestDir.Text)) then
+      Directory := ConvertToRelativePath(edtDestDir.Text);
     if Execute then
-      edtDestDir.Text := IncludeTrailingPathDelimiter(Directory);
+      edtDestDir.Text := ConvertToRelativePath(IncludeTrailingPathDelimiter(Directory));
   end;
 end;
 
@@ -399,11 +502,11 @@ procedure TfrmMain.btnEULAClick(Sender: TObject);
 begin
   with od do
   begin
-    Title := 'Please select the EULA.RTF file...';
-    Filter := 'RTF Files (*.rtf)|*.rtf|All Files (*.*)|*.*';
+    Title := 'Please select the EULA file...';
+    Filter := 'Rich Text Format Files (*.rtf)|*.rtf|Text Files (*.txt)|*.txt|All Files (*.*)|*.*';
     DefaultExt := 'rtf';
     if Execute then
-      edtEULA.Text := FileName;
+      edtEULA.Text := ConvertToRelativePath(FileName);
   end;
 end;
 
@@ -416,9 +519,24 @@ end;
 
 procedure TfrmMain.btnMakeClick(Sender: TObject);
 begin
+  // Because we can use relative path in the input fields
+  SetCurrentDir(GetApplicationDirectory);
+
   // Create the package!
   if CheckInputs then
     MakePackage;
+end;
+
+procedure TfrmMain.btnOpenSourceDirClick(Sender: TObject);
+var
+  EditName: string;
+  E: TEdit;
+
+begin
+  EditName := StringReplace((Sender as TButton).Name, 'btnOpen', 'edt', []);
+  E := FindComponent(EditName) as TEdit;
+  if Assigned(E) then
+    OpenWindowsExplorer(ExpandFileName(E.Text));
 end;
 
 procedure TfrmMain.btnPC1Click(Sender: TObject);
@@ -489,6 +607,39 @@ begin
   SetControlsState(True);
 end;
 
+procedure TfrmMain.edtEULAChange(Sender: TObject);
+var
+  FileName: TFileName;
+
+begin
+  FileName := (Sender as TEdit).Text;
+  RichEditClear(reEula);
+  if FileExists(FileName) then
+    reEula.Lines.LoadFromFile(FileName);
+end;
+
+procedure TfrmMain.edtSourceDirChange(Sender: TObject);
+var
+  BtnName: string;
+  Btn: TButton;
+
+begin
+  BtnName := StringReplace((Sender as TEdit).Name, 'edt', 'btnOpen', []);
+  Btn := FindComponent(BtnName) as TButton;
+  if Assigned(Btn) then
+    Btn.Enabled := DirectoryExists((Sender as TEdit).Text);
+end;
+
+procedure TfrmMain.edtWebURLChange(Sender: TObject);
+begin
+  btnWebURL.Enabled := edtWebURL.Text <> '';
+end;
+
+procedure TfrmMain.edtWizardTitleChange(Sender: TObject);
+begin
+  UpdateShowAppTitleCheckBox;
+end;
+
 procedure TfrmMain.WorkingThreadTerminateHandler;
 begin
 {$IFDEF DEBUG}
@@ -548,6 +699,9 @@ var
 begin
   // Init the Main Form
   Caption := Application.Title + ' v' + GetApplicationVersion;
+{$IFDEF DEBUG}
+  Caption := Caption + ' *DEBUG*';
+{$ENDIF}
   lblAppTitle.Caption := Application.Title;
 
   // Init the About Box
@@ -562,6 +716,21 @@ begin
   sbMain.DoubleBuffered := True;
   DoubleBuffered := True;
 
+  btnOpenSourceDir.Enabled := False;
+  btnOpenDestDir.Enabled := False;
+
+  // Init the Release Info Tab
+  edtReleaseDate.Date := Now;
+  btnWebURL.Enabled := False;
+  edtWizardTitleChange(edtWizardTitle);
+
+  // Init the Logger
+  mLog.Clear;
+  mLog.Lines.Add(
+    Caption + ' - Activity Log' + sLineBreak +
+    '---' + sLineBreak
+  );
+  
   //init banner list
   for i := 1 to 10 do
     with lvwSkinLeft.Items.Add do
@@ -594,12 +763,25 @@ begin
 {$ELSE}
   GeneratePasswords;
 {$ENDIF}
+
+  // Load the configuration !
+  LoadConfig;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  SaveConfig;
   WorkingThread.Free;
   MediaHashKeys.Free;
+end;
+
+procedure TfrmMain.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = Chr(VK_ESCAPE) then
+  begin
+    Key := #0;
+    Close;
+  end;
 end;
 
 procedure TfrmMain.GeneratePasswords;
@@ -646,6 +828,11 @@ end;
 function TfrmMain.GetStatus;
 begin
   Result := sbMain.Panels[1].Text;
+end;
+
+function TfrmMain.GetWebURL: string;
+begin
+  Result := cbxProtocolWebURL.Items[cbxProtocolWebURL.ItemIndex] + edtWebURL.Text;
 end;
 
 procedure TfrmMain.InitProgressBar;
@@ -699,6 +886,18 @@ begin
   end;
 end;
 
+procedure TfrmMain.AddLog(const MessageText: string);
+var
+  DT: string;
+  
+begin
+  DT := DateToStr(Now) + ' ' + TimeToStr(Now);
+  if MessageText <> '' then  
+    mLog.Lines.Add(DT + ': ' + MessageText)
+  else
+    mLog.Lines.Add('');
+end;
+
 function TfrmMain.AddMediaKey;
 begin
   Result := False;
@@ -727,12 +926,15 @@ var
 
 begin
   fCanceledByClosingWindow := True;
+  tsLogger.Show;
+
   WorkingThread.Free;
   WorkingThread := TPackageMakerThread.Create;
   with (WorkingThread as TPackageMakerThread) do
   begin
     OnStart := PackageManagerStart;
     OnProgress := PackageManagerProgress;
+    OnStatus := PackageManagerStatus;
     OnFinish := PackageManagerFinish;
 //    OnStartCrypto := PackageManagerStartCrypto;
 //    OnProgressCrypto := PackageManagerProgressCrypto;
@@ -752,8 +954,18 @@ begin
         Left.Add(LeftImages[i]);
     end;
     Eula := edtEULA.Text;
-    AppConfig := edtAppConfig.Text; // Ui
+    AppConfig := edtAppConfig.Text; // ui.ini file
     MediaHashKeys.Assign(Self.MediaHashKeys);
+    with ReleaseInfo do
+    begin
+      Add('Author', edtAuthor.Text);
+      Add('GameName', edtGameName.Text);
+      Add('WebURL', WebURL);
+      Add('ReleaseDate', DateToStr(edtReleaseDate.Date));
+      Add('Version', edtVersion.Text);
+      Add('WizardTitle', edtWizardTitle.Text);
+      Add('ShowAppTitle', BoolToStr(cbxShowAppName.Checked));
+    end;
     Resume;
   end;
 end;
@@ -763,21 +975,38 @@ begin
   Result := MessageBoxA(Handle, PAnsiChar(Text), PAnsiChar(Title), Flags);
 end;
 
+procedure TfrmMain.opdClose(Sender: TObject);
+begin
+  SetCurrentDir(GetApplicationDirectory);
+end;
+
 procedure TfrmMain.PackageManagerFinish;
+var
+  CanDo: Integer;
+  Thread: TPackageMakerThread;
+
 begin
 {$IFDEF DEBUG}
   WriteLn('Finish');
 {$ENDIF}
-  if (Sender as TPackageMakerThread).Aborted then
+
+  Thread := (Sender as TPackageMakerThread);
+  if Thread.Aborted then
   begin
     Status := 'Aborted !';
     Delay(2000);
   end else begin
     Status := 'Done !';
     SetStatusProgress(MaxDouble);
-    MsgBox('All the files were packaged successfully.' + WrapStr +
-      'Your production is now ready to be released!', 'Congrats!',
-      MB_ICONINFORMATION); 
+    CanDo := MsgBox('All the files were packaged successfully.' + WrapStr +
+      'Your production is now ready to be released!' + WrapStr +
+      'You should test the generated package before spreading it.' + WrapStr +
+      'Do it know ?', 'Congrats!',
+      MB_ICONINFORMATION + MB_YESNO);
+
+    // Run the production to test it...
+    if CanDo = IDYES then
+      RunNoWait(Thread.OutputFileName);
   end;
 
   Status := 'Ready';
@@ -814,7 +1043,18 @@ begin
   SetStatusProgressMax(Total);
   SetStatusProgress(0);
   SetControlsState(False);
-  Status := 'Building package... please wait.';
+//  Status := 'Building package... please wait.';
+end;
+
+procedure TfrmMain.PackageManagerStatus(Sender: TObject; StatusText: string);
+begin
+  Status := StatusText;
+end;
+
+procedure TfrmMain.reEulaURLClick(Sender: TObject; const URLText: string;
+  Button: TMouseButton);
+begin
+  OpenLink(URLText);
 end;
 
 (*procedure TfrmMain.PackageManagerStartCrypto;
@@ -881,23 +1121,41 @@ begin
   edtSkinBottom.Enabled := State;
   btnLoadMediaKeys.Enabled := State;
   btnSaveMediaKeys.Enabled := State;
+  edtAuthor.Enabled := State;
+  edtGameName.Enabled := State;
+  edtReleaseDate.Enabled := State;
+  edtWebURL.Enabled := State;
+  edtVersion.Enabled := State;
+  edtWizardTitle.Enabled := State;
+  cbxProtocolWebURL.Enabled := State;
   if not State then
-    btnQuit.Caption := '&Cancel'
-  else
+  begin
+    cbxShowAppName.Enabled := False;
+    btnQuit.Caption := '&Cancel';
+  end else begin
+    UpdateShowAppTitleCheckBox;
     btnQuit.Caption := '&Quit';
+  end;
 end;
 
 procedure TfrmMain.SetLeftImage(Index: Integer; const Value: TFileName);
 begin
-  lvwSkinLeft.Items[Index].SubItems[1] := ExtractFileName(Value);
-  lvwSkinLeft.Items[Index].SubItems[2] := ExtractFilePath(Value);
+  if ((Value <> '') and (Value <> '\')) then
+  begin
+    lvwSkinLeft.Items[Index].SubItems[1] := ExtractFileName(Value);
+    lvwSkinLeft.Items[Index].SubItems[2] := ExtractFilePath(Value);
+  end;
 end;
 
 procedure TfrmMain.SetStatus;
 begin
   sbMain.Panels[1].Text := Value;
+  AddLog(Value);
   if Value = 'Ready' then
+  begin
     SetStatusProgress(0);
+    AddLog('');
+  end;
 end;
 
 procedure TfrmMain.SetStatusProgress;
@@ -922,6 +1180,13 @@ begin
   fStatusProgressMax := MaxValue;
   pbMain.Max := 100;
   SetStatusProgress(0);
+end;
+
+procedure TfrmMain.UpdateShowAppTitleCheckBox;
+begin
+  cbxShowAppName.Enabled := edtWizardTitle.Text <> '';
+  if not cbxShowAppName.Enabled then
+    cbxShowAppName.Checked := True;
 end;
 
 end.

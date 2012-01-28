@@ -10,8 +10,12 @@ uses
   , HashIdx
 {$ENDIF};
 
+const
+  LISTVIEW_RELEASE_INFO_ITEM_NORMAL = 0;
+  LISTVIEW_RELEASE_INFO_ITEM_WEBURL = 1;
+
 // Resource Strings Manager
-procedure InitializeStringUI;
+procedure InitializeResMan;
 function GetStringUI(Section, Code: string): string;
 function SizeUnitToString(SizeUnit: TSizeUnit): string;
 procedure LoadWizardUI(Section: string);
@@ -21,7 +25,8 @@ function InitializeSkin: Boolean;
 
 // Misc
 procedure FillReleaseInfo;
-function ShowAppName: Boolean;
+function AppNameWizardTitle: string;
+function AppNameShow: Boolean;
 function GetLink(FieldName: string; LinkNumber: Integer): string;
 
 implementation
@@ -85,7 +90,9 @@ const
   INVALID_STRING = '(%INVALID%)';
 
 var
-  GameName, WebURL: string;
+  ReleaseInfo: TPackageReleaseInfo;
+  GameName, WebURL, StrAppNameWizardTitle: string;
+  BoolAppNameShow: Boolean;
   IniUiFile: TIniFile;
   StringLocalizer: TStringLocalizer;
   IsFadingOut, AbortFadingOut: Boolean;
@@ -93,9 +100,16 @@ var
 
 //------------------------------------------------------------------------------
                              
-function ShowAppName: Boolean;
+function AppNameShow: Boolean;
 begin
-  Result := IniUiFile.ReadBool('Title', 'ShowAppName', True);
+  Result := BoolAppNameShow;
+end;
+
+//------------------------------------------------------------------------------
+
+function AppNameWizardTitle: string;
+begin
+  Result := StrAppNameWizardTitle;
 end;
 
 //------------------------------------------------------------------------------
@@ -106,18 +120,39 @@ var
   i: Integer;
 
   procedure _Add(Key: string);
+  var
+    Value: string;
+
   begin
     with frmMain.lvwInfos.Items.Add do
     begin
-      Caption := GetStringUI('HomeInfos', Key);
-      SubItems.Add(GetStringUI('General', Key));
+      Caption := GetStringUI('HomeInfosCols', Key);
+      Value := ReleaseInfo.GetValueFromKey(Key);
+      SubItems.Add(Value);
+
+      // if a web url...
+      Data := Pointer(LISTVIEW_RELEASE_INFO_ITEM_NORMAL);
+      if (IsInString('://', Value)) or (IsInString('mailto:', Value)) then
+        Data := Pointer(LISTVIEW_RELEASE_INFO_ITEM_WEBURL);
+
+{$IFDEF DEBUG}
+      WriteLn(
+        ' ~ ', Key, sLineBreak,
+        '    Caption: ', Caption, sLineBreak,
+        '    Value  : ', Value, sLineBreak,
+        '    IsURL  : ', Integer(Data) = LISTVIEW_RELEASE_INFO_ITEM_WEBURL
+      );
+{$ENDIF}
     end;
   end;
 
 begin
+{$IFDEF DEBUG}
+  WriteLn('FillReleaseInfo: ');
+{$ENDIF}
   SL := TStringList.Create;
   try
-    IniUiFile.ReadSection('General', SL);
+    IniUiFile.ReadSection('HomeInfosCols', SL);
     for i := 0 to SL.Count - 1 do
       _Add(SL[i]);
   finally
@@ -134,21 +169,45 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure InitializeStringUI;
+procedure InitializeResMan;
 var
   DefSize: Integer;
-  
+
 begin
+  // Infos from UI.INI
+{$IFDEF DEBUG}
+  WriteLn('Init UI.INI');
+{$ENDIF}
   IniUiFile := TIniFile.Create(GetWorkingTempDirectory + APPCONFIG_UI_MESSAGES);
   StringLocalizer := TStringLocalizer.Create;
 
+  // Infos from CONFIG.INI
+{$IFDEF DEBUG}
+  WriteLn('Init CONFIG.INI');
+{$ENDIF}
+  ReleaseInfo := TPackageReleaseInfo.Create;
+  ReleaseInfo.LoadFromFile(GetWorkingTempDirectory + APPCONFIG_RELEASEINFO);
+
+  // Init UI
   with frmMain do
   begin
     // Generic
     btnAbout.Caption := GetStringUI('Buttons', 'About');
     btnCancel.Caption := GetStringUI('Buttons', 'Cancel');
-    GameName := GetStringUI('General', 'GameName');
-    WebURL := GetStringUI('General', 'WebURL');
+
+    // Parameters...
+    GameName := ReleaseInfo.GetValueFromKey('GameName');
+    WebURL := ReleaseInfo.GetValueFromKey('WebURL');
+
+    // Wizard title parameters...
+    BoolAppNameShow := StrToBoolDef(ReleaseInfo.GetValueFromKey('ShowAppTitle'), True);
+    StrAppNameWizardTitle := ReleaseInfo.GetValueFromKey('WizardTitle');
+{$IFDEF DEBUG}
+    WriteLn('Wizard Title Parameters:', sLineBreak,
+      '   BoolAppNameShow = ', BoolAppNameShow, sLineBreak,
+      '   StrAppNameWizardTitle = ', StrAppNameWizardTitle
+    );
+{$ENDIF}
 
     // BrowseForDialog for the OutputDirectory
     bfdOutput.StatusText := GetStringUI('Params', 'bfdStatusText');
@@ -550,11 +609,14 @@ end;
 //------------------------------------------------------------------------------
 
 initialization
+  StrAppNameWizardTitle := '';
+  BoolAppNameShow := True;
   JvLinkLabelHandler := TJvLinkLabelHandler.Create;
   IsFadingOut := False;
   AbortFadingOut := False;
 
 finalization
+  ReleaseInfo.Free;
   IniUiFile.Free;
   StringLocalizer.Free;
   JvLinkLabelHandler.Free;

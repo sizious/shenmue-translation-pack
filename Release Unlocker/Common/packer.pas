@@ -7,14 +7,16 @@ interface
 
 uses
   Windows, SysUtils, Classes, OpThBase, D7zipAPI, Common;
-
+  
 type
+  TPackageMakerThreadStatusEvent = procedure(
+    Sender: TObject; StatusText: string) of object;
+
   TPackageMakerThread = class(TOperationThread)
   private
     { Déclarations privées }
+    fPackageReleaseInfo: TPackageReleaseInfo;
     fPasswords: TPackagePasswords;
-//    fOnStartCrypto: TOperationStartEvent;
-//    fOnProgressCrypto: TOperationProgressEvent;
     fOutputDirectory: TFileName;
     fInputDirectory: TFileName;
     fDirectorySize: Int64;
@@ -22,27 +24,30 @@ type
     fSkinImages: TSkinImages;
     fAppConfig: TFileName;
     fEula: TFileName;
+    fOnStatus: TPackageMakerThreadStatusEvent;
 
-//    procedure StartCryptoEvent;
-//    procedure ProgressCryptoEvent;
+    fLoggingMessage: string;
+    fOutputFileName: TFileName;
+    procedure DoLog;
 
     procedure CompressSourcePackage;
-//    procedure EncryptPackage;
-    procedure CompileRuntimePackage;
     procedure CompileExtraFiles;
-    function WriteDiscAuthentification: TFileName;
-
+    procedure CompileRuntimePackage;
     procedure SetInputDirectory(const Value: TFileName);
     procedure SetOutputDirectory(const Value: TFileName);
+    function WriteDiscAuthentification: TFileName;
+    procedure SetAppConfig(const Value: TFileName);
+    procedure SetEula(const Value: TFileName);
   protected
     procedure Execute; override;
     function WritePackage: Boolean;
+    procedure Log(Text: string);
   public
     constructor Create; overload;
     destructor Destroy; override;
 
-    property AppConfig: TFileName read fAppConfig write fAppConfig;
-    property Eula: TFileName read fEula write fEula;
+    property AppConfig: TFileName read fAppConfig write SetAppConfig;
+    property Eula: TFileName read fEula write SetEula;
 
     property InputDirectory: TFileName read fInputDirectory
       write SetInputDirectory;
@@ -50,14 +55,15 @@ type
       write fMediaHashKeys;
     property OutputDirectory: TFileName read fOutputDirectory
       write SetOutputDirectory;
+    property OutputFileName: TFileName read fOutputFileName;
     property Passwords: TPackagePasswords read fPasswords;
+
+    property ReleaseInfo: TPackageReleaseInfo read fPackageReleaseInfo;
 
     property SkinImages: TSkinImages read fSkinImages;
 
-(*    property OnStartCrypto: TOperationStartEvent read fOnStartCrypto
-      write fOnStartCrypto;
-    property OnProgressCrypto: TOperationProgressEvent read fOnProgressCrypto
-      write fOnProgressCrypto;*)
+    property OnStatus: TPackageMakerThreadStatusEvent read
+      fOnStatus write fOnStatus;
   end;
 
 //------------------------------------------------------------------------------
@@ -65,7 +71,7 @@ implementation
 //------------------------------------------------------------------------------
 
 uses
-  IniFiles, SysTools, WorkDir;
+  IniFiles, SysTools, WorkDir, UpxLib;
 
 const
   COMPRESSION_LEVEL_MAX = 9;
@@ -73,7 +79,7 @@ const
   RUNTIME_PACKAGE_RELEASE_FILENAME            = 'package.tmp';
 
   RUNTIME_PACKAGE_RESOURCE_NAME               = 'RUNTIME';
-  RUNTIME_PACKAGE_FINAL_OUTPUT                = 'unpacker.exe'; // rlzulock.exe
+  RUNTIME_PACKAGE_FINAL_OUTPUT                = 'unpacker.exe';
 
   RUNTIME_PRIMARY_EXTRA_RESOURCE_FILENAME     = 'master.dat';
   RUNTIME_SECONDARY_EXTRA_RESOURCE_FILENAME   = 'slave.dat';
@@ -107,6 +113,7 @@ end;
 
 procedure TPackageMakerThread.Execute;
 begin
+  Log('Starting process.');
   fTerminated := False;
   WorkingThread := Self;
   try
@@ -116,20 +123,36 @@ begin
   end;
 end;
 
+procedure TPackageMakerThread.Log(Text: string);
+begin
+  fLoggingMessage := Text;
+  Synchronize(DoLog);
+end;
+
 (*procedure TPackageMakerThread.ProgressCryptoEvent;
 begin
   if Assigned(OnProgressCrypto) then
     OnProgressCrypto(Self, fCurrent, fTotal);
 end;*)
 
+procedure TPackageMakerThread.SetAppConfig(const Value: TFileName);
+begin
+  fAppConfig := ExpandFileName(Value);
+end;
+
+procedure TPackageMakerThread.SetEula(const Value: TFileName);
+begin
+  fEula := ExpandFileName(Value);
+end;
+
 procedure TPackageMakerThread.SetInputDirectory;
 begin
-  fInputDirectory := IncludeTrailingPathDelimiter(Value);
+  fInputDirectory := IncludeTrailingPathDelimiter(ExpandFileName(Value));
 end;
 
 procedure TPackageMakerThread.SetOutputDirectory;
 begin
-  fOutputDirectory := IncludeTrailingPathDelimiter(Value);
+  fOutputDirectory := IncludeTrailingPathDelimiter(ExpandFileName(Value));
 end;
 
 (*procedure TPackageMakerThread.StartCryptoEvent;
@@ -183,8 +206,10 @@ constructor TPackageMakerThread.Create;
 begin
   inherited Create;
   fPasswords := TPackagePasswords.Create;
+  fPackageReleaseInfo := TPackageReleaseInfo.Create;
   fMediaHashKeys := TStringList.Create;
   fSkinImages := TSkinImages.Create;
+  fOutputFileName := '';
 end;
 
 destructor TPackageMakerThread.Destroy;
@@ -192,7 +217,17 @@ begin
   fPasswords.Free;
   fMediaHashKeys.Free;
   fSkinImages.Free;
+  fPackageReleaseInfo.Free;
   inherited;
+end;
+
+procedure TPackageMakerThread.DoLog;
+begin
+  if Assigned(fOnStatus) then
+    fOnStatus(Self, fLoggingMessage);
+{$IFDEF DEBUG}
+  WriteLn('UserLog: ', fLoggingMessage);
+{$ENDIF}
 end;
 
 (*
@@ -292,6 +327,11 @@ var
     ForceDirectories(ExtraTempDir);
   end;
 
+  procedure _GenerateReleaseInfoFile;
+  begin
+    ReleaseInfo.SaveToFile(ExtraTempDir + APPCONFIG_RELEASEINFO);
+  end;
+
 begin
   // Compress the primary resource file...
   _Init();
@@ -299,6 +339,7 @@ begin
   _CP(SkinImages.Top, SKIN_IMAGE_TOP);
   _CP(SkinImages.Bottom, SKIN_IMAGE_BOTTOM);
   _CP(SkinImages.Left[0].FileName, SKIN_IMAGES_LEFT_ORDER[0]); // Home image
+  _GenerateReleaseInfoFile();
   _Compress(RUNTIME_PRIMARY_EXTRA_RESOURCE_FILENAME);
 
   // Compress the secondary resource file...
@@ -315,7 +356,7 @@ end;
 procedure TPackageMakerThread.CompileRuntimePackage;
 var
   i: Integer;
-  WorkFileName, RuntimeFileName, DiscAuthFileName, ExtraOutputPackage,
+  RuntimeFileName, DiscAuthFileName, ExtraOutputPackage,
   ReleasePackage: TFileName;
   DiscAuthInStream, OutStream: TFileStream;
   CryptedStream: TMemoryStream;
@@ -377,9 +418,13 @@ begin
   if FileExists(DiscAuthFileName) then
   begin
     // Extracting the Runtime Setup Application ('Shenmue Release Unlocker')
-    // Sure to be UPX ?
+    Log('Extracting runtime...');
     RuntimeFileName := _FP(RUNTIME_PACKAGE_RESOURCE_NAME + '.BIN');
     ExtractFile(RUNTIME_PACKAGE_RESOURCE_NAME, RuntimeFileName);
+
+    // Compress binary by UPX
+    Log('Compressing runtime with UPX (Thx UPX Team!)...');
+    CompressBinary(RuntimeFileName);
 
     // Opening Runtime to write the extra files inside it.
     OutStream := TFileStream.Create(RuntimeFileName, fmOpenWrite);
@@ -392,6 +437,7 @@ begin
       // WRITING PACKAGE.BIN TO RUNTIME
       //------------------------------------------------------------------------
 
+      Log('Writing package to runtime...');
       ReleasePackage := OutputDirectory + RUNTIME_PACKAGE_RELEASE_FILENAME;
       BindResource(ReleasePackage, rtPackage);
 
@@ -400,16 +446,20 @@ begin
       //------------------------------------------------------------------------
 
       // Write the primary extra file...
+      Log('Writing primary extra resource file...');
       ExtraOutputPackage := _FP(RUNTIME_PRIMARY_EXTRA_RESOURCE_FILENAME);
       BindResource(ExtraOutputPackage, rtResPrimary);
 
       // Write the secondary extra file...
+      Log('Writing secondary extra resource file...');
       ExtraOutputPackage := _FP(RUNTIME_SECONDARY_EXTRA_RESOURCE_FILENAME);
       BindResource(ExtraOutputPackage, rtResSecondary);
 
       //------------------------------------------------------------------------
       // WRITING DISCAUTH.INF FILES
       //------------------------------------------------------------------------
+
+      Log('Creating disc authentification memory streams...');
 
 {$IFDEF DEBUG}
       WriteLn(sLineBreak, 'Creating DiscAuth.xxx files...', sLineBreak);
@@ -422,9 +472,8 @@ begin
         i := 0;
         while (i < MediaHashKeys.Count) and (not Aborted) do
         begin
-{$IFDEF DEBUG}
-          WriteLn('  Processing Key #', i, ': ', MediaHashKeys[i]);
-{$ENDIF}
+          Log(Format('  Processing Key #%d: %s', [i, MediaHashKeys[i]]));
+
           CryptedStream := TMemoryStream.Create;
           try
             // Encrypt Stream...
@@ -460,17 +509,19 @@ begin
 
       // Write the number of entry at the end of the file too.
       OutStream.Write(ResCount, UINT32_SIZE);
+
+      Log('Finalizing runtime...');
     finally
       OutStream.Free;
 
       // Move the final runtime binary to the output directory...
-      WorkFileName := OutputDirectory + RUNTIME_PACKAGE_FINAL_OUTPUT;
-      if FileExists(WorkFileName) then
-        DeleteFile(WorkFileName);
-      MoveFile(RuntimeFileName, WorkFileName);
+      fOutputFileName := OutputDirectory + RUNTIME_PACKAGE_FINAL_OUTPUT;
+      if FileExists(OutputFileName) then
+        DeleteFile(OutputFileName);
+      MoveFile(RuntimeFileName, OutputFileName);
     end; // try
     
-  end; // FileExists 
+  end; // FileExists
 end;
 
 function TPackageMakerThread.WriteDiscAuthentification;
@@ -505,18 +556,25 @@ begin
   Result := True;
   try
     // First, make the 7z package. Encrypt with AES.
+    Log('Making release package... please wait.');
     CompressSourcePackage;
 
     // Encrypt the result compressed package source file with Camellia.
 //    EncryptPackage;
 
     // Compile extra resource (gui, images, etc...)
+    Log('Compiling extra resources...');
     CompileExtraFiles;
 
     // Compile the final package.
+    Log('Building final package...');
     CompileRuntimePackage;
   except
-    Result := False;
+    on e:Exception do
+    begin
+      Log('Error when making package: ' + e.Message);
+      Result := False;
+    end;
   end;
 end;
 
