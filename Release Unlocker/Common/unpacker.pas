@@ -185,7 +185,7 @@ end;
 function GetUnlockKeys(MediaHashKey: string; ResultPasswords: TPackagePasswords;
   var UnpackedSize: Int64): Boolean;
 const
-  DISCAUTH_INVALID_INTEGER = 0;
+  DISCAUTH_INVALID_INTEGER = -1;
   DISCAUTH_INVALID_STRING = 'DEADBEEF#DEADBEEF#DEADBEEF#DEADBEEF';
 
 var
@@ -226,13 +226,16 @@ begin
         try
           with DiscAuthFile do
           begin
-            UnpackedSize := StrToInt64Def(ReadString('DISCAUTH', 'DirSize', DISCAUTH_INVALID_STRING), 0);
+            UnpackedSize := StrToInt64Def(ReadString('DISCAUTH', 'DirSize', DISCAUTH_INVALID_STRING), DISCAUTH_INVALID_INTEGER);
             Passwords.PC1 := ReadString('DISCAUTH', 'PC1', DISCAUTH_INVALID_STRING);
             Passwords.Camellia := ReadString('DISCAUTH', 'Camellia', DISCAUTH_INVALID_STRING);
             Passwords.AES := ReadString('DISCAUTH', 'AES', DISCAUTH_INVALID_STRING);
           end;
         finally
           DiscAuthFile.Free;
+{$IFDEF DEBUG}
+          CopyFile(DiscAuthFileName, GetWorkingTempDirectory + MediaHashKey + '_key' + IntToStr(i) + '.txt', False);
+{$ENDIF}
           DeleteFile(DiscAuthFileName);
         end;
 

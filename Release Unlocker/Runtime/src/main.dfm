@@ -12,11 +12,13 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
   object pcWizard: TPageControl
@@ -24,7 +26,7 @@ object frmMain: TfrmMain
     Top = 61
     Width = 518
     Height = 385
-    ActivePage = tsHome
+    ActivePage = tsDone
     Align = alClient
     MultiLine = True
     Style = tsFlatButtons
@@ -51,9 +53,15 @@ object frmMain: TfrmMain
         Top = 41
         Width = 489
         Height = 104
-        Caption = '(lklHomeMessage)'
+        Caption = 
+          '(lklHomeMessage)<br><br><b>PLEASE READ: THIS APPLICATION WASN'#39'T ' +
+          'MADE TO BE RUN IN STANDALONE MODE.<br>USE THE RUNTIME PROJECT IN' +
+          'STEAD.</b>'
         Text.Strings = (
-          '(lklHomeMessage)')
+          
+            '(lklHomeMessage)<br><br><b>PLEASE READ: THIS APPLICATION WASN'#39'T ' +
+            'MADE TO BE RUN IN STANDALONE MODE.<br>USE THE RUNTIME PROJECT IN' +
+            'STEAD.</b>')
         Transparent = True
         AutoHeight = False
         OnLinkClick = lklHomeMessageLinkClick
@@ -10722,13 +10730,23 @@ object frmMain: TfrmMain
         Left = 12
         Top = 41
         Width = 485
-        Height = 300
+        Height = 284
         Caption = '(lklDoneMessage)'
         Text.Strings = (
           '(lklDoneMessage)')
         Transparent = True
         AutoHeight = False
         OnLinkClick = lklHomeMessageLinkClick
+      end
+      object chkOpenOutputDir: TCheckBox
+        Left = 12
+        Top = 335
+        Width = 485
+        Height = 17
+        Caption = '(chkOpenOutputDir)'
+        Checked = True
+        State = cbChecked
+        TabOrder = 0
       end
     end
     object tsDoneFail: TTabSheet

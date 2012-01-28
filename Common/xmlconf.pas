@@ -9,7 +9,7 @@ type
   EXMLConfigurationFile = class(Exception);
   EInvalidConfigID = class(EXMLConfigurationFile);
 
-  TXMLConfigurationFile = class
+  TXMLConfigurationFile = class(TObject)
   private
     fXMLDocument: IXMLDocument;
     fLoadedFileName: TFileName;

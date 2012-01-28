@@ -81,6 +81,7 @@ function StringArraySequentialSearch(Source: array of string;
 function Left(SubStr: string; S: string): string;
 function LeftNRight(SubStr, S: string; N: Integer): string;
 function Right(SubStr: string; S: string): string;
+function RunNoWait(const TargetFileName: TFileName): Boolean;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
 function VariantToString(V: Variant): string;
 procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
@@ -102,7 +103,8 @@ implementation
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  TlHelp32, Forms, Math, Variants, XMLDom, MSXMLDom, XMLDoc, ActiveX;
+  TlHelp32, Forms, Math, Variants, XMLDom, MSXMLDom, XMLDoc, ActiveX,
+  ShellApi;
 
 const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
@@ -604,6 +606,16 @@ begin
     Exit;
   end;
   Result := FileExists(OutputFileName)
+end;
+
+//------------------------------------------------------------------------------
+
+function RunNoWait(const TargetFileName: TFileName): Boolean;
+begin
+  Result := FileExists(TargetFileName);
+  if Result then
+    ShellExecute(Application.Handle, 'open', PChar(TargetFileName), '', '',
+      SW_SHOWNORMAL);
 end;
 
 //------------------------------------------------------------------------------
