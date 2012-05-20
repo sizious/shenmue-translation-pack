@@ -9,11 +9,14 @@ const
   SRF_DATABLOCK_SIZE = 1024;
   
 type
+  ESRFEditor = class(Exception);
+  EGetExtraData = class(ESRFEditor);
+
   TSRFEditor = class;
   TSRFSubtitlesList = class;
 
   TSRFDataBlock = array[0..SRF_DATABLOCK_SIZE - 1] of Char;
-  
+
   TSRFSubtitlesListItem = class(TObject)
   private
     fText: string;
@@ -169,7 +172,16 @@ end;
 
 function TSRFSubtitlesListItem.GetExtraData: TSRFDataBlock;
 begin
-  CopyMemory(@Result, ExtraDataStream.Memory, ExtraDataStream.Size);
+  try
+    CopyMemory(@Result, ExtraDataStream.Memory, ExtraDataStream.Size);
+  except
+    on E:Exception do
+      raise EGetExtraData.Create(
+        'GetExtraData: Unable to perform CopyMemory (Size='
+        + IntToStr(ExtraDataStream.Size) + '), Reason: '
+        + E.Message + ', Class='
+        + E.ClassName);
+  end;
 end;
 
 function TSRFSubtitlesListItem.GetExtraDataSize: LongWord;
@@ -579,6 +591,7 @@ end;
 function TSRFEditor.ComputeHashKey: string;
 var
   i: Integer;
+  DataString: string;
 
 begin
   Result := '';
@@ -586,7 +599,10 @@ begin
      file, even if the subtitles are modified. *)
   try
     for i := 0 to Subtitles.Count - 1 do
-      Result := MD5(Result + Subtitles[i].ExtraDataString);
+    begin
+      DataString := Subtitles[i].ExtraDataString;
+      Result := MD5(Result + DataString);
+    end;
     Result := 'K' + UpperCase(Result);
   except
   end;
@@ -804,13 +820,16 @@ begin
     InStream.Read(Header, SizeOf(TShenmueSubtitleHeader));
 
     if StrEquals(Header.Name, SHENMUE_SIGN) then begin
+
+{$IFDEF DEBUG}
+      WriteLn(sLineBreak, '0x', IntToHex(InStream.Position - SizeOf(TShenmueSubtitleHeader), 8), ':');
+{$ENDIF}
+
       PaddingSeekDemand := psdNoPadding;
       StrBuf := ReadNullTerminatedString(InStream, Header.SubtitleLength - 4);
 
 {$IFDEF DEBUG}
-      WriteLn(sLineBreak,
-        '0x', IntToHex(InStream.Position, 8), ': ',
-        sLineBreak, '  "', StrBuf, '"');
+      WriteLn('  "', StrBuf, '"');
 {$ENDIF}
 
       // Create the subtitle item
@@ -825,10 +844,15 @@ begin
       Dec(SubDataSize, 4);
 
       // Read the data
-      with CurrentItem.ExtraDataStream do begin
-        Seek(0, soFromBeginning);
-        CopyFrom(InStream, SubDataSize);
-      end;
+      // Fix by SiZ! on 2012-05-20: If the SubDataSize=0, then the block is copied entierly...
+      // we don't need this Delphi behaviour
+      if SubDataSize > 0 then
+      begin
+        with CurrentItem.ExtraDataStream do begin
+          Seek(0, soFromBeginning);
+          CopyFrom(InStream, SubDataSize);
+        end;
+      end; // SubDataSize
 
       LastEntryOffset := InStream.Position;
       LastBlockCount  := BlockCount;

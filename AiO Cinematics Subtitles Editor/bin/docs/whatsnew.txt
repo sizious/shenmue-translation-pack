@@ -5,6 +5,20 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.2: 2012-05-20 |__________________________________________________
+
+ADDED:
+- Shortcuts to navigate in the subtitles list, allowing you to edit the file
+  faster. Hit the F9 key to switch to the next subtitle, and Ctrl+F9 to return
+  to the previous (Thanks IlDucci for the idea).
+
+FIXED:
+- Little correction in the SRF hacking algorithm on the padding computing,
+  causing freezing when opening some SRF files (Thanks IlDucci).
+- Fixed a thread bug in the DebugLog module - the DebugLog don't shows up
+  if it not necessary when the application starts.
+- The About Box shows correctly the logo image under a non-themed Windows.
+___                           __________________________________________________
 ___| Version 2.1: 2010-09-26 |__________________________________________________
 
 ADDED:

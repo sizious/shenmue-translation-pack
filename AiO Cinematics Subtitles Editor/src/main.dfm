@@ -201,9 +201,10 @@ object frmMain: TfrmMain
     object lOldSub: TLabel
       Left = 11
       Top = 340
-      Width = 67
+      Width = 79
       Height = 13
       Anchors = [akLeft, akBottom]
+      AutoSize = False
       Caption = '<Generated>'
     end
     object lblText: TLabel
@@ -564,6 +565,21 @@ object frmMain: TfrmMain
       object N13: TMenuItem
         Caption = '-'
       end
+      object miGoPrevSub: TMenuItem
+        Caption = 'Previous s&ubtitle'
+        Hint = 'Switch to the previous subtitle for editing.'
+        ShortCut = 16504
+        OnClick = miGoPrevSubClick
+      end
+      object miGoNextSub: TMenuItem
+        Caption = 'Ne&xt subtitle'
+        Hint = 'Switch to the next subtitle for editing.'
+        ShortCut = 120
+        OnClick = miGoNextSubClick
+      end
+      object N14: TMenuItem
+        Caption = '-'
+      end
       object miBrowseDirectory: TMenuItem
         Caption = '&Browse directory...'
         Hint = 'Open the selected directory in Windows Explorer.'
@@ -582,7 +598,7 @@ object frmMain: TfrmMain
         ShortCut = 16500
         OnClick = miRefreshFilesListClick
       end
-      object N14: TMenuItem
+      object N15: TMenuItem
         Caption = '-'
       end
       object miCharset: TMenuItem
@@ -657,7 +673,7 @@ object frmMain: TfrmMain
     Left = 494
     Top = 8
     Bitmap = {
-      494C010110001300080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010110001200080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1328,7 +1344,7 @@ object frmMain: TfrmMain
     Left = 460
     Top = 8
     Bitmap = {
-      494C010113001800080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001500080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       000000000000000000000000000000000000F0CFD150BF675FFFAF574FFF9F4F
       4FFF9F4F4FFF9F4F4FFF8F474FFF8F473FFF8F473FFF7F3F3FFF7F373FFF7F37

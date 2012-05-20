@@ -53,7 +53,7 @@ object DirectoryScannerQueryWindow: TDirectoryScannerQueryWindow
       Top = 16
       Width = 267
       Height = 21
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 1
     end
   end
