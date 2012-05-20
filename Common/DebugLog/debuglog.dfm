@@ -103,6 +103,13 @@ object frmDebugLog: TfrmDebugLog
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object sbDebug: TJvStatusBar
+    Left = 0
+    Top = 227
+    Width = 492
+    Height = 19
+    Panels = <>
+  end
   object mDebug: TJvRichEdit
     AlignWithMargins = True
     Left = 3
@@ -118,15 +125,7 @@ object frmDebugLog: TfrmDebugLog
     Font.Style = []
     ParentFont = False
     ReadOnly = True
-    TabOrder = 0
-    WordWrap = False
-  end
-  object sbDebug: TJvStatusBar
-    Left = 0
-    Top = 227
-    Width = 492
-    Height = 19
-    Panels = <>
+    TabOrder = 1
   end
   object mmDebug: TMainMenu
     Left = 10
@@ -196,7 +195,7 @@ object frmDebugLog: TfrmDebugLog
     OnException = aeDebugException
     OnHint = aeDebugHint
     Left = 10
-    Top = 38
+    Top = 46
   end
   object sdDebug: TSaveDialog
     DefaultExt = 'rtf'
@@ -206,6 +205,6 @@ object frmDebugLog: TfrmDebugLog
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save the Debug Log to...'
     Left = 10
-    Top = 68
+    Top = 84
   end
 end

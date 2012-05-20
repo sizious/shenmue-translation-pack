@@ -25,11 +25,13 @@ object frmAbout: TfrmAbout
     Alignment = taCenter
     AutoSize = False
     Caption = '< Name >'
+    Color = clBtnFace
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clSilver
+    Font.Color = clMedGray
     Font.Height = -16
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
+    ParentColor = False
     ParentFont = False
     Transparent = True
   end
@@ -1551,6 +1553,7 @@ object frmAbout: TfrmAbout
       AutoSize = False
       Caption = ' '
       ShowAccelChar = False
+      Transparent = True
       OnDblClick = Label2DblClick
     end
   end

@@ -44,9 +44,25 @@ unit DebugLog;
 // Define this to debug this module
 // {$DEFINE DEBUG_DEBUGLOG}
 
-// Define this to enable the thread bug fix code...
-// I DON'T REMEMBER WHAT IS IT !!! (SHIT!)
-// {$DEFINE DEBUG_THREAD_BUG_FIX}
+(*
+  ~~~ About Thread Fix: ~~~
+
+  SiZ! Update on 2012-05-20: I reproduced this damn bug and here is the reason
+  why I have added this fix:
+
+  If the DebugLog window is never opened in an application using the
+  DirectoryScanner module, when using this module, the application hangs and we
+  can't use it anymore (it freeze).
+
+  When the DebugLog window is opened, the DirectoryScanner works properly.
+  The DebugLog window can be closed after showing up 1 time, the
+  DirectoryScanner still works.
+
+  So the 'buggy' case is to use the DirectoryScanner without opening the
+  DebugLog Window!
+
+  So I enabled the fix to be permanent.
+*)
 
 interface
 
@@ -133,12 +149,12 @@ type
     miSelectAll: TMenuItem;
     miSeparator1: TMenuItem;
     miClose: TMenuItem;
-    mDebug: TJvRichEdit;
     sbDebug: TJvStatusBar;
     aeDebug: TApplicationEvents;
     sdDebug: TSaveDialog;
     miShowMainWindow: TMenuItem;
     miAutoScroll: TMenuItem;
+    mDebug: TJvRichEdit;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure aeDebugHint(Sender: TObject);
@@ -214,6 +230,7 @@ begin
 //  SelStart := mDebug.SelStart;
 //  mDebug.SelLength := 0;
 //  mDebug.SelStart := Length(mDebug.Lines.Text) - 1;
+
 {$IFDEF DEBUG} {$IFDEF DEBUG_DEBUGLOG}
   WriteLn('Debug: SelStart: ', mDebug.SelStart, ', SelLength: ', mDebug.SelLength,
     ', TextLength: ', Length(mDebug.Lines.Text));
@@ -260,6 +277,10 @@ begin
   
   aeDebug.OnException := aeDebugException;
   aeDebug.Activate;
+
+  // Thread Fix ... The WordWrap property freeze the app if it used without
+  // showing the form.
+  mDebug.WordWrap := False;
 end;
 
 //------------------------------------------------------------------------------
@@ -542,11 +563,6 @@ end;
 //------------------------------------------------------------------------------
 
 constructor TDebugLogHandlerInterface.Create;
-{$IFDEF DEBUG_THREAD_BUG_FIX}
-var
-  L, T: Integer;
-{$ENDIF}
-
 begin
 {$IFDEF DEBUG}
   if Assigned(DebugLogWindow) then
@@ -564,17 +580,19 @@ begin
   fFormDebugLog := TfrmDebugLog.Create(nil);
   DebugLogWindow.fOwnerHandler := Self;
 
-{$IFDEF DEBUG_THREAD_BUG_FIX}
-  // Thread Freeze Bug Fix (FUCK!!!)
-  with DebugLogWindow do begin
-    L := Left; T := Top;
-    Left := -9999; Top := -9999;
-    Show; Hide;
-    Left := L; Top := T;
-  end;
-  // Update of the 10/08/2011: SHIT, I DON'T REMEMBER WHAT IS IT !!!
-  // So I introduced a new compilation directive : DEBUG_THREAD_BUG_FIX.
-{$ENDIF}
+(*
+  About Thread Fix:
+
+  Update of the 10/08/2011: SHIT, I DON'T REMEMBER WHAT IS IT !!!
+  So I introduced a new compilation directive : DEBUG_THREAD_BUG_FIX.
+
+  Update of the 20/05/2012: OK, I remember the problem, it's appened when
+  I was debugging the Cinematics Editor v2.2; so this fix was moved to
+  DebugLogWindow.Activate
+
+  It was the WordWrap property freezing the application if it was defined to
+  False under the Delphi Designer.
+*)
 end;
 
 //------------------------------------------------------------------------------

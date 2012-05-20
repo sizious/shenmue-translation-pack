@@ -119,6 +119,9 @@ type
     miOriginalTextField: TMenuItem;
     miOriginalColumnList: TMenuItem;
     tbOriginalTextField: TToolButton;
+    N15: TMenuItem;
+    miGoPrevSub: TMenuItem;
+    miGoNextSub: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -165,6 +168,8 @@ type
     procedure miExportFilesListClick(Sender: TObject);
     procedure miOriginalTextFieldClick(Sender: TObject);
     procedure miOriginalColumnListClick(Sender: TObject);
+    procedure miGoNextSubClick(Sender: TObject);
+    procedure miGoPrevSubClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -449,7 +454,7 @@ begin
   StatusText := 'Scanning directory... please wait.';
 
   SelectedDirectory := SRFDirectoryScanner.SourceDirectory;
-  
+
   Debug.AddLine(ltInformation, 'Scanning directory "'
     + SelectedDirectory + '"...');
 end;
@@ -494,6 +499,18 @@ end;
 procedure TfrmMain.miFilePropertiesClick(Sender: TObject);
 begin
   ShellOpenPropertiesDialog(SelectedFileName);
+end;
+
+procedure TfrmMain.miGoNextSubClick(Sender: TObject);
+begin
+  lvSubs.ItemIndex := lvSubs.ItemIndex + 1;
+  ListViewSelectItem(lvSubs, lvSubs.ItemIndex);
+end;
+
+procedure TfrmMain.miGoPrevSubClick(Sender: TObject);
+begin
+  lvSubs.ItemIndex := lvSubs.ItemIndex - 1;
+  ListViewSelectItem(lvSubs, lvSubs.ItemIndex);
 end;
 
 procedure TfrmMain.miImportSubtitlesClick(Sender: TObject);
@@ -893,6 +910,10 @@ begin
 
     // Update the subtitle length count
     UpdateSubtitleLengthControls(SelectedSubtitle, eFirstLineLength, eSecondLineLength);
+
+    // Update the navigations menus items (Next & Previous Menu Items)
+    miGoPrevSub.Enabled := lvSubs.ItemIndex > 0;
+    miGoNextSub.Enabled := lvSubs.ItemIndex < lvSubs.Items.Count - 1;    
   end;
 end;
 
@@ -1333,6 +1354,8 @@ begin
   miLocateOnDisk2.Enabled := State;
   miFileProperties.Enabled := State;
   miFileProperties2.Enabled := State;
+  miGoPrevSub.Enabled := State;
+  miGoNextSub.Enabled := State;
 end;
 
 procedure TfrmMain.SetControlsStateSaveOperation(State: Boolean);
