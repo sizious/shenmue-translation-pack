@@ -16,6 +16,8 @@
 <div id="howto_version">Version <?php echo $howto_version; ?> (<?php echo $howto_date; ?>)</div>
 <a name="howto"></a><h1>How to use this Translation Pack ?</h1>
 
+<div style="font-size: x-small;margin-bottom: 12px;"><strong>Location:</strong> How To</div>
+
 <p>This tutorial is here to explain you the basis of the Shenmue translation and the use of this tools pack.</p>
 
 <p>Well done, so you want to start a new <strong>Shenmue</strong> translation? Great! Please <a href="<?php echo ROOT_PATH; ?>/about.php#contact">contact us</a>, we will 

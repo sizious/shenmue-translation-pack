@@ -8,6 +8,8 @@
 
 <a name="two"></a><h1>Translating a Shenmue Two game</h1>
 
+<div style="font-size: x-small;"><strong>Location:</strong> <a href="<?php echo ROOT_PATH; ?>/howto/">How To</a> &gt; Translating a Shenmue Two game</div>
+
 <div align="center"><img src="<?php echo ROOT_PATH; ?>/images/logos/shenmue2.png" /></div>
 
 <p>Yu Suzuki's cinematic masterpiece returns with more spellbinding adventure and an even more immersive world. 
@@ -47,14 +49,14 @@ the first episode in the series.</p>
 
 <p>You'll see a lot of <strong>AFS</strong> and <strong>IDX</strong> files. Each <strong>AFS</strong> 
 contains cinematics game datas, which means a <strong>SRF</strong> file 
-(to be opened by <a href="download.php#srf">AiO Cinematics Subtitles Editor</a>)
-and some <strong>AHX</strong> files (You can listen to them with the <a href="download.php#addons">ADX Tools</a> from <a target="_blank" href="http://www.cri-mw.com/">CRI</a>).</p>
+(to be opened by <a href="<?php echo ROOT_PATH; ?>/download.php#srf">AiO Cinematics Subtitles Editor</a>)
+and some <strong>AHX</strong> files (You can listen to them with the <a href="<?php echo ROOT_PATH; ?>/download.php#addons">ADX Tools</a> from <a target="_blank" href="http://www.cri-mw.com/">CRI</a>).</p>
 	
 <div>To perform this operation you'll need the following tools from our pack:</div>
 <ul>
-	<li><a href="download.php#afs">AFS Utils</a></li>
-	<li><a href="download.php#srf">AiO Cinematics Subtitles Editor</a></li>
-	<li><a href="download.php#idx">IDX Creator</a></li>	
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#srf">AiO Cinematics Subtitles Editor</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#idx">IDX Creator</a></li>	
 </ul>
 <?php print_set_to_top(); ?>
 
@@ -63,7 +65,7 @@ and some <strong>AHX</strong> files (You can listen to them with the <a href="do
 <p>The whole example is based on the <strong>0001.AFS</strong> file from the Disc 1 (it's the opening scene with <strong>Shenhua</strong>).</p>
 
 <ol>
-	<li>Run <a href="download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
+	<li>Run <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
 	<li>Select the <strong>\SCENE\01\STREAM\0001.AFS</strong> file and click <strong>OK</strong>.</li>
 	<li>Select the <strong>0001.AFS</strong> on the left.</li>
 	<li>Click on the <strong>Tools</strong> &gt; <strong>Mass extraction...</strong> menu item.</li>
@@ -80,7 +82,7 @@ You'll unable to recongnize <strong>SRF</strong> or <strong>AHX</strong> files.<
 
 <h3>Translating SRF file</h3>
 
-<p>To edit <strong>SRF</strong> files it's pretty simple. Open the <a href="download.php#srf">AiO Cinematics Subtitles Editor</a> tool and select the 
+<p>To edit <strong>SRF</strong> files it's pretty simple. Open the <a href="<?php echo ROOT_PATH; ?>/download.php#srf">AiO Cinematics Subtitles Editor</a> tool and select the 
 <strong>File</strong> &gt; <strong>Open files...</strong> command. Open the <strong>SRF</strong> file you want to translate and press <strong>OK</strong>.
 </p>
 
@@ -99,7 +101,7 @@ When you have finished, don't forget to save your work!</p>
 Now, we must rebuild the <strong>AFS</strong> file with the updated <strong>SRF</strong> file. To do that, do the following:</p>
 
 <ol>
-	<li>Fire up <a href="download.php#afs">AFS Utils</a> and select the <strong>Tools</strong> &gt; <strong>AFS Creator</strong> command.</li>
+	<li>Fire up <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>Tools</strong> &gt; <strong>AFS Creator</strong> command.</li>
 	<li>In the <strong>AFS Creator</strong> window, select the <strong>File</strong> &gt; <strong>Import XML list...</strong> and click <strong>OK</strong>.</li>
 	<li>Select the generated <strong>0001_list.xml</strong> in the <strong>0001</strong> directory, and click <strong>OK</strong>.</li>
 	<li>The <strong>AFS Creator</strong> window should be filled with the original <strong>0001.AFS</strong> filenames content.</li>
@@ -114,7 +116,7 @@ Now, we must rebuild the <strong>AFS</strong> file with the updated <strong>SRF<
 <p>Now we have an updated <strong>AFS</strong>, everything is ready to make the correct index file (<strong>IDX</strong>). To do that, it's pretty simple (<strong>0001.AFS</strong> is again the example file):</p>
 
 <ol>
-	<li>Launch <a href="download.php#idx">IDX Creator</a>.</li>
+	<li>Launch <a href="<?php echo ROOT_PATH; ?>/download.php#idx">IDX Creator</a>.</li>
 	<li>In the <strong>Select the game to generate the proper IDX format</strong>, select <strong>Shenmue II</strong>.</li>
 	<li>For the <strong>Modified AFS</strong> field, choose the updated <strong>0001.AFS</strong> file.</li>
 	<li>The <strong>IDX</strong> field will be automatically filled, but you can change the file location if you want.</li>
@@ -150,8 +152,8 @@ directory and run the image creation (for the <strong>Dreamcast</strong> version
 
 <div>These tools are needed to translate these NPC:</div>
 <ul>
-	<li><a href="download.php#afs">AFS Utils</a></li>
-	<li><a href="download.php#fq">AiO Free Quest Subtitles Editor</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#fq">AiO Free Quest Subtitles Editor</a></li>
 </ul>
 
 <?php print_set_to_top(); ?>
@@ -161,7 +163,7 @@ directory and run the image creation (for the <strong>Dreamcast</strong> version
 <p>The first thing to do is to extract all the NPC datas from the <strong>HUMANS.AFS</strong> file. To do that, do the following (example based on the Disc 1):</p>
 
 <ol>
-	<li>Run <a href="download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
+	<li>Run <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
 	<li>Select the <strong>\SCENE\01\NPC\HUMANS.AFS</strong> file and click <strong>OK</strong>.</li>
 	<li>Select the <strong>HUMANS.AFS</strong> on the left.</li>
 	<li>Click on the <strong>Tools</strong> &gt; <strong>Mass extraction...</strong> menu item.</li>
@@ -178,7 +180,7 @@ directory and run the image creation (for the <strong>Dreamcast</strong> version
 
 <h3>Translating a NPC character speech</h3>
 
-<p>You have successfully the <strong>HUMANS.AFS</strong> archive? Great! So you can now translating NPC characters. To do that, you'll need <a href="download.php#fq">AiO Free Quest Subtitles Editor</a>.</p>
+<p>You have successfully the <strong>HUMANS.AFS</strong> archive? Great! So you can now translating NPC characters. To do that, you'll need <a href="<?php echo ROOT_PATH; ?>/download.php#fq">AiO Free Quest Subtitles Editor</a>.</p>
 
 <p>A lot of text is identical so to accelerate the translation you can if you want use the <strong>Global-Translation</strong> (allowing 
 you to translate identical text in one time, using a very fast module) or the <strong>Multi-Translation</strong> (it's a little more slow but you can translate in the original context). Try them both to choose your prefered version.</p>
@@ -188,9 +190,9 @@ He's wearing a blue suit. Here is a screenshot:</p>
 
 <?php print_screenshot("2_03E_", "The '03E_' NPC is located on the right when you go out from the Freestay Lodge.", "The <strong>03E_</strong> NPC."); ?>
 
-<div>Now, open the <strong>03E_.PKS</strong> file with <a href="download.php#fq">AiO Free Quest Subtitles Editor</a>. To do that, do the following:</div>
+<div>Now, open the <strong>03E_.PKS</strong> file with <a href="<?php echo ROOT_PATH; ?>/download.php#fq">AiO Free Quest Subtitles Editor</a>. To do that, do the following:</div>
 <ol>
-	<li>Run the <a href="download.php#fq">AiO Free Quest Subtitles Editor</a>. 
+	<li>Run the <a href="<?php echo ROOT_PATH; ?>/download.php#fq">AiO Free Quest Subtitles Editor</a>. 
 	If a window pop ups to inform you a <em>newer version of the hacking algorithm</em>, you can close it (I think that you never have used old versions of this editor).</li>	
 	<li>Click on the <strong>File</strong> &gt; <strong>Open files...</strong> command and select the <strong>03E_.PKS</strong> file in the list.</li>
 	<li>The file will be opened on the editor. You can now edit your subtitles. Don't forget to save your file!</li>
@@ -208,7 +210,7 @@ With this functionnality you can edit multi files in the same time.</p>
 <h3>Repacking the HUMANS.AFS</h3>
 
 <p>The last step is repacking the <strong>HUMANS.AFS</strong> file with our hacked <strong>03E_.PKS</strong> file. 
-You can do this with <a href="download.php#afs">AFS Utils</a> or if you have only one file to replace, with <a href="download.php#addons">AFS Explorer</a>.</p>
+You can do this with <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> or if you have only one file to replace, with <a href="<?php echo ROOT_PATH; ?>/download.php#addons">AFS Explorer</a>.</p>
 
 <p>After creating new <strong>HUMANS.AFS</strong>, copy it on the <strong>\SCENE\01\NPC\</strong> directory and run the image 
 creation (for the <strong>Dreamcast</strong> version) or transfer these files on the FTP (<strong>Xbox</strong> version).</p>
@@ -235,28 +237,28 @@ creation (for the <strong>Dreamcast</strong> version) or transfer these files on
 
 <div>These tools are needed to do this:</div>
 <ul>
-	<li><a href="download.php#ipac">IPAC Browser</a></li>
-	<li><a href="download.php#spr">SPR Utils</a></li>
-	<li><a href="download.php#addons">Sega PVR Tools</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#ipac">IPAC Browser</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#spr">SPR Utils</a></li>
+	<li><a href="<?php echo ROOT_PATH; ?>/download.php#addons">Sega PVR Tools</a></li>
 </ul>
 
 <p>This operation is really easy to do. Follow the guide.</p>
 
 <ol>
-<li>Open <a href="download.php#ipac">IPAC Browser</a> and select the <strong>MISC/TEXTURES.PKS</strong> file.</li>
-<li>In the <a href="download.php#ipac">IPAC Browser</a> view, extract the <strong>LD_NL.SPR</strong> entry. 
+<li>Open <a href="<?php echo ROOT_PATH; ?>/download.php#ipac">IPAC Browser</a> and select the <strong>MISC/TEXTURES.PKS</strong> file.</li>
+<li>In the <a href="<?php echo ROOT_PATH; ?>/download.php#ipac">IPAC Browser</a> view, extract the <strong>LD_NL.SPR</strong> entry. 
 To do that, right-click on the <strong>LD_NL.SPR</strong>, then select the <strong>Export...</strong> command.</li>
-<li>Run <a href="download.php#spr">SPR Utils</a>, then select the previous extracted <strong>LD_NL.SPR</strong> file.</li>
-<li>In the <a href="download.php#spr">SPR Utils</a> window, extract the only texture contained in this <strong>SPR</strong> package: the "loading" texture.</li>
+<li>Run <a href="<?php echo ROOT_PATH; ?>/download.php#spr">SPR Utils</a>, then select the previous extracted <strong>LD_NL.SPR</strong> file.</li>
+<li>In the <a href="<?php echo ROOT_PATH; ?>/download.php#spr">SPR Utils</a> window, extract the only texture contained in this <strong>SPR</strong> package: the "loading" texture.</li>
 <li>You can now edit the <strong>loading.pvr</strong> file.</li>
 </ol>
 
-<p>Please note that for modifying the <strong>loading.pvr</strong> texture, you can use the Photoshop PVR plugin inside the <a href="download.php#addons">Sega PVR Tools</a> package.
+<p>Please note that for modifying the <strong>loading.pvr</strong> texture, you can use the Photoshop PVR plugin inside the <a href="<?php echo ROOT_PATH; ?>/download.php#addons">Sega PVR Tools</a> package.
 Keep it mind that when you save the loading texture, you must keep the original flags for the file. In clear: <strong>VQ3</strong>, <strong>ARGB 4444</strong>, <strong>MipMap: NO</strong>.
 Note that this <strong>loading.pvr</strong> texture have an alpha channel, so you must update it too.<p>
 
-<p>After doing this you must repack the <strong>loading.pvr</strong> with <a href="download.php#spr">SPR Utils</a>, then 
-update the <strong>MISC/TEXTURES.PKS</strong> with <a href="download.php#ipac">IPAC Browser</a>.</p>
+<p>After doing this you must repack the <strong>loading.pvr</strong> with <a href="<?php echo ROOT_PATH; ?>/download.php#spr">SPR Utils</a>, then 
+update the <strong>MISC/TEXTURES.PKS</strong> with <a href="<?php echo ROOT_PATH; ?>/download.php#ipac">IPAC Browser</a>.</p>
 
 <p>Here is an example of the result:</p>
 
