@@ -8,8 +8,8 @@ function togglediv(id) {
 			aref.innerHTML = "Click here to expand";*/
 			
  		img = document.getElementById("i" + id);
-		img.src = (img.src.match("images/buttons/plus.gif") == null ? "images/buttons/plus.gif" : "images/buttons/minus.gif");
-		img.alt = (img.src.match("images/buttons/plus.gif") == null ? "[-]" : "[+]");
+		img.src = (img.src.match(sBase + "/images/buttons/plus.gif") == null ? sBase + "/images/buttons/plus.gif" : sBase + "/images/buttons/minus.gif");
+		img.alt = (img.src.match(sBase + "/images/buttons/plus.gif") == null ? "[-]" : "[+]");
 		
 		vis = document.getElementById("d"+id).style;
 		vis.display = (vis.display == "block" ? "none" : "block");
