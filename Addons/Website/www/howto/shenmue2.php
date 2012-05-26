@@ -6,15 +6,9 @@
 	print_header("howto");	
 ?>
 
-<!--
-	*****************************************************************
-	                          SHENMUE II
-	*****************************************************************
--->
+<a name="two"></a><h1>Translating a Shenmue Two game</h1>
 
-<a name="two"></a><h1>II. Translating a Shenmue Two game</h1>
-
-<div align="center"><img src="./images/logos/shenmue2.png" /></div>
+<div align="center"><img src="<?php echo ROOT_PATH; ?>/images/logos/shenmue2.png" /></div>
 
 <p>Yu Suzuki's cinematic masterpiece returns with more spellbinding adventure and an even more immersive world. 
 The epic continues as Ryo Hazuki arrives in Hong Kong on his quest to avenge his father's murder by the warlord Lan Di and unravel the mystery of the Phoenix mirror. 
@@ -28,8 +22,22 @@ the first episode in the series.</p>
 
 <div align="right" style="margin-bottom: 5px;"><em>Quoted from <a target="_blank" href="http://uk.xbox.ign.com/objects/480/480600.html">IGN</a></em></div>
 
-<p>Before starting, please check the <a href="#pre">prerequists</a>.</p>
+<p>Before starting, please check the <a href="<?php echo ROOT_PATH; ?>/howto/#pre">prerequists</a>.</p>
 
+<?php print_set_to_top(); ?>
+
+<a name="toc2"></a><h2>Summary</h2>
+
+<p>To translate <strong>Shenmue II</strong> in your language, follow this guide.</p>
+
+<ol>
+	<li><a href="#cine2">Subtitles in cinematics</a></li>
+	<li><a href="#fq2">Subtitles in Free Quest mode</a></li>
+	<li><a href="#tex2">Textures game data</a></li>
+	<li><a href="#load2">Loading screen</a></li>
+	<li><a href="#title2">Title screen</a></li>
+	<li><a href="#font2">Hacking the game font</a></li>
+</ol>
 <?php print_set_to_top(); ?>
 
 <!-- Shenmue II: Subtitles in cinematics -->
@@ -271,3 +279,7 @@ update the <strong>MISC/TEXTURES.PKS</strong> with <a href="download.php#ipac">I
 <p><em>(Coming soon)</em></p>
 
 <?php print_set_to_top(); ?>
+
+<?php
+	print_footer();
+?>
