@@ -1,0 +1,316 @@
+<?php 
+	include_once("../engine/header.php");
+	include_once("../engine/footer.php");
+	include_once("../engine/topbtn.php");		
+	print_header("howto");
+	
+	global $howto_version;
+	global $howto_date;
+	
+	$version_filename = "./log/version.txt";
+	$howto_date = date("Y-m-d", filemtime($version_filename));	
+	$handle = fopen($version_filename, "r");
+	$howto_version = fread($handle, filesize($version_filename));
+	fclose($handle);
+?>
+<div id="howto_version">Version <?php echo $howto_version; ?> (<?php echo $howto_date; ?>)</div>
+<a name="howto"></a><h1>How to use this Translation Pack ?</h1>
+
+<p>This tutorial is here to explain you the basis of the Shenmue translation and the use of this tools pack.</p>
+
+<p>Well done, so you want to start a new <strong>Shenmue</strong> translation? Great! Please <a href="about.php#contact">contact us</a>, we will 
+add a new link to your project homepage in our <a href="links.php">links page</a>!</p>
+
+<div>Here is the summary table of this document:</div>
+<ul>
+	<li>
+		<span><a href="#howto">How to use this Translation Pack ?</a></span>
+		<ol>
+			<li><a href="#pre">Prerequists</a></li>
+			<li><a href="#warn">Things to know before starting</a></li>
+			<li><a href="#dctest">Setting Dreamcast Test Environment</a></li>
+			<li><a href="#xbtest">Setting Xbox Test Environment</a></li>
+			<li><a href="#engine">Choosing the right engine version</a></li>			
+		</ol>
+	</li>
+	<li>
+		<span><a href="#one">Translating a Shenmue One game</a></span>
+		<!--<ol>
+			<li><a href="#cine1">Subtitles in cinematics</a></li>
+			<li><a href="#fq1">Subtitles in Free Quest mode</a></li>
+			<li><a href="#tex1">Textures game data</a></li>
+			<li><a href="#load1">Loading screen</a></li>
+			<li><a href="#title1">Title screen</a></li>
+			<li><a href="#font1">Hacking the game font</a></li>
+		</ol>-->
+		<div style="margin-left: 40px; margin-bottom: 5px;">(Coming soon)</div>
+	</li>
+	<li>
+		<span><a href="#two">Translating a Shenmue Two game</a></span>
+		<ol>
+			<li><a href="#cine2">Subtitles in cinematics</a></li>
+			<li><a href="#fq2">Subtitles in Free Quest mode</a></li>
+			<li><a href="#tex2">Textures game data</a></li>
+			<li><a href="#load2">Loading screen</a></li>
+			<li><a href="#title2">Title screen</a></li>
+			<li><a href="#font2">Hacking the game font</a></li>
+		</ol>
+	</li>
+</ul>
+
+<p>Please note that the project of translating a such game can take a very long time, so you must be patient and have a team or such thing like this in order to finish your work. 
+For example, the translation of the <strong>Shenmue II</strong> game in the French language was started in 2007 and it isn't already over...</p>
+
+<p>You have been warned! :-)</p>
+
+<!-- Begin Document revisions -->
+<a id="a1" href="javascript:togglediv('1');">
+	<img id="i1" src="<?php echo ROOT_PATH; ?>/images/buttons/plus.gif" alt="[+]"/>&nbsp;
+	Click here to know the document history revision...
+</a>
+<div id="d1" style="display:none;">
+	<table width="100%" style="margin-bottom: 10px;">
+		<tr>
+			<th width="150">Date</th>
+			<th width="80" align="center">Version</th>
+			<th>Comments</th>
+		</tr>
+<!--	
+		<tr>
+			<td><?php echo $howto_date; ?></td>
+			<td align="center"><?php echo $howto_version; ?></td>
+			<td><em>Actual</em></td>
+		</tr>
+-->
+<?php
+	$handle = fopen("./log/history.csv", "r");
+	fgetcsv($handle); // skip the first row
+	while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+?>
+		<tr>
+			<td><?php echo $data[0]; ?></td>
+			<td align="center"><?php echo $data[1]; ?></td>	
+			<td><?php echo $data[2]; ?></td>			
+		</tr>
+<?php
+	}
+	fclose($handle);
+?>
+	</table>
+</div>
+<!-- End Document revisions -->
+
+<?php print_set_to_top(); ?>
+
+<!-- Prerequists -->
+<a name="pre"></a><h2>Prerequists</h2>
+<p>Before starting, please check if you have the following prerequists, depending of your system:</p>
+
+<table id="prerequists" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<th>
+			<img src="./images/logos/dc.png" alt="Dreamcast" title="Dreamcast" />
+		</td>
+		<th>
+			<img src="./images/logos/xbox.png" alt="Xbox" title="Xbox" />
+		</td>
+	</tr>
+	<tr>
+		<!-- Dreamcast -->
+		<td>
+			<ul>
+				<li>The <a href="download.php">Shenmue Translation Pack</a></li>
+				<li>The full dump of the game you want to translate (don't ask us for this)</li>
+				<li>A working Dreamcast with the boot on CD-R feature</li>
+				<li>Dreamcast emulator (<a target="_blank" href="http://www.emudev.org/nullDC/Releases/Current/nullDC_103.rar">nullDC</a> is highly recommanded)</li>
+				<li><em>Optional:</em> Blank CD-Rs</li>
+			</ul>
+		</td>
+		<!-- Xbox -->
+		<td>
+			<ul>
+				<li>The <a href="download.php">Shenmue Translation Pack</a></li>		
+				<li>The full dump of the game you want to translate (don't ask us for this)</li>
+				<li>A modded or exploited Xbox</li>
+				<li>A network connection between your Xbox and your computer</li>
+				<li><em>Optional:</em> Blank DVD medias</li>
+			</ul>
+		</td>
+	</tr>
+</table>
+
+<p>The most important prerequist is to have a full dump of the game you want to translate. 
+A dump is an exact GD-ROM (<strong>Dreamcast</strong>) and/or DVD-ROM (<strong>Xbox</strong>) backup copy of the game. 
+To get it you must rip it yourself from your hardware.
+If you don't know how to do that, you can stop reading now.</p>
+
+<div id="warning-wrap" align="center" style="padding:0">
+	<table cellspacing="0" cellpadding="0" class="warning">
+		<tr>
+			<td width="55"><img src="images/logos/warn.gif"/></td>
+			<td>WE WON'T HELP YOU TO GET AND/OR TO DUMP THE GAME YOU WANT TO TRANSLATE, SO PLEASE DON'T ASK US FOR THIS POINT, THANKS.</td>
+		</tr>
+	</table>
+</div>
+
+<!-- Difference between Dreamcast and Xbox -->
+<p>The major difference between the <strong>Dreamcast</strong> hardware and <strong>Xbox</strong> hardware is that on the <strong>Xbox</strong>, 
+you can test every modification made directly by sending the modified file
+over the network. For example, you can use the <a target="_blank" href="http://en.wikipedia.org/wiki/UnleashX">UnleashX</a> dashboard to do that. 
+On the <strong>Dreamcast</strong>, it's more complicated. You can test the modification by burning the
+modified files on a blank CD-R (don't forget to leave the session opened because it allow you to burn again if you want to do more tests) and try 
+the burned disc on your <strong>Dreamcast</strong> (every standard main unit can read natively CD-R), but it's
+really a expensive solution (if you like wasting CD-R, it's great for you!). I suggest to use the excellent <strong>Dreamcast Emulator</strong> 
+<a target="_blank" href="http://www.emudev.org/nullDC/Releases/Current/nullDC_103.rar">nullDC</a>
+by <strong>drk||Raziel</strong> instead. Associating this solution with the <a href="download.php#test">Dreamcast Test Environment</a>, 
+you'll have a excellent test solution for the <strong>Dreamcast</strong>. 
+You have more interest to do so since all the episodes were first released on <strong>Dreamcast</strong>.</p>
+
+<?php print_set_to_top(); ?>
+
+<!-- Things to know before starting -->
+<a name="warn"></a><h2>Things to know before starting</h2>
+
+<div>Here you can find some things to know before starting your (crazy) project:</div>
+<ul>
+	<li>There are two kind of subtitles: Cinematics and Free Quest mode. Cinematics are pre-programmed sequences on the game (like the <strong>Shenhua</strong> intro),
+	instead of Free Quest which is
+	subtitles shown when you talk to NPC character. Depending of your game version and subtitles type, you'll need to use the correct editor to work.</li>
+	<li>Two group of game exists: The <strong>Shenmue One</strong> (including What's Shenmue, US Shenmue and Shenmue, all on <strong>Dreamcast</strong>),
+	and the <strong>Shenmue Two</strong> (every <strong>Shenmue II</strong> version). You can read more <a href="#engine">here</a>.</li>
+	<li>For the <strong>Dreamcast</strong> version, <strong>Shenmue II</strong> is splitted in 4 GD-ROMs. For the <strong>Xbox</strong>, all the data files are on the same DVD-ROM.</li>
+	<li>This project started with the <strong>Shenmue II Xbox</strong> version, so we wrote this tutorial by detailing the <strong>Shenmue II</strong> translation process.</li>
+	<li><strong>WE DON'T SUPPORT PIRACY AND DISTRIBUTION OF TRANSLATED IMAGES.</strong></li>
+	<li>You'll need a lot of courage to finish this!</li>
+</ul>
+
+<?php print_set_to_top(); ?>
+
+<!-- Setting Dreamcast Test Environment -->
+<a name="dctest"></a><h2>Setting Dreamcast Test Environment</h2>
+
+<p>For your convenience, we made a ready-to-use <a href="download.php#test">Dreamcast Test Environment</a> based on the <a href="download.php#addons">Selfboot Data Pack</a> by 
+<strong>FamilyGuy</strong>. This tutorial will use this pack but if you know how to <em>selfboot</em> <strong>Dreamcast</strong> games, you don't need it.</p>
+
+<div>To set up the environment, read below:</div>
+<ol>
+<li>Download the <a href="download.php#test">Dreamcast Test Environment</a> pack if not already done.</li>
+<li>Unzip the pack in a folder, for example <strong>C:\SHENTEST</strong>.</li>
+<li>Copy your game data in the <strong>data</strong> folder of this pack. If you have only the GDI dump, copy the dump on the pack root folder and double-click on the <strong>gdi2data</strong> batch file to extract the game data files.</li>
+<li>Copy the <strong>IP.BIN</strong> bootstrap file on the pack root folder.</li>
+</ol>
+
+<p>You are now ready to generate working <strong>Dreamcast Shenmue</strong> images. Just double-click on the <strong>makedisc</strong> batch file in order to launch the generation process.</p>
+
+<?php print_set_to_top(); ?>
+
+<!-- Setting Xbox Test Environment -->
+<a name="xbtest"></a><h2>Setting Xbox Test Environment</h2>
+
+<p>For the <strong>Xbox</strong> version you'll need only a softmodded/hardmodded console. 
+You only need to store the game on the <strong>Xbox</strong>'s hard-drive and transfer modified files by the FTP. 
+You can use for example the <a target="_blank" href="http://en.wikipedia.org/wiki/UnleashX">UnleashX</a> dashboard to do this.
+</p>
+
+<?php print_set_to_top(); ?>
+
+<!-- Game Version -->
+<a name="engine"></a><h2>Choosing the right engine version</h2>
+<p>Now, you need to know there is two version of the engine used in this game, the <strong>Shenmue One</strong> engine and the <strong>Shenmue Two</strong> engine.
+In the array below you'll find the correct engine version of the game you want to translate. This has an impact in the translation process, so please select the right
+engine version.</p>
+
+<table width="100%" id="gameversion" style="margin-bottom: 10px;">
+	<tr>
+		<th width="auto">Game</th>
+		<th width="50" align="center">Region</th>
+		<th width="50" align="center">System</th>				
+		<th width="200">Engine</th>		
+	</tr>
+	<tr>
+		<td>What's Shenmue</td>
+		<td align="center">NTSC-J</td>		
+		<td align="center"><img src="images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td><a href="#one">Shenmue One</a></td>
+	</tr>
+	<tr>
+		<td>Shenmue</td>
+		<td align="center">ALL</td>
+		<td align="center"><img src="images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td><a href="#one">Shenmue One</a></td>
+	</tr>
+	<tr>
+		<td>US Shenmue</td>
+		<td align="center">NTSC-J</td>
+		<td align="center"><img src="images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td><a href="#one">Shenmue One</a></td>
+	</tr>
+	<tr>
+		<td>Shenmue II</td>
+		<td align="center">ALL</td>
+		<td align="center"><img src="images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td><a href="#two">Shenmue Two</a></td>
+	</tr>
+	<tr>
+		<td>Shenmue 2X (Demo)</td>
+		<td align="center">?</td>
+		<td align="center"><img src="images/icons/xb.png" alt="Xbox" title="Xbox" /></td>
+		<td><a href="#two">Shenmue Two</a></td>
+	</tr>	
+	<tr>
+		<td>Shenmue 2X</td>
+		<td align="center">ALL</td>
+		<td align="center"><img src="images/icons/xb.png" alt="Xbox" title="Xbox" /></td>
+		<td><a href="#two">Shenmue Two</a></td>
+	</tr>
+</table>
+
+<p>After choosing your engine version, you are ready to start the work!</p>
+
+<?php print_set_to_top(); ?>
+
+<!--
+	*****************************************************************
+	                          SHENMUE I
+	*****************************************************************
+-->
+
+<a name="one"></a><h1>I. Translating a Shenmue One game</h1>
+
+<div align="center"><img src="./images/logos/shenmue.png" /></div>
+
+<p>"He shall appear from a far Eastern land across the sea. A young man who has yet to know his potential. This potential is a power that can either destroy him, or realize his will. His courage shall determine his fate. The path he must traverse, fraught with adversity, I await whilst praying. For this destiny predetermined since ancient times... A pitch, black night unfolds with the morning star as its only light. And thus the saga, begins..."</p>
+
+<p>This first chapter of Shenmue kicks off Yu Suzuki's cinematic Dreamcast tour-de-force, an exploration-heavy adventure that has players immerse themselves in Yokosuka, Japan. Players slip into the role of a young martial artist named Ryo Hazuki, who is on the trail of his father's killer. On the way, players must talk with hundreds of characters, engage in martial arts battles, and marvel at the realistic depiction of the Japanese coastal town.</p>
+
+<div align="right" style="margin-bottom: 5px;"><em>Quoted from <a target="_blank" href="http://uk.ign.com/games/shenmue/dc-14499">IGN</a></em></div>
+
+<p>This first chapter of Ryo Hazuki's tales was only released in Dreamcast around the world, unlike Shenmue II; which only saw the light of day in Xbox in the United States.</p>
+
+<p>Before starting, please check the <a href="#pre">prerequists</a>.</p>
+
+<?php print_set_to_top(); ?>
+
+<!-- Shenmue I: Subtitles in cinematics -->
+<a name="cine1"></a><h2>Subtitles in cinematics</h2>
+
+<p>In the game data folder, go to the <strong>\SCENE\&lt;DISC_NUMBER&gt;\STREAM\</strong> directory.</p>
+
+<p>You'll see a lot of <strong>AFS</strong> and <strong>IDX</strong> files. Each <strong>AFS</strong> 
+contains cinematics game datas, which means a <strong>SRF</strong> file 
+(to be opened by <a href="download.php#srf">Cinematics Subtitles Editor</a>)
+and some <strong>STR</strong> files (You can listen to them with the <a href="download.php#adpcm">ADPCM Streaming Toolkit</a> included in the <a href="download.php">Shenmue Translation Pack</a>).</p>
+	
+<div>To perform this operation you'll need the following tools from our pack:</div>
+<ul>
+	<li><a href="download.php#afs">AFS Utils</a></li>
+	<li><a href="download.php#srf">AiO Cinematics Subtitles Editor</a></li>
+	<li><a href="download.php#idx">IDX Creator</a></li>	
+</ul>
+<?php print_set_to_top(); ?>
+
+
+
+<?php
+	print_footer();
+?>
