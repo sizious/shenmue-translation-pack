@@ -23,7 +23,7 @@ Also, the international fans of Shenmue who were interested in this project!</p>
 <table cellspacing="0" cellpadding="0" class="warning">
 <tr>
 	<td width="55"><img src="<?php echo ROOT_PATH; ?>/images/logos/warn.gif"/></td>
-	<td>WE DON'T APPROVE READY-TO-BURN TRANSLATED IMAGES DISTRIBUTION. PLEASE DISTRIBUTE ONLY PATCH PACKS (See the <a href="faq.php">F.A.Q</a> to learn more).</td>
+	<td>WE DON'T APPROVE READY-TO-BURN TRANSLATED IMAGES DISTRIBUTION. PLEASE DISTRIBUTE ONLY PATCH PACKS (See the <a href="<?php echo ROOT_PATH; ?>/faq/">F.A.Q</a> to learn more).</td>
 </tr>
 </table>
 </div>
@@ -77,16 +77,16 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 <!-- Credits -->
 <a name="credits"></a><h2>Credits</h2>
 
-<p>The first versions of this project were initially created by <strong>Manic</strong>, the project founder. All of them were rewritten or updated by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
+<p>The first versions of this project were initially created by <strong>Manic</strong>, the project founder. It includes <strong>AFS Utils</strong>, <strong>Cinematics Subtitles Editor</strong>, <strong>SPR Utils</strong> and <strong>IDX Creator</strong>. All of them were rewritten or updated by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
 
 <p><strong>ADPCM Streaming Toolkit</strong> was written by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> using the <a target="_blank" href="http://hcs64.com/vgmstream.html">vgmstream</a> SDK, originally written by <strong>hcs64</strong>.</p>
 
 <p>The <strong>Free Quest Subtitles Editor</strong> and <strong>IDX Creator (Console version)</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> with <strong>Manic</strong>'s support.</p>
 
-<p><strong>Models Textures Editor</strong>, <strong>Font Utility</strong>, <strong>VMU Screen Editor</strong>, <strong>IPAC Browser</strong>, <strong>Notebook Editor</strong> and <strong>Nozomi Motorcycle Subtitles Editor</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
+<p><strong>Models Textures Editor</strong>, <strong>Font Utility</strong>, <strong>VMU Screen Editor</strong>, <strong>IPAC Browser</strong>, <strong>Notebook Editor</strong>, <strong>Release Maker</strong>, <strong>System Talk Subtitles Editor</strong> and <strong>Nozomi Motorcycle Subtitles Editor</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
 
 <p><strong>Dreamcast Test Environment</strong> was created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>, based on the
-<a href="download.php#addons">Selfboot DATA Pack</a> by <strong>FamilyGuy</strong>.</p>
+<a href="<?php echo ROOT_PATH; ?>/download/#addons">Selfboot DATA Pack</a> by <strong>FamilyGuy</strong>.</p>
 
 <p><strong>Binary Translator</strong> was written by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> for the GUI and <strong>Ayla</strong> for the engine.</p>
 

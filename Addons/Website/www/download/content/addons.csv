@@ -1,0 +1,28 @@
+Filename;Name;Version;Author URL;Author Name;Description
+CRI_Middleware_ADX_Tools_v1.14_Win32.rar;ADX Tools;1.14;http://www.cri-mw.com/;CRI Middleware;The CRI Middleware ADX SDK allow you to handle AHX and ADX files. This is the official SDK. Tested with <strong>Shenmue II</strong> and works fine. <strong>Windows</strong> binaries only.
+CRI_Middleware_ADX_Tools_v1.15_Linux_Win32.rar;ADX Tools;1.15;http://www.cri-mw.com/;CRI Middleware;The CRI Middleware ADX SDK allow you to handle AHX and ADX files. This is the official SDK. Not tested with any <strong>Shenmue</strong> episode. <strong>Windows</strong> and <strong>GNU/Linux</strong> binaries included.
+adxutil_221.zip;ADXUtil;2.21;;"Verdi&nbsp;Kasugano";This program can handle AFS and ADX files.
+afs2wav_10.zip;AFS2WAV;1.0;http://sbibuilder.shorturl.com/;SiZiOUS;AFS2WAV is a AFS to WAV converter. It's a GUI of the <strong>ADXUtil</strong> tool from <strong>Verdi Kasugano</strong>.
+AFSExplorer_3_7.rar;AFS Explorer;3.7;;DTE-NG;"Allow you to patch AFS file much faster than <a href=""#afs"">AFS Utils</a> but have some limitation if the patched file is too big."
+am2drvext.zip;AM2 DTPK sound driver extractor;0.00;http://snesmusic.org/hoot/kingshriek/ssf/;kingshriek;"Extract the AM2 DTPK sound driver. Requires <a href=""http://www.python.org/"" target=""_blank"">Python framework.</a>"
+binhack32_1.0.0.3-Win32_Linux.zip;Binhack 32bits clone;1.0.0.3;http://www.metagames-eu.com/forums/dreamcast/binhack32-un-clone-de-binhack-en-32bit-122802.html;FamilyGuy;This is a 32bits BINHACK clone, designed to hack the IP.BIN bootstrap and the 1ST_READ.BIN Dreamcast binary. <strong>Windows</strong> and <strong>Linux</strong> binaries and complete <strong>source code</strong> included.
+dtpkext.zip;DTPK driver data extractor;0.00;http://snesmusic.org/hoot/kingshriek/ssf/;kingshriek;"Extract DTPK driver data. Requires <a href=""http://www.python.org/"" target=""_blank"">Python framework.</a>"
+dsfdtpk.zip;DTPK to DSF converter;0.01;http://snesmusic.org/hoot/kingshriek/ssf/;kingshriek;"Converts AMD2 DTPK sound format to DSF. Requires <a href=""http://www.python.org/"" target=""_blank"">Python framework.</a>"
+jc-gdiexplorer-v1.4b.zip;GDI Explorer;1.4b;http://japanese-cake.livejournal.com/;japanese_cake;"GDI Explorer is a small tool that enables you to extract data from *.gdi files. Requires <a href=""http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=333325fd-ae52-4e35-b531-508d977d32a6"" target=""_blank"">.NET Framework v3.5</a>."
+humans_dissecter_14.rar;Humans Dissecter;1.4;;SHENTRAD;Extract every sections of a PAKS file contained in the HUMANS.AFS archive.
+mpipatch-1.0.1.14.zip;MAPINFO.BIN Patcher;1.0.1.14;;whiteShadow;Quickly patch a map information file with data from other map information file, for map switching.
+nullDC_103.rar;nullDC Emulator;1.0.3;http://www.emudev.org/nullDC-new/;nullDC Team;Official release of the <strong>nullDC Dreamcast Emulator</strong>. You'll need a <strong>Dreamcast BIOS</strong> in order to run it (Don't ask here for this).
+nullDC_104_r22.rar;nullDC Emulator;1.0.4 R22;http://www.emudev.org/nullDC-new/;nullDC Team;Lastest official release of the <strong>nullDC Dreamcast Emulator</strong>.<br/>You still need a <strong>Dreamcast BIOS</strong> in order to run it (Don't ask here for this, again). Untested version with Shenmue, but should work.
+nullDC_104_r24-source.zip;nullDC Emulator (Source);1.0.4 R24;http://www.emudev.org/nullDC-new/;nullDC Team;"C/C++ source code of the <strong>nullDC Dreamcast Emulator</strong>. Dumped from the <a target=""_blank"" href=""http://code.google.com/p/nulldc/source/list/"">SVN</a> on 2010-05-19."
+yazgoo-mt5_extraction_tools-20100217.zip;MT5 Extraction Tools;17/02/2010;http://abdessel.iiens.net/dreamcast/;yazgoo;This is the yazgoo tools pack containing a 3D meshes models extractor from MT5 files.
+Photoshop_Plugins_8.23.1101.1715.exe;NVIDIA Photoshop Plug-ins;8.23.1101.1715;http://developer.nvidia.com/object/photoshop_dds_plugins.html;NVIDIA;This is a plug-ins pack containing a <strong>DirectDraw Surface</strong> (DDS) converter plug-in for <strong>Adobe Photoshop</strong>.
+pvr2png.zip;PVR to PNG;1.01;;Gzav;Convert any PowerVR texture to the PNG format. This tool keep the alpha-channel.
+pvrdis-b2-1.0.1.173.zip;PVR Dissector;1.0.1.173;;whiteShadow;Extract every PowerVR texture from generic game datas.
+pvrx2png-mingw-0.1-bin.zip;PVR-X to PNG;0.1;http://sbibuilder.shorturl.com/;SiZiOUS;"Convert any PVR-X (DirectDraw Surface embedded in PowerVR texture) to the PNG format. This tool keep the alpha-channel. Source is available on the <a href=""#source"">Shenmue Translation Pack SVN</a>."
+Sega_PVR_Tools_Package_R11b_Win32.zip;Sega PVR Tools;R11b;http://www.sega.com/;Sega;This package contains every tools made by Sega to handle Dreamcast PVR textures files.
+Sega_Stream_Extractor_v1.0_by_SWAT.7z;Sega Stream Extractor;1.0;http://www.dc-swat.net.ru/;SWAT;Extract Stream from generic game datas.
+Selfboot_DATA_Pack_v1.3_by_FamilyGuy.rar;Selfboot DATA Pack;1.3;;FamilyGuy;This pack allow you to create auto-boot CD-R images for your Dreamcast.
+snd2wav.zip;SND2WAV;?;;FamilyGuy;This package was done to decode Shenmue II SND files to RIFF Wave files.
+tilemolester-0.16-full.7z;Tile Molester;0.16;;SnowBro;Tile Molester is the next generation of tile editors. It has compatibility for many systems. It requires at least version 1.4.2 of J2SE. Source code is included.
+Universal_AFS_Extractor_v1.0_by_SWAT.7z;Universal AFS Extractor;1.0;http://www.dc-swat.net.ru/;SWAT;Extract files from AFS.
+Universal_PVR_Extractor_v1.3.7_by_SWAT.7z;Universal PVR Extractor;1.3.7;http://www.dc-swat.net.ru/;SWAT;Extract every PVR from generic game datas.
