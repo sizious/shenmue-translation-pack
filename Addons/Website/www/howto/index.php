@@ -36,10 +36,10 @@ add a new link to your project homepage in our <a href="<?php echo ROOT_PATH; ?>
 		</ol>
 	</li>
 	<li>
-		<span><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1.php">Translating a Shenmue One game</a></span>
+		<span><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Translating a Shenmue One game</a></span>
 	</li>
 	<li>
-		<span><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2.php">Translating a Shenmue Two game</a></span>
+		<span><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Translating a Shenmue Two game</a></span>
 	</li>	
 </ul>
 
@@ -216,37 +216,37 @@ engine version.</p>
 		<td>What's Shenmue</td>
 		<td align="center">NTSC-J</td>		
 		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
-		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1.php">Shenmue One</a></td>
+		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Shenmue One</a></td>
 	</tr>
 	<tr>
 		<td>Shenmue</td>
 		<td align="center">ALL</td>
 		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
-		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1.php">Shenmue One</a></td>
+		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Shenmue One</a></td>
 	</tr>
 	<tr>
 		<td>US Shenmue</td>
 		<td align="center">NTSC-J</td>
 		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
-		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1.php">Shenmue One</a></td>
+		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Shenmue One</a></td>
 	</tr>
 	<tr>
 		<td>Shenmue II</td>
 		<td align="center">ALL</td>
 		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
-		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2.php">Shenmue Two</a></td>
+		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Shenmue Two</a></td>
 	</tr>
 	<tr>
 		<td>Shenmue 2X (Demo)</td>
 		<td align="center">?</td>
 		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/xb.png" alt="Xbox" title="Xbox" /></td>
-		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2.php">Shenmue Two</a></td>
+		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Shenmue Two</a></td>
 	</tr>	
 	<tr>
 		<td>Shenmue 2X</td>
 		<td align="center">ALL</td>
 		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/xb.png" alt="Xbox" title="Xbox" /></td>
-		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2.php">Shenmue Two</a></td>
+		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Shenmue Two</a></td>
 	</tr>
 </table>
 
