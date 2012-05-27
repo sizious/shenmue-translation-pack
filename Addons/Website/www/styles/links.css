@@ -1,6 +1,19 @@
-ul.links div {
+table.links {
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+table.links td {
 	font-size: 10px;
 	margin-bottom: 5px;
+}
+
+table.links input {
+	border: 1px solid white;
+	background-color: black;
+	color: white;
+	cursor: pointer;
+	font: 10px Arial;
 }
 
 ul.links img {

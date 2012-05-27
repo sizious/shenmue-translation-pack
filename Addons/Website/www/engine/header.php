@@ -30,7 +30,13 @@
 			case "download":
 				$current_photo = "both3";			
 				$page_title = "Download";
-				$include_css = "<link href=\"".ROOT_PATH."/styles/download.css\" rel=\"stylesheet\" type=\"text/css\" media=\"screen\" />\n";				
+				$include_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".ROOT_PATH."/scripts/highslide/highslide.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"".ROOT_PATH."/styles/download.css\" media=\"screen\" />\n";			
+				$include_js = "<script type=\"text/javascript\" src=\"".ROOT_PATH."/scripts/highslide/highslide.js\"></script>\n<script language=\"javascript\" type=\"text/javascript\" src=\"".ROOT_PATH."/scripts/common.js\"></script>\n
+					<script type='text/javascript'>
+						hs.graphicsDir = sBase + '/scripts/highslide/graphics/';
+						hs.outlineType = 'outer-glow';
+						hs.wrapperClassName = 'outer-glow';
+					</script>";
 				$download_active = true;
 				break;
 			

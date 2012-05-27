@@ -2,32 +2,38 @@
 	define("PROJECT_TOOLS_FILES_LIST", "prjfiles.csv", true);
 	define("ADDONS_FILES_LIST", "addons.csv", true);
 	
-	include_once("./engine/header.php");
-	include_once("./engine/footer.php");
-	include_once("./engine/topbtn.php");		
+	include_once("../engine/header.php");
+	include_once("../engine/footer.php");
+	include_once("../engine/topbtn.php");		
 	print_header("download");	
 	
-	function make_program_link( $program_name, $link_text ) {
+	function make_program_link( $program_name ) {
 		$program_url = str_replace(" ", "%20", $program_name);
-		return '<a target="_blank" href="'.
-			'http://sourceforge.net/projects/shenmuesubs/files/'.
-			$program_url.'/">'.$link_text.'</a>';
+		return "http://sourceforge.net/projects/shenmuesubs/files/$program_url/";
 	}
-	
-	function print_download_item( $section_name, $program_name, $description, $image, $image_legend ) {
-/*		$description = str_replace("\n", chr(13), $description);		
-		$description = str_replace("\t", chr(8), $description);	 */
+		
+	$image_index = 0;
+	function print_download_item( $section_name, $program_name, $description, $image, $image_legend, $url ) {
+		global $image_index;		
+		$image_index++;
 		
 		echo "
 		
 <!-- ".$program_name." -->
 <a name=\"".$section_name."\"></a><h2>".$program_name."</h2>
 <p>".$description."</p>
-<div align=\"center\">
-	<a target=\"_blank\" href=\"./images/screens/fullsize/".$image."\"><img src=\"./images/screens/thumbs/".$image."\"/></a>
-	<div class=\"img_legend\">".$image_legend."</div>
+
+<div align=\"center\" style=\"margin-bottom: 10px;\">
+	<a id=\"thumb$image_index\" href=\"".ROOT_PATH."/download/img/fullsize/".$image."\" class=\"highslide\" onclick=\"return hs.expand(this)\">
+		<img src=\"".ROOT_PATH."/download/img/thumbs/".$image."\"/>
+	</a>
+	<div class=\"highslide-caption\">$image_legend</div>
+	<div class=\"img_legend\">$image_legend (click to enlarge)</div>
 </div>
 		";
+?>
+<div align="center"><a style="font-size: 16px" target="_blank" href="<?php echo $url; ?>">Download</a></div>
+<?php
 		print_set_to_top();
 	}
 	
@@ -41,7 +47,7 @@
 		
 <!-- ".$name." -->
 <tr>
-	<td><a href=\"rsrc/download/addons/".$filename."\">".$name."</a>
+	<td><a href=\"".ROOT_PATH."/download/addons/".$filename."\">".$name."</a>
 	<td align='center'>".$version."</td>
 	<td align='center' nowrap='nowrap'>".$author."</td>
 	<td>".$description."</td>
@@ -55,8 +61,8 @@
 <p>The project is composed by several tools. You can click on each of them to get a short description.</p>
 <ul>
 <?php
-	// Print each Download item	
-	$handle = fopen( "rsrc/download/".PROJECT_TOOLS_FILES_LIST, "r" );
+	// Print each Download item	(Make TOC)
+	$handle = fopen( "./content/".PROJECT_TOOLS_FILES_LIST, "r" );
 	fgetcsv( $handle ); // skip the first row
 	while ( ( $data = fgetcsv( $handle, 1000, ";" ) ) !== FALSE ) {
 ?>
@@ -85,12 +91,12 @@ This website spread some <a href="#addons">additional tools</a> that may be usef
 
 <?php
 	// Print each Download item	
-	$handle = fopen( "rsrc/download/".PROJECT_TOOLS_FILES_LIST, "r" );
+	$handle = fopen( "./content/".PROJECT_TOOLS_FILES_LIST, "r" );
 	fgetcsv( $handle ); // skip the first row
 	while ( ( $data = fgetcsv( $handle, 1000, ";" ) ) !== FALSE ) {
-		$url = make_program_link( $data[1], $data[4] );
-		$desc = $url.$data[5];
-		print_download_item( $data[0], $data[1], $desc, $data[2], $data[3] );
+		$url = make_program_link( $data[1] );
+		$desc = "<a target='_blank' href='$url'>$data[4]</a> $data[5]";
+		print_download_item( $data[0], $data[1], $desc, $data[2], $data[3], $url );
 	}
 	fclose( $handle );
 ?>
@@ -114,7 +120,7 @@ This website spread some <a href="#addons">additional tools</a> that may be usef
 		<th>Description</th>
 	</tr>
 <?php
-	$handle = fopen( "rsrc/download/".ADDONS_FILES_LIST, "r" );
+	$handle = fopen( "./content/".ADDONS_FILES_LIST, "r" );
 	fgetcsv( $handle ); // skip the first row
 	while ( ( $data = fgetcsv( $handle, 1000, ";" ) ) !== FALSE ) {
 		print_addon_item( $data[0], $data[1], $data[2], $data[3], $data[4], $data[5] );

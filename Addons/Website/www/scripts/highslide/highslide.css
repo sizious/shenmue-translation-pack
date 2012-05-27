@@ -51,6 +51,9 @@
 	font-size: 1em;
 	padding: 5px;
 	/*background: white;*/
+	/* For SHENTRAD */
+	font-weight: bold;
+	color: white;
 }
 .highslide-heading {
 	display: none;
