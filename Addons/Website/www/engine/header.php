@@ -122,12 +122,12 @@ if ($page_title !== "") {
 <div id="header2">
 	<ul id="menu">
 		<li><a title="Home page" href="<?php echo ROOT_PATH; ?>/" <?php if($home_active) echo "id=\"active\""; ?>>Home</a></li>
-		<li><a title="Get the Shenmue Translation Pack" href="<?php echo ROOT_PATH; ?>/download.php" <?php if($download_active) echo "id=\"active\""; ?>>Download</a></li>
+		<li><a title="Get the Shenmue Translation Pack" href="<?php echo ROOT_PATH; ?>/download/" <?php if($download_active) echo "id=\"active\""; ?>>Download</a></li>
 		<li><a title="Documentation on the Shenmue Translation Pack" href="<?php echo ROOT_PATH; ?>/howto/" <?php if($howto_active) echo "id=\"active\""; ?>>How To</a></li>
-		<li><a title="Files specifications" href="<?php echo ROOT_PATH; ?>/specs.php" <?php if($specs_active) echo "id=\"active\""; ?>>Technical stuffs</a></li>
-		<li><a title="F.A.Q" href="<?php echo ROOT_PATH; ?>/faq.php" <?php if($faq_active) echo "id=\"active\""; ?>>F.A.Q</a></li>
-		<li><a title="Useful links" href="<?php echo ROOT_PATH; ?>/links.php" <?php if($links_active) echo "id=\"active\""; ?>>Links</a></li>
-		<li><a title="Random page hehe..." href="<?php echo ROOT_PATH; ?>/about.php" <?php if($about_active) echo "id=\"active\""; ?>>About</a></li>
+		<li><a title="Files specifications" href="<?php echo ROOT_PATH; ?>/specs/" <?php if($specs_active) echo "id=\"active\""; ?>>Technical stuffs</a></li>
+		<li><a title="F.A.Q" href="<?php echo ROOT_PATH; ?>/faq/" <?php if($faq_active) echo "id=\"active\""; ?>>F.A.Q</a></li>
+		<li><a title="Useful links" href="<?php echo ROOT_PATH; ?>/links/" <?php if($links_active) echo "id=\"active\""; ?>>Links</a></li>
+		<li><a title="Random page hehe..." href="<?php echo ROOT_PATH; ?>/about/" <?php if($about_active) echo "id=\"active\""; ?>>About</a></li>
 	</ul>
 </div> 	
 
