@@ -1,8 +1,8 @@
 <?php 
-	require_once("../engine/header.php");
-	require_once("../engine/footer.php");
-	require_once("../engine/topbtn.php");		
-	require_once("utils/printscr.php");		
+	require_once("../../engine/header.php");
+	require_once("../../engine/footer.php");
+	require_once("../../engine/topbtn.php");		
+	require_once("../utils/printscr.php");		
 	print_header("howto");	
 ?>
 
