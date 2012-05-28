@@ -79,6 +79,8 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 
 <p>The first versions of this project were initially created by <strong>Manic</strong>, the project founder. It includes <strong>AFS Utils</strong>, <strong>Cinematics Subtitles Editor</strong>, <strong>SPR Utils</strong> and <strong>IDX Creator</strong>. All of them were rewritten or updated by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a>.</p>
 
+<p>Also, the first version of this website was made by <strong>Manic</strong>. <a target="_blank" href="<?php echo ROOT_PATH; ?>/legacy/">Take me back</a>.</p>
+
 <p><strong>ADPCM Streaming Toolkit</strong> was written by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> using the <a target="_blank" href="http://hcs64.com/vgmstream.html">vgmstream</a> SDK, originally written by <strong>hcs64</strong>.</p>
 
 <p>The <strong>Free Quest Subtitles Editor</strong> and <strong>IDX Creator (Console version)</strong> were created by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> with <strong>Manic</strong>'s support.</p>
