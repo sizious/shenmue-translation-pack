@@ -43,3 +43,12 @@ div #prerequists {
 	color: #FFFF59;
 }
 
+table.howto {
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+table.howto td {
+	font-size: 11px;
+	padding: 2px;
+}

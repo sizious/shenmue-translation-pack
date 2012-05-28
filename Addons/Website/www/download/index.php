@@ -112,6 +112,8 @@
 
 <p>I use the <a target="_blank" href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> client to access the SVN.</p>
 
+<p><strong>Indiket</strong> of <a target="_blank" href="http://www.dreamcast.es/">Dreamcast.es</a> made a great guide explaning how to compile these tools. <a target="_blank" href="http://www.google.com/translate?u=http://www.dreamcast.es/forum/viewthread.php?thread_id=1562&hl=en&ie=UTF8&sl=es&tl=en">Check it out</a>!</p>
+
 <?php print_set_to_top(); ?>
 
 <a name="addons"></a><h1>Additional Tools</h1>

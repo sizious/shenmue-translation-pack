@@ -20,8 +20,8 @@
 
 <p>This tutorial is here to explain you the basis of the Shenmue translation and the use of this tools pack.</p>
 
-<p>Well done, so you want to start a new <strong>Shenmue</strong> translation? Great! Please <a href="<?php echo ROOT_PATH; ?>/about.php#contact">contact us</a>, we will 
-add a new link to your project homepage in our <a href="<?php echo ROOT_PATH; ?>/links.php">links page</a>!</p>
+<p>Well done, so you want to start a new <strong>Shenmue</strong> translation? Great! Please <a href="<?php echo ROOT_PATH; ?>/about/#contact">contact us</a>, we will 
+add a new link to your project homepage in our <a href="<?php echo ROOT_PATH; ?>/links/">links page</a>!</p>
 
 <div>Here is the summary table of this document:</div>
 <ul>
@@ -104,7 +104,7 @@ For example, the translation of the <strong>Shenmue II</strong> game in the Fren
 		<!-- Dreamcast -->
 		<td>
 			<ul>
-				<li>The <a href="<?php echo ROOT_PATH; ?>/download.php">Shenmue Translation Pack</a></li>
+				<li>The <a href="<?php echo ROOT_PATH; ?>/download/">Shenmue Translation Pack</a></li>
 				<li>The full dump of the game you want to translate (don't ask us for this)</li>
 				<li>A working Dreamcast with the boot on CD-R feature</li>
 				<li>Dreamcast emulator (<a target="_blank" href="http://code.google.com/p/nulldc/downloads/list">nullDC</a> is highly recommanded)</li>
@@ -114,7 +114,7 @@ For example, the translation of the <strong>Shenmue II</strong> game in the Fren
 		<!-- Xbox -->
 		<td>
 			<ul>
-				<li>The <a href="<?php echo ROOT_PATH; ?>/download.php">Shenmue Translation Pack</a></li>		
+				<li>The <a href="<?php echo ROOT_PATH; ?>/download/">Shenmue Translation Pack</a></li>		
 				<li>The full dump of the game you want to translate (don't ask us for this)</li>
 				<li>A modded or exploited Xbox</li>
 				<li>A network connection between your Xbox and your computer</li>
@@ -147,7 +147,7 @@ modified files on a blank CD-R (don't forget to leave the session opened because
 the burned disc on your <strong>Dreamcast</strong> (every standard main unit can read natively CD-R), but it's
 really a expensive solution (if you like wasting CD-R, it's great for you!). I suggest to use the excellent <strong>Dreamcast Emulator</strong> 
 <a target="_blank" href="http://code.google.com/p/nulldc/downloads/list">nullDC</a>
-by <strong>drk||Raziel</strong> instead. Associating this solution with the <a href="<?php echo ROOT_PATH; ?>/download.php#test">Dreamcast Test Environment</a>, 
+by <strong>drk||Raziel</strong> instead. Associating this solution with the <a href="<?php echo ROOT_PATH; ?>/download/#test">Dreamcast Test Environment</a>, 
 you'll have a excellent test solution for the <strong>Dreamcast</strong>. 
 You have more interest to do so since all the episodes were first released on <strong>Dreamcast</strong>.</p>
 
@@ -174,12 +174,12 @@ You have more interest to do so since all the episodes were first released on <s
 <!-- Setting Dreamcast Test Environment -->
 <a name="dctest"></a><h2>Setting Dreamcast Test Environment</h2>
 
-<p>For your convenience, we made a ready-to-use <a href="<?php echo ROOT_PATH; ?>/download.php#test">Dreamcast Test Environment</a> based on the <a href="<?php echo ROOT_PATH; ?>/download.php#addons">Selfboot Data Pack</a> by 
+<p>For your convenience, we made a ready-to-use <a href="<?php echo ROOT_PATH; ?>/download/#test">Dreamcast Test Environment</a> based on the <a href="<?php echo ROOT_PATH; ?>/download/#addons">Selfboot Data Pack</a> by 
 <strong>FamilyGuy</strong>. This tutorial will use this pack but if you know how to <em>selfboot</em> <strong>Dreamcast</strong> games, you don't need it.</p>
 
 <div>To set up the environment, read below:</div>
 <ol>
-<li>Download the <a href="<?php echo ROOT_PATH; ?>/download.php#test">Dreamcast Test Environment</a> pack if not already done.</li>
+<li>Download the <a href="<?php echo ROOT_PATH; ?>/download/#test">Dreamcast Test Environment</a> pack if not already done.</li>
 <li>Unzip the pack in a folder, for example <strong>C:\SHENTEST</strong>.</li>
 <li>Copy your game data in the <strong>data</strong> folder of this pack. If you have only the GDI dump, copy the dump on the pack root folder and double-click on the <strong>gdi2data</strong> batch file to extract the game data files.</li>
 <li>Copy the <strong>IP.BIN</strong> bootstrap file on the pack root folder.</li>
@@ -214,38 +214,38 @@ engine version.</p>
 	</tr>
 	<tr>
 		<td>What's Shenmue</td>
-		<td align="center">NTSC-J</td>		
-		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td align="center"><?php print_region("j"); ?></td>		
+		<td align="center"><?php print_system("dc"); ?></td>
 		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Shenmue One</a></td>
 	</tr>
 	<tr>
 		<td>Shenmue</td>
-		<td align="center">ALL</td>
-		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td align="center"><?php print_region("w"); ?></td>
+		<td align="center"><?php print_system("dc"); ?></td>
 		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Shenmue One</a></td>
 	</tr>
 	<tr>
 		<td>US Shenmue</td>
-		<td align="center">NTSC-J</td>
-		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td align="center"><?php print_region("j"); ?></td>
+		<td align="center"><?php print_system("dc"); ?></td>
 		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/">Shenmue One</a></td>
 	</tr>
 	<tr>
 		<td>Shenmue II</td>
-		<td align="center">ALL</td>
-		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/dc.png" alt="Dreamcast" title="Dreamcast" /></td>
+		<td align="center"><?php print_region("w"); ?></td>
+		<td align="center"><?php print_system("dc"); ?></td>
 		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Shenmue Two</a></td>
 	</tr>
 	<tr>
 		<td>Shenmue 2X (Demo)</td>
 		<td align="center">?</td>
-		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/xb.png" alt="Xbox" title="Xbox" /></td>
+		<td align="center"><?php print_system("xb"); ?></td>
 		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Shenmue Two</a></td>
 	</tr>	
 	<tr>
 		<td>Shenmue 2X</td>
-		<td align="center">ALL</td>
-		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/xb.png" alt="Xbox" title="Xbox" /></td>
+		<td align="center"><?php print_region("w"); ?></td>
+		<td align="center"><?php print_system("xb"); ?></td>
 		<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue2/">Shenmue Two</a></td>
 	</tr>
 </table>
