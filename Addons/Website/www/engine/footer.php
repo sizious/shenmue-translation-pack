@@ -17,11 +17,11 @@
 <div class="copyleft"><a href="http://www.kitgraphiquegratuit.org/" onclick="window.open(this.href); return false;" title="Free Graphical Kits for your website!" ></a></div>
 <!-- mention de copyright Ne pas retirer sans autorisation écrite -->	
  <ul id="plandusite">
-          <li><a href="about.php#contact">Contact</a></li>
-          <li><a href="about.php#license">License</a></li>
-          <li><a href="about.php#credits">Credits</a></li>
-		  <li><a href="about.php#disclamer">Disclamer</a></li> 
-		  <li><a href="./">Home</a></li>
+          <li><a href="<?php echo ROOT_PATH; ?>/about/#contact">Contact</a></li>
+          <li><a href="<?php echo ROOT_PATH; ?>/about/#license">License</a></li>
+          <li><a href="<?php echo ROOT_PATH; ?>/about/#credits">Credits</a></li>
+		  <li><a href="<?php echo ROOT_PATH; ?>/about/#disclamer">Disclamer</a></li> 
+		  <li><a href="<?php echo ROOT_PATH; ?>/">Home</a></li>
 </ul>
 </div>
 </div>

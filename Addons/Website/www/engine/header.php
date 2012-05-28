@@ -1,6 +1,33 @@
 <?php
 	require_once("config.inc.php");
 	
+	// Print system icon
+	function print_system($system) {
+		switch ($system) {
+			case 'dc': $system_name = 'Dreamcast'; break;
+			case 'xb': $system_name = 'Xbox'; break;
+			default: $system_name = '';
+		}
+?>
+<img alt="<?php echo $system_name ; ?>" title="<?php echo $system_name ; ?>" src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $system; ?>.png"/>
+<?php
+	}
+	
+	// Print Region Flag
+	function print_region($region) {
+		switch ($region) {
+			case 'w': $region_name = 'Worldwide'; break;
+			case 'j': $region_name = 'NTSC-J'; break;
+			case 'u': $region_name = 'NTSC-U'; break;
+			case 'e': $region_name = 'PAL'; break;
+			default: $region_name = '';
+		}
+?>
+<img alt="<?php echo $region_name ; ?>" title="<?php echo $region_name ; ?>" src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $region; ?>.png"/>
+<?php
+	}
+	
+	// Print Header
 	function print_header($page_type) {
 		$page_type = strtolower($page_type);
 		
@@ -142,14 +169,14 @@ if ($page_title !== "") {
 	<tr>
 		<td>
 			<div id="left"><!-- Colonne Gauche -->
-				<h1>Welcome to the Shenmue Translation Pack website</h1>
+				<h1>Welcome to the Shenmue Translation Pack website !</h1>
 				<p>Welcome stranger to the fantastic modding temple of the <strong>Shenmue</strong> series.</p>
 				<p>This website is here to spread around the world the technics and tools to modify all the <strong>Shenmue</strong> games series.</p>
-				<p>The first goal of our project is to translate every <strong>Shenmue</strong> episode in another language. The episodes includes the following:</p>
+				<p>The first goal of our project is to translate every <strong>Shenmue</strong> episode in another language. This includes the following:</p>
 				<ul>
-					<li><strong>What's Shenmue</strong> (NTSC-J) (Dreamcast)</li>
-					<li><strong>Shenmue</strong> (ALL) (Dreamcast)</li>
-					<li><strong>Shenmue II</strong> (ALL) (Dreamcast) (Xbox)</li>
+					<li><strong>What's Shenmue</strong> <?php print_region("j"); ?> <?php print_system("dc"); ?></li>
+					<li><strong>Shenmue</strong> <?php print_region("w"); ?> and <strong>US Shenmue</strong> <?php print_region("j"); ?> <?php print_system("dc"); ?></li>
+					<li><strong>Shenmue II</strong> <?php print_region("w"); ?> <?php print_system("dc"); ?> <?php print_system("xb"); ?></li>
 				</ul>
 				<p>Enjoy this cool project!</p>				
 			</div><!-- Fin Colonne Gauche -->
