@@ -128,7 +128,7 @@
 		"French project by The Shenmue Master Team, aka Shendream, Sadako, Sunmingzhao, ...", 
 		"fr", 
 		"dc", 
-		"2012-01-25", 
+		"2012-01-26", 
 		"Release A",
 		"CD-R 900MB",
 		"http://shenmuemaster.fr/"
@@ -141,7 +141,7 @@
 		"French project by The Shenmue Master Team, aka Shendream, Sadako, Sunmingzhao, ...", 
 		"fr", 
 		"xb", 
-		"2012-01-26", 
+		"2012-01-30", 
 		"Release A",
 		"DVD",
 		"http://shenmuemaster.fr/"
