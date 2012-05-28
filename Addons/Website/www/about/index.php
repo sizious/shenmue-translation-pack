@@ -31,7 +31,7 @@ Also, the international fans of Shenmue who were interested in this project!</p>
 <p>If you see here any piracy act or something you don't like, please <a href="#contact">contact us</a> immediately (please be indulgent... oh, and by the way, we want <strong>Shenmue III</strong> on next-gen hardware !).</p>
 
 <p>This project is not affilated with <a href="http://www.sega.com/" target="_blank">Sega</a> or <strong>AM2</strong> in any way. 
-If you are from these societies and you don't approve this project, please <a href="#content">contact us</a>. 
+If you are from these companies and you don't approve this project, please <a href="#content">contact us</a>. 
 We understand that this project can be considered illegal by copyright laws. We know that modifying copyright materials such games files are illegal. 
 We are doing this only because we are fans people, we don't want to make money with this project. 
 <strong>But if you want to immediately stop this project, just write an <a href="#contact">e-mail</a> and everything will be destroyed (source code, website, everything) as soon as possible</strong>. 
@@ -91,9 +91,9 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 <p><strong>Binary Translator</strong> was written by <a target="_blank" href="http://sbibuilder.shorturl.com/">SiZiOUS</a> for the GUI and <strong>Ayla</strong> for the engine.</p>
 
 <p>Special thanks to 
-<strong>Ayla</strong>, <strong>Shendream</strong>, <strong>Sadako</strong>, <strong>Hiei-</strong>, <strong>kogami-san</strong>, <strong>Dark_Neo</strong>, 
-<strong>mimix</strong>, <strong>Sunmingzhao</strong>, <strong>MagicSeb</strong>, <strong>L@Cible</strong>, <strong>Ti Dragon</strong>,
-<strong>alphaphoenix55</strong>, <strong>FamilyGuy</strong>, <strong>Ryo Suzuki</strong>, <strong>IlDucci</strong>, <strong>PlusTuta</strong> 
+<strong>Ayla</strong>, <a target="_blank" href="http://www.shenmuemaster.fr/">Shendream</a>, <strong>Sadako</strong>, <a target="_blank" href="http://www.hiei-tf.fr/shenmue1-howtotranslate-english.html">Hiei-</a>, <strong>kogami-san</strong>, <strong>Dark_Neo</strong>, 
+<strong>mimix</strong>, <a target="_blank" href="http://sunmingzhao.over-blog.fr/">Sunmingzhao</a>, <strong>MagicSeb</strong>, <a target="_blank" href="http://la.cible.free.fr/">L@Cible</a>, <a target="_blank" href="http://traf.romhack.org/">Ti Dragon</a>,
+<strong>alphaphoenix55</strong>, <strong>FamilyGuy</strong>, <strong>Ryo Suzuki</strong>, <a target="_blank" href="http://tiovictor.romhackhispano.org/">IlDucci</a>, <strong>PlusTuta</strong> 
 and everyone who supporting us. If we forgot you, feel free to <a href="#contact">contact us</a> today !</p>
 	
 <?php 

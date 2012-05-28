@@ -58,7 +58,7 @@
 ?>
 <h1>Download</h1>
 
-<p>The project is composed by several tools. You can click on each of them to get a short description.</p>
+<p>The <a target="_blank" href="https://sourceforge.net/projects/shenmuesubs/files/">Shenmue Translation Pack</a> is a package composed by several tools. You can download all of them in one click by clicking the <a target="_blank" href="https://sourceforge.net/projects/shenmuesubs/files/">Download</a> button below and selecting the <a target="_blank" href="http://sourceforge.net/projects/shenmuesubs/files/All-in-One%20Pack/">All-in-One</a> package after. If you want, you can click on one of them to get a short description or to direct download the tool if needed. In all cases, to learn how to use them, please read the <a href="<?php echo ROOT_PATH; ?>/howto/">How To</a> page.</p>
 <ul>
 <?php
 	// Print each Download item	(Make TOC)
@@ -73,8 +73,9 @@
 ?>
 </ul>
 
-<p>If you are interested to get the source code (written in <em>Delphi 2007</em>), <a href="#source">click here</a>. 
-This website spread some <a href="#addons">additional tools</a> that may be useful. If you are interested to get them, <a href="#addons">click here</a>.</p>
+<p>If you are interested to get the source code, <a href="#source">click here</a>.</p> 
+
+<p>This website spread some <a href="#addons">additional tools</a> that may be useful. If you are interested to get them, <a href="#addons">click here</a>.</p>
 
 <p>To download the <strong>Shenmue Translation Pack</strong>, <a target="_blank" href="https://sourceforge.net/projects/shenmuesubs/files/" title="Download the Shenmue Translation Pack">click here</a> or the button below.</p>
 
@@ -103,9 +104,14 @@ This website spread some <a href="#addons">additional tools</a> that may be usef
 
 <a name="source"></a><h1>Source</h1>
 
+<p>The source is written in big majority with <a target="_blank" href="http://www.embarcadero.com/products/delphi/">Delphi 2007</a>, but some very minor parts are written under <a target="_blank" href="http://www.mingw.org/">MinGW GCC</a>.</p>
+
 <p>You can get the source on the SVN repository:</p>
+
 <div class="code">svn co https://shenmuesubs.svn.sourceforge.net/svnroot/shenmuesubs shenmuesubs</div>
+
 <p>I use the <a target="_blank" href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> client to access the SVN.</p>
+
 <?php print_set_to_top(); ?>
 
 <a name="addons"></a><h1>Additional Tools</h1>
