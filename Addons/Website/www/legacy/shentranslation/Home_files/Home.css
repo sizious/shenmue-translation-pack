@@ -1,0 +1,17 @@
+.graphic_navigationbar_style_default {
+    background: transparent;
+    float: none;
+    margin: 0px;
+    opacity: 1.00;
+}
+div {
+    overflow: visible;
+}
+img {
+    border: none;
+}
+.InlineBlock {display: inline; }
+.InlineBlock {display: inline-block; }
+.tinyText {
+    font-size: 1px;
+}
