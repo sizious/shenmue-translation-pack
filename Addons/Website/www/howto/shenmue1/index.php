@@ -212,7 +212,7 @@ you to translate identical text in one time, using a very fast module) or the <s
 
 <p>You can take the <strong>INE_.PKS</strong> file for the example. This is the subtitle sheet for <strong>Ine Hayata ("Ine-san")</strong>, who is always at <strong>Hazuki Residence</strong>. After the game intro and getting the first allowance, you can find her here:</p>
 
-<?php print_screenshot("1_Freequest02", "Ine-san in Hazuki's Residence.", "Ine-san."); ?>
+<?php print_screenshot("1_FreeQuest02", "Ine-san in Hazuki's Residence.", "Ine-san."); ?>
 
 <div>Now, open the <strong>INE_.PKS</strong> file with <?php _PT("fq"); ?>. To do that, do the following:</div>
 <ol>
@@ -222,7 +222,7 @@ you to translate identical text in one time, using a very fast module) or the <s
 	<li>The file will be opened on the editor. You can now edit your subtitles. Don't forget to save your file!</li>
 </ol>
 
-<?php print_screenshot("1_Freequest03", "Here, all subtitles of the 'INE_' NPC were modified with the same value.", "After modifying subtitles in your editor..."); ?>
+<?php print_screenshot("1_FreeQuest03", "Here, all subtitles of the 'INE_' NPC were modified with the same value.", "After modifying subtitles in your editor..."); ?>
 
 <p>You can open the whole directory by clicking the <strong>File</strong> &gt; <strong>Open directory...</strong> command. The program'll be scan every file to find valid NPC characters.
 With this functionnality you can edit multi files in the same time.</p>
@@ -243,7 +243,7 @@ With this functionnality you can edit multi files in the same time.</p>
     <li>After all Disc 1 .XML files are generated, click on the Done button, then close the <?php _PT("fq"); ?>.</li>
 </ol>
 
-<?php print_screenshot("1_Freequest04", "Here, all subtitles of the 'INE_' NPC were modified with the same value.", "After modifying subtitles in your editor..."); ?>
+<?php print_screenshot("1_FreeQuest04", "Here, all subtitles of the 'INE_' NPC were modified with the same value.", "After modifying subtitles in your editor..."); ?>
 
 In order to export the right FREE for the right disc, you'll need to select one of the three disc options.
 
