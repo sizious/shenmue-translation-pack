@@ -1,7 +1,33 @@
 <?php
 	require_once("config.inc.php");
 	
+	//
+	// Print External Links
+	//
+	function _PEL($name, $url, $title = '') {
+?>
+<a title="<?php echo $title; ?>" target="_blank" href="<?php echo $url; ?>"><?php echo $name; ?></a><?php
+	}
+	
+	//
+	// Warning Box
+	//
+	function print_warning($message) {
+?>
+<div id="warning-wrap" align="center" style="padding:0">
+	<table cellspacing="0" cellpadding="0" class="warning">
+		<tr>
+			<td width="55"><img alt="Warning" title="Warning !" src="<?php echo ROOT_PATH; ?>/images/logos/warn.gif"/></td>
+			<td><?php echo $message; ?></td>
+		</tr>
+	</table>
+</div>
+<?php
+	}
+	
+	//
 	// Print system icon
+	//
 	function print_system($system) {
 		switch ($system) {
 			case 'dc': $system_name = 'Dreamcast'; break;
@@ -9,11 +35,12 @@
 			default: $system_name = '';
 		}
 ?>
-<img alt="<?php echo $system_name ; ?>" title="<?php echo $system_name ; ?>" src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $system; ?>.png"/>
-<?php
+<img alt="<?php echo $system_name ; ?>" title="<?php echo $system_name ; ?>" src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $system; ?>.png"/><?php
 	}
 	
+	//
 	// Print Region Flag
+	//
 	function print_region($region) {
 		switch ($region) {
 			case 'w': $region_name = 'Worldwide'; break;
@@ -23,11 +50,12 @@
 			default: $region_name = '';
 		}
 ?>
-<img alt="<?php echo $region_name ; ?>" title="<?php echo $region_name ; ?>" src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $region; ?>.png"/>
-<?php
+<img alt="<?php echo $region_name ; ?>" title="<?php echo $region_name ; ?>" src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $region; ?>.png"/><?php
 	}
 	
+	//
 	// Print Header
+	//
 	function print_header($page_type) {
 		$page_type = strtolower($page_type);
 		

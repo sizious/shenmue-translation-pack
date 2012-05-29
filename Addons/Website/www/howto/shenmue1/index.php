@@ -4,6 +4,7 @@
 	require_once("../../engine/topbtn.php");		
 	require_once("../utils/printscr.php");		
 	require_once("../utils/filestbl.php");		
+	require_once("../utils/printutl.php");		
 	print_header("howto");	
 ?>
 
@@ -33,14 +34,14 @@
 
 <p>You'll see a lot of <strong>AFS</strong> and <strong>IDX</strong> files. Each <strong>AFS</strong> 
 contains cinematics game datas, which means a <strong>SRF</strong> file 
-(to be opened by <a href="download.php#srf">Cinematics Subtitles Editor</a>)
-and some <strong>STR</strong> files (You can listen to them with the <a href="<?php echo ROOT_PATH; ?>/download.php#adpcm">ADPCM Streaming Toolkit</a> included in the <a href="<?php echo ROOT_PATH; ?>/download.php">Shenmue Translation Pack</a>).</p>
+(to be opened by <?php _PT("srf"); ?>)
+and some <strong>STR</strong> files (You can listen to them with the <?php _PT("adpcm"); ?> included in the <a href="<?php echo ROOT_PATH; ?>/download/">Shenmue Translation Pack</a>).</p>
 	
 <div>To perform this operation you'll need the following tools from our pack:</div>
 <ul>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#srf">AiO Cinematics Subtitles Editor</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#idx">IDX Creator</a></li>	
+	<li><?php _PT("afs"); ?></li>
+	<li><?php _PT("srf"); ?></li>
+	<li><?php _PT("idx"); ?></li>	
 </ul>
 
 <?php print_set_to_top(); ?>
@@ -51,7 +52,7 @@ and some <strong>STR</strong> files (You can listen to them with the <a href="<?
 <p>The whole example is based on the <strong>A0114.AFS</strong> file from the Disc 1 (it's the first game scene, the death of Iwao Hazuki).</p>
 
 <ol>
-	<li>Run <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
+	<li>Run <?php _PT("afs"); ?> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
 	<li>Select the <strong>\SCENE\01\STREAM\A0114.AFS</strong> file and click <strong>OK</strong>.</li>
 	<li>Select the <strong>A0114.AFS</strong> on the left.</li>
 	<li>Click on the <strong>Tools</strong> &gt; <strong>Mass extraction...</strong> menu item.</li>
@@ -69,7 +70,7 @@ You'll unable to recongnize <strong>SRF</strong> or <strong>STR</strong> files.<
 <!-- Shenmue I: Subtitles in cinematics / Translating SRF file -->
 <h3>Translating SRF file</h3>
 
-<p>To edit <strong>SRF</strong> files it's pretty simple. Open the <a href="<?php echo ROOT_PATH; ?>/download.php#srf">Cinematics Subtitles Editor</a> tool and select the 
+<p>To edit <strong>SRF</strong> files it's pretty simple. Open the <?php _PT("srf"); ?> tool and select the 
 <strong>File</strong> &gt; <strong>Open files...</strong> command. Open the <strong>SRF</strong> file you want to translate and press <strong>OK</strong>.
 </p>
 
@@ -89,7 +90,7 @@ When you have finished, don't forget to save your work!</p>
 Now, we must rebuild the <strong>AFS</strong> file with the updated <strong>SRF</strong> file. To do that, do the following:</p>
 
 <ol>
-	<li>Fire up <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>Tools</strong> &gt; <strong>AFS Creator</strong> command.</li>
+	<li>Fire up <?php _PT("afs"); ?> and select the <strong>Tools</strong> &gt; <strong>AFS Creator</strong> command.</li>
 	<li>In the <strong>AFS Creator</strong> window, select the <strong>File</strong> &gt; <strong>Import XML list...</strong> and click <strong>OK</strong>.</li>
 	<li>Select the generated <strong>A0114_list.xml</strong> in the <strong>A0114</strong> directory, and click <strong>OK</strong>.</li>
 	<li>The <strong>AFS Creator</strong> window should be filled with the original <strong>A0114.AFS</strong> filenames content.</li>
@@ -106,7 +107,7 @@ Now, we must rebuild the <strong>AFS</strong> file with the updated <strong>SRF<
 <p>Now we have an updated <strong>AFS</strong>, everything is ready to make the correct index file (<strong>IDX</strong>). You should keep a copy of the original AFS and IDX files in order to create the new files. To do that, it's pretty simple (<strong>A0114.AFS</strong> is again the example file):</p>
 
 <ol>
-	<li>Launch <a href="<?php echo ROOT_PATH; ?>/download.php#idx">IDX Creator</a>.</li>
+	<li>Launch <?php _PT("idx"); ?>.</li>
 	<li>In the <strong>Select the game to generate the proper IDX format</strong>, select <strong>Shenmue I</strong>.</li>
 	<li>Select the <strong>Create with template</strong> box, and then select the original <strong>A0114.IDX</strong> and <strong>A0114.AFS</strong> files.</li>
 	<li>For the <strong>Modified AFS</strong> field, choose the updated <strong>A0114.AFS</strong> file.</li>
@@ -132,6 +133,14 @@ directory and run the image creation for the <strong>Dreamcast</strong>.</p>
 
 <p>To translate NPC characters speechs in this version of the game, you need to edit the .SRF files located inside the <strong>FREE&lt;DISC_NUMBER&gt;.AFS</strong> and <strong>FREE&lt;DISC_NUMBER&gt;.IDX</strong>, but these subtitles don't have the correct order, so the best way to translate this is using the <strong>HUMANS.AFS</strong> file. The associated index file (<strong>HUMANS.IDX</strong>) is <strong>NOT</strong> needed.</p>
 
+<p>In clear, in <strong>Shenmue One Engine</strong> games, Free Quest subtitles are in duplicates places:</p>
+<ul>
+	<li><strong>FREE&lt;DISC_NUMBER&gt;.AFS</strong>, which are the subtitles read by the game but much difficult to translate (because without context);</li>
+	<li><strong>HUMANS.IDX</strong>, the subtitles contained here aren't used by the game but it most easier to translate from there because subtitles are in the correct order.</li>
+</ul>
+
+<p>We'll see in this tutorial how to import datas from <strong>HUMANS.IDX</strong> to the proper <strong>FREE&lt;DISC_NUMBER&gt;.AFS</strong> file.</p>
+
 <div>The <strong>HUMANS.AFS</strong> contains NPC characters datas, splitted in two files, always on this form:</div>
 <ul>
 	<li><strong>&lt;NPC_CHARID&gt;.PKF:</strong> Contains textures data (in PVR) for the model (face and body) ;</li>
@@ -143,10 +152,10 @@ directory and run the image creation for the <strong>Dreamcast</strong>.</p>
 
 <div>These tools are needed to translate these NPC:</div>
 <ul>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#fq">Free Quest Subtitles Editor</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#srf">Cinematics Subtitles Editor</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download.php#idx">IDX Creator</a></li>
+	<li><?php _PT("afs"); ?></li>
+	<li><?php _PT("fq"); ?></li>
+	<li><?php _PT("srf"); ?></li>
+	<li><?php _PT("idx"); ?></li>
 </ul>
 
 <?php print_set_to_top(); ?>
@@ -157,7 +166,7 @@ directory and run the image creation for the <strong>Dreamcast</strong>.</p>
 <p>The first thing to do is to extract all the subtitles from the Disc 1's <strong>FREE01.AFS</strong> file (Contains all the subtitle files for the NPCs on Disc 1). To do that, do the following:</p>
 
 <ol>
-	<li>Run <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
+	<li>Run <?php _PT("afs"); ?> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
 	<li>Select the <strong>\SCENE\01\NPC\FREE01.AFS</strong> file and click <strong>OK</strong>.</li>
 	<li>Select the <strong>FREE01.AFS</strong> on the left.</li>
 	<li>Click on the <strong>Tools</strong> &gt; <strong>Mass extraction...</strong> menu item.</li>
@@ -166,7 +175,9 @@ directory and run the image creation for the <strong>Dreamcast</strong>.</p>
 	<li>You have succesfully unpacked the Disc 1 Free Quest files. Great job!</li>
 </ol>
 
-<p>If you use a pirated version of the game, you won't see the original files name in the archive. SO PLEASE DON'T USE PIRATED VERSIONS OF THIS GAME. You'll unable to recongnize SRF or STR files.</p>
+<?php 
+	print_warning("IF YOU USE A PIRATED VERSION OF THE GAME, YOU WON'T SEE THE ORIGINAL FILES NAME IN THE ARCHIVE, SO PLEASE, DON'T USE SUCH VERSION."); 
+?>
 
 <?php print_set_to_top_section("fq1"); ?>
 
@@ -176,7 +187,7 @@ directory and run the image creation for the <strong>Dreamcast</strong>.</p>
 <p>Next, you have to extract all the NPC datas from the <strong>HUMANS.AFS</strong> file. You only need to unpack one HUMANS file from any of the discs, as it contains all the subtitles of the entire game.</p>
 
 <ol>
-	<li>Run <a href="<?php echo ROOT_PATH; ?>/download.php#afs">AFS Utils</a> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
+	<li>Run <?php _PT("afs"); ?> and select the <strong>File</strong> &gt; <strong>Open files...</strong> command.</li>
 	<li>Select the <strong>\SCENE\01\NPC\HUMANS.AFS</strong> file and click <strong>OK</strong>.</li>
 	<li>Select the <strong>HUMANS.AFS</strong> on the left.</li>
 	<li>Click on the <strong>Tools</strong> &gt; <strong>Mass extraction...</strong> menu item.</li>
@@ -194,18 +205,18 @@ directory and run the image creation for the <strong>Dreamcast</strong>.</p>
 <!-- Shenmue I : Subtitles in Free Quest mode / Translating a NPC character speech -->
 <h3>Translating a NPC character speech</h3>
 
-<p>You have successfully located the <strong>HUMANS.AFS</strong> archive? Great! So you can now translating NPC characters. To do that, you'll need <a href="<?php echo ROOT_PATH; ?>/download.php#fq">Free Quest Subtitles Editor</a>.</p>
+<p>You have successfully located the <strong>HUMANS.AFS</strong> archive? Great! So you can now translating NPC characters. To do that, you'll need <?php _PT("fq"); ?>.</p>
 
 <p>A lot of text is identical so to accelerate the translation you can if you want use the <strong>Global-Translation</strong> (allowing 
 you to translate identical text in one time, using a very fast module) or the <strong>Multi-Translation</strong> (it's a little more slow but you can translate in the original context). Try them both to choose your prefered version.</p>
 
-<p>You can take the <strong>INE_.PKS</strong> file for the example. This is the subtitle sheet for Ine Hayata, who is always at Hazuki Residence. After the game intro and getting the first allowance, you can find her here:</p>
+<p>You can take the <strong>INE_.PKS</strong> file for the example. This is the subtitle sheet for <strong>Ine Hayata ("Ine-san")</strong>, who is always at <strong>Hazuki Residence</strong>. After the game intro and getting the first allowance, you can find her here:</p>
 
 <?php print_screenshot("1_Freequest02", "Ine-san in Hazuki's Residence.", "Ine-san."); ?>
 
-<div>Now, open the <strong>INE_.PKS</strong> file with <a href="<?php echo ROOT_PATH; ?>/download.php#fq">Free Quest Subtitles Editor</a>. To do that, do the following:</div>
+<div>Now, open the <strong>INE_.PKS</strong> file with <?php _PT("fq"); ?>. To do that, do the following:</div>
 <ol>
-	<li>Run the <a href="<?php echo ROOT_PATH; ?>/download.php#fq">Free Quest Subtitles Editor</a>. 
+	<li>Run the <?php _PT("fq"); ?>. 
 	If a window pop ups to inform you a <em>newer version of the hacking algorithm</em>, you can close it (I think that you never have used old versions of this editor).</li>	
 	<li>Click on the <strong>File</strong> &gt; <strong>Open files...</strong> command and select the <strong>INE_.PKS</strong> file in the list.</li>
 	<li>The file will be opened on the editor. You can now edit your subtitles. Don't forget to save your file!</li>
@@ -224,12 +235,12 @@ With this functionnality you can edit multi files in the same time.</p>
 <p>After you translated the characters, you need to export all the contents to the .SRF files located at the FREE<DISC_NUMBER>.AFS. For this example we'll be using Disc 1's FREE01.AFS.</p>
 
 <ol>
-    <li>Run AiO Free Quest Subtitles Editor and open all the contents inside the HUMANS folder.</li>
+    <li>Run <?php _PT("fq"); ?> and open all the contents inside the HUMANS folder.</li>
     <li>Click on the Tools > Batch Cinematics script... menu item.</li>
     <li>Select the target directory where the exported .XML files will be generated.</li>
     <li>Select the disc you are going to export (Disc 1).</li>
     <li>Click on the Generate button.</li>
-    <li>After all Disc 1 .XML files are generated, click on the Done button, then close the AiO Free Quest Subtitles Editor.</li>
+    <li>After all Disc 1 .XML files are generated, click on the Done button, then close the <?php _PT("fq"); ?>.</li>
 </ol>
 
 <?php print_screenshot("1_Freequest04", "Here, all subtitles of the 'INE_' NPC were modified with the same value.", "After modifying subtitles in your editor..."); ?>
@@ -239,7 +250,7 @@ In order to export the right FREE for the right disc, you'll need to select one 
 Before continuing, it's recommended that you remove the "_srf_discX" from all the .XML filenames.
 
 <ol>
-    <li>Run AiO Cinematics Subtitles Editor and open all the .SRF files inside the FREE01 folder.</li>
+    <li>Run <?php _PT("srf"); ?> and open all the .SRF files inside the FREE01 folder.</li>
     <li>Click on the Tools -> Batch import... menu item.</li>
     <li>Select the folder where you exported all the .XML files.</li>
     <li>Click on the Import button.</li>
@@ -254,7 +265,7 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 <!-- Shenmue I : Subtitles in Free Quest mode / Repacking the FREE<DISC_NUMBER>.AFS -->
 <h3>Repacking the FREE&lt;DISC_NUMBER&gt;.AFS</h3>
 
-<p>The last step is repacking the FREE01.AFS file with our hacked subtitle files. You can do this with AFS Utils or if you have only one file to replace, with AFS Explorer.</p>
+<p>The last step is repacking the FREE01.AFS file with our hacked subtitle files. You can do this with <?php _PT("afs"); ?> or if you have only one file to replace, with <?php _PT("afsex"); ?>.</p>
 
 <p>After creating new FREE01.AFS, don't forget to create a new .IDX file WITH TEMPLATE. Otherwise, the process won't work and you won't be able to hear the voices, plus the subtitles will be read from a different file. Copy both .AFS and .IDX files it on the \SCENE\01\STREAM\ directory and run the image creation process.</p>
 
@@ -289,15 +300,15 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 <p>These tools are needed for this menu:</p>
 
 <ul>
-    <li>SPR Utils</li>
-    <li>Adobe Photoshop PVR plugin</li>
+    <li><?php _PT("spr"); ?></li>
+    <li><?php _PT("pvr"); ?></li>
 </ul>
 
 <p>In this case, because the file is compressed with .GZ, we have to decompress it before we are able to work with it.</p>
 
 <ol>
-	<li>Decompress the TITLE4_E.SPR with WinRAR, WinZip or 7Zip.</li>
-    <li>Run SPR Utils and open the TITLE4_E.SPR.</li>
+	<li>Decompress the TITLE4_E.SPR with <?php _PEL("WinRAR", "http://www.rarlab.com/"); ?>, <?php _PEL("WinZip", "http://www.winzip.com/"); ?> or <?php _PEL("7-zip", "http://www.7-zip.org/"); ?>.</li>
+    <li>Run <?php _PT("spr"); ?> and open the TITLE4_E.SPR.</li>
     <li>Click on the Tools > Mass extraction... menu item.</li>
     <li>Select the output folder and press OK! The TITLE4_E directory'll be created in the output folder, and will contain each file packed in the TITLE4_E.SPR file.</li>
     <li>You have succesfully unpacked the TITLE4_E.SPR file. Well done!</li>
@@ -314,7 +325,7 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 <p>Edit the files you need to edit. When you are done, it's time to repack them.</p>
 
 <ol>
-    <li>Run SPR Utils and click on the File > New menu item.</li>
+    <li>Run <?php _PT("spr"); ?> and click on the File > New menu item.</li>
     <li>Open the .XML file that it's with the .PVR files.</li>
     <li>Make sure Tools > Rewrite PVR global index at creation is activated.</li>
     <li>FOR .GZ FILES ONLY: Activate Tools > GZip output file at creation.</li>
@@ -362,14 +373,14 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 <p>Shenmue I's models are contained inside .MT5 files, which have both geometry and textures. For this purpose, you will need this:</p>
 
 <ul>
-    <li>Adobe Photoshop PVR plugin</li>
-    <li>Models Textures Editor</li>
+    <li><?php _PT("pvr"); ?></li>
+    <li><?php _PT("mt"); ?></li>
 </ul>
 
 <p>Editing these files is easy as pie. For this example, we are going to look on the SCENE/01/D000 folder, on Disc 1.</p>
 
 <ol>
-    <li>Run Models Textures Editor and open all the .MT5 files inside the SCENE/01/D000.</li>
+    <li>Run <?php _PT("mt"); ?> and open all the .MT5 files inside the SCENE/01/D000.</li>
     <li>Pick one of the models from the list on the left.</li>
     <li>Hit the F3 key to see a preview of the textures you are seeing.</li>
     <li>Check the textures on the right side to see which ones need translation, then Export them.</li>
@@ -428,26 +439,26 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 
 <div>These tools are needed to do this:</div>
 <ul>
-	<li><a href="<?php echo ROOT_PATH; ?>/download/#ipac">IPAC Browser</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download/#spr">SPR Utils</a></li>
-	<li><a href="<?php echo ROOT_PATH; ?>/download/#addons">Sega PVR Tools</a></li>
+	<li><?php _PT("ipac"); ?></li>
+	<li><?php _PT("spr"); ?></li>
+	<li><?php _PT("pvr"); ?></li>
 </ul>
 
 <p>This operation is really easy to do. Follow the guide.</p>
 
 <ol>
-    <li>Open IPAC Browser and select the MISC/TEXTURES.PKS file.</li>
-    <li>In the IPAC Browser view, extract the LD_NL.SPR entry. To do that, right-click on the LD_NL.SPR, then select the Export... command.</li>
-    <li>Run SPR Utils, then select the previous extracted LD_NL.SPR file.</li>
-    <li>In the SPR Utils window, extract the only texture contained in this SPR package: the "loading" texture.</li>
+    <li>Open <?php _PT("ipac"); ?> and select the MISC/TEXTURES.PKS file.</li>
+    <li>In the <?php _PT("ipac"); ?> view, extract the LD_NL.SPR entry. To do that, right-click on the LD_NL.SPR, then select the Export... command.</li>
+    <li>Run <?php _PT("spr"); ?>, then select the previous extracted LD_NL.SPR file.</li>
+    <li>In the <?php _PT("spr"); ?> window, extract the only texture contained in this SPR package: the "loading" texture.</li>
     <li>You can now edit the loading.pvr file.</li>
 </ol>
 
-<p>After doing this you must repack the loading.pvr with SPR Utils, then update the MISC/TEXTURES.PKS with IPAC Browser.</p>
+<p>After doing this you must repack the loading.pvr with <?php _PT("spr"); ?>, then update the MISC/TEXTURES.PKS with <?php _PT("ipac"); ?>.</p>
 
-<p>Here is an example of the result:</p>
+<!--p>Here is an example of the result:</p>
 
-<?php print_screenshot("Loading", "Okay, the Loading screen was updated!", "Okay, the Loading screen was updated!"); ?>
+<!--?php print_screenshot("Loading", "Okay, the Loading screen was updated!", "Okay, the Loading screen was updated!"); ?-->
 
 <p>The following files are IPACs with .SPR files inside:</p>
 
@@ -461,7 +472,7 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 	print_table_footer();
 ?>
 
-<p>For the .PVR version, right now the IPAC Browser doesn't display these .PVRs right, so we'll need to rip our way through.</p>
+<p>For the .PVR version, right now the <?php _PT("ipac"); ?> doesn't display these .PVRs right, so we'll need to rip our way through.</p>
 
 <p>The following files are IPACs with .PVR files inside:</p>
 
