@@ -4,6 +4,9 @@ CRI_Middleware_ADX_Tools_v1.15_Linux_Win32.rar;ADX Tools;1.15;http://www.cri-mw.
 adxutil_221.zip;ADXUtil;2.21;;"Verdi&nbsp;Kasugano";This program can handle AFS and ADX files.
 afs2wav_10.zip;AFS2WAV;1.0;http://sbibuilder.shorturl.com/;SiZiOUS;AFS2WAV is a AFS to WAV converter. It's a GUI of the <strong>ADXUtil</strong> tool from <strong>Verdi Kasugano</strong>.
 AFSExplorer_3_7.rar;AFS Explorer;3.7;;DTE-NG;"Allow you to patch AFS file much faster than <a href=""#afs"">AFS Utils</a> but have some limitation if the patched file is too big."
+AFSPacker-v1.1.7z;AFS Packer;1.1;http://pacochan.tales-tra.com/programas/afs-packer/;PacoChan;"AFS Packer can extract the files of an AFS archive to a folder, or
+generate a new AFS archive with the files inside a folder. The AFS format
+is used in many games. Many of them from Sega. Console version only. Requires <a href=""http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=333325fd-ae52-4e35-b531-508d977d32a6"" target=""_blank"">.NET Framework v3.5</a>."
 am2drvext.zip;AM2 DTPK sound driver extractor;0.00;http://snesmusic.org/hoot/kingshriek/ssf/;kingshriek;"Extract the AM2 DTPK sound driver. Requires <a href=""http://www.python.org/"" target=""_blank"">Python framework.</a>"
 binhack32_1.0.0.3-Win32_Linux.zip;Binhack 32bits clone;1.0.0.3;http://www.metagames-eu.com/forums/dreamcast/binhack32-un-clone-de-binhack-en-32bit-122802.html;FamilyGuy;This is a 32bits BINHACK clone, designed to hack the IP.BIN bootstrap and the 1ST_READ.BIN Dreamcast binary. <strong>Windows</strong> and <strong>Linux</strong> binaries and complete <strong>source code</strong> included.
 demul-0.57-wip.7z;DEmul Emulator;0.57;http://demul.emulation64.com/;DEmul Team;"Another great <strong>Dreamcast Emulator</strong>, which supports Shenmue very well. You'll need a <strong>Dreamcast BIOS</strong> in order to run it (Don't ask here for this)."
