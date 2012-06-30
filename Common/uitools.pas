@@ -301,6 +301,9 @@ var
   ShortCutStr: string;
 
 begin
+  // Fix for Unstyled Windows
+  ToolBar.Transparent := ThemeServices.ThemesEnabled;
+  
   // Associating each ToolButton with the appropriate MenuItem
   for i := 0 to ToolBar.ButtonCount - 1 do
     if ToolBar.Buttons[i].Style = tbsButton then begin

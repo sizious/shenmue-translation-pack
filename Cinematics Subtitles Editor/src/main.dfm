@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = '< Dynamic Title > // SRF Editor'
-  ClientHeight = 496
+  ClientHeight = 515
   ClientWidth = 572
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -24,7 +24,7 @@ object frmMain: TfrmMain
   TextHeight = 13
   object sbMain: TStatusBar
     Left = 0
-    Top = 477
+    Top = 496
     Width = 572
     Height = 19
     Panels = <
@@ -40,6 +40,7 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
+    ExplicitTop = 477
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -190,26 +191,28 @@ object frmMain: TfrmMain
     Left = 155
     Top = 29
     Width = 414
-    Height = 445
+    Height = 464
     Margins.Left = 4
     Align = alClient
     Caption = ' Editor : '
     TabOrder = 2
+    ExplicitHeight = 445
     DesignSize = (
       414
-      445)
+      464)
     object lOldSub: TLabel
       Left = 11
-      Top = 340
+      Top = 359
       Width = 79
       Height = 13
       Anchors = [akLeft, akBottom]
       AutoSize = False
       Caption = '<Generated>'
+      ExplicitTop = 340
     end
     object lblText: TLabel
       Left = 11
-      Top = 383
+      Top = 402
       Width = 48
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -218,33 +221,36 @@ object frmMain: TfrmMain
     end
     object Label3: TLabel
       Left = 7
-      Top = 418
+      Top = 437
       Width = 77
       Height = 13
       Anchors = [akLeft, akBottom]
       Caption = 'First line length:'
+      ExplicitTop = 418
     end
     object Label4: TLabel
       Left = 142
-      Top = 418
+      Top = 437
       Width = 91
       Height = 13
       Anchors = [akLeft, akBottom]
       Caption = 'Second line length:'
+      ExplicitTop = 418
     end
     object Label8: TLabel
       Left = 288
-      Top = 418
+      Top = 437
       Width = 75
       Height = 13
       Anchors = [akRight, akBottom]
       Caption = 'Subtitles count:'
+      ExplicitTop = 418
     end
     object lvSubs: TJvListView
       Left = 11
       Top = 17
       Width = 394
-      Height = 302
+      Height = 321
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = <
         item
@@ -279,10 +285,11 @@ object frmMain: TfrmMain
         end
         item
         end>
+      ExplicitHeight = 302
     end
     object mOldSub: TMemo
       Left = 96
-      Top = 325
+      Top = 344
       Width = 309
       Height = 38
       Anchors = [akLeft, akRight, akBottom]
@@ -300,10 +307,11 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       WordWrap = False
+      ExplicitTop = 325
     end
     object mNewSub: TMemo
       Left = 96
-      Top = 369
+      Top = 388
       Width = 309
       Height = 39
       Anchors = [akLeft, akRight, akBottom]
@@ -320,10 +328,11 @@ object frmMain: TfrmMain
       TabOrder = 2
       WordWrap = False
       OnChange = mNewSubChange
+      ExplicitTop = 369
     end
     object eFirstLineLength: TEdit
       Left = 96
-      Top = 414
+      Top = 433
       Width = 30
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -331,10 +340,11 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 3
       Text = '(nb)'
+      ExplicitTop = 414
     end
     object eSecondLineLength: TEdit
       Left = 239
-      Top = 414
+      Top = 433
       Width = 30
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -342,10 +352,11 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 4
       Text = '(nb)'
+      ExplicitTop = 414
     end
     object eSubCount: TEdit
       Left = 369
-      Top = 414
+      Top = 433
       Width = 36
       Height = 21
       Anchors = [akRight, akBottom]
@@ -353,6 +364,7 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 5
       Text = '(nb)'
+      ExplicitTop = 414
     end
   end
   object gbFilesList: TGroupBox
@@ -360,7 +372,7 @@ object frmMain: TfrmMain
     Left = 3
     Top = 29
     Width = 148
-    Height = 445
+    Height = 464
     Margins.Right = 0
     Align = alLeft
     Caption = ' Files list: '
@@ -369,11 +381,12 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 3
+    ExplicitHeight = 445
     object lbFilesList: TListBox
       Left = 4
       Top = 17
       Width = 140
-      Height = 371
+      Height = 390
       Align = alClient
       ItemHeight = 13
       PopupMenu = pmFilesList
@@ -381,16 +394,18 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnKeyUp = lbFilesListKeyUp
       OnMouseUp = lbFilesListMouseUp
+      ExplicitHeight = 371
     end
     object Panel2: TPanel
       Left = 4
-      Top = 388
+      Top = 407
       Width = 140
       Height = 53
       Align = alBottom
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
+      ExplicitTop = 388
       DesignSize = (
         140
         53)

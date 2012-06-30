@@ -7,7 +7,7 @@ uses
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls,
   OpThBase, DiscAuth, Packer, JvBaseDlg, JvBrowseFolder, ExtDlgs, JvDialogs,
   JvRichEdit, Mask, JvExMask, JvToolEdit, JvMaskEdit, JvCheckedMaskEdit,
-  JvDatePickerEdit, GraphicEx;
+  JvDatePickerEdit;
 
 type
   TfrmMain = class(TForm)

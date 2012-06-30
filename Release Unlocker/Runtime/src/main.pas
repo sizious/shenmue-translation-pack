@@ -5,7 +5,7 @@ interface
 uses
   Windows, SysUtils, Forms, Graphics, Classes, Controls, StdCtrls, ComCtrls,
   ExtCtrls, JvExStdCtrls, JvCombobox, JvDriveCtrls, OpThBase, Unpacker, Common,
-  GraphicEx, AppEvnts, Dialogs, JvBaseDlg, JvBrowseFolder, JvRichEdit,
+  AppEvnts, Dialogs, JvBaseDlg, JvBrowseFolder, JvRichEdit,
   JvExComCtrls, JvListView, JvExControls, JvLinkLabel;
 
 type

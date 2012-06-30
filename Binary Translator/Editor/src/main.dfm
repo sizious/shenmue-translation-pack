@@ -51,6 +51,7 @@ object frmMain: TfrmMain
     Height = 26
     DisabledImages = ilToolBarDisabled
     EdgeBorders = [ebTop]
+    GradientEndColor = clBtnFace
     Images = ilToolBar
     List = True
     TabOrder = 1
@@ -201,7 +202,7 @@ object frmMain: TfrmMain
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 0
+      ItemHeight = 13
       Sorted = True
       TabOrder = 0
       OnSelect = cbSectionsSelect
@@ -877,7 +878,7 @@ object frmMain: TfrmMain
     Left = 288
     Top = 65532
     Bitmap = {
-      494C01010D000E00080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D000F00080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
