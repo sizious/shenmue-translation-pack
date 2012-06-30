@@ -107,7 +107,8 @@
 		<th>Format</th>
 		<th>Download</th>
 	</tr>
-<?php 
+<?php
+	
 	print_release_item(
 		"s2",
 		"Shenmue Master ~ Projet 5", 
@@ -145,7 +146,20 @@
 		"Release A",
 		"DVD",
 		"http://shenmuemaster.fr/"
-	);  	
+	);  
+
+	print_release_item(
+		"s1",
+		"Tio Victor &amp; Sega Saturno",
+		"http://tiovictor.romhackhispano.org/",		
+		"Spanish project by IlDucci, Ryo Suzuki, PacoChan and maybe others.",
+		"sp",
+		"dc",
+		"2012-06-17",
+		"1.0.1",
+		"CD-R 700MB",
+		"http://tiovictor.romhackhispano.org/"
+	);	
 ?>
 </table>
 
@@ -165,15 +179,7 @@
 		<th width="200">Team</th>		
 		<th>Description</th>
 	</tr>
-<?php
-	print_project(
-		"s1",
-		"Sega Saturno",
-		"http://www.segasaturno.com/",		
-		"Spanish project maintained <strong>Ryo Suzuki</strong>, <strong>IlDucci</strong> and maybe others.",
-		"sp"
-	);
-	
+<?php	
 	print_project(
 		"s1",
 		"Project Berkley",
