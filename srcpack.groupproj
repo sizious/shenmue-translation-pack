@@ -5,12 +5,10 @@
   <ItemGroup />
   <ItemGroup>
     <Projects Include="AFS Utils\src\afsutils.dproj" />
-    <Projects Include="AiO Cinematics Subtitles Editor\src\scinsube.dproj" />
-    <Projects Include="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" />
-    <Projects Include="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" />
-    <Projects Include="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
     <Projects Include="Binary Translator\Editor\src\binedit.dproj" />
+    <Projects Include="Cinematics Subtitles Editor\src\scinsube.dproj" />
     <Projects Include="Font Utility\src\fontutil.dproj" />
+    <Projects Include="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
     <Projects Include="IDX Creator\src\idxmaker.dproj" />
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
     <Projects Include="IPAC Browser\src\ipacedit.dproj" />
@@ -45,15 +43,6 @@
   <Target Name="idxmaker:Make">
     <MSBuild Projects="IDX Creator\src\idxmaker.dproj" Targets="Make" />
   </Target>
-  <Target Name="sfqsubed">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="" />
-  </Target>
-  <Target Name="sfqsubed:Clean">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="sfqsubed:Make">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Make" />
-  </Target>
   <Target Name="mteditor">
     <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="" />
   </Target>
@@ -62,15 +51,6 @@
   </Target>
   <Target Name="mteditor:Make">
     <MSBuild Projects="Models Textures Editor\src\mteditor.dproj" Targets="Make" />
-  </Target>
-  <Target Name="convert">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="" />
-  </Target>
-  <Target Name="convert:Clean">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="convert:Make">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Converter\src\convert.dproj" Targets="Make" />
   </Target>
   <Target Name="afsutils">
     <MSBuild Projects="AFS Utils\src\afsutils.dproj" Targets="" />
@@ -117,15 +97,6 @@
   <Target Name="nzmbiked:Make">
     <MSBuild Projects="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" Targets="Make" />
   </Target>
-  <Target Name="hdissect">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" Targets="" />
-  </Target>
-  <Target Name="hdissect:Clean">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="hdissect:Make">
-    <MSBuild Projects="AiO Free Quest Subtitles Editor\Dissecter\src\hdissect.dproj" Targets="Make" />
-  </Target>
   <Target Name="fontutil">
     <MSBuild Projects="Font Utility\src\fontutil.dproj" Targets="" />
   </Target>
@@ -143,15 +114,6 @@
   </Target>
   <Target Name="notebked:Make">
     <MSBuild Projects="Notebook Editor\src\notebked.dproj" Targets="Make" />
-  </Target>
-  <Target Name="scinsube">
-    <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="" />
-  </Target>
-  <Target Name="scinsube:Clean">
-    <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="scinsube:Make">
-    <MSBuild Projects="AiO Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
   <Target Name="binedit">
     <MSBuild Projects="Binary Translator\Editor\src\binedit.dproj" Targets="" />
@@ -171,14 +133,32 @@
   <Target Name="systalkc:Make">
     <MSBuild Projects="System Talk Subtitles Editor\src\systalkc.dproj" Targets="Make" />
   </Target>
+  <Target Name="scinsube">
+    <MSBuild Projects="Cinematics Subtitles Editor\src\scinsube.dproj" Targets="" />
+  </Target>
+  <Target Name="scinsube:Clean">
+    <MSBuild Projects="Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="scinsube:Make">
+    <MSBuild Projects="Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sfqsubed">
+    <MSBuild Projects="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="" />
+  </Target>
+  <Target Name="sfqsubed:Clean">
+    <MSBuild Projects="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sfqsubed:Make">
+    <MSBuild Projects="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;sfqsubed;mteditor;convert;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;hdissect;fontutil;notebked;scinsube;binedit;systalkc" />
+    <CallTarget Targets="idxwrite;idxmaker;mteditor;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;fontutil;notebked;binedit;systalkc;scinsube;sfqsubed" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;sfqsubed:Clean;mteditor:Clean;convert:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;hdissect:Clean;fontutil:Clean;notebked:Clean;scinsube:Clean;binedit:Clean;systalkc:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;mteditor:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;fontutil:Clean;notebked:Clean;binedit:Clean;systalkc:Clean;scinsube:Clean;sfqsubed:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;sfqsubed:Make;mteditor:Make;convert:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;hdissect:Make;fontutil:Make;notebked:Make;scinsube:Make;binedit:Make;systalkc:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;mteditor:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;fontutil:Make;notebked:Make;binedit:Make;systalkc:Make;scinsube:Make;sfqsubed:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
