@@ -120,6 +120,10 @@ object frmMain: TfrmMain
     object tsDisclamer: TTabSheet
       Caption = 'Warn'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDisclamerTitle: TLabel
         Left = 12
         Top = 12
@@ -158,6 +162,10 @@ object frmMain: TfrmMain
     object tsLicense: TTabSheet
       Caption = 'Eula'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblLicenseTitle: TLabel
         Left = 12
         Top = 12
@@ -216,6 +224,10 @@ object frmMain: TfrmMain
     object tsDiscAuth: TTabSheet
       Caption = 'Auth'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDiscAuthTitle: TLabel
         Left = 12
         Top = 12
@@ -10494,7 +10506,6 @@ object frmMain: TfrmMain
           Height = 22
           DriveTypes = [dtCDROM]
           Offset = 4
-          ItemHeight = 16
           TabOrder = 0
         end
       end
@@ -10517,6 +10528,10 @@ object frmMain: TfrmMain
     object tsAuthFail: TTabSheet
       Caption = 'AFail'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblAuthFailTitle: TLabel
         Left = 12
         Top = 12
@@ -10546,6 +10561,10 @@ object frmMain: TfrmMain
     object tsParams: TTabSheet
       Caption = 'Param'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblParamsTitle: TLabel
         Left = 12
         Top = 12
@@ -10624,6 +10643,10 @@ object frmMain: TfrmMain
     object tsReady: TTabSheet
       Caption = 'Ready'
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblReadyTitle: TLabel
         Left = 12
         Top = 12
@@ -10653,6 +10676,10 @@ object frmMain: TfrmMain
     object tsWorking: TTabSheet
       Caption = 'Work'
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblWorkingTitle: TLabel
         Left = 12
         Top = 12
@@ -10713,6 +10740,10 @@ object frmMain: TfrmMain
     object tsDone: TTabSheet
       Caption = 'Done'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDoneTitle: TLabel
         Left = 12
         Top = 12
@@ -10752,6 +10783,10 @@ object frmMain: TfrmMain
     object tsDoneFail: TTabSheet
       Caption = 'DFail'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblDoneFailTitle: TLabel
         Left = 12
         Top = 12
