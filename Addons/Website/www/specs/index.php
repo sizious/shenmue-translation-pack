@@ -92,6 +92,12 @@
 		<td>Cinematics</td>
 		<td>Cinematics file (SRF) format for Shenmue II. Used in <a href="<?php echo ROOT_PATH; ?>/download/#srf">Cinematics Subtitles Editor</a>.</td>
 	</tr>
+	<tr>
+		<td><a target="_blank" href="<?php echo ROOT_PATH; ?>/specs/files/s2seq/">/SCENE/XX/CODE/</a></td>
+		<td align="center"><img src="<?php echo ROOT_PATH; ?>/images/icons/html.gif" alt="HTML" title="HTML" /></td>				
+		<td>Cutscenes Description</td>
+		<td>Cutscenes code description, extracted from the game.</td>
+	</tr>	
 </table>
 
 </div>
