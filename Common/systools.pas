@@ -31,7 +31,7 @@ type
 // Functions
 //function ByteToStr(T: array of Byte): string; overload;
 function CopyFile(SourceFileName, DestFileName: TFileName;
-  FailIfExists: Boolean): Boolean;
+  FailIfExists: Boolean = False): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
 procedure Delay(Milliseconds: Double);
 procedure DeleteDirectory(DirectoryToRemove: TFileName);
