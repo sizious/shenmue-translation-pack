@@ -1,3 +1,6 @@
+(* This is a simple LZMA decoder wrapper.
+This is using an embedded 7zDec binary, you can find the source of this
+in the /addons/ directory. *)
 unit LZMADec;
 
 interface

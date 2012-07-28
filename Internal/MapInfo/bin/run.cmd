@@ -1,1 +1,5 @@
-mapinfo DCBN_01.BIN
+@echo off
+for /R %%f in (*.bin) do (
+mapinfo %%f
+)
+pause
