@@ -1,0 +1,1 @@
+This is a project to test the XML parsing for Binary Translator.

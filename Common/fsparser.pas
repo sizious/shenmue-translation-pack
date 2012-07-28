@@ -1,3 +1,8 @@
+(*
+  This unit was designed to parse the Shenmue files data.
+  Very suitable for multi-sections files, combined in one single file.
+  A very good example is COLD.BIN, MT files, MAPINFO.BIN files...
+*)
 unit FSParser;
 
 (* Please define this to enable the fast search algorithm, powered by the DCL.
@@ -44,7 +49,8 @@ type
     function Add(Name: string; AbsoluteOffset, Size: LongWord): Integer;
     procedure Clear;
   public
-    constructor Create(AOwner: TObject);
+    constructor Create; overload;
+    constructor Create(AOwner: TObject); overload;
     destructor Destroy; override;
     function IndexOf(SectionName: string): Integer;
     property Count: Integer read GetCount;
@@ -168,6 +174,11 @@ begin
 {$IFDEF USE_DCL}
   fOptimizationHashMap.Clear;
 {$ENDIF}
+end;
+
+constructor TFileSectionsList.Create;
+begin
+  Self.Create(nil);
 end;
 
 constructor TFileSectionsList.Create(AOwner: TObject);
