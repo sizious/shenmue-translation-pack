@@ -21,18 +21,18 @@ begin
 
       with BinaryHacker.PlaceHolders do
       begin
-        Add($280, $18);
-        Add($2A0, $D);
-        Add($2B5, $A);
-        Add($2C7, $9);
-        Add($98, $50);
+        Add(640, 24);
+        Add(672, 13);
+        Add(693, 10);
+        Add(711,  9);
+        Add(152, 80);
       end;
 
       with BinaryHacker.Strings do
       begin
-        Add($14, 'Another ultimate test #2 by SiZ!');
-        Add($4, 'This is the ultimate test #1');
-        Add($20, 'SiZ #3');
+        Add( 32, 'SiZ #3');
+        Add( 20, 'Another ultimate test #2 by SiZ!');
+        Add(  4, 'This is the ultimate test #1');
         Add(320, '0123456789');
         Add(324, 'Erick Sermon');
         Add(328, 'This is EPMD, Motha Fucka!');
@@ -54,7 +54,6 @@ begin
 
       BinaryHacker.PlaceHolders.DebugPrint;
       BinaryHacker.Strings.DebugPrint;
-
     except
       on E:Exception do
         Writeln(E.Classname, ': ', E.Message);
