@@ -4,9 +4,9 @@ program binhdbg;
 
 uses
   SysUtils,
-  binhack in 'binhack.pas',
   systools in '..\..\..\Common\systools.pas',
-  hashidx in '..\..\..\Common\hashidx.pas';
+  hashidx in '..\..\..\Common\hashidx.pas',
+  binhack in '..\..\..\Common\binhack.pas';
 
 var
   BinaryHacker: TBinaryHacker;
