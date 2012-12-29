@@ -37,8 +37,8 @@
     <DelphiCompile Include="binhdbg.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="..\..\..\Common\binhack.pas" />
     <DCCReference Include="..\..\..\Common\hashidx.pas" />
     <DCCReference Include="..\..\..\Common\systools.pas" />
-    <DCCReference Include="binhack.pas" />
   </ItemGroup>
 </Project>
