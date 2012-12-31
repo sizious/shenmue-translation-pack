@@ -65,7 +65,7 @@
 	}
 	
 	// Release
-	function print_release_item($game, $team_name, $team_url, $team_desc, $lang, $system, $date, $version, $format, $download_link) {		
+	function print_release_item($game, $team_name, $team_url, $team_desc, $lang, $system, $date, $version, $format, $download_link, $download_params = null) {		
 		$game_name = get_game_name($game);
 		$lang_name = get_language_name($lang);
 		$system_name = get_system_name($system);
@@ -78,7 +78,15 @@
 		<td align="center" nowrap="nowrap"><?php echo $version; ?></td>
 		<td align="center" nowrap="nowrap"><img src="<?php echo ROOT_PATH; ?>/images/icons/<?php echo $system; ?>.png" alt="<?php echo $system; ?>" title="<?php echo $system_name; ?>" /></td>
 		<td align="center" nowrap="nowrap"><?php echo $format; ?></td>
-		<td align="center"><form target='_blank' action="<?php echo $download_link; ?>"><input value="Get" type="submit"/></form></td>
+<?php
+		$dl_params = "";
+		if (isset($download_params)) {
+			foreach ($download_params as $key => $value) {
+				$dl_params .= "<input type='hidden' name='$key' value='$value'/>";
+			}
+		}
+?>
+		<td align="center"><form target='_blank' method='get' action="<?php echo $download_link; ?>"><?php echo $dl_params; ?><input value="Get" type="submit"/></form></td>
 </tr>
 <?php
 	}
@@ -119,7 +127,8 @@
 		"2012-01-25", 
 		"Release A",
 		"CD-R 700MB",
-		"http://shenmuemaster.fr/"
+		"http://eversonic.fr/shenmuemaster/forum/viewtopic.php",
+		array("t" => "655")
 	);
 
 	print_release_item(
@@ -132,7 +141,8 @@
 		"2012-01-26", 
 		"Release A",
 		"CD-R 900MB",
-		"http://shenmuemaster.fr/"
+		"http://eversonic.fr/shenmuemaster/forum/viewtopic.php",
+		array("t" => "655")
 	);
 
 	print_release_item(
@@ -145,20 +155,21 @@
 		"2012-01-30", 
 		"Release A",
 		"DVD",
-		"http://shenmuemaster.fr/"
+		"http://eversonic.fr/shenmuemaster/forum/viewtopic.php",
+		array("t" => "655")
 	);  
 
 	print_release_item(
 		"s1",
-		"Tio Victor &amp; Sega Saturno",
+		"Tío Víctor &amp; Sega Saturno",
 		"http://tiovictor.romhackhispano.org/",		
-		"Spanish project by IlDucci, Ryo Suzuki, PacoChan and maybe others.",
+		"Spanish project by IlDucci, Ryo Suzuki, PacoChan and contributors.",
 		"sp",
 		"dc",
-		"2012-06-17",
-		"1.0.1",
+		"2012-07-14",
+		"1.0.2",
 		"CD-R 700MB",
-		"http://tiovictor.romhackhispano.org/"
+		"http://tiovictor.romhackhispano.org/shenmue/"
 	);	
 ?>
 </table>
@@ -186,7 +197,16 @@
 		"http://nerox92.altervista.org/",		
 		"Italian project maintained by <strong>Nerox92</strong>.",
 		"it"
-	);	
+	);
+
+	print_project(
+		"s2",
+		"Tío Víctor &amp; Dreamcast.es",
+		"http://tiovictor.romhackhispano.org/",		
+		"Spanish project maintained by <strong>IlDucci</strong> and <a href='http://www.dreamcast.es/' target='_blank'>Dreamcast.es</a> team.",
+		"sp"
+	);
+	
 ?>	
 </table>
 
