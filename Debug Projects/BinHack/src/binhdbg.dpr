@@ -68,13 +68,16 @@ const
   SL = #$81#$9C#$90#$C2;
   BR = #$81#$95;
 
+var
+  ExtraSize: LongWord;
+
 begin
   BinaryHacker := TBinaryHacker.Create;
   try
 
     try
 
-      BinaryHacker.PlaceHolders.Add(9512, 600);
+      BinaryHacker.PlaceHolders.Add(9512, 539);
 
       with BinaryHacker.Strings do
       begin
@@ -92,7 +95,8 @@ begin
       end;
 
       BinaryHacker.MakeBackup := False;
-      WriteLn('ExtraSize: ', BinaryHacker.Execute('NBIK03USA.SCN'));
+      ExtraSize := BinaryHacker.Execute('NBIK03USA.SCN');
+      WriteLn('ExtraSize: ', ExtraSize);
 
       BinaryHacker.PlaceHolders.DebugPrint;
       BinaryHacker.Strings.DebugPrint;
