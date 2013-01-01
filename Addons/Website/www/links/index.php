@@ -97,7 +97,7 @@
 
 <h2>Translation Projects</h2>
 
-<p>The section below contains all links to translation projects, grouped by status.</p>
+<p>The section below contains all links to translation projects, grouped by status. Remember, you can't directly download any translated production here, only the tools pack allowing you to start a translation project.</p>
 
 <h3>Completed</h3>
 
@@ -201,9 +201,9 @@
 
 	print_project(
 		"s2",
-		"Tío Víctor &amp; Dreamcast.es",
+		"Tío Víctor",
 		"http://tiovictor.romhackhispano.org/",		
-		"Spanish project maintained by <strong>IlDucci</strong> and <a href='http://www.dreamcast.es/' target='_blank'>Dreamcast.es</a> team.",
+		"Spanish project maintained by <strong>IlDucci</strong>.",
 		"sp"
 	);
 	
@@ -229,11 +229,27 @@
 <?php
 	print_project(
 		"s1",
+		"Hiei-",
+		"http://www.hiei-tf.fr/shenmue1-howtotranslate-english.html",		
+		"French project maintained by <strong>Hiei-</strong>.",
+		"fr"
+	);
+	
+	print_project(
+		"s1",
 		"Shenmue Brazil",
 		"http://www.shenmuebrasil.com/",		
 		"Brazilian project maintained by <strong>PlusTuta</strong>.",
 		"br"
 	);
+	
+	print_project(
+		"s2",
+		"Dreamcast.es",
+		"http://www.dreamcast.es/",		
+		"Spanish project maintained by the <strong>Dreamcast.es</strong> team.",
+		"sp"
+	);	
 ?>	
 </table>
 
