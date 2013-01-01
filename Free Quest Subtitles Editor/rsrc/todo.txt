@@ -1,0 +1,3 @@
+- chercher un charID dans la liste des fichiers
+- drag and drop file to open
+- Quand le fichier édité est en lecture seul: prévenir
