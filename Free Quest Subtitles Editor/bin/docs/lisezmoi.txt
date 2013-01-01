@@ -1,0 +1,69 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                                           _________________________________
+ __| Shenmue AiO Free Quest Subtitles Editor |_________________________________
+
+  Shenmue AiO Free Quest Subtitles Editor est un logiciel libre qui permet de 
+  modifier les sous-titres des personnages non jouables (NPC) de la série 
+  Shenmue, incluant:
+  
+    - What's Shenmue (DC)
+    - Shenmue I (DC)
+    - Shenmue II (DC / XBOX)
+
+  Vous pouvez parler à ces NPC lorsque vous êtes en mode Free Quest 
+  (c'est-à-dire dans la rue). Si vous voulez traduire les sous-titres des
+  cinématiques, utilisez l'éditeur "Shenmue AiO Subtitles Editor" à la place.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  Les fichiers des NPC sont localisés dans le fichier AFS appelé "HUMANS.AFS".
+  Cet AFS est localisé dans le dossier 'SCENE\<DISC_NUM>\NPC'.
+   
+  Premièrement, vous devez extraire le contenu de "HUMANS.AFS" dans un 
+  dossier. Après, vous pouvez utiliser le menu "Select directory" 
+  (sélectionner dossier) depuis le menu principal de cet éditeur pour 
+  récupérer chaque NPC à éditer.
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  Ce programme utilise des fichiers supplémentaires. Tous ces fichiers sont
+  situés dans le dossier "data".
+  
+  Structure du dossier "data":
+    - npc_info.csv   : Contient des informations sur les NPC (Sexe, type...)
+    - chrlistX.csv   : Ce fichier est utilisé pour le support des caractères 
+                       accentués. Ouvrez-le avec un éditeur de texte pour voir 
+                       les caractères disponibles. Il existe 2 versions, une
+                       pour Shenmue I et l'autre pour Shenmue II.
+    - faces          : Ce dossier contient des images de visage pour les NPC.
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Code additionnel....: Manic
+  Tests Alpha/Beta....: Shendream, Sadako
+  Merci à.............: Manic, Shendream, Sadako, Hiei-, kogami-san, Dark_Neo,
+                        mimix, Sunmingzhao, MagicSeb, FamilyGuy et tous ceux
+                        qui nous supportent.
+ _____________________________________________________________________[ FIN ]___
