@@ -8,7 +8,7 @@
     <Projects Include="Binary Translator\Editor\src\binedit.dproj" />
     <Projects Include="Cinematics Subtitles Editor\src\scinsube.dproj" />
     <Projects Include="Font Utility\src\fontutil.dproj" />
-    <Projects Include="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" />
+    <Projects Include="Free Quest Subtitles Editor\src\sfqsubed.dproj" />
     <Projects Include="IDX Creator\src\idxmaker.dproj" />
     <Projects Include="IDX Creator\src\idxwrite.dproj" />
     <Projects Include="IPAC Browser\src\ipacedit.dproj" />
@@ -144,15 +144,6 @@
   <Target Name="scinsube:Make">
     <MSBuild Projects="Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
-  <Target Name="sfqsubed">
-    <MSBuild Projects="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="" />
-  </Target>
-  <Target Name="sfqsubed:Clean">
-    <MSBuild Projects="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="sfqsubed:Make">
-    <MSBuild Projects="Free Quest Subtitles Editor\Editor\src\sfqsubed.dproj" Targets="Make" />
-  </Target>
   <Target Name="rlzulock">
     <MSBuild Projects="Release Unlocker\Runtime\src\rlzulock.dproj" Targets="" />
   </Target>
@@ -171,14 +162,23 @@
   <Target Name="rlzmaker:Make">
     <MSBuild Projects="Release Unlocker\Designer\src\rlzmaker.dproj" Targets="Make" />
   </Target>
+  <Target Name="sfqsubed">
+    <MSBuild Projects="Free Quest Subtitles Editor\src\sfqsubed.dproj" Targets="" />
+  </Target>
+  <Target Name="sfqsubed:Clean">
+    <MSBuild Projects="Free Quest Subtitles Editor\src\sfqsubed.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sfqsubed:Make">
+    <MSBuild Projects="Free Quest Subtitles Editor\src\sfqsubed.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;mteditor;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;fontutil;notebked;binedit;systalkc;scinsube;sfqsubed;rlzulock;rlzmaker" />
+    <CallTarget Targets="idxwrite;idxmaker;mteditor;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;fontutil;notebked;binedit;systalkc;scinsube;rlzulock;rlzmaker;sfqsubed" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;mteditor:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;fontutil:Clean;notebked:Clean;binedit:Clean;systalkc:Clean;scinsube:Clean;sfqsubed:Clean;rlzulock:Clean;rlzmaker:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;mteditor:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;fontutil:Clean;notebked:Clean;binedit:Clean;systalkc:Clean;scinsube:Clean;rlzulock:Clean;rlzmaker:Clean;sfqsubed:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;mteditor:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;fontutil:Make;notebked:Make;binedit:Make;systalkc:Make;scinsube:Make;sfqsubed:Make;rlzulock:Make;rlzmaker:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;mteditor:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;fontutil:Make;notebked:Make;binedit:Make;systalkc:Make;scinsube:Make;rlzulock:Make;rlzmaker:Make;sfqsubed:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
