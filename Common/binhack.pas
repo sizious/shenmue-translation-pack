@@ -68,7 +68,7 @@ type
     fItemsList: TList;
     fWorkingGrowOffset: LongWord;
     procedure Clear;
-    procedure Initialize(const FileSize: LongWord);
+    procedure Initialize(OutputFileStream: TFileStream);
     procedure CloseStringWriteContext(Context: TPlaceHolderContext);
     function GetCount: Integer;
     function GetExtraBlocksSizeWritten: LongWord;
@@ -159,7 +159,7 @@ type
     fPlaceHolders: TBHPlaceHolders;
     fStrings: TBHStrings;
     fMakeBackup: Boolean;
-    procedure Initialize(const FileSize: LongWord);
+    procedure Initialize(OutputFileStream: TFileStream);
   public
     // Constructor... (of course you know that)
     constructor Create;
@@ -228,7 +228,7 @@ begin
   fTargetFileStream := TFileStream.Create(FileName, fmOpenWrite);
   try
     // Initializing Engine
-    Initialize(fTargetFileStream.Size);
+    Initialize(fTargetFileStream);
 
     // Writing each String... (starting with the biggest)
     for i := Strings.Count - 1 downto 0 do
@@ -268,13 +268,13 @@ begin
   end;
 end;
 
-procedure TBinaryHacker.Initialize(const FileSize: LongWord);
+procedure TBinaryHacker.Initialize(OutputFileStream: TFileStream);
 begin
   // Sorting lists before working
   Strings.Sort;
 
   // Initializing Place Holders...
-  PlaceHolders.Initialize(FileSize);
+  PlaceHolders.Initialize(OutputFileStream);
 end;
 
 { TBHStrings }
@@ -473,7 +473,7 @@ var
     Result := -1;
     Found := False;
     i := Count - 1; // starting with the biggest space
-    while (not Found) and (i > 0) do
+    while (not Found) and (i >= 0) do
     begin
       Found := Items[i].fSizeSpaceRemaining >= StringSize; // we found a better place holder!
       Dec(i);
@@ -525,12 +525,25 @@ begin
   Result := TBHPlaceHolderItem(fItemsList[Index]);
 end;
 
-procedure TBHPlaceHolders.Initialize(const FileSize: LongWord);
+procedure TBHPlaceHolders.Initialize(OutputFileStream: TFileStream);
+var
+  i: Integer;
+  Offset: Int64;
+  
 begin
   // Initializing the Extra PlaceHolder
   if GrowMethod = gmEOF then
-    GrowOffset := FileSize;
+    GrowOffset := OutputFileStream.Size;
   // else, the GrowOffset was designed!
+
+  // Cleaning the place holders...
+  Offset := OutputFileStream.Position;
+  for i := 0 to Count - 1 do
+  begin
+    OutputFileStream.Seek(Items[i].Offset, soFromBeginning);
+    WriteNullBlock(OutputFileStream, Items[i].Size);
+  end;
+  OutputFileStream.Seek(Offset, soFromBeginning);
 end;
 
 procedure TBHPlaceHolders.Reset;

@@ -84,7 +84,7 @@ function Right(SubStr: string; S: string): string;
 function RunNoWait(const TargetFileName: TFileName): Boolean;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
 function VariantToString(V: Variant): string;
-procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
+procedure WriteNullBlock(F: TFileStream; const Size: LongWord);
 procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
   const WriteNullEndChar: Boolean = True);
 {$IFDEF DEBUG}
@@ -821,7 +821,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure WriteNullBlock(var F: TFileStream; const Size: LongWord);
+procedure WriteNullBlock(F: TFileStream; const Size: LongWord);
 const
   MAX_BUFFER_SIZE = 32;
 
