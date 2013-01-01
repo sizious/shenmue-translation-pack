@@ -464,7 +464,7 @@ function TBHPlaceHolders.OpenStringWriteContext(StringSize: LongWord): TPlaceHol
 var
   FoundArea: Boolean;
 
-  function _Find: Integer;
+  function _FindNewPlaceHolder: Integer;
   var
     Found: Boolean;
     i: Integer;
@@ -493,7 +493,7 @@ begin
   if not FoundArea then
   begin
     Sort;
-    fCurrentPlaceHolderIndex := _Find;
+    fCurrentPlaceHolderIndex := _FindNewPlaceHolder;
   end;
 
   
