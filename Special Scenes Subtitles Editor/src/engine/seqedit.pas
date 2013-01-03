@@ -85,6 +85,7 @@ type
     fDumpedSceneInputFileName: TFileName;
     fSubtitles: TSpecialSequenceSubtitlesList;
     fCharset: TShenmueCharsetCodec;
+    fSequenceDatabaseIndex: Integer;
   protected
     procedure UpdateDumpedSceneFile;
     property DumpedSceneInputFileName: TFileName read fDumpedSceneInputFileName;
@@ -139,7 +140,8 @@ end;
 constructor TSpecialSequenceEditor.Create;
 begin
   fSequenceDatabase := TSequenceDatabase.Create;
-  SevenZipExtract(GetApplicationDataDirectory + SEQINFO_DB, GetWorkingTempDirectory);
+  SevenZipExtract(GetApplicationDataDirectory + SEQINFO_DB,
+    GetWorkingTempDirectory);
   SequenceDatabase.LoadDatabase(GetWorkingTempDirectory + SEQINFO_XML);
   fCharset := TShenmueCharsetCodec.Create;
   fSubtitles := TSpecialSequenceSubtitlesList.Create(Self);
@@ -167,8 +169,8 @@ var
   Input: TFileStream;
   DumpedSceneInput: TFileStream;
   i: Integer;
-  FileInfo: Integer;
-  
+  StringPtrs: TStringPointersList;
+
 begin
 {$IFDEF DEBUG}
   WriteLn('*** READING FILE ***');
@@ -196,13 +198,18 @@ begin
       DumpedSceneInput.Seek(0, soFromBeginning);
 
       // Detect the file version
-      FileInfo := SequenceDatabase.IdentifyFile(DumpedSceneInput);
-      Result := FileInfo <> -1;
+      fSequenceDatabaseIndex := SequenceDatabase.IdentifyFile(DumpedSceneInput);
+      Result := fSequenceDatabaseIndex <> -1;
       if Result then begin
 
         // The file was successfully opened
         fSourceFileName := FileName;
         fLoaded := True;
+
+        // Loading string pointers...
+        StringPtrs := SequenceDatabase[fSequenceDatabaseIndex].StringPointers;
+        for i := 0 to StringPtrs.Count - 1 do
+          StringPointersList.Add(Pointer(StringPtrs[i].StringPointer));
 
         // Calculating the beginning of the subtitles table
         DumpedSceneInput.Seek(Integer(StringPointersList[0]), soFromBeginning);
@@ -221,7 +228,7 @@ begin
   finally
     Input.Free;
     DumpedSceneInput.Free;
-  end;  
+  end;
 end;
 
 function TSpecialSequenceEditor.Save: Boolean;
