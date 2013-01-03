@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>	
+<SequenceFileInfoDatabase>
+	<SequenceFileInfo Offset="$24EC" Id="#$22#$02#$00#$00#$EA#$D3#$FF#$FF">
+		<Identifier>		
+			<SequenceID>NBIK</SequenceID>
+			<DiscID>3</DiscID>
+			<Game>gvShenmue</Game>
+			<Region>prEurope</Region>
+			<Platform>pvDreamcast</Platform>
+		</Identifier>
+		<StringPointers>
+			<Pointer String="Like a dream I once saw,•it passes by as it touches my cheek.">$03A8</Pointer>
+			<Pointer String="This street leading to the ocean•carries the smell of sea.">$03C3</Pointer>
+			<Pointer String="Before love makes me tell a white lie.">$03D9</Pointer>
+			<Pointer String="This loneliness=@•I want you to hold it in your arms now.">$03EE</Pointer>
+			<Pointer String="If you will always be by my side,">$0403</Pointer>
+			<Pointer String="there'll be no sorrow or tears in my eyes.">$0418</Pointer>
+			<Pointer String="Can't live without you.•Why did you have to decide?">$042E</Pointer>
+			<Pointer String="You won't be aware of my pains and lies.">$0443</Pointer>
+			<Pointer String="Don't leave me alone, stay with me.">$0458</Pointer>
+			<Pointer String="I don't know if you'll ever look back.">$046D</Pointer>
+			<Pointer String="I'll remember you forever.">$0482</Pointer>
+		</StringPointers>
+		<PlaceHolders>
+			<PlaceHolder Offset="$265C" Size="$021B"/>
+		</PlaceHolders>
+		<SpecificCharset>
+			<SpecificCharsetItem Code="#$81#$95" Value="#$0D#$0A"/>
+		</SpecificCharset>
+	</SequenceFileInfo>
+	<SequenceFileInfo Offset="$246C" Id="#$E4#$F8#$FF#$FF#$C8#$D1#$FF#$FF">
+		<Identifier>		
+			<SequenceID>NBIK</SequenceID>
+			<DiscID>3</DiscID>
+			<Game>gvShenmue</Game>
+			<Region>prUSA</Region>
+			<Platform>pvDreamcast</Platform>
+		</Identifier>
+		<StringPointers>
+			<Pointer String="Like a dream I once saw,•it passes by as it touches my cheek.">$03A8</Pointer>
+			<Pointer String="This street leading to the ocean•carries the smell of sea.">$03C3</Pointer>
+			<Pointer String="Before love makes me tell a white lie.">$03D9</Pointer>
+			<Pointer String="This loneliness=@•I want you to hold it in your arms now.">$03EE</Pointer>
+			<Pointer String="If you will always be by my side,">$0403</Pointer>
+			<Pointer String="there'll be no sorrow or tears in my eyes.">$0418</Pointer>
+			<Pointer String="Can't live without you.•Why did you have to decide?">$042E</Pointer>
+			<Pointer String="You won't be aware of my pains and lies.">$0443</Pointer>
+			<Pointer String="Don't leave me alone, stay with me.">$0458</Pointer>
+			<Pointer String="I don't know if you'll ever look back.">$046D</Pointer>
+			<Pointer String="I'll remember you forever.">$0482</Pointer>
+		</StringPointers>
+		<PlaceHolders>
+			<PlaceHolder Offset="$265C" Size="$021B"/>
+		</PlaceHolders>
+		<SpecificCharset>
+			<SpecificCharsetItem Code="#$81#$95" Value="#$0D#$0A"/>
+		</SpecificCharset>
+	</SequenceFileInfo>
+	<SequenceFileInfo Offset="$1568" Id="#$70#$4E#$42#$49#$4B#$50#$63#$1B">
+		<Identifier>		
+			<SequenceID>NBIK</SequenceID>
+			<DiscID>4</DiscID>
+			<Game>gvShenmue</Game>
+			<Region>prUndef</Region>
+			<Platform>pvDreamcast</Platform>
+		</Identifier>
+		<StringPointers>
+			<Pointer String="Like a dream I once saw,•it passes by as it touches my cheek.">$0409</Pointer>
+			<Pointer String="This street leading to the ocean•carries the smell of sea.">$0424</Pointer>
+			<Pointer String="Before love makes me tell a white lie.">$043A</Pointer>
+			<Pointer String="This loneliness=@•I want you to hold it in your arms now.">$044F</Pointer>
+			<Pointer String="If you will always be by my side,">$0464</Pointer>
+			<Pointer String="there'll be no sorrow or tears in my eyes.">$0479</Pointer>
+			<Pointer String="Can't live without you.•Why did you have to decide?">$048F</Pointer>
+			<Pointer String="You won't be aware of my pains and lies.">$04A4</Pointer>
+			<Pointer String="Don't leave me alone, stay with me.">$04B9</Pointer>
+			<Pointer String="I don't know if you'll ever look back.">$04CE</Pointer>
+			<Pointer String="I'll remember you forever.">$04E3</Pointer>
+		</StringPointers>
+		<PlaceHolders>
+			<PlaceHolder Offset="$265C" Size="$021B"/>
+		</PlaceHolders>
+		<SpecificCharset>
+			<SpecificCharsetItem Code="#$81#$95" Value="#$0D#$0A"/>
+		</SpecificCharset>
+	</SequenceFileInfo>	
+</SequenceFileInfoDatabase>
