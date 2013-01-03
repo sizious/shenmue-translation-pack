@@ -15,6 +15,7 @@
     <Projects Include="Padding\src\padding.dproj" />
     <Projects Include="Progress\src\dbgprog.dproj" />
     <Projects Include="SevenLib\src\sevenlib.dproj" />
+    <Projects Include="SpcScnEd\src\spcscned.dproj" />
     <Projects Include="SRF\src\srfdebug.dproj" />
     <Projects Include="Systalk\src\systalk.dproj" />
     <Projects Include="TextDB\src\dbgtxtdb.dproj" />
@@ -161,14 +162,23 @@
   <Target Name="sevenlib:Make">
     <MSBuild Projects="SevenLib\src\sevenlib.dproj" Targets="Make" />
   </Target>
+  <Target Name="spcscned">
+    <MSBuild Projects="SpcScnEd\src\spcscned.dproj" Targets="" />
+  </Target>
+  <Target Name="spcscned:Clean">
+    <MSBuild Projects="SpcScnEd\src\spcscned.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="spcscned:Make">
+    <MSBuild Projects="SpcScnEd\src\spcscned.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin;padding;systalk;dbgcrypt;dbgdchk;readdisc;sevenlib" />
+    <CallTarget Targets="dbgcodec;srfdebug;preview;dbgscan;dbghash;dbgprog;md5debug;dbgtxtdb;dbgbin;padding;systalk;dbgcrypt;dbgdchk;readdisc;sevenlib;spcscned" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean;padding:Clean;systalk:Clean;dbgcrypt:Clean;dbgdchk:Clean;readdisc:Clean;sevenlib:Clean" />
+    <CallTarget Targets="dbgcodec:Clean;srfdebug:Clean;preview:Clean;dbgscan:Clean;dbghash:Clean;dbgprog:Clean;md5debug:Clean;dbgtxtdb:Clean;dbgbin:Clean;padding:Clean;systalk:Clean;dbgcrypt:Clean;dbgdchk:Clean;readdisc:Clean;sevenlib:Clean;spcscned:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make;padding:Make;systalk:Make;dbgcrypt:Make;dbgdchk:Make;readdisc:Make;sevenlib:Make" />
+    <CallTarget Targets="dbgcodec:Make;srfdebug:Make;preview:Make;dbgscan:Make;dbghash:Make;dbgprog:Make;md5debug:Make;dbgtxtdb:Make;dbgbin:Make;padding:Make;systalk:Make;dbgcrypt:Make;dbgdchk:Make;readdisc:Make;sevenlib:Make;spcscned:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

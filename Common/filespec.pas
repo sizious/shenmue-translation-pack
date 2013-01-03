@@ -32,6 +32,9 @@ function PlatformVersionToString(PlateformVersion: TPlatformVersion): string;
 implementation
 //------------------------------------------------------------------------------
 
+uses
+  SysTools;
+  
 function GameVersionCodeStringToString(S: string): string;
 begin
   Result := GameVersionToString(CodeStringToGameVersion(S));
@@ -54,28 +57,49 @@ end;
 //------------------------------------------------------------------------------
 
 function CodeStringToGameVersion(S: string): TGameVersion;
+const
+  S1: array[0..3] of string = (
+    'S1',     'SHENMUE1',       'SHENMUE',    'GVSHENMUE'
+  );
+  S2: array[0..3] of string = (
+    'S2',     'SHENMUE2',       'SHENMUEII',  'GVSHENMUE2'
+  );
+  WH: array[0..3] of string = (
+    'WH',     'WHATSSHENMUE',   'WHATS',      'GVWHATSSHENMUE'
+  );
+  USS: array[0..3] of string = (
+    'USS',    'USSHENMUE',      'S1US',       'GVUSSHENMUE'
+  );
+
 begin
   Result := gvUndef;
   S := UpperCase(S);
-  if ((S = 'S1') or (S = 'SHENMUE1') or (S = 'SHENMUE')) then
+  if IsInArray(S1, S) then
     Result := gvShenmue
-  else if ((S = 'S2') or (S = 'SHENMUE2') or (S = 'SHENMUEII')) then
+  else if IsInArray(S2, S) then
     Result := gvShenmue2
-  else if ((S = 'WH') or (S = 'WHATSSHENMUE') or (S = 'WHATS')) then
-    Result := gvWhatsShenmue;
+  else if IsInArray(WH, S) then
+    Result := gvWhatsShenmue
+  else if IsInArray(USS, S) then
+    Result := gvUSShenmue;
 end;
 
 //------------------------------------------------------------------------------
 
 function CodeStringToGameRegion(S: string): TGameRegion;
+const
+  JAP: array[0..4] of string = ('J', 'JAP', 'JAPAN','NTSC-J','PRJAPAN');
+  USA: array[0..3] of string = ('U', 'USA', 'NTSC-U', 'PRUSA');
+  EUR: array[0..5] of string = ('E', 'EUR', 'PAL', 'P', 'EUROPE', 'PREUROPE');
+  
 begin
   Result := prUndef;
   S := UpperCase(S);
-  if ((S = 'J') or (S = 'JAP') or (S = 'JAPAN') or (S = 'NTSC-J')) then
+  if IsInArray(JAP, S) then
     Result := prJapan
-  else if ((S = 'U') or (S = 'USA') or (S = 'NTSC-U')) then
+  else if IsInArray(USA, S) then
     Result := prUSA
-  else if ((S = 'E') or (S = 'EUR') or (S = 'PAL') or (S = 'EUROPE')) then
+  else if IsInArray(EUR, S) then
     Result := prEurope;
 end;
 
@@ -166,12 +190,16 @@ end;
 //------------------------------------------------------------------------------
 
 function CodeStringToPlatformVersion(S: string): TPlatformVersion;
+const
+  DC: array[0..5] of string = ('DC', 'DREAMCAST', 'DREAM', 'D', 'DCAST', 'PVDREAMCAST');
+  XB: array[0..4] of string = ('XB', 'XBOX', 'XBOX1', 'X', 'PVXBOX');
+
 begin
   Result := pvUndef;
   S := UpperCase(S);
-  if (S = 'DC') or (S = 'DREAMCAST') then
+  if IsInArray(DC, S) then
     Result := pvDreamcast
-  else if (S = 'XB') or (S = 'XBOX') then
+  else if IsInArray(XB, S) then
     Result := pvXbox;
 end;
 

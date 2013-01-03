@@ -29,7 +29,6 @@ type
   TSizeUnit = (suByte, suKiloByte, suMegaByte, suGigaByte);
 
 // Functions
-//function ByteToStr(T: array of Byte): string; overload;
 function CopyFile(SourceFileName, DestFileName: TFileName;
   FailIfExists: Boolean = False): Boolean;
 procedure CopyFileBlock(var FromF, ToF: file; StartOffset, BlockSize: Integer);
@@ -61,6 +60,7 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
+function IsInArray(Source: array of string; S: string): Boolean;
 function IsInString(const SubStr, S: string): Boolean;
 function IsJapaneseString(const S: string): Boolean;
 procedure LoadUnicodeTextFile(SL: TStringList; const FileName: TFileName);
@@ -68,6 +68,11 @@ function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
 function ParseStr(SubStr, S: string; n: Integer): string;
+procedure ParseTextToByteArray(const EncodedString: string;
+  var Dest: TBytes);
+function ParseTextToString(const EncodedString: string): string;
+function ParseTextToValue(const EncodedString: string;
+  DefaultValue: Integer): Integer;
 function ReadNullTerminatedString(var F: TFileStream): string; overload;
 function ReadNullTerminatedString(var F: TFileStream;
   const StrSize: LongWord): string; overload;
@@ -110,6 +115,88 @@ const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
   NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+function ParseTextToValue(const EncodedString: string;
+  DefaultValue: Integer): Integer;
+begin
+  if Copy(EncodedString, 1, 1) = '$' then
+    // This's a hexadecimal value
+    Result := HexToInt(Copy(EncodedString, 2, Length(EncodedString) - 1))
+  else
+    // This is a decimal value
+    Result := StrToIntDef(EncodedString, DefaultValue);
+end;
+
+//------------------------------------------------------------------------------
+
+function ParseTextToString(const EncodedString: string): string;
+var
+  StringList: TStringList;
+  Value, i: Integer;
+
+begin
+  // This'll convert a encoded string (like '#$65#$66') to a real string.
+  // Extracted from ChrCodec on 2013-01-02.
+  Result := EncodedString;
+  if (Pos('#', EncodedString) = 0) or (EncodedString = '#') then Exit;
+
+  Result := '';
+  StringList := TStringList.Create;
+  try
+    StringList.Delimiter := '#';
+    StringList.DelimitedText := EncodedString;
+
+    // For each value in the string
+    for i := 0 to StringList.Count - 1 do
+    begin
+
+      // Parsing the value
+      Value := ParseTextToValue(StringList[i], -1);
+
+      // Converting the value
+      if (Value > -1) and (Value < 256) then
+        Result := Result + Chr(Value);
+
+    end; // for
+
+  finally
+    StringList.Free;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure ParseTextToByteArray(const EncodedString: string;
+  var Dest: TBytes);
+var
+  Buf: string;
+  i, j: Integer;
+
+begin
+  Buf := ParseTextToString(EncodedString);
+  j :=  Length(Buf);
+  SetLength(Dest, j);
+  for i := 1 to j do
+    Dest[i - 1] := Ord(Buf[i]);   
+end;
+
+//------------------------------------------------------------------------------
+
+function IsInArray(Source: array of string; S: string): Boolean;
+var
+  i: Integer;
+
+begin
+  Result := False;
+  i := Low(Source);
+  while (not Result) and (i <= High(Source)) do
+  begin
+    Result := SameText(Source[i], S);
+    Inc(i);
+  end;
+end;
 
 //------------------------------------------------------------------------------
 
@@ -242,21 +329,6 @@ begin
       FourCC[i - 1] := S[i];  // it sucks but the StrCopy don't works properly!
   end;
 end;
-
-//------------------------------------------------------------------------------
-
-(*function ByteToStr(T: array of Byte): string;
-const
-  Digits: array[0..15] of Char =
-          ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
-
-var
-  I: integer;
-begin
-  Result := '';
-  for I := Low(T) to High(T) do
-    Result := Result + Digits[(T[I] shr 4) and $0f] + Digits[T[I] and $0f];
-end;*)
 
 //------------------------------------------------------------------------------
 

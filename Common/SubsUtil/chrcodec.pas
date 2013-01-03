@@ -51,7 +51,6 @@ type
     function GetItem(Index: Integer): TCharsetListItem;
   protected
     procedure Add(ShenmueCode, WindowsCode: string);
-    function BytesToString(const EncodedString: string): string;    
     procedure Clear;
     function TranslateChar(Operation: TTranslateOperation;
       const EncodedChar: string; var DecodedChar: string): Boolean;
@@ -199,8 +198,8 @@ var
 {$ENDIF}
 
 begin
-  ShenmueCode := BytesToString(ShenmueCode);
-  WindowsCode := BytesToString(WindowsCode);
+  ShenmueCode := ParseTextToString(ShenmueCode);
+  WindowsCode := ParseTextToString(WindowsCode);
   
   // Adding the new item to the Charset
   Item := TCharsetListItem.Create;
@@ -351,43 +350,6 @@ end;
 function TCharsetList.GetItem(Index: Integer): TCharsetListItem;
 begin
   Result := TCharsetListItem(fList[Index]);
-end;
-
-function TCharsetList.BytesToString(const EncodedString: string): string;
-var
-  StringList: TStringList;
-  Value, i: Integer;
-
-begin
-  Result := EncodedString;
-  if (Pos('#', EncodedString) = 0) or (EncodedString = '#') then Exit;
-
-  Result := '';
-  StringList := TStringList.Create;
-  try
-    StringList.Delimiter := '#';
-    StringList.DelimitedText := EncodedString;
-
-    // For each value in the string
-    for i := 0 to StringList.Count - 1 do begin
-
-      // Parsing the value
-      if Copy(StringList[i], 1, 1) = '$' then
-        // This's a hexadecimal value
-        Value := HexToInt(Copy(StringList[i], 2, Length(StringList[i]) - 1))
-      else
-        // This is a decimal value
-        Value := StrToIntDef(StringList[i], -1);
-
-      // Converting the value
-      if (Value > -1) and (Value < 256) then
-        Result := Result + Chr(Value);
-
-    end; // for
-
-  finally
-    StringList.Free;
-  end;
 end;
 
 function TCharsetList.TranslateString(Operation: TTranslateOperation;
