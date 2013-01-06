@@ -2,7 +2,7 @@ Main coder:
 [big_fury]SiZiOUS
 
 Thanks to:
-Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-, alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, PlusTuta, Nerox92, Master Kyodai, yazgoo, the MetaGames-EU and Shenmue Dojo forums and everyone supporting us!
+IlDucci, Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-, alphaphoenix55, FamilyGuy, Ryo Suzuki, PlusTuta, Nerox92, Master Kyodai, yazgoo, the MetaGames-EU and Shenmue Dojo forums and everyone supporting us!
 
 -- About us --
 
@@ -13,7 +13,8 @@ The SHENTRAD Team is Manic, from Québec, and SiZiOUS from France (and Portugal!)
 Icons authors:
 Microsoft (Office 2007)
 Iconaholic
-FixIcon / Mr Missiku (Main icon)
+IconLeak (Main icon)
+http://iconleak.com/
 
 Thanks to the authors of the following libraries...
 
