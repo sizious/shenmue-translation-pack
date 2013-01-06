@@ -6,19 +6,14 @@
 *)
 unit BinHack;
 
-// Use the DCL library to optimize the speed
-{$DEFINE USE_DCL}
-
 interface
 
 uses
-  Windows, SysUtils, Classes
-{$IFDEF USE_DCL}
-  , HashIdx
-{$ENDIF}
-;
+  Windows, SysUtils, Classes;
 
 type
+  EBinaryHacker = class(Exception);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Place Holders                                                              //
@@ -35,6 +30,7 @@ type
    emEOF = The extra place holder is written at the end of file
    emDesigned = The extra place holder is written at the specified offset.
 *)
+
   TPlaceHolderGrowMethod = (gmEOF, gmDesigned);
 
   // Place Holder Context
@@ -67,7 +63,7 @@ type
     fGrowOffset: LongWord;
     fItemsList: TList;
     fWorkingGrowOffset: LongWord;
-    procedure Clear;
+    fExtraBlocksSizeWritten: LongWord;
     procedure Initialize(OutputFileStream: TFileStream);
     procedure CloseStringWriteContext(Context: TPlaceHolderContext);
     function GetCount: Integer;
@@ -76,7 +72,9 @@ type
     function OpenStringWriteContext(StringSize: LongWord): TPlaceHolderContext;
     procedure Reset;
     procedure Sort;
+    procedure SetGrowOffsetValue(const Value: LongWord);
     procedure SetGrowOffset(const Value: LongWord);
+    procedure Finalize(OutputFileStream: TFileStream);
   public
     constructor Create;
     destructor Destroy; override;
@@ -85,6 +83,7 @@ type
 {$IFDEF DEBUG}
     procedure DebugPrint;
 {$ENDIF}
+    procedure Clear;
     property Count: Integer read GetCount;
     property GrowMethod: TPlaceHolderGrowMethod
       read fGrowMethod write fGrowMethod;
@@ -93,6 +92,7 @@ type
     property Items[Index: Integer]: TBHPlaceHolderItem
       read GetItem; default;
   end;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Strings                                                                    //
@@ -106,6 +106,7 @@ type
                 writing in the pointer offset
     - Sub     : Sub the PointerOffsetBaseAddress ...
 *)
+
   TBHStringPointerOffsetMode = (pomDefault, pomAdd, pomSub);
 
   TBHStringItem = class
@@ -129,7 +130,6 @@ type
   TBHStrings = class
   private
     fList: TList;
-    procedure Clear;
     function GetCount: Integer;
     function GetItem(Index: Integer): TBHStringItem;
     procedure Sort;
@@ -144,15 +144,18 @@ type
 {$IFDEF DEBUG}
     procedure DebugPrint;
 {$ENDIF}
+    procedure Clear;
     property Count: Integer read GetCount;
     property Items[Index: Integer]: TBHStringItem
       read GetItem; default;
   end;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Binary Hacker Main Class                                                   //
 ////////////////////////////////////////////////////////////////////////////////
-  
+
+
   TBinaryHacker = class
   private
     fTargetFileStream: TFileStream;
@@ -160,6 +163,7 @@ type
     fStrings: TBHStrings;
     fMakeBackup: Boolean;
     procedure Initialize(OutputFileStream: TFileStream);
+    procedure Finalize(OutputFileStream: TFileStream);
   public
     // Constructor... (of course you know that)
     constructor Create;
@@ -186,6 +190,7 @@ type
       read fPlaceHolders;
   end;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 implementation
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,8 +199,9 @@ uses
   SysTools;
 
 const
-  SBACKUP_EXT = '.BAK';
-  
+  SBACKUP_EXT       = '.BAK';
+  PLACEHOLDER_SIGN  = 'SiZ!';
+
 { TBinaryHacker }
 
 constructor TBinaryHacker.Create;
@@ -225,7 +231,7 @@ begin
     CopyFile(FileName, ChangeFileExt(FileName, SBACKUP_EXT));
 
   // Opening target file
-  fTargetFileStream := TFileStream.Create(FileName, fmOpenWrite);
+  fTargetFileStream := TFileStream.Create(FileName, fmOpenReadWrite);
   try
     // Initializing Engine
     Initialize(fTargetFileStream);
@@ -256,16 +262,21 @@ begin
       end;
 
     end;
+
+    // Finalizing Engine
+    Finalize(fTargetFileStream);
   finally
     // Close the target file
     fTargetFileStream.Free;
 
     // Return the number of bytes written in extra
     Result := PlaceHolders.GetExtraBlocksSizeWritten;
-
-    // Reset the temporary vars used by the engine...
-    PlaceHolders.Reset;
   end;
+end;
+
+procedure TBinaryHacker.Finalize(OutputFileStream: TFileStream);
+begin
+  PlaceHolders.Finalize(OutputFileStream);
 end;
 
 procedure TBinaryHacker.Initialize(OutputFileStream: TFileStream);
@@ -437,7 +448,7 @@ begin
 
   // this define how to manage the extra space to add to the file
   fGrowMethod := gmEOF;
-  GrowOffset := 0; // will be calculated under the EOF flag
+  SetGrowOffsetValue(0); // will be calculated under the EOF flag
 end;
 
 {$IFDEF DEBUG}
@@ -458,6 +469,28 @@ begin
   Clear;
   fItemsList.Free;
   inherited;
+end;
+
+procedure TBHPlaceHolders.Finalize(OutputFileStream: TFileStream);
+var
+  Buf: TSectionEntry;
+
+begin
+  // Calculate the extra size added to the file
+  fExtraBlocksSizeWritten := fWorkingGrowOffset - fGrowOffset;
+
+  // Write the section footer for the binary hacker if needed...
+  if (GrowMethod = gmEOF) and (GetExtraBlocksSizeWritten > 0) then
+  begin
+    OutputFileStream.Seek(0, soFromEnd);
+    Buf.Name := PLACEHOLDER_SIGN;
+    Buf.Size := fGrowOffset;
+    OutputFileStream.Write(Buf, SECTIONENTRY_SIZE);
+    Inc(fExtraBlocksSizeWritten, SECTIONENTRY_SIZE);
+  end;
+
+  // Reset the temporary vars used by the engine...
+  Reset;
 end;
 
 function TBHPlaceHolders.OpenStringWriteContext(StringSize: LongWord): TPlaceHolderContext;
@@ -517,7 +550,7 @@ end;
 
 function TBHPlaceHolders.GetExtraBlocksSizeWritten: LongWord;
 begin
-  Result := fWorkingGrowOffset - fGrowOffset;
+  Result := fExtraBlocksSizeWritten;
 end;
 
 function TBHPlaceHolders.GetItem(Index: Integer): TBHPlaceHolderItem;
@@ -529,21 +562,46 @@ procedure TBHPlaceHolders.Initialize(OutputFileStream: TFileStream);
 var
   i: Integer;
   Offset: Int64;
-  
-begin
-  // Initializing the Extra PlaceHolder
-  if GrowMethod = gmEOF then
-    GrowOffset := OutputFileStream.Size;
-  // else, the GrowOffset was designed!
+  Buf: TSectionEntry;
 
-  // Cleaning the place holders...
+begin
   Offset := OutputFileStream.Position;
+
+  // Initializing the Extra PlaceHolder
+  fExtraBlocksSizeWritten := 0;
+  if GrowMethod = gmEOF then
+  begin
+    // By default, this's the file end.
+    SetGrowOffsetValue(OutputFileStream.Size);
+
+    // We'll determinate if the binhacker has been used on this file
+    // if yes, we'll use the real 'end' of the file, not the extra place holder
+    // added by this binhacker.
+    OutputFileStream.Seek(-SECTIONENTRY_SIZE, soFromEnd);
+    OutputFileStream.Read(Buf, SECTIONENTRY_SIZE);
+    if SameText(Buf.Name, PLACEHOLDER_SIGN) then
+    begin
+      // Getting the real end of the file
+      SetGrowOffsetValue(Buf.Size);
+      // Truncate the file
+      OutputFileStream.Size := Buf.Size;
+    end;
+  end;
+  // ... else, the GrowOffset was designed!
+  
+  // Cleaning the place holders...
   for i := 0 to Count - 1 do
   begin
     OutputFileStream.Seek(Items[i].Offset, soFromBeginning);
     WriteNullBlock(OutputFileStream, Items[i].Size);
   end;
   OutputFileStream.Seek(Offset, soFromBeginning);
+end;
+
+procedure TBHPlaceHolders.SetGrowOffsetValue(const Value: LongWord);
+begin
+  fGrowOffset := Value;
+  fWorkingGrowOffset := Value;
 end;
 
 procedure TBHPlaceHolders.Reset;
@@ -562,8 +620,10 @@ end;
 
 procedure TBHPlaceHolders.SetGrowOffset(const Value: LongWord);
 begin
-  fGrowOffset := Value;
-  fWorkingGrowOffset := Value;
+  if GrowMethod = gmEOF then
+    raise EBinaryHacker.Create('GrowOffset: Unable to set the GrowOffset' +
+      ' because the GrowMethod is set to gmEOF!');
+  SetGrowOffsetValue(Value);
 end;
 
 procedure TBHPlaceHolders.Sort;

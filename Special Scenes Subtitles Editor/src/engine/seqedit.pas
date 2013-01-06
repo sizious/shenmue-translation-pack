@@ -3,7 +3,7 @@ unit SeqEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes, SeqDB, FSParser, ChrCodec;
+  Windows, SysUtils, Classes, SeqDB, FSParser, ChrCodec, BinHack;
   
 type
   TSequenceDataHeader = record
@@ -24,6 +24,22 @@ type
   TSpecialSequenceEditor = class;
   TSpecialSequenceSubtitlesList = class;
 
+  TSpecialSequenceBackupSubtitleItem = class
+  private
+    fInitialText: string;
+    fOriginalText: string;
+    fOwner: TSpecialSequenceSubtitlesList;
+    function GetInitialText: string;
+    function GetOriginalText: string;
+  public
+    constructor Create(AOwner: TSpecialSequenceSubtitlesList);
+    // Original AM2 subtitle (Text never modified)
+    property InitialText: string read GetInitialText;
+    // Subtitle before any modification
+    property OriginalText: string read GetOriginalText;
+    property RawOriginalText: string read fOriginalText;
+  end;
+
   TSpecialSequenceSubtitleItem = class(TObject)
   private
     fText: string;
@@ -33,6 +49,7 @@ type
     fStringPointerOffset: Integer;
     fOriginalTextLength: Integer;
     fNewStringOffset: Integer;
+    fBackupText: TSpecialSequenceBackupSubtitleItem;
     function GetPatchValue: Integer;
     function GetEditor: TSpecialSequenceEditor;
     function GetText: string;
@@ -44,6 +61,10 @@ type
     property OriginalTextLength: Integer read fOriginalTextLength;
     property PatchValue: Integer read GetPatchValue;
   public
+    constructor Create(AOwner: TSpecialSequenceSubtitlesList);
+    destructor Destroy; override;
+    property BackupText: TSpecialSequenceBackupSubtitleItem
+      read fBackupText;
     property Index: Integer read fIndex;
     property RawText: string read fText;
     property StringPointerOffset: Integer read fStringPointerOffset;
@@ -60,7 +81,8 @@ type
     function GetCount: Integer;
     function GetSubtitleItem(Index: Integer): TSpecialSequenceSubtitleItem;
   protected
-    procedure Add(const StrPointerOffset: Integer; var Input: TFileStream);
+    function Add(const StrPointerOffset: Integer;
+      var Input: TFileStream): Integer;
     procedure Clear;
   public
     constructor Create(AOwner: TSpecialSequenceEditor);
@@ -75,6 +97,10 @@ type
 
   TSpecialSequenceEditor = class(TObject)
   private
+    fOriginalHeaderSize: LongWord;
+    fOriginalHeaderDataSize1: LongWord;
+    fOriginalHeaderDataSize2: LongWord;
+    fBinaryHacker: TBinaryHacker;
     fStringPointersList: TList;
     fValuesToUpdateList: TList;
     fSequenceDatabase: TSequenceDatabase;
@@ -88,6 +114,7 @@ type
     fSequenceDatabaseIndex: Integer;
   protected
     procedure UpdateDumpedSceneFile;
+    property BinaryHacker: TBinaryHacker read fBinaryHacker;
     property DumpedSceneInputFileName: TFileName read fDumpedSceneInputFileName;
     property SequenceDatabase: TSequenceDatabase read fSequenceDatabase;
     property StringPointersList: TList read fStringPointersList;
@@ -139,6 +166,7 @@ end;
 
 constructor TSpecialSequenceEditor.Create;
 begin
+  fBinaryHacker := TBinaryHacker.Create;
   fSequenceDatabase := TSequenceDatabase.Create;
   SevenZipExtract(GetApplicationDataDirectory + SEQINFO_DB,
     GetWorkingTempDirectory);
@@ -160,6 +188,7 @@ begin
   fFileSectionsList.Free;
   fCharset.Free;
   fSequenceDatabase.Free;
+  fBinaryHacker.Free;
   inherited;
 end;
 
@@ -168,8 +197,8 @@ function TSpecialSequenceEditor.LoadFromFile(
 var
   Input: TFileStream;
   DumpedSceneInput: TFileStream;
-  i: Integer;
-  StringPtrs: TStringPointersList;
+  i, j: Integer;
+  SeqDbItem: TSequenceDatabaseItem;
 
 begin
 {$IFDEF DEBUG}
@@ -201,15 +230,28 @@ begin
       fSequenceDatabaseIndex := SequenceDatabase.IdentifyFile(DumpedSceneInput);
       Result := fSequenceDatabaseIndex <> -1;
       if Result then begin
+        SeqDbItem := SequenceDatabase[fSequenceDatabaseIndex];
 
         // The file was successfully opened
         fSourceFileName := FileName;
         fLoaded := True;
 
         // Loading string pointers...
-        StringPtrs := SequenceDatabase[fSequenceDatabaseIndex].StringPointers;
-        for i := 0 to StringPtrs.Count - 1 do
-          StringPointersList.Add(Pointer(StringPtrs[i].StringPointer));
+        for i := 0 to SeqDbItem.StringPointers.Count - 1 do
+          StringPointersList.Add(Pointer(SeqDbItem.StringPointers[i].StringPointer));
+
+        // Loading the Binary Hacker engine : place holders
+        BinaryHacker.PlaceHolders.Clear;
+        for i := 0 to SeqDbItem.PlaceHolders.Count - 1 do
+          BinaryHacker.PlaceHolders.Add(
+            SeqDbItem.PlaceHolders[i].Offset,
+            SeqDbItem.PlaceHolders[i].Size
+          );
+
+        // Setting original header values
+        fOriginalHeaderSize := SeqDbItem.OriginalHeaderValues.Size;
+        fOriginalHeaderDataSize1 := SeqDbItem.OriginalHeaderValues.DataSize1;
+        fOriginalHeaderDataSize2 := SeqDbItem.OriginalHeaderValues.DataSize2;
 
         // Calculating the beginning of the subtitles table
         DumpedSceneInput.Seek(Integer(StringPointersList[0]), soFromBeginning);
@@ -220,7 +262,11 @@ begin
         WriteLn(sLineBreak, 'Reading subtitle table:');
 {$ENDIF}
         for i := 0 to StringPointersList.Count - 1 do
-          Subtitles.Add(Integer(StringPointersList[i]), DumpedSceneInput);
+        begin
+          j := Subtitles.Add(Integer(StringPointersList[i]), DumpedSceneInput);
+          Subtitles[j].BackupText.fInitialText :=
+            SeqDbItem.StringPointers[i].StringValue;
+        end;
       end; // Result
 
     end; // Result
@@ -245,6 +291,10 @@ var
 begin
   Result := False;
   if not Loaded then Exit;
+
+{$IFDEF DEBUG}
+  WriteLn(sLineBreak, '*** SAVING FILE ***', sLineBreak);
+{$ENDIF}
 
   // Patch the extracted Scene info file
   UpdateDumpedSceneFile;
@@ -303,104 +353,52 @@ end;
 
 procedure TSpecialSequenceEditor.UpdateDumpedSceneFile;
 var
-  Input, Output: TFileStream;
-  OutputTempFileName: TFileName;
-  Value, i, TotalPatchValue: Integer;
+  OutputStream: TFileStream;
+  i: Integer;
+  ExtraValue: LongWord;
   Header: TSequenceDataHeader;
   
 begin
-{$IFDEF DEBUG}
-  WriteLn(sLineBreak, '*** SAVING FILE ***', sLineBreak);
-{$ENDIF}
+  // Writing the new strings...
+  BinaryHacker.Strings.Clear;
+  for i := 0 to Subtitles.Count - 1 do
+  begin
+    BinaryHacker.Strings.Add(
+      Integer(StringPointersList[i]),
+      SUBTITLE_DELIMITER + Subtitles[i].RawText
+    );
+  end;
+  ExtraValue := BinaryHacker.Execute(DumpedSceneInputFileName);
 
-  OutputTempFileName := GetTempFileName;
-
-  Input := TFileStream.Create(DumpedSceneInputFileName, fmOpenRead);
-  Output := TFileStream.Create(OutputTempFileName, fmCreate);
+  // Updating the Section Header
+  OutputStream := TFileStream.Create(DumpedSceneInputFileName, fmOpenReadWrite);
   try
-
-    // Copy everything without original subtitle table
-    Output.CopyFrom(Input, StringTableOffset);
-
-    // Writing the subtitles table
-    TotalPatchValue := 0;
-    for i := 0 to Subtitles.Count - 1 do begin
-      // Writing the subtitle
-      Subtitles[i].WriteSubtitle(Output);
-
-      // Updating the string pointer value
-      Output.Seek(Subtitles[i].StringPointerOffset, soFromBeginning);
-      Output.Write(Subtitles[i].NewStringOffset, 4);
-      Output.Seek(0, soFromEnd);
-
-      // Calculating the TotalPatchValue
-      Inc(TotalPatchValue, Subtitles[i].PatchValue);
-    end;
-
-    // Writing the lastest dummy subtitle (which is 1 byte length)
-    Value := $0;
-    Output.Write(Value, 1);
-
-(*
-    // Updating misc pointer values
-{$IFDEF DEBUG}
-    WriteLn(sLineBreak, 'Updating pointers:');
-{$ENDIF}
-    for i := 0 to ValuesToUpdateList.Count - 1 do begin
-      Output.Seek(Integer(ValuesToUpdateList[i]), soFromBeginning);
-{$IFDEF DEBUG}
-      Write('  #', Format('%2.2d', [i]),
-        ': Ptr=0x', IntToHex(Integer(ValuesToUpdateList[i]), 4));
-{$ENDIF}
-      Output.Read(Value, 4);
-{$IFDEF DEBUG}
-      Write(', OldValue=0x', IntToHex(Value, 4));
-{$ENDIF}
-      Output.Seek(-4, soCurrent);
-      Inc(Value, TotalPatchValue);
-{$IFDEF DEBUG}
-      WriteLn(', NewValue=0x', IntToHex(Value, 4));
-{$ENDIF}
-      Output.Write(Value, 4);
-    end;
-*)
-
-    // Writing the file footer
-    Input.Seek(Integer(ValuesToUpdateList[0]), soFromBeginning);
-    Input.Read(Value, 4);
-    Input.Seek(Value, soFromBeginning);    
-{$IFDEF DEBUG}
-    Write('Writing footer: offset=0x', IntToHex(Value, 4));
-{$ENDIF}
-    Value := Input.Size - Value;
-{$IFDEF DEBUG}
-    WriteLn(', size=', Value);
-{$ENDIF}
-    Output.Seek(0, soFromEnd);
-    Output.CopyFrom(Input, Value);
-
-    // Updating the section header
-    Output.Seek(0, soFromBeginning);
-    Output.Read(Header, SizeOf(TSequenceDataHeader));
-    Output.Seek(0, soFromBeginning);
-    Inc(Header.Size, TotalPatchValue);
-    Inc(Header.DataSize1, TotalPatchValue);
-    Inc(Header.DataSize2, TotalPatchValue);
-    Output.Write(Header, SizeOf(TSequenceDataHeader));
-    
+    OutputStream.Seek(0, soFromBeginning);
+    OutputStream.Read(Header, SizeOf(TSequenceDataHeader));
+    OutputStream.Seek(0, soFromBeginning);
+    Header.Size := fOriginalHeaderSize + ExtraValue;
+    Header.DataSize1 := fOriginalHeaderDataSize1 + ExtraValue;
+    Header.DataSize2 := fOriginalHeaderDataSize2 + ExtraValue;
+    OutputStream.Write(Header, SizeOf(TSequenceDataHeader));
   finally
-    Input.Free;
-    Output.Free;
-
-    // Deleting old DumpedSceneFile
-    if FileExists(OutputTempFileName) then begin
-      CopyFile(OutputTempFileName, DumpedSceneInputFileName, False);
-      DeleteFile(OutputTempFileName);
-    end;
+    OutputStream.Free;
   end;
 end;
 
 { TSpecialSequenceSubtitleItem }
+
+constructor TSpecialSequenceSubtitleItem.Create(
+  AOwner: TSpecialSequenceSubtitlesList);
+begin
+  fOwner := AOwner;
+  fBackupText := TSpecialSequenceBackupSubtitleItem.Create(fOwner);
+end;
+
+destructor TSpecialSequenceSubtitleItem.Destroy;
+begin
+  fBackupText.Free;
+  inherited;
+end;
 
 function TSpecialSequenceSubtitleItem.GetEditor: TSpecialSequenceEditor;
 begin
@@ -458,12 +456,12 @@ end;
 
 { TSpecialSequenceSubtitlesList }
 
-procedure TSpecialSequenceSubtitlesList.Add(
-  const StrPointerOffset: Integer; var Input: TFileStream);
+function TSpecialSequenceSubtitlesList.Add(
+  const StrPointerOffset: Integer; var Input: TFileStream): Integer;
 var
   NewItem: TSpecialSequenceSubtitleItem;
   Subtitle: string;
-  ItemIndex, StrOffset: Integer;
+  StrOffset: Integer;
   c: Char;
   Done: Boolean;                                   
   
@@ -485,15 +483,16 @@ begin
   end;
 
   // Adding the new item to the internal list
-  NewItem := TSpecialSequenceSubtitleItem.Create;
-  ItemIndex := fSubtitleList.Add(NewItem);
-  with NewItem do begin
-    fOwner := Self;
+  NewItem := TSpecialSequenceSubtitleItem.Create(Self);
+  Result := fSubtitleList.Add(NewItem);
+  with NewItem do
+  begin
     fStringPointerOffset := StrPointerOffset;
     fText := StringReplace(Subtitle, SUBTITLE_DELIMITER, '', []);
-    fIndex := ItemIndex;
+    fIndex := Result;
     fOriginalTextLength := Length(fText); // Length(Subtitle);
     fStringOffset := StrOffset;
+    BackupText.fOriginalText := fText;
   end;
 
 {$IFDEF DEBUG}
@@ -554,6 +553,24 @@ begin
   else
     CharsetFunc := Owner.Charset.Encode;
   Result := CharsetFunc(Subtitle);
+end;
+
+{ TSpecialSequenceBackupSubtitleItem }
+
+constructor TSpecialSequenceBackupSubtitleItem.Create(
+  AOwner: TSpecialSequenceSubtitlesList);
+begin
+  fOwner := AOwner;
+end;
+
+function TSpecialSequenceBackupSubtitleItem.GetInitialText: string;
+begin
+  Result := fOwner.TransformText(fInitialText);
+end;
+
+function TSpecialSequenceBackupSubtitleItem.GetOriginalText: string;
+begin
+  Result := fOwner.TransformText(fOriginalText);
 end;
 
 initialization

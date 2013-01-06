@@ -5,7 +5,6 @@ program binhdbg;
 uses
   SysUtils,
   systools in '..\..\..\Common\systools.pas',
-  hashidx in '..\..\..\Common\hashidx.pas',
   binhack in '..\..\..\Common\binhack.pas';
 
 var

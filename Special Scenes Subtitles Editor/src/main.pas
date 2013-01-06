@@ -103,7 +103,6 @@ type
     fSelectedSubtitle: TSpecialSequenceSubtitleItem;
     fDebugLogVisible: Boolean;
     fFileModified: Boolean;
-//    fSelectedSubtitlePrevInfo: TSubtitlesTextManagerListItem;
     fQuitOnFailure: Boolean;
     fPreviewerVisible: Boolean;
     fDecodeSubtitles: Boolean;
@@ -144,6 +143,7 @@ type
     procedure SetDecodeSubtitles(const Value: Boolean);
     procedure SetOriginalSubtitleField(const Value: Boolean);
     procedure SetOriginalSubtitleColumn(const Value: Boolean);
+    function GetSelectedSubtitleBackupText: string;
     property OriginalSubtitlesColumnObject: TListColumn
       read fOriginalSubtitlesColumnObject write fOriginalSubtitlesColumnObject;
     property OriginalSubtitlesColumnObjectWidth: Integer
@@ -166,8 +166,8 @@ type
       write SetPreviewerVisible;
     property SelectedSubtitle: string read GetSelectedSubtitle
       write SetSelectedSubtitle;
-(*    property SelectedSubtitlePrevInfo: TSubtitlesTextManagerListItem read
-      fSelectedSubtitlePrevInfo; *)
+    property SelectedSubtitleBackupText: string
+      read GetSelectedSubtitleBackupText;
     property StatusText: string read GetStatusText write SetStatusText;
   end;
 
@@ -185,9 +185,6 @@ implementation
 uses
   Config, UITools, SysTools, ChrCount, About, AppVer;
 
-(*var
-  SubtitlesTextManager: TSubtitlesTextManager;*)
-
 procedure TfrmMain.Clear(const UpdateOnlyUI: Boolean);
 begin
   if not UpdateOnlyUI then begin
@@ -195,14 +192,13 @@ begin
     lvSubs.Clear;
     fSelectedSubtitleUI := nil;
     fSelectedSubtitle := nil;
-//    fSelectedSubtitlePrevInfo := nil;
     mOldSub.Text := '';
     mNewSub.Text := '';
     UpdateSubtitleLengthControls('', eFirstLineLength, eSecondLineLength);
     eSubCount.Text := '0';
   end;
 
-//  UpdateFileModifiedState;
+  UpdateFileModifiedState;
   SetControlsStateFileOperations(False);
   SetControlsStateSaveOperation(False);
 
@@ -385,9 +381,6 @@ begin
   // Destroying Debug Log
   DebugLog.Free;
 
-  // Destroying the original and old subtitle manager object
-//  SubtitlesTextManager.Free;
-
   // Cleaning Bugs Handler
   BugsHandler.Free;
 end;
@@ -417,10 +410,6 @@ begin
       'Shenmue Decode subtitle function won''t be available.',
       'FileName: "' + CharsetFile + '".');
   end;
-
-  (* Manage the original subtitle (=AM2 original text) and the
-     old subtitle (=before any modifications) *)
-//  SubtitlesTextManager := TSubtitlesTextManager.Create;
 
   // Init the Previewer
   InitPreviewer;
@@ -452,14 +441,10 @@ procedure TfrmMain.RefreshOldTextField;
 begin
   if OriginalSubtitleField then begin
     lOldSub.Caption := 'Original text:';
-    mOldSub.Text := '';
-(*    if Assigned(SelectedSubtitlePrevInfo) then
-      mOldSub.Text := SequenceEditor.Subtitles.TransformText(
-        SelectedSubtitlePrevInfo.InitialText);*)
   end else begin
     lOldSub.Caption := 'Old text:';
-    mOldSub.Text := SelectedSubtitle;
   end;
+  mOldSub.Text := SelectedSubtitleBackupText;
 end;
 
 procedure TfrmMain.RefreshSubtitleSelection;
@@ -473,6 +458,16 @@ begin
   Result := '';
   if not IsSubtitleSelected then Exit;
   Result := fSelectedSubtitle.Text;
+end;
+
+function TfrmMain.GetSelectedSubtitleBackupText: string;
+begin
+  Result := '';
+  if not IsSubtitleSelected then Exit;
+  if OriginalSubtitleField then
+    Result := fSelectedSubtitle.BackupText.InitialText
+  else
+    Result := fSelectedSubtitle.BackupText.OriginalText;
 end;
 
 function TfrmMain.GetStatusText: string;
@@ -532,7 +527,6 @@ begin
     fSelectedSubtitleUI := Item;
     Index := Integer(Item.Data);
     fSelectedSubtitle := SequenceEditor.Subtitles[Index];
-//    fSelectedSubtitlePrevInfo := SubtitlesTextManager.Subtitles[Index];
 
     // Refresh the view
     RefreshOldTextField;
@@ -571,9 +565,6 @@ begin
     // Filling the UI with the content
     if SequenceEditor.Loaded then begin
 
-      // Initializing Text Corrector Database
-//      SubtitlesTextManager.Initialize(SequenceEditor);
-
       // Display the subtitles count
       eSubCount.Text := IntToStr(SequenceEditor.Subtitles.Count);
 
@@ -604,8 +595,7 @@ begin
             Data := Pointer(i);
             Caption := IntToStr(i);
             SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
-(*            SubItems[1] := BR(SequenceEditor.Charset.Decode(
-              SubtitlesTextManager.Subtitles[i].InitialText));*)
+            SubItems[1] := BR(SequenceEditor.Subtitles[i].BackupText.InitialText);
           end;
       end;                   
 
@@ -845,7 +835,7 @@ begin
     ListItem := lvSubs.FindData(0, Pointer(i), True, False);
     if Assigned(ListItem) then begin
       ListItem.SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
-//      ListItem.SubItems[1] := BR(SequenceEditor.Subtitles.TransformText(SubtitlesTextManager.Subtitles[i].InitialText));
+      ListItem.SubItems[1] := BR(SequenceEditor.Subtitles[i].BackupText.InitialText);
     end;
   end;
 
@@ -936,12 +926,13 @@ var
 
 begin
   Modified := False;
-  for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
-//    OldSubtitle := SubtitlesTextManager.Subtitles[i].OriginalText;
+  for i := 0 to SequenceEditor.Subtitles.Count - 1 do
+  begin
+    OldSubtitle := SequenceEditor.Subtitles[i].BackupText.RawOriginalText;
     NewSubtitle := SequenceEditor.Subtitles[i].RawText;
-(*{$IFDEF DEBUG}
+{$IFDEF DEBUG}
     WriteLn(i, ' Old: "', OldSubtitle, '"', sLineBreak, i, ' New: "', NewSubtitle, '"');
-{$ENDIF}*)
+{$ENDIF}
     Modified := Modified or (OldSubtitle <> NewSubtitle);
   end;
   FileModified := Modified;
