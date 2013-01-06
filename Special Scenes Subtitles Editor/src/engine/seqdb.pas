@@ -70,8 +70,20 @@ type
     property Value: TBytes read fValue;
   end;
 
+  TSequenceOriginalHeaderValues = class
+  private
+    fDataSize2: LongWord;
+    fDataSize1: LongWord;
+    fSize: LongWord;
+  public
+    property DataSize1: LongWord read fDataSize1;
+    property DataSize2: LongWord read fDataSize2;
+    property Size: LongWord read fSize;
+  end;
+
   TSequenceDatabaseItem = class
   private
+    fOriginalHeaderValues: TSequenceOriginalHeaderValues;
     fGame: TGameVersion;
     fPlatform: TPlatformVersion;
     fSequenceID: string;
@@ -85,6 +97,8 @@ type
     destructor Destroy; override;
     property DiscID: Byte read fDiscID;
     property Game: TGameVersion read fGame;
+    property OriginalHeaderValues: TSequenceOriginalHeaderValues
+      read fOriginalHeaderValues;
     property Platform: TPlatformVersion read fPlatform;
     property Region: TGameRegion read fRegion;
     property SequenceID: string read fSequenceID;
@@ -268,6 +282,18 @@ begin
               ParseTextToValue(NodeList[j].Attributes['Size'], 0);
             PlaceHolders.Add(PlaceHoldersItem);
           end;
+
+          // Read 'OriginalHeaderValues'
+          NodeList :=
+            SequenceInfoNode.ChildNodes.FindNode('OriginalHeaderValues').ChildNodes;
+          with OriginalHeaderValues do
+          begin
+            fSize := ParseTextToValue(NodeList.FindNode('Size').NodeValue, 0);
+            fDataSize1 := ParseTextToValue(NodeList.FindNode('DataSize1').NodeValue, 0);
+            fDataSize2 := ParseTextToValue(NodeList.FindNode('DataSize2').NodeValue, 0);
+          end;
+
+          // Read 'SpecificCharset' don't know if it really needed or not
                     
         end;
 
@@ -298,6 +324,7 @@ begin
   fSignature := TSequenceSignature.Create;
   fStringPointersList := TStringPointersList.Create;
   fPlaceHolders := TPlaceHoldersList.Create;
+  fOriginalHeaderValues := TSequenceOriginalHeaderValues.Create;
 end;
 
 destructor TSequenceDatabaseItem.Destroy;
@@ -305,6 +332,7 @@ begin
   fSignature.Free;
   fStringPointersList.Free;
   fPlaceHolders.Free;
+  fOriginalHeaderValues.Free;
   inherited;
 end;
 
