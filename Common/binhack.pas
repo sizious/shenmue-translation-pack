@@ -239,6 +239,10 @@ begin
     // Writing each String... (starting with the biggest)
     for i := Strings.Count - 1 downto 0 do
     begin
+    
+{$IFDEF DEBUG}
+      Write('#', i, ': ');
+{$ENDIF}
 
       // Request the place holder object to get a necessary place to write our string
       CurrentItem := Strings[i];
@@ -253,9 +257,18 @@ begin
         end;
         fTargetFileStream.Write(StrOffset, UINT32_SIZE);
 
+{$IFDEF DEBUG}
+        WriteLn('PtrOffset=', CurrentItem.PointerOffset, ', StrOffset=', StrOffset); 
+{$ENDIF}
+
         // Writing the string
         fTargetFileStream.Seek(Context.StringOffset, soFromBeginning);
         WriteNullTerminatedString(fTargetFileStream, CurrentItem.StringValue);
+
+{$IFDEF DEBUG}
+        WriteLn(' "', CurrentItem.StringValue, '"');
+{$ENDIF}
+
       finally
         // Updating the place holder context...
         PlaceHolders.CloseStringWriteContext(Context);
@@ -574,7 +587,7 @@ begin
     // By default, this's the file end.
     SetGrowOffsetValue(OutputFileStream.Size);
 
-    // We'll determinate if the binhacker has been used on this file
+    // We'll determinate if the binhacker has been used on this file before.
     // if yes, we'll use the real 'end' of the file, not the extra place holder
     // added by this binhacker.
     OutputFileStream.Seek(-SECTIONENTRY_SIZE, soFromEnd);

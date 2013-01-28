@@ -167,6 +167,7 @@ end;
 constructor TSpecialSequenceEditor.Create;
 begin
   fBinaryHacker := TBinaryHacker.Create;
+  BinaryHacker.MakeBackup := False;
   fSequenceDatabase := TSequenceDatabase.Create;
   SevenZipExtract(GetApplicationDataDirectory + SEQINFO_DB,
     GetWorkingTempDirectory);
@@ -218,7 +219,7 @@ begin
     if Result then begin
 
       // Initializing the SCN3 FileStream receiver
-      fDumpedSceneInputFileName := GetTempFileName;
+      fDumpedSceneInputFileName := GetWorkingTempFileName;
       DumpedSceneInput := TFileStream.Create(DumpedSceneInputFileName, fmCreate);
 
       // Dumping the SCN3 section
@@ -302,7 +303,7 @@ begin
   try
 
     // Write the new MAPINFO.BIN file
-    OutputTempFileName := GetTempFileName;
+    OutputTempFileName := GetWorkingTempFileName;
     Input := TFileStream.Create(SourceFileName, fmOpenRead);
     Output := TFileStream.Create(OutputTempFileName, fmCreate);
     try
@@ -377,8 +378,8 @@ begin
     OutputStream.Read(Header, SizeOf(TSequenceDataHeader));
     OutputStream.Seek(0, soFromBeginning);
     Header.Size := fOriginalHeaderSize + ExtraValue;
-    Header.DataSize1 := fOriginalHeaderDataSize1 + ExtraValue;
-    Header.DataSize2 := fOriginalHeaderDataSize2 + ExtraValue;
+//    Header.DataSize1 := fOriginalHeaderDataSize1 + ExtraValue;
+//    Header.DataSize2 := fOriginalHeaderDataSize2 + ExtraValue;
     OutputStream.Write(Header, SizeOf(TSequenceDataHeader));
   finally
     OutputStream.Free;

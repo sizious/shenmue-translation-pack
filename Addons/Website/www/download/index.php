@@ -108,7 +108,7 @@
 
 <p>You can get the source on the SVN repository:</p>
 
-<div class="code">svn co https://shenmuesubs.svn.sourceforge.net/svnroot/shenmuesubs shenmuesubs</div>
+<div class="code">svn checkout --username=sizious svn+ssh://sizious@svn.code.sf.net/p/shenmuesubs/code/trunk shenmuesubs-code</div>
 
 <p>I use the <a target="_blank" href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> client to access the SVN.</p>
 

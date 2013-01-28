@@ -71,7 +71,7 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'Shenmue AiO Free Quest Subtitles Editor';
+  Application.Title := 'Shenmue Free Quest Subtitles Editor';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmSelectDir, frmSelectDir);

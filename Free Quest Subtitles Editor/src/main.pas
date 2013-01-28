@@ -1,17 +1,20 @@
-//    This file is part of Shenmue AiO Free Quest Subtitles Editor.
-//
-//    Shenmue AiO Free Quest Subtitles Editor is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-//
-//    Shenmue AiO Free Quest Subtitles Editor is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with Shenmue AiO Free Quest Subtitles Editor.  If not, see <http://www.gnu.org/licenses/>.
+(*
+  This file is part of Shenmue Free Quest Subtitles Editor.
+
+  Shenmue Free Quest Subtitles Editor is free software: you can redistribute it
+  and/or modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Shenmue AiO Free Quest Subtitles Editor is distributed in the hope that it
+  will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Shenmue AiO Free Quest Subtitles Editor.  If not, see
+  <http://www.gnu.org/licenses/>.
+*)
 
 unit Main;
 
@@ -28,7 +31,7 @@ uses
   Dialogs, ComCtrls, StdCtrls, Menus, SCNFEdit, SCNFUtil, MultiScan, ExtCtrls,
   ScnfScan, JvExExtCtrls, JvExComCtrls, JvListView, Clipbrd, ShellApi,
   AppEvnts, FilesLst, SubsExp, JvBaseDlg, JvBrowseFolder, Viewer, TextData,
-  ImgList, ViewUpd, Progress, TextDB;
+  ImgList, ViewUpd, Progress, TextDB, ToolWin, JvToolBar;
 
 const
 {$IFDEF DEBUG}
@@ -36,9 +39,9 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.10' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.11' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'June 20, 2010 @05:11PM';
+  COMPIL_DATE_TIME = 'Jan 27, 2013 @05:11PM';
 
 type
   TGlobalTranslationModule = class;
@@ -193,6 +196,29 @@ type
     miDEBUG_TestSRFDB: TMenuItem;
     N23: TMenuItem;
     miBatchSRF: TMenuItem;
+    tbMain: TJvToolBar;
+    ToolButton1: TToolButton;
+    tbOpen: TToolButton;
+    tbReload: TToolButton;
+    tbSave: TToolButton;
+    ToolButton4: TToolButton;
+    tbImportSubtitles: TToolButton;
+    tbExportSubtitles: TToolButton;
+    ToolButton9: TToolButton;
+    tbDebugLog: TToolButton;
+    tbPreview: TToolButton;
+    tbOriginalTextField: TToolButton;
+    tbCharset: TToolButton;
+    ToolButton5: TToolButton;
+    tbBatchImportSubtitles: TToolButton;
+    tbBatchExportSubtitles: TToolButton;
+    ToolButton6: TToolButton;
+    tbAutoSave: TToolButton;
+    tbMakeBackup: TToolButton;
+    ToolButton2: TToolButton;
+    tbAbout: TToolButton;
+    ilToolBar: TImageList;
+    ilToolBarDisabled: TImageList;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);

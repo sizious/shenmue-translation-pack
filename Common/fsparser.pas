@@ -13,7 +13,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, SysTools
-  {$IFDEF USE_DCL}, DCL_intf, HashMap {$ENDIF};
+  {$IFDEF USE_DCL}, HashIdx {$ENDIF};
   
 type
   TFileSectionsList = class;
@@ -39,15 +39,15 @@ type
   TFileSectionsList = class
   private
 {$IFDEF USE_DCL}
-    fOptimizationHashMap: IStrMap;
+    fOptimizationHashMap: THashIndexOptimizer;
 {$ENDIF}
     fOwner: TObject;
     fList: TList;
     function GetCount: Integer;
-    function GetItem(Index: Integer): TFileSectionsListItem;
   protected
     function Add(Name: string; AbsoluteOffset, Size: LongWord): Integer;
     procedure Clear;
+    function GetItem(Index: Integer): TFileSectionsListItem;    
   public
     constructor Create; overload;
     constructor Create(AOwner: TObject); overload;
@@ -66,20 +66,6 @@ implementation
 
 const
   UNIT_NAME = 'FSParser';
-
-{$IFDEF USE_DCL}
-
-type
-  TIndexHashItem = class(TObject)
-  private
-    fItemIndex: Integer;
-    fSectionName: string;
-  public
-    property SectionName: string read fSectionName write fSectionName;
-    property ItemIndex: Integer read fItemIndex write fItemIndex;
-  end;
-
-{$ENDIF}
 
 procedure ParseFileSections(var FS: TFileStream; var Result: TFileSectionsList);
 var
@@ -135,9 +121,6 @@ end;
 function TFileSectionsList.Add(Name: string; AbsoluteOffset, Size: LongWord): Integer;
 var
   Item: TFileSectionsListItem;
-{$IFDEF USE_DCL}
-  HashItem: TIndexHashItem;
-{$ENDIF}
 
 begin
   Item := TFileSectionsListItem.Create(Self);
@@ -148,13 +131,8 @@ begin
   Item.fIndex := Result;
 
 {$IFDEF USE_DCL}
-  // Adding the entry in the Hash map.  
-  HashItem := TIndexHashItem.Create;
-  with HashItem do begin
-    Name := Item.Name;
-    ItemIndex := Result;
-  end;
-  fOptimizationHashMap.PutValue(Item.Name, HashItem);
+  // Adding the entry in the Hash map.
+  fOptimizationHashMap.Add(Item.Name, Result);
 {$ENDIF}
 
 {$IFDEF DEBUG}
@@ -186,7 +164,7 @@ begin
   fList := TList.Create;
   fOwner := AOwner;
 {$IFDEF USE_DCL}
-  fOptimizationHashMap := TStrHashMap.Create;
+  fOptimizationHashMap := THashIndexOptimizer.Create;
 {$ENDIF}
 end;
 
@@ -194,6 +172,9 @@ destructor TFileSectionsList.Destroy;
 begin
   Clear;
   fList.Free;
+{$IFDEF USE_DCL}
+  fOptimizationHashMap.Free;
+{$ENDIF}
   inherited;
 end;
 
@@ -208,10 +189,8 @@ begin
 end;
 
 function TFileSectionsList.IndexOf(SectionName: string): Integer;
+{$IFNDEF USE_DCL}
 var
-{$IFDEF USE_DCL}
-  HashIndex: TIndexHashItem;
-{$ELSE}
   MaxIndex: Integer;
   Found: Boolean;  
 {$ENDIF}
@@ -224,9 +203,7 @@ begin
 
   // Using the Optimization HashMap
 
-  HashIndex := TIndexHashItem(fOptimizationHashMap.GetValue(SectionName));
-  if Assigned(HashIndex) then
-    Result := HashIndex.ItemIndex;
+  Result := fOptimizationHashMap.IndexOf(SectionName);
 
 {$ELSE}
 
