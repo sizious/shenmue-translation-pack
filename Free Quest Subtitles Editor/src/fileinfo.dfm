@@ -29,10 +29,6 @@ object frmFileInfo: TfrmFileInfo
     TabOrder = 0
     object tsGeneral: TTabSheet
       Caption = '&Header'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvHeader: TJvListView
         AlignWithMargins = True
         Left = 3
@@ -60,17 +56,11 @@ object frmFileInfo: TfrmFileInfo
           end
           item
           end>
-        ExplicitWidth = 455
-        ExplicitHeight = 165
       end
     end
     object tsIpac: TTabSheet
       Caption = 'F&ooter'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvIpac: TJvListView
         AlignWithMargins = True
         Left = 3
@@ -110,16 +100,11 @@ object frmFileInfo: TfrmFileInfo
           end
           item
           end>
-        ExplicitHeight = 73
       end
     end
     object tsCharsIdDecode: TTabSheet
       Caption = 'CharID &table'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvCharsId: TJvListView
         AlignWithMargins = True
         Left = 3
@@ -147,17 +132,11 @@ object frmFileInfo: TfrmFileInfo
           end
           item
           end>
-        ExplicitWidth = 455
-        ExplicitHeight = 165
       end
     end
     object tsSubsInfo: TTabSheet
       Caption = '&Subtitles table'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvSubs: TJvListView
         AlignWithMargins = True
         Left = 1

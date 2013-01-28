@@ -372,16 +372,16 @@ object frmMain: TfrmMain
     end
     object miHelp: TMenuItem
       Caption = '&Help'
-      object ProjectHome1: TMenuItem
+      object miProjectHome: TMenuItem
         Caption = '&Project home...'
         Hint = 'Visit the project home web site.'
         ShortCut = 112
-        OnClick = ProjectHome1Click
+        OnClick = miProjectHomeClick
       end
-      object Checkforupdate1: TMenuItem
+      object miCheckForUpdate: TMenuItem
         Caption = '&Check for update...'
         Hint = 'Open the SourceForge page of the project.'
-        OnClick = Checkforupdate1Click
+        OnClick = miCheckForUpdateClick
       end
       object N7: TMenuItem
         Caption = '-'
@@ -410,6 +410,10 @@ object frmMain: TfrmMain
       object miDEBUG_TEST4: TMenuItem
         Caption = 'Strong Test SeqEdit'
         OnClick = miDEBUG_TEST4Click
+      end
+      object miDEBUG_TEST5: TMenuItem
+        Caption = 'First/Last'
+        OnClick = miDEBUG_TEST5Click
       end
     end
   end

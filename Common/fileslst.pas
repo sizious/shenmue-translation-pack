@@ -76,7 +76,8 @@ begin
     Result := fList.Add(Item);
     Item.fOwner := Self;
 {$IFDEF USE_DCL}
-    HashMap.Add(FileName, Result);
+    if FileName <> '' then    
+      HashMap.Add(FileName, Result);
 {$ENDIF}
   end;
 end;

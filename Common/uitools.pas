@@ -3,14 +3,26 @@ unit UITools;
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, Menus, Messages, ComCtrls, StdCtrls,
-  JvToolbar, JvRichEdit;
+  Windows, SysUtils, Classes, Forms, Menus, Messages, Graphics, ComCtrls,
+  StdCtrls, JvToolbar, JvRichEdit;
 
 type
   EUserInterface = class(Exception);
   EInvalidToolBarButton = class(EUserInterface);
   TScrollDirection = (sdTop, sdBottom);
 
+  // This was made to colorize the background of TTabSheet
+  TTabSheet = class(ComCtrls.TTabSheet)
+  private
+    FColor: TColor;
+    procedure SetColor(Value: TColor);
+    procedure WMEraseBkGnd(var Msg: TWMEraseBkGnd);
+      message WM_ERASEBKGND;
+  public
+    constructor Create(aOwner: TComponent); override;
+    property Color: TColor read FColor write SetColor;
+  end;
+  
 const
   UNDEFINED_VALUE = '##UNDEF!##';
   
@@ -34,15 +46,19 @@ procedure OpenWindowsExplorer(const Directory: TFileName);
 procedure RichEditClear(RichEdit: TJvRichEdit);
 function SetCloseWindowButtonState(Form: TForm; State: Boolean): Boolean;
 procedure ShellOpenPropertiesDialog(FileName: TFileName);
+function TabSheetCustomDraw(Control: TCustomTabControl; TabIndex: Integer;
+  Rect: TRect): Boolean;
 procedure ToolBarCustomDraw(Toolbar: TToolBar);
 procedure ToolBarInitControl(SourceForm: TForm; ToolBar: TToolBar);
 procedure VerticalScrollControl(Handle: THandle; Direction: TScrollDirection);
 function WrapStr: string;
 
+////////////////////////////////////////////////////////////////////////////////
 implementation
+////////////////////////////////////////////////////////////////////////////////
 
 uses
-  Themes, ShellApi, Graphics, Registry, Controls;
+  Themes, ShellApi, Registry, Controls;
 
 var
   sWrapStr: string; // used for MsgBox
@@ -475,6 +491,67 @@ begin
     else
         // Aucun curseur n'a été chargé
         Result := false;
+end;
+
+//------------------------------------------------------------------------------
+
+// Thanks to Bruno Van de Velde
+// http://www.delphifr.com/forum/sujet-COULEUR-TPAGECONTROL-TABSHEET_920125.aspx
+constructor TTabSheet.Create(aOwner: TComponent);
+begin
+  inherited;
+  FColor := clBtnFace;
+end;
+
+procedure TTabSheet.SetColor(Value: TColor);
+begin
+  if FColor <> Value then
+  begin
+    FColor := Value;
+    Invalidate;
+  end;
+end;
+
+procedure TTabSheet.WMEraseBkGnd(var Msg: TWMEraseBkGnd);
+begin
+  if FColor = clBtnFace then
+    inherited
+  else
+  begin
+    Brush.Color := FColor;
+    Windows.FillRect(Msg.dc, ClientRect, Brush.Handle);
+    Msg.Result := 1;
+  end;
+end;
+
+function TabSheetCustomDraw(Control: TCustomTabControl; TabIndex: Integer;
+  Rect: TRect): Boolean;
+var
+  AText: string;
+  APoint: TPoint;
+  PageControl: TPageControl;
+
+begin
+  try
+    PageControl := Control as TPageControl;
+    if not PageControl.OwnerDraw then
+      raise EUserInterface.Create('PageControl.OwnerDraw is false!');
+    with PageControl.Canvas do
+    begin
+      Brush.Color := ClGreen;
+      FillRect(Rect);
+      AText := PageControl.Pages[TabIndex].Caption;
+      with PageControl.Canvas do
+      begin
+        APoint.x := (Rect.Right - Rect.Left) div 2 - TextWidth(AText) div 2;
+        APoint.y := (Rect.Bottom - Rect.Top) div 2 - TextHeight(AText) div 2;
+        TextRect(Rect, Rect.Left + APoint.x, Rect.Top + APoint.y, AText);
+      end;
+    end;
+    Result := True;
+  except
+    Result := False;
+  end;
 end;
 
 //------------------------------------------------------------------------------

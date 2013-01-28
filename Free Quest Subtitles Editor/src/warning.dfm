@@ -221,7 +221,7 @@ object frmWarning: TfrmWarning
   object Label5: TLabel
     Left = 44
     Top = 160
-    Width = 330
+    Width = 310
     Height = 26
     Caption = 
       'If you have never used this editor before the v2.0, you aren'#39't c' +
@@ -237,7 +237,7 @@ object frmWarning: TfrmWarning
   object Label6: TLabel
     Left = 44
     Top = 100
-    Width = 295
+    Width = 290
     Height = 26
     Caption = 
       'ANYWAY, THESE OLD BAD HACKED FILES WILL WORK RANDOMLY IN YOUR CO' +

@@ -52,9 +52,9 @@ type
     N6: TMenuItem;
     tbCharset: TToolButton;
     tbOriginal: TToolButton;
-    ProjectHome1: TMenuItem;
+    miProjectHome: TMenuItem;
     N7: TMenuItem;
-    Checkforupdate1: TMenuItem;
+    miCheckForUpdate: TMenuItem;
     miDEBUG_TEST3: TMenuItem;
     lvSubs: TJvListView;
     miDEBUG_TEST4: TMenuItem;
@@ -68,6 +68,7 @@ type
     eSecondLineLength: TEdit;
     Label8: TLabel;
     eSubCount: TEdit;
+    miDEBUG_TEST5: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -90,13 +91,14 @@ type
     procedure lvSubsSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure miCharsetClick(Sender: TObject);
-    procedure ProjectHome1Click(Sender: TObject);
-    procedure Checkforupdate1Click(Sender: TObject);
+    procedure miProjectHomeClick(Sender: TObject);
+    procedure miCheckForUpdateClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure miOriginalClick(Sender: TObject);
     procedure miOriginalColumnClick(Sender: TObject);
     procedure miDEBUG_TEST3Click(Sender: TObject);
     procedure miDEBUG_TEST4Click(Sender: TObject);
+    procedure miDEBUG_TEST5Click(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -235,7 +237,7 @@ begin
   DebugLog.SaveLogFile;
 end;
 
-procedure TfrmMain.Checkforupdate1Click(Sender: TObject);
+procedure TfrmMain.miCheckForUpdateClick(Sender: TObject);
 begin
   OpenLink('https://sourceforge.net/projects/shenmuesubs/files/');
 end;
@@ -309,6 +311,23 @@ begin
     end;
   end;
 
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+procedure TfrmMain.miDEBUG_TEST5Click(Sender: TObject);
+{$IFDEF DEBUG}
+const
+  MAX_SUB = '____________________________________________' + sLineBreak
+    + '____________________________________________';
+begin
+  // for NBIK test
+  LoadFile('MAPINFO\NBIK_P_4.BIN');
+  SequenceEditor.Subtitles[0].Text := MAX_SUB;
+  SequenceEditor.Subtitles[10].Text := MAX_SUB;
+  SequenceEditor.Save;
+  LoadFile('MAPINFO\NBIK_P_4.BIN');
 {$ELSE}
 begin
 {$ENDIF}
@@ -432,7 +451,7 @@ begin
   PreviewerVisible := False;
 end;
 
-procedure TfrmMain.ProjectHome1Click(Sender: TObject);
+procedure TfrmMain.miProjectHomeClick(Sender: TObject);
 begin
   OpenLink('http://shenmuesubs.sourceforge.net/');
 end;

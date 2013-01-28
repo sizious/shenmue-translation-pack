@@ -98,10 +98,6 @@ object frmMultiTranslation: TfrmMultiTranslation
     TabOrder = 3
     object TabSheet1: TTabSheet
       Caption = 'T&ranslator'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         498
         320)
@@ -152,9 +148,9 @@ object frmMultiTranslation: TfrmMultiTranslation
             item
             end
             item
+            end
+            item
             end>
-          ExplicitWidth = 489
-          ExplicitHeight = 130
         end
         object cbFiles: TComboBox
           Left = 37
@@ -163,7 +159,7 @@ object frmMultiTranslation: TfrmMultiTranslation
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
           OnSelect = cbFilesSelect
         end
