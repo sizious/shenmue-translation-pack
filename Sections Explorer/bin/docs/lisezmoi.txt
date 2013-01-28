@@ -1,0 +1,57 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                             ________________________________________________
+ __| Shenmue Sections Explorer |________________________________________________
+
+  Cet éditeur est un éditeur très simple qui permet de visualiser le contenu
+  des fichiers de données utilisés par Shenmue (toutes versions).
+  
+  Cet outil analyse la structure des fichiers et permet de patcher certaines 
+  sections. Attention, pour visualiser/éditer le contenu des sections de type 
+  "IPAC", il faut utiliser le programme "IPAC Browser".
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  L'éditeur s'utilise de la même façon qu'IPAC Browser. Lancez l'outil, puis
+  sélectionnez un fichier de données du jeu (par exemple un fichier 
+  "MAPINFO.BIN", un fichier ".PKS" ou tout autre fichier).
+  
+  Vous pouvez importer/exporter des données depuis/vers le fichier de données
+  du jeu, voir les informations sur ces fichiers et bien plus.  
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône principale a été créée par Treetog ArtWork.
+      
+  Pour les crédits complets, rendez-vous dans la boîte de dialogue "A propos".
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+ _____________________________________________________________________[ FIN ]___
