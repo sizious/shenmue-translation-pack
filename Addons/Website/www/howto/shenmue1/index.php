@@ -506,6 +506,13 @@ Before continuing, it's recommended that you remove the "_srf_discX" from all th
 	<th align="center">Source</th>
 </tr>
 <tr>
+	<td><a href="<?php echo ROOT_PATH; ?>/howto/shenmue1/addons/Shenmue_I_PAL_Saves_Pack_DC-IlDucci.7z">Shenmue Saves Pack</a></td>
+	<td align="center"><a target="_blank" href="http://tiovictor.romhackhispano.org/">IlDucci</a></td>
+	<td align="center">2012-06-03</td>
+	<td>This saves pack allow you to translate the game more easier. It contains several checkpoints to test your translation.</td>
+	<td align="center">-</td>
+</tr>
+<tr>
 	<td><a target="_blank" href="<?php echo ROOT_PATH; ?>/howto/shenmue1/addons/S1_JPG_083.pdf">Shenmue Japanization Guide</a></td>
 	<td align="center">Shensoul</td>
 	<td align="center">0.8.3</td>
