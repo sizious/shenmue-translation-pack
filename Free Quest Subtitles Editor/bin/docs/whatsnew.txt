@@ -1,10 +1,25 @@
-               Shenmue AiO Free Quest Subtitles Editor
+                  Shenmue Free Quest Subtitles Editor
               ______ __                                  
              |      |  |--.---.-.-----.-----.-----.-----.
              |   ---|     |  _  |     |  _  |  -__|__ --|
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
-___                           __________________________________________________
+___                            _________________________________________________
+___| Version 2.11: 2013-02-03 |_________________________________________________
+
+ADDED:
+- Previous (Ctrl+F9) and Next subtitles (F9) navigation by keyboard (thanks 
+  IlDucci for the idea).
+- Same toolbar as the Cinematics Subtitles Editor.
+
+FIXED:
+- Some menu items shortcuts were reset to match the Cinematics Subtitles Editor.
+- Common libraries rebuilt (with lots of bugs fixes).
+
+UPDATED:
+- The "AiO" (for All-in-One) tag from "Shenmue AiO Free Quest..." was removed.
+- Code cleanup
+___                            _________________________________________________
 ___| Version 2.10: 2010-06-20 |_________________________________________________
 
 FIXED:

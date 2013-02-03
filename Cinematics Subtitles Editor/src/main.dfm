@@ -40,7 +40,6 @@ object frmMain: TfrmMain
         Text = '# Application State #'
         Width = 50
       end>
-    ExplicitTop = 477
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -196,7 +195,6 @@ object frmMain: TfrmMain
     Align = alClient
     Caption = ' Editor : '
     TabOrder = 2
-    ExplicitHeight = 445
     DesignSize = (
       414
       464)
@@ -285,7 +283,6 @@ object frmMain: TfrmMain
         end
         item
         end>
-      ExplicitHeight = 302
     end
     object mOldSub: TMemo
       Left = 96
@@ -307,7 +304,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 1
       WordWrap = False
-      ExplicitTop = 325
     end
     object mNewSub: TMemo
       Left = 96
@@ -328,7 +324,6 @@ object frmMain: TfrmMain
       TabOrder = 2
       WordWrap = False
       OnChange = mNewSubChange
-      ExplicitTop = 369
     end
     object eFirstLineLength: TEdit
       Left = 96
@@ -340,7 +335,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 3
       Text = '(nb)'
-      ExplicitTop = 414
     end
     object eSecondLineLength: TEdit
       Left = 239
@@ -352,7 +346,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 4
       Text = '(nb)'
-      ExplicitTop = 414
     end
     object eSubCount: TEdit
       Left = 369
@@ -364,7 +357,6 @@ object frmMain: TfrmMain
       ReadOnly = True
       TabOrder = 5
       Text = '(nb)'
-      ExplicitTop = 414
     end
   end
   object gbFilesList: TGroupBox
@@ -381,7 +373,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 3
-    ExplicitHeight = 445
     object lbFilesList: TListBox
       Left = 4
       Top = 17
@@ -394,7 +385,6 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnKeyUp = lbFilesListKeyUp
       OnMouseUp = lbFilesListMouseUp
-      ExplicitHeight = 371
     end
     object Panel2: TPanel
       Left = 4
@@ -405,7 +395,6 @@ object frmMain: TfrmMain
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
-      ExplicitTop = 388
       DesignSize = (
         140
         53)
@@ -625,21 +614,6 @@ object frmMain: TfrmMain
     end
     object miTools: TMenuItem
       Caption = '&Tools'
-      object miAutoSave: TMenuItem
-        Caption = '&Auto-save'
-        Hint = 'Auto-saving the current file when needed.'
-        ShortCut = 118
-        OnClick = miAutoSaveClick
-      end
-      object miMakeBackup: TMenuItem
-        Caption = '&Make backup'
-        Hint = 'Auto-create a copy of the current file before saving it.'
-        ShortCut = 119
-        OnClick = miMakeBackupClick
-      end
-      object N9: TMenuItem
-        Caption = '-'
-      end
       object miBatchImportSubtitles: TMenuItem
         Caption = '&Batch import...'
         Hint = 'Import subtitles in mass.'
@@ -651,6 +625,21 @@ object frmMain: TfrmMain
         Hint = 'Export subtitles in mass.'
         ShortCut = 49221
         OnClick = miBatchExportSubtitlesClick
+      end
+    end
+    object miOptions: TMenuItem
+      Caption = '&Options'
+      object miAutoSave: TMenuItem
+        Caption = '&Auto-save'
+        Hint = 'Auto-saving the current file when needed.'
+        ShortCut = 118
+        OnClick = miAutoSaveClick
+      end
+      object miMakeBackup: TMenuItem
+        Caption = '&Make backup'
+        Hint = 'Auto-create a copy of the current file before saving it.'
+        ShortCut = 119
+        OnClick = miMakeBackupClick
       end
     end
     object miHelp: TMenuItem
