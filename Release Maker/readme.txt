@@ -1,4 +1,20 @@
- This is the Read Me file to learn how to compile the Shenmue Release Unlocker
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+
+ This is the Read Me file to learn how to compile the Shenmue Release Maker
  Package. Please read it before start working.
       ___                  _      __  _         
      / _ \___ ___ ________(_)__  / /_(_)__  ___ 
@@ -36,7 +52,7 @@ This app was developed as usual in Delphi 2007.
 
 To compile this app you'll need:
 
-- Delphi 7 or superior (XML units needed)
+- Delphi 2007 or superior (XML units needed)
 - JCL/JVCL components: http://homepages.codegear.com/jedi/jvcl/
 - The whole Common units from the Shenmue Translation Pack (you have it if you
   retrieve everything from the SVN).

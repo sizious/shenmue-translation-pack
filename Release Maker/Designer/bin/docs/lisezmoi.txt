@@ -1,0 +1,68 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+ __                         ____________________________________________________
+ __| Shenmue Release Maker |____________________________________________________
+
+  L'intérêt de cette application est de générer des paquets auto-extractibles
+  avec un mécanisme de vérification de disque. Vous pouvez utiliser cette 
+  application pour distribuer vos traductions !
+  
+  En clair, le paquet auto-extractible généré par cette application ne pourra
+  fonctionner que si l'utilisateur final insère le disque original nécessaire
+  pour décrypter le disque. Sinon, il sera impossible d'utiliser le paquet car
+  celui-ci est crypté par 3 algorithmes (AES-256, PC-1 et Camellia).
+
+  L'application dispose d'un haut niveau de paramétrage.
+ __               _____________________________________________________________
+ __| UTiLiSATiON |_____________________________________________________________
+
+  Lancez simplement "Release Maker" et indiquez au moins :
+    1. Le dossier source ("Source Directory dans l'onglet "Main") contenant les
+       fichiers à distribuer.
+    2. Les informations sur la distribution ("Auteur", "Nom du jeu"...).
+    3. Le "CLUF" dans l'onglet correspondant ("EULA"). Vous devriez plutôt 
+       utiliser un fichier RTF.
+    4. Dans l'onglet "Config", la langue pour le paquet à générer.
+    5. Au moins une "media key" dans l'onglet "Unlock". Vous devez insérer le 
+       disque original dans le lecteur.
+    6. Puis cliquez "Make" pour créer le paquet.
+	
+  Il est vivement recommandé de tester le paquet généré avant de faire sa
+  diffusion.
+ __         ___________________________________________________________________
+ __| iNFOS |___________________________________________________________________
+
+  L'icône principale a été créée par Flameia Design.
+      
+  Pour les crédits complets, rendez-vous dans la boîte de dialogue "A propos".
+ __           _________________________________________________________________
+ __| CONTACT |_________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+ __           _________________________________________________________________
+ __| CREDiTS |_________________________________________________________________
+ 
+  Code principal......: [big_fury]SiZiOUS (http://sbibuilder.shorturl.com/)
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+ _____________________________________________________________________[ FIN ]___
