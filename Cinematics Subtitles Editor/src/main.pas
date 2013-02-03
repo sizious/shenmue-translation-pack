@@ -91,7 +91,6 @@ type
     miExportSubtitles2: TMenuItem;
     miClose2: TMenuItem;
     N8: TMenuItem;
-    N9: TMenuItem;
     miAutoSave: TMenuItem;
     miMakeBackup: TMenuItem;
     bfdBatchExport: TJvBrowseForFolderDialog;
@@ -122,6 +121,7 @@ type
     N15: TMenuItem;
     miGoPrevSub: TMenuItem;
     miGoNextSub: TMenuItem;
+    miOptions: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;

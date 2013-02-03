@@ -36,7 +36,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 0
-    ExplicitHeight = 341
     object lbFilesList: TListBox
       Left = 4
       Top = 17
@@ -50,7 +49,6 @@ object frmMain: TfrmMain
       OnContextPopup = lbFilesListContextPopup
       OnDblClick = lbFilesListDblClick
       OnKeyPress = lbFilesListKeyPress
-      ExplicitHeight = 293
     end
     object Panel2: TPanel
       Left = 4
@@ -60,7 +58,6 @@ object frmMain: TfrmMain
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitTop = 310
       DesignSize = (
         140
         27)
@@ -95,10 +92,8 @@ object frmMain: TfrmMain
     Align = alClient
     TabOrder = 1
     OnChange = pcSubsChange
-    ExplicitHeight = 341
     object tsEditor: TTabSheet
       Caption = '&Editor'
-      ExplicitHeight = 313
       DesignSize = (
         407
         321)
@@ -198,7 +193,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 0
         Text = '0'
-        ExplicitTop = 290
       end
       object eFirstLineLength: TEdit
         Left = 104
@@ -210,7 +204,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 1
         Text = '0'
-        ExplicitTop = 290
       end
       object mSubText: TMemo
         Left = 104
@@ -224,7 +217,6 @@ object frmMain: TfrmMain
         MaxLength = 90
         TabOrder = 2
         OnChange = mSubTextChange
-        ExplicitTop = 250
       end
       object eSubCount: TEdit
         Left = 368
@@ -236,7 +228,6 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 3
         Text = '100'
-        ExplicitTop = 290
       end
       object eCharID: TEdit
         Left = 230
@@ -281,7 +272,6 @@ object frmMain: TfrmMain
           end
           item
           end>
-        ExplicitHeight = 103
       end
       object mOldSubEd: TMemo
         Left = 104
@@ -296,7 +286,6 @@ object frmMain: TfrmMain
         MaxLength = 90
         ReadOnly = True
         TabOrder = 6
-        ExplicitTop = 210
       end
       object rbMale: TRadioButton
         Left = 164
@@ -413,10 +402,6 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         407
         321)
@@ -428,7 +413,6 @@ object frmMain: TfrmMain
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = ' Global-Translation available strings : '
         TabOrder = 0
-        ExplicitHeight = 176
         DesignSize = (
           401
           184)
@@ -441,7 +425,6 @@ object frmMain: TfrmMain
           Caption = 'Clear...'
           TabOrder = 0
           OnClick = bMTClearClick
-          ExplicitTop = 148
         end
         object tvMultiSubs: TTreeView
           Left = 8
@@ -468,7 +451,6 @@ object frmMain: TfrmMain
           Caption = 'Expand all'
           TabOrder = 2
           OnClick = bMTExpandAllClick
-          ExplicitTop = 148
         end
         object bMTCollapseAll: TButton
           Left = 236
@@ -479,7 +461,6 @@ object frmMain: TfrmMain
           Caption = 'Collapse all'
           TabOrder = 3
           OnClick = bMTCollapseAllClick
-          ExplicitTop = 148
         end
       end
       object GroupBox4: TGroupBox
@@ -494,7 +475,6 @@ object frmMain: TfrmMain
         Anchors = [akLeft, akRight, akBottom]
         Caption = ' Replace the string with : '
         TabOrder = 1
-        ExplicitTop = 182
         DesignSize = (
           401
           129)
@@ -592,7 +572,6 @@ object frmMain: TfrmMain
         Caption = 'Retrieve...'
         TabOrder = 2
         OnClick = bMTRetrieveSubsClick
-        ExplicitTop = 151
       end
     end
   end
@@ -610,7 +589,6 @@ object frmMain: TfrmMain
     Padding.Right = 2
     Padding.Bottom = 2
     TabOrder = 2
-    ExplicitTop = 373
     object mDebug: TMemo
       Left = 4
       Top = 16
@@ -641,7 +619,6 @@ object frmMain: TfrmMain
         Text = 'Ready'
         Width = 50
       end>
-    ExplicitTop = 477
   end
   object tbMain: TJvToolBar
     Left = 0
@@ -654,6 +631,8 @@ object frmMain: TfrmMain
     List = True
     TabOrder = 4
     Transparent = True
+    OnCustomDraw = tbMainCustomDraw
+    ExplicitTop = -3
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -661,14 +640,12 @@ object frmMain: TfrmMain
       Caption = 'ToolButton1'
       Style = tbsSeparator
     end
-    object tbOpen: TToolButton
+    object tbScanDirectory: TToolButton
       Left = 8
       Top = 0
-      Hint = 'Open the IPAC file'
-      Caption = 'Open'
       ImageIndex = 0
     end
-    object tbReload: TToolButton
+    object tbReloadCurrentFile: TToolButton
       Left = 31
       Top = 0
       ImageIndex = 2
@@ -687,16 +664,16 @@ object frmMain: TfrmMain
       ImageIndex = 3
       Style = tbsSeparator
     end
-    object tbImportSubtitles: TToolButton
+    object tbImportSubs: TToolButton
       Left = 85
       Top = 0
-      Caption = 'tbImportSubtitles'
+      Caption = 'tbImportSubs'
       ImageIndex = 13
     end
-    object tbExportSubtitles: TToolButton
+    object tbExportSubs: TToolButton
       Left = 108
       Top = 0
-      Caption = 'tbExportSubtitles'
+      Caption = 'tbExportSubs'
       ImageIndex = 12
     end
     object ToolButton9: TToolButton
@@ -707,52 +684,46 @@ object frmMain: TfrmMain
       ImageIndex = 14
       Style = tbsSeparator
     end
-    object tbDebugLog: TToolButton
+    object tbSubsPreview: TToolButton
       Left = 139
       Top = 0
-      Caption = 'tbDebugLog'
-      ImageIndex = 7
-    end
-    object tbPreview: TToolButton
-      Left = 162
-      Top = 0
-      Caption = 'tbPreview'
+      Caption = 'tbSubsPreview'
       ImageIndex = 8
     end
-    object tbOriginalTextField: TToolButton
-      Left = 185
+    object tbShowOriginalText: TToolButton
+      Left = 162
       Top = 0
-      Caption = 'tbOriginalTextField'
+      Caption = 'tbShowOriginalText'
       ImageIndex = 18
     end
-    object tbCharset: TToolButton
-      Left = 208
+    object tbEnableCharsMod: TToolButton
+      Left = 185
       Top = 0
-      Caption = 'tbCharset'
+      Caption = 'tbEnableCharsMod'
       ImageIndex = 10
     end
     object ToolButton5: TToolButton
-      Left = 231
+      Left = 208
       Top = 0
       Width = 8
       Caption = 'ToolButton5'
       ImageIndex = 12
       Style = tbsSeparator
     end
-    object tbBatchImportSubtitles: TToolButton
-      Left = 239
+    object tbBatchImportSubs: TToolButton
+      Left = 216
       Top = 0
-      Caption = 'tbBatchImportSubtitles'
+      Caption = 'tbBatchImportSubs'
       ImageIndex = 14
     end
-    object tbBatchExportSubtitles: TToolButton
-      Left = 262
+    object tbBatchExportSubs: TToolButton
+      Left = 239
       Top = 0
-      Caption = 'tbBatchExportSubtitles'
+      Caption = 'tbBatchExportSubs'
       ImageIndex = 15
     end
     object ToolButton6: TToolButton
-      Left = 285
+      Left = 262
       Top = 0
       Width = 8
       Caption = 'ToolButton6'
@@ -760,19 +731,19 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object tbAutoSave: TToolButton
-      Left = 293
+      Left = 270
       Top = 0
       Caption = 'tbAutoSave'
       ImageIndex = 16
     end
     object tbMakeBackup: TToolButton
-      Left = 316
+      Left = 293
       Top = 0
       Caption = 'tbMakeBackup'
       ImageIndex = 17
     end
     object ToolButton2: TToolButton
-      Left = 339
+      Left = 316
       Top = 0
       Width = 8
       Caption = 'ToolButton2'
@@ -780,7 +751,7 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object tbAbout: TToolButton
-      Left = 347
+      Left = 324
       Top = 0
       Caption = 'tbAbout'
       ImageIndex = 11
@@ -909,7 +880,7 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object miShowOriginalText: TMenuItem
-        Caption = 'Original text in field'
+        Caption = '&Original text in field'
         Hint = 
           'Show untouched original subtitles extracted from the game in the' +
           ' old text field.'
@@ -917,7 +888,7 @@ object frmMain: TfrmMain
         OnClick = miShowOriginalTextClick
       end
       object miOriginalColumnList: TMenuItem
-        Caption = 'Original column in list'
+        Caption = 'Original column in &list'
         Hint = 
           'Show an additional column with the original subtitle text in the' +
           ' view.'
@@ -927,14 +898,19 @@ object frmMain: TfrmMain
       object N12: TMenuItem
         Caption = '-'
       end
-      object miEnableCharsMod: TMenuItem
-        Caption = '&Decode subtitles'
-        Enabled = False
-        Hint = 'Translate the Shenmue charset to Windows charset and vice-versa.'
-        ShortCut = 117
-        OnClick = miEnableCharsModClick
+      object miGoPrevSub: TMenuItem
+        Caption = 'Previous su&btitle'
+        Hint = 'Switch to the previous subtitle for editing.'
+        ShortCut = 16504
+        OnClick = miGoPrevSubClick
       end
-      object N15: TMenuItem
+      object miGoNextSub: TMenuItem
+        Caption = 'Ne&xt subtitle'
+        Hint = 'Switch to the next subtitle for editing.'
+        ShortCut = 120
+        OnClick = miGoNextSubClick
+      end
+      object N24: TMenuItem
         Caption = '-'
       end
       object miBrowseDirectory2: TMenuItem
@@ -944,10 +920,20 @@ object frmMain: TfrmMain
         OnClick = miBrowseDirectoryClick
       end
       object miReloadDir2: TMenuItem
-        Caption = '&Refresh'
+        Caption = '&Refresh files list'
         Hint = 'Rescan the selected directory to find files.'
-        ShortCut = 116
+        ShortCut = 16500
         OnClick = miReloadDirClick
+      end
+      object N15: TMenuItem
+        Caption = '-'
+      end
+      object miEnableCharsMod: TMenuItem
+        Caption = '&Decode subtitles'
+        Enabled = False
+        Hint = 'Translate the Shenmue charset to Windows charset and vice-versa.'
+        ShortCut = 117
+        OnClick = miEnableCharsModClick
       end
     end
     object miTools: TMenuItem
@@ -988,7 +974,6 @@ object frmMain: TfrmMain
       object miFacesExtractor: TMenuItem
         Caption = '&Faces extractor...'
         Hint = 'Extract NPC faces textures files from associated PAKF files.'
-        ShortCut = 120
         OnClick = miFacesExtractorClick
       end
     end

@@ -41,7 +41,7 @@ const
   APP_VERSION =
     '2.11' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'Jan 27, 2013 @05:11PM';
+  COMPIL_DATE_TIME = 'Feb 03, 2013 @07:29PM';
 
 type
   TGlobalTranslationModule = class;
@@ -198,20 +198,19 @@ type
     miBatchSRF: TMenuItem;
     tbMain: TJvToolBar;
     ToolButton1: TToolButton;
-    tbOpen: TToolButton;
-    tbReload: TToolButton;
+    tbScanDirectory: TToolButton;
+    tbReloadCurrentFile: TToolButton;
     tbSave: TToolButton;
     ToolButton4: TToolButton;
-    tbImportSubtitles: TToolButton;
-    tbExportSubtitles: TToolButton;
+    tbImportSubs: TToolButton;
+    tbExportSubs: TToolButton;
     ToolButton9: TToolButton;
-    tbDebugLog: TToolButton;
-    tbPreview: TToolButton;
-    tbOriginalTextField: TToolButton;
-    tbCharset: TToolButton;
+    tbSubsPreview: TToolButton;
+    tbShowOriginalText: TToolButton;
+    tbEnableCharsMod: TToolButton;
     ToolButton5: TToolButton;
-    tbBatchImportSubtitles: TToolButton;
-    tbBatchExportSubtitles: TToolButton;
+    tbBatchImportSubs: TToolButton;
+    tbBatchExportSubs: TToolButton;
     ToolButton6: TToolButton;
     tbAutoSave: TToolButton;
     tbMakeBackup: TToolButton;
@@ -219,6 +218,9 @@ type
     tbAbout: TToolButton;
     ilToolBar: TImageList;
     ilToolBarDisabled: TImageList;
+    miGoPrevSub: TMenuItem;
+    N24: TMenuItem;
+    miGoNextSub: TMenuItem;
     procedure miScanDirectoryClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbFilesListClick(Sender: TObject);
@@ -291,6 +293,10 @@ type
     procedure miExportToCinematicScriptClick(Sender: TObject);
     procedure miDEBUG_TestSRFDBClick(Sender: TObject);
     procedure miBatchSRFClick(Sender: TObject);
+    procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
+      var DefaultDraw: Boolean);
+    procedure miGoNextSubClick(Sender: TObject);
+    procedure miGoPrevSubClick(Sender: TObject);
   private
     { Déclarations privées }
 //    fPrevMessage: string;
@@ -612,6 +618,7 @@ end;
 procedure TfrmMain.ApplicationEventsException(Sender: TObject; E: Exception);
 begin
   miSubsPreview.Enabled := not (E is ESubtitlesPreviewInterface);
+  tbSubsPreview.Enabled := miSubsPreview.Enabled;
   RunBugsHandler(Sender, E);
 end;
 
@@ -1113,12 +1120,15 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  Caption := Application.Title + ' - v' + APP_VERSION + ' - by [big_fury]SiZiOUS';
+  Caption := Application.Title + ' v' + APP_VERSION;
 
 {$IFNDEF DEBUG}
   // Debug Menu
   miDebug.Visible := False;
 {$ENDIF}
+
+  // Initialize the Toolbar
+  ToolBarInitControl(Self, tbMain);
 
   // Initialize the Text Corrector Database
   PreviousLoadedGameVersion := gvUndef;
@@ -1181,6 +1191,7 @@ begin
   CanEnableCharsMod1 := IsCharsModAvailable(gvShenmue);
   CanEnableCharsMod2 := IsCharsModAvailable(gvShenmue2);
   miEnableCharsMod.Enabled := CanEnableCharsMod1 or CanEnableCharsMod2;
+  tbEnableCharsMod.Enabled := miEnableCharsMod.Enabled;
   EnableCharsMod := miEnableCharsMod.Enabled;
   
   if not CanEnableCharsMod1 then
@@ -1298,6 +1309,20 @@ end;
 function TfrmMain.GetTargetFileName: TFileName;
 begin
   Result := fTargetFileName;
+end;
+
+procedure TfrmMain.miGoNextSubClick(Sender: TObject);
+begin
+  lvSubsSelect.ItemIndex := lvSubsSelect.ItemIndex + 1;
+  ListViewSelectItem(lvSubsSelect, lvSubsSelect.ItemIndex);
+  lvSubsSelectClick(Self);
+end;
+
+procedure TfrmMain.miGoPrevSubClick(Sender: TObject);
+begin
+  lvSubsSelect.ItemIndex := lvSubsSelect.ItemIndex - 1;
+  ListViewSelectItem(lvSubsSelect, lvSubsSelect.ItemIndex);
+  lvSubsSelectClick(Self);
 end;
 
 procedure TfrmMain.miGoToClick(Sender: TObject);
@@ -1520,6 +1545,7 @@ begin
   if LoadRes then begin
     SCNFEditor.CharsList.Active := EnableCharsMod;
     miEnableCharsMod.Enabled := True;
+    tbEnableCharsMod.Enabled := miEnableCharsMod.Enabled;
   end else begin
     AddDebug('WARNING: Unable to load the characters list for "'
       + GameVersionToFriendlyString(SCNFEditor.GameVersion)
@@ -1528,6 +1554,7 @@ begin
     if pcSubs.TabIndex = 0 then begin // Only if we have the "Editor" tab shown...
       SCNFEditor.CharsList.Active := False; // because in Global mode, we can enable it
       miEnableCharsMod.Enabled := False;
+      tbEnableCharsMod.Enabled := miEnableCharsMod.Enabled;
     end;
   end;
 
@@ -1653,6 +1680,10 @@ begin
 
     // Update the OldSubEd edit
     UpdateOldSubtitleField;
+
+    // Update the navigations menus items (Next & Previous Menu Items)
+    miGoPrevSub.Enabled := lvSubsSelect.ItemIndex > 0;
+    miGoNextSub.Enabled := lvSubsSelect.ItemIndex < lvSubsSelect.Items.Count - 1;      
   end;
 end;
 
@@ -1698,6 +1729,7 @@ end;
 procedure TfrmMain.miSubsPreviewClick(Sender: TObject);
 begin
   miSubsPreview.Checked := not miSubsPreview.Checked;
+  tbSubsPreview.Down := miSubsPreview.Checked;
   SubsViewerVisible := miSubsPreview.Checked;
 
   if SubsViewerVisible then begin
@@ -1850,6 +1882,7 @@ begin
 
             // Change state of the the CharsMod menu depending of the file selected
             miEnableCharsMod.Enabled := IsCharsModAvailable(SCNFEditor.GameVersion);
+            tbEnableCharsMod.Enabled := miEnableCharsMod.Enabled;
           end;
         end;
 
@@ -1858,6 +1891,7 @@ begin
           // Save files changes if needed
           SaveFileIfNeeded(False);
           miEnableCharsMod.Enabled := CanEnableCharsMod1 or CanEnableCharsMod2;
+          tbEnableCharsMod.Enabled := miEnableCharsMod.Enabled;
         end;
 
   end;
@@ -1867,6 +1901,7 @@ end;
 procedure TfrmMain.PreviewWindowClosedEvent(Sender: TObject);
 begin
   Self.miSubsPreview.Checked := False;
+  tbSubsPreview.Down := False;
 end;
 
 procedure TfrmMain.miFileProperties2Click(Sender: TObject);
@@ -1888,7 +1923,9 @@ begin
   miClearFilesList.Enabled := False;
   miClearFilesList2.Enabled := False;
   miBatchImportSubs.Enabled := False;
+  tbBatchImportSubs.Enabled := False;
   miBatchExportSubs.Enabled := False;
+  tbBatchExportSubs.Enabled := False;
   miBatchSRF.Enabled := False;
 
   if SubsViewerVisible then
@@ -2148,7 +2185,9 @@ begin
   miClearFilesList.Enabled := True;
   miClearFilesList2.Enabled := True;
   miBatchImportSubs.Enabled := True;
+  tbBatchImportSubs.Enabled := True;
   miBatchExportSubs.Enabled := True;
+  tbBatchImportSubs.Enabled := True;
   miBatchSRF.Enabled := True;
 end;
 
@@ -2176,11 +2215,13 @@ procedure TfrmMain.SetAutoSave(const Value: Boolean);
 begin
   fAutoSave := Value;
   miAutoSave.Checked := AutoSave;
+  tbAutoSave.Down := AutoSave;
 end;
 
 procedure TfrmMain.SetEnableCharsMod(const Value: Boolean);
 begin
   miEnableCharsMod.Checked := Value;
+  tbEnableCharsMod.Down := Value;
   fEnableCharsMod := Value;
 
   // Single view
@@ -2226,6 +2267,7 @@ procedure TfrmMain.SetEnableOriginalSubtitlesView(const Value: Boolean);
 begin
   fEnableOriginalSubtitlesView := Value;
   miShowOriginalText.Checked := Value;
+  tbShowOriginalText.Down := Value;
   UpdateOldSubtitleField;
   if Value then
     lOldText.Caption := 'Original text:'
@@ -2239,8 +2281,11 @@ begin
   miCloseFile2.Enabled := State;
   miReloadCurrentFile.Enabled := State;
   miReloadCurrentFile2.Enabled := State;
+  tbReloadCurrentFile.Enabled := State;
   miImportSubs.Enabled := State;
+  tbImportSubs.Enabled := State;
   miExportSubs.Enabled := State;
+  tbExportSubs.Enabled := State;
   miImportSubs3.Enabled := State;
   miExportSubs3.Enabled := State;
   miFileProperties.Enabled := State;
@@ -2249,8 +2294,11 @@ begin
   miExportToCinematicScript2.Enabled := State;
   if State then
     lvSubsSelect.PopupMenu := pmSubsSelect
-  else
+  else begin
     lvSubsSelect.PopupMenu := nil;
+    miGoPrevSub.Enabled := State;
+    miGoNextSub.Enabled := State;
+  end;
   Self.miLocateFile.Enabled := State;
   // Self.Multitranslation1.Enabled := State;
 end;
@@ -2259,6 +2307,7 @@ procedure TfrmMain.SetFileSaveOperationsMenusItemEnabledState(
   const State: Boolean);
 begin
   miSave.Enabled := State;
+  tbSave.Enabled := State;
   miSaveAs.Enabled := State;
 end;
 
@@ -2267,6 +2316,7 @@ begin
   fMakeBackup := Value;
   SCNFEditor.MakeBackup := Value;
   miMakeBackup.Checked := Value;
+  tbMakeBackup.Down := Value;
 end;
 
 procedure TfrmMain.SetModified(const State: Boolean);
@@ -2360,6 +2410,12 @@ begin
 {$ELSE}
 begin
 {$ENDIF}
+end;
+
+procedure TfrmMain.tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
+  var DefaultDraw: Boolean);
+begin
+  ToolBarCustomDraw(Sender);
 end;
 
 procedure TfrmMain.tvMultiSubsClick(Sender: TObject);
