@@ -35,9 +35,9 @@ type
     lvDiscKeys: TListView;
     tsConfig: TTabSheet;
     gbxUI: TGroupBox;
-    Label2: TLabel;
-    edtAppConfig: TEdit;
-    btnAppConfig: TButton;
+    lblLangCustom: TLabel;
+    edtLangCustom: TEdit;
+    btnLangCustom: TButton;
     gbxDestination: TGroupBox;
     Label5: TLabel;
     edtDestDir: TEdit;
@@ -153,10 +153,10 @@ type
     btnColorsPreviewNext: TButton;
     lblColorsPreviewLinks: TLabel;
     lblColorsPreviewWarning: TLabel;
-    cbxLangUI: TComboBox;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
-    Label26: TLabel;
+    cbxLangStandard: TComboBox;
+    rbnLangStandard: TRadioButton;
+    rbnLangCustom: TRadioButton;
+    lblLangStandard: TLabel;
     procedure btnQuitClick(Sender: TObject);
     procedure btnAddKeyClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -170,7 +170,7 @@ type
     procedure btnSkinBottomClick(Sender: TObject);
     procedure btnSkinLeftAddClick(Sender: TObject);
     procedure btnSkinLeftDelClick(Sender: TObject);
-    procedure btnAppConfigClick(Sender: TObject);
+    procedure btnLangCustomClick(Sender: TObject);
     procedure btnEULAClick(Sender: TObject);
     procedure lvwSkinLeftDblClick(Sender: TObject);
     procedure btnAboutClick(Sender: TObject);
@@ -201,6 +201,7 @@ type
     procedure clbWarningSelect(Sender: TObject);
     procedure btnColorsPreviewAboutClick(Sender: TObject);
     procedure lblColorsPreviewLinksClick(Sender: TObject);
+    procedure rbnLangStandardClick(Sender: TObject);
   private
     { Déclarations privées }
     fWorkingThread: TOperationThread;
@@ -233,6 +234,7 @@ type
     procedure SetStatus(const Value: string);
     procedure SetControlsState(State: Boolean);
     procedure SetCloseControlsState(State: Boolean);
+    procedure SetLanguagePackControlsState(State: Boolean);
     procedure SetStatusProgress(const Value: Double);
     procedure SetStatusProgressMax(const MaxValue: Double);
     procedure WorkingThreadTerminateHandler(Sender: TObject);
@@ -240,6 +242,8 @@ type
     procedure SetLeftImage(Index: Integer; const Value: TFileName);
     function GetWebURL: string;
     procedure SetAppIconFileName(const Value: TFileName);
+    function GetSelectedLanguagePack: TFileName;
+    procedure SetSelectedLanguagePack(const Value: TFileName);
     property WebURL: string read GetWebURL;
     property WorkingThread: TOperationThread read fWorkingThread
       write fWorkingThread;
@@ -257,6 +261,8 @@ type
       write fMediaHashKeys;
     property LeftImages[Index: Integer]: TFileName read GetLeftImage
       write SetLeftImage;
+    property SelectedLanguagePack: TFileName read GetSelectedLanguagePack
+      write SetSelectedLanguagePack;
   end;
 
 var
@@ -371,7 +377,7 @@ end;
 // Check passwords length and fill the missing characters with random ones.
 function TfrmMain.CheckInputs: Boolean;
 const
-  FILES_EDIT: array[0..1] of string = ('edtAppConfig', 'edtEULA');
+  FILES_EDIT: array[0..0] of string = ('edtEULA');
   FILES_EDIT_OPTIONAL: array[0..1] of string = ('edtSkinTop', 'edtSkinBottom');
   FOLDER_EDIT: array[0..1] of string = ('edtSourceDir', 'edtDestDir');
   INFOS_EDIT: array[0..3] of string = ('edtAuthor', 'edtGameName', 'edtWebURL', 'edtVersion');
@@ -429,6 +435,13 @@ begin
   for i := Low(FILES_EDIT) to High(FILES_EDIT) do
   begin
     Edit := FindComponent(FILES_EDIT[i]) as TEdit;
+    Result := _CHK(False);
+    if not Result then Exit;
+  end;
+
+  if rbnLangCustom.Checked then
+  begin
+    Edit := edtLangCustom;
     Result := _CHK(False);
     if not Result then Exit;
   end;
@@ -579,7 +592,7 @@ begin
   end;
 end;
 
-procedure TfrmMain.btnAppConfigClick(Sender: TObject);
+procedure TfrmMain.btnLangCustomClick(Sender: TObject);
 begin
   with od do
   begin
@@ -587,7 +600,7 @@ begin
     Filter := 'INI Files (*.ini)|*.ini|All Files (*.*)|*.*';
     DefaultExt := 'ini';
     if Execute then
-      edtAppConfig.Text := ConvertToRelativePath(FileName);
+      edtLangCustom.Text := ConvertToRelativePath(FileName);
   end;
 end;
 
@@ -862,6 +875,7 @@ begin
 
   btnOpenSourceDir.Enabled := False;
   btnOpenDestDir.Enabled := False;
+  rbnLangStandard.Checked := True;
 
   // Init the Release Info Tab
   edtReleaseDate.Date := Now;
@@ -963,6 +977,13 @@ begin
   end;
 end;
 
+function TfrmMain.GetSelectedLanguagePack: TFileName;
+begin
+  Result := '';
+  if cbxLangStandard.ItemIndex = -1 then Exit;
+  Result := LanguagePacks[cbxLangStandard.ItemIndex];
+end;
+
 function TfrmMain.GetStatus;
 begin
   Result := sbMain.Panels[1].Text;
@@ -1045,7 +1066,7 @@ begin
         begin
           LangName := ChangeFileExt(SR.Name, '');
           LangName[1] := UpCase(LangName[1]);
-          cbxLangUI.Items.Add(LangName);
+          cbxLangStandard.Items.Add(LangName);
           LanguagePacks.Add(LngDir + SR.Name);
         end;
       until (FindNext(SR) <> 0);
@@ -1053,7 +1074,7 @@ begin
     end;
   except
     on E:Exception do
-      raise EUserInterface.Create('Unable to load the language packs!');
+      raise EUserInterface.Create('Unable to load language packs!');
   end;
 end;
 
@@ -1142,7 +1163,12 @@ begin
         Left.Add(LeftImages[i]);
     end;
     Eula := edtEULA.Text;
-    AppConfig := edtAppConfig.Text; // ui.ini file
+
+    if rbnLangStandard.Checked then
+      AppConfig := SelectedLanguagePack
+    else
+      AppConfig := edtLangCustom.Text; // Custom ui.ini file
+
     AppIcon := AppIconFileName;
     MediaHashKeys.Assign(Self.MediaHashKeys);
     with ReleaseInfo do // config.ini file
@@ -1258,6 +1284,11 @@ begin
   lblColorsPreviewLinks.Font.Color := clbLinks.Selected;
 end;
 
+procedure TfrmMain.rbnLangStandardClick(Sender: TObject);
+begin
+  SetLanguagePackControlsState(rbnLangStandard.Checked);
+end;
+
 procedure TfrmMain.reEulaURLClick(Sender: TObject; const URLText: string;
   Button: TMouseButton);
 begin
@@ -1289,7 +1320,8 @@ begin
     imgPackIcon.Picture.LoadFromFile(fAppIconFileName);
   end else begin
     fAppIconFileName := '';
-    LoadDefaultPackageIcon
+    edtPackIcon.Text := '';
+    LoadDefaultPackageIcon;
   end;
 end;
 
@@ -1317,8 +1349,6 @@ begin
   btnSourceDir.Enabled := State;
   edtDestDir.Enabled := State;
   btnDestDir.Enabled := State;
-  edtAppConfig.Enabled := State;
-  btnAppConfig.Enabled := State;
   edtEULA.Enabled := State;
   btnEULA.Enabled := State;
   btnSkinTop.Enabled := State;
@@ -1337,14 +1367,43 @@ begin
   edtVersion.Enabled := State;
   edtWizardTitle.Enabled := State;
   cbxProtocolWebURL.Enabled := State;
+  edtPackIcon.Enabled := State;
+  btnPackIconLoad.Enabled := State;
+  btnPackIconDefault.Enabled := State;
+  clbText.Enabled := State;
+  clbWarning.Enabled := State;
+  clbLeft.Enabled := State;
+  clbTop.Enabled := State;
+  clbBottom.Enabled := State;
+  clbCenter.Enabled := State;
+  clbLinks.Enabled := State;
+  clbLinksClicked.Enabled := State;
+  clbLinksHot.Enabled := State;
+  cbxLangStandard.Enabled := State;
+  rbnLangStandard.Enabled := State;
+  rbnLangCustom.Enabled := State;
   if not State then
   begin
     cbxShowAppName.Enabled := False;
     btnQuit.Caption := '&Cancel';
+    edtLangCustom.Enabled := False;
+    btnLangCustom.Enabled := False;
+    btnWebURL.Enabled := False;
   end else begin
     UpdateShowAppTitleCheckBox;
     btnQuit.Caption := '&Quit';
+    rbnLangStandardClick(Self);
+    edtWebURLChange(Self);
   end;
+end;
+
+procedure TfrmMain.SetLanguagePackControlsState(State: Boolean);
+begin
+  lblLangCustom.Enabled := not State;
+  edtLangCustom.Enabled := not State;
+  btnLangCustom.Enabled := not State;
+  lblLangStandard.Enabled := State;
+  cbxLangStandard.Enabled := State;
 end;
 
 procedure TfrmMain.SetLeftImage(Index: Integer; const Value: TFileName);
@@ -1357,6 +1416,16 @@ begin
     lvwSkinLeft.Items[Index].SubItems[1] := '';
     lvwSkinLeft.Items[Index].SubItems[2] := '';
   end;
+end;
+
+procedure TfrmMain.SetSelectedLanguagePack(const Value: TFileName);
+var
+  i: Integer;
+
+begin
+  i := cbxLangStandard.Items.IndexOf(LowerCase(Value));
+  if i = -1 then Exit;
+  cbxLangStandard.ItemIndex := i;
 end;
 
 procedure TfrmMain.SetStatus;

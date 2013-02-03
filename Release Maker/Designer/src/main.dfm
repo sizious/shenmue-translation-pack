@@ -352,7 +352,7 @@ object frmMain: TfrmMain
     Top = 71
     Width = 618
     Height = 315
-    ActivePage = tsConfig
+    ActivePage = tsInfo
     TabOrder = 1
     object tsGeneral: TTabSheet
       Caption = 'Main'
@@ -514,7 +514,7 @@ object frmMain: TfrmMain
           Top = 97
           Width = 340
           Height = 21
-          TabOrder = 1
+          TabOrder = 3
           OnChange = edtWebURLChange
         end
         object edtReleaseDate: TJvDatePickerEdit
@@ -524,14 +524,14 @@ object frmMain: TfrmMain
           Height = 21
           AllowNoDate = True
           Checked = True
-          TabOrder = 2
+          TabOrder = 5
         end
         object edtVersion: TEdit
           Left = 410
           Top = 124
           Width = 177
           Height = 21
-          TabOrder = 3
+          TabOrder = 6
         end
         object btnWebURL: TButton
           Left = 530
@@ -548,7 +548,7 @@ object frmMain: TfrmMain
           Width = 487
           Height = 21
           ItemHeight = 13
-          TabOrder = 5
+          TabOrder = 1
           Items.Strings = (
             'Shenmue'
             'Shenmue II'
@@ -562,7 +562,7 @@ object frmMain: TfrmMain
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 0
-          TabOrder = 6
+          TabOrder = 2
           Text = 'http://'
           Items.Strings = (
             'http://'
@@ -1881,62 +1881,62 @@ object frmMain: TfrmMain
         Height = 66
         Caption = ' Wizard UI File : '
         TabOrder = 0
-        object Label2: TLabel
+        object lblLangCustom: TLabel
           Left = 261
           Top = 39
           Width = 62
           Height = 13
           Caption = 'Custom File :'
         end
-        object Label26: TLabel
+        object lblLangStandard: TLabel
           Left = 8
           Top = 39
           Width = 54
           Height = 13
           Caption = 'Language :'
         end
-        object edtAppConfig: TEdit
+        object edtLangCustom: TEdit
           Left = 328
           Top = 36
           Width = 236
           Height = 21
-          TabOrder = 0
+          TabOrder = 3
         end
-        object btnAppConfig: TButton
+        object btnLangCustom: TButton
           Left = 570
           Top = 36
           Width = 25
           Height = 21
           Caption = '...'
-          TabOrder = 1
-          OnClick = btnAppConfigClick
+          TabOrder = 4
+          OnClick = btnLangCustomClick
         end
-        object cbxLangUI: TComboBox
+        object cbxLangStandard: TComboBox
           Left = 74
           Top = 36
           Width = 169
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 2
+          TabOrder = 1
         end
-        object RadioButton1: TRadioButton
+        object rbnLangStandard: TRadioButton
           Left = 74
           Top = 17
           Width = 161
           Height = 17
           Caption = 'Use a standard messages file'
-          Checked = True
-          TabOrder = 3
-          TabStop = True
+          TabOrder = 0
+          OnClick = rbnLangStandardClick
         end
-        object RadioButton2: TRadioButton
+        object rbnLangCustom: TRadioButton
           Left = 328
           Top = 17
           Width = 236
           Height = 17
           Caption = 'Use a custom messages file'
-          TabOrder = 4
+          TabOrder = 2
+          OnClick = rbnLangStandardClick
         end
       end
       object gbxKeysAuth: TGroupBox
@@ -1992,7 +1992,7 @@ object frmMain: TfrmMain
           Width = 462
           Height = 21
           MaxLength = 32
-          TabOrder = 1
+          TabOrder = 2
         end
         object btnPC1: TButton
           Left = 528
@@ -2000,7 +2000,7 @@ object frmMain: TfrmMain
           Width = 69
           Height = 25
           Caption = 'Generate'
-          TabOrder = 2
+          TabOrder = 1
           OnClick = btnPC1Click
         end
         object btnCamellia: TButton
@@ -2052,7 +2052,7 @@ object frmMain: TfrmMain
           AutoSize = True
           BevelOuter = bvLowered
           BevelWidth = 2
-          TabOrder = 0
+          TabOrder = 3
           object imgPackIcon: TImage
             Left = 2
             Top = 2
@@ -2069,7 +2069,7 @@ object frmMain: TfrmMain
           Width = 69
           Height = 25
           Caption = '&Load...'
-          TabOrder = 1
+          TabOrder = 2
           OnClick = btnPackIconLoadClick
         end
         object btnPackIconDefault: TButton
@@ -2078,7 +2078,7 @@ object frmMain: TfrmMain
           Width = 69
           Height = 25
           Caption = '&Default...'
-          TabOrder = 2
+          TabOrder = 1
           OnClick = btnPackIconDefaultClick
         end
         object edtPackIcon: TEdit
@@ -2086,7 +2086,7 @@ object frmMain: TfrmMain
           Top = 43
           Width = 462
           Height = 21
-          TabOrder = 3
+          TabOrder = 0
           OnChange = edtPackIconChange
         end
       end
@@ -2205,8 +2205,6 @@ object frmMain: TfrmMain
     object tsColors: TTabSheet
       Caption = 'Colors'
       ImageIndex = 7
-      ExplicitLeft = 7
-      ExplicitTop = 28
       object gbxTextColors: TGroupBox
         Left = 175
         Top = 123
@@ -2419,7 +2417,6 @@ object frmMain: TfrmMain
             ParentBackground = False
             TabOrder = 1
             OnClick = pnlColorsPreviewCenterClick
-            ExplicitTop = 1
             object btnColorsPreviewAbout: TButton
               Left = 6
               Top = 4
@@ -2508,7 +2505,6 @@ object frmMain: TfrmMain
             ParentBackground = False
             TabOrder = 3
             OnClick = pnlColorsPreviewCenterClick
-            ExplicitTop = 26
             object lblColorsPreviewTitle: TLabel
               Left = 6
               Top = 6

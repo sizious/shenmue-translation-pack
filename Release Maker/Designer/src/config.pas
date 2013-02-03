@@ -44,7 +44,6 @@ begin
     end;
     frmMain.edtSourceDir.Text := ReadString('main', 'inputdir', frmMain.edtSourceDir.Text);
     frmMain.edtDestDir.Text := ReadString('main', 'outputdir', GetCurrentDir);
-    frmMain.edtAppConfig.Text := ReadString('main', 'appconfig', frmMain.edtAppConfig.Text);
     frmMain.edtEULA.Text := ReadString('main', 'eula',
       GetDefaultFileName('.\data\eula.rtf'));
 
@@ -101,6 +100,18 @@ begin
     frmMain.edtWizardTitle.Text := ReadString('info', 'wintitle', frmMain.edtWizardTitle.Text);
     frmMain.edtReleaseDate.Date := StrToDateDef(ReadString('info', 'rlzdate', ''), Now);
     frmMain.UpdateShowAppTitleCheckBox;
+
+    // Language
+    frmMain.SelectedLanguagePack := ReadString('main', 'languagepackstandard', '');
+    if (frmMain.cbxLangStandard.ItemIndex = -1)
+      and (frmMain.cbxLangStandard.Items.Count > 0) then
+        frmMain.cbxLangStandard.ItemIndex := 0;    
+    frmMain.edtLangCustom.Text := ReadString('main', 'languagepackcustom',
+      frmMain.edtLangCustom.Text);    
+    if ReadBool('main', 'applangiscustom', False) then
+      frmMain.rbnLangCustom.Checked := True
+    else
+      frmMain.rbnLangStandard.Checked := True;
   end;
 end;
 
@@ -115,9 +126,14 @@ begin
     WriteFormAttributes(frmMain);
     WriteString('main', 'inputdir', frmMain.edtSourceDir.Text);
     WriteString('main', 'outputdir', frmMain.edtDestDir.Text);
-    WriteString('main', 'appconfig', frmMain.edtAppConfig.Text);
     WriteString('main', 'eula', frmMain.edtEULA.Text);
+    WriteBool('main', 'applangiscustom', frmMain.rbnLangCustom.Checked);
+    WriteString('main', 'languagepackcustom', frmMain.edtLangCustom.Text);
 
+    i := frmMain.cbxLangStandard.ItemIndex;
+    if i <> -1 then    
+      WriteString('main', 'languagepackstandard', LowerCase(frmMain.cbxLangStandard.Items[i]));
+    
     WriteString('skin', 'top', frmMain.edtSkinTop.Text);
     WriteString('skin', 'bottom', frmMain.edtSkinBottom.Text);
 
