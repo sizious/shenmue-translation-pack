@@ -402,6 +402,10 @@ object frmMain: TfrmMain
     object tsMultiTrad: TTabSheet
       Caption = '&Global'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         407
         321)
@@ -632,7 +636,6 @@ object frmMain: TfrmMain
     TabOrder = 4
     Transparent = True
     OnCustomDraw = tbMainCustomDraw
-    ExplicitTop = -3
     object ToolButton1: TToolButton
       Left = 0
       Top = 0

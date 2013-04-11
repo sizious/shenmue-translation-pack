@@ -270,6 +270,8 @@ function TPVRConverter.RunEngine: Boolean;
 var
   BatchContent: TStringList;
   BatchTarget, EngineFile: TFileName;
+  i: Integer;
+  S, OemString: string;
 
 begin
   Result := False;
@@ -291,6 +293,7 @@ begin
   try
     with BatchContent do begin
       Add('@echo off');
+      Add('REM Created by Img2Png Unit by [big_fury]SiZiOUS');
       Add('"' + EngineFile + '" '
         + '"' + SourceFileName + '" '
         + '"' + TargetFileName + '" > '
@@ -298,6 +301,17 @@ begin
       {Add(':label');
       Add('del "' + BatchTarget + '" > nul 2> nul');
       Add('if exist "' + BatchTarget + '" goto label');}
+
+      // OEM FIX (2013-04-11)
+      // TODO: Test this code because I don't have any PVR image on my VM...
+      for i := 0 to Count - 1 do
+      begin
+        S := BatchContent[i];
+        SetLength(OemString, Length(S));
+        CharToOem(PChar(S), PChar(OemString));
+        BatchContent[i] := OemString;
+      end;
+      
       SaveToFile(BatchTarget);
     end;
   finally
