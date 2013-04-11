@@ -10,6 +10,8 @@ uses
   ;
 
 type
+  ECinematicsHashKeyDatabase = class(Exception);
+
   TCinematicsHashKeyDatabase = class(TObject)
   private
 {$IFDEF USE_DCL}
@@ -96,6 +98,14 @@ begin
     SevenZipExtract(FileName, GetWorkingTempDirectory);
     CinematicsDatabaseFileName := GetWorkingTempDirectory + 'index.dbi';
   end;
+
+  // Verify the existance of the file
+  if not FileExists(CinematicsDatabaseFileName) then
+    raise ECinematicsHashKeyDatabase.Create('The Cinematics Database can''t ' +
+      'be read. Please check if the filepath doesn''t contains some Unicode ' +
+      'characters. If yes, please move the Shenmue Translation Pack binaries ' +
+      'to another location, for example "C:\SHENTRAD\". Please close this ' +
+      'application now and restart it when the new filepath location is set.');
 
   // Open the XML file
   XMLDoc := TXMLDocument.Create(nil);

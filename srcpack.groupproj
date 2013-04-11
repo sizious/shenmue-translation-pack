@@ -15,8 +15,8 @@
     <Projects Include="Models Textures Editor\src\mteditor.dproj" />
     <Projects Include="Notebook Editor\src\notebked.dproj" />
     <Projects Include="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" />
-    <Projects Include="Release Unlocker\Designer\src\rlzmaker.dproj" />
-    <Projects Include="Release Unlocker\Runtime\src\rlzulock.dproj" />
+    <Projects Include="Release Maker\Designer\src\rlzmaker.dproj" />
+    <Projects Include="Release Maker\Runtime\src\rlzulock.dproj" />
     <Projects Include="SPR Utils\src\sprutils.dproj" />
     <Projects Include="System Talk Subtitles Editor\src\systalkc.dproj" />
     <Projects Include="VMU Screen Editor\src\vmulcded.dproj" />
@@ -154,22 +154,22 @@
     <MSBuild Projects="Cinematics Subtitles Editor\src\scinsube.dproj" Targets="Make" />
   </Target>
   <Target Name="rlzulock">
-    <MSBuild Projects="Release Unlocker\Runtime\src\rlzulock.dproj" Targets="" />
+    <MSBuild Projects="Release Maker\Runtime\src\rlzulock.dproj" Targets="" />
   </Target>
   <Target Name="rlzulock:Clean">
-    <MSBuild Projects="Release Unlocker\Runtime\src\rlzulock.dproj" Targets="Clean" />
+    <MSBuild Projects="Release Maker\Runtime\src\rlzulock.dproj" Targets="Clean" />
   </Target>
   <Target Name="rlzulock:Make">
-    <MSBuild Projects="Release Unlocker\Runtime\src\rlzulock.dproj" Targets="Make" />
+    <MSBuild Projects="Release Maker\Runtime\src\rlzulock.dproj" Targets="Make" />
   </Target>
   <Target Name="rlzmaker">
-    <MSBuild Projects="Release Unlocker\Designer\src\rlzmaker.dproj" Targets="" />
+    <MSBuild Projects="Release Maker\Designer\src\rlzmaker.dproj" Targets="" />
   </Target>
   <Target Name="rlzmaker:Clean">
-    <MSBuild Projects="Release Unlocker\Designer\src\rlzmaker.dproj" Targets="Clean" />
+    <MSBuild Projects="Release Maker\Designer\src\rlzmaker.dproj" Targets="Clean" />
   </Target>
   <Target Name="rlzmaker:Make">
-    <MSBuild Projects="Release Unlocker\Designer\src\rlzmaker.dproj" Targets="Make" />
+    <MSBuild Projects="Release Maker\Designer\src\rlzmaker.dproj" Targets="Make" />
   </Target>
   <Target Name="Build">
     <CallTarget Targets="idxwrite;idxmaker;mteditor;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;fontutil;notebked;binedit;systalkc;sfqsubed;scinsube;rlzulock;rlzmaker" />

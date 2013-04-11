@@ -220,6 +220,7 @@ end;
 //------------------------------------------------------------------------------
 
 initialization
+  CoInitialize(nil);
   sWorkingTempDirectory := ''; // see GetWorkingTempDirectory
   ConfigFileName := GetApplicationDirectory + 'config.xml';
   PreviousSelectedPathFileName := GetApplicationDirectory + 'selpath.ini';

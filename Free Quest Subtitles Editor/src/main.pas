@@ -39,9 +39,9 @@ const
 {$ENDIF}
 
   APP_VERSION =
-    '2.11' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
+    '2.12' {$IFDEF DEBUG} {$IFDEF DEBUG_BUILD_RELEASE} + DEBUG_VERSION + ' [DEBUG BUILD]' {$ENDIF} {$ENDIF};
 
-  COMPIL_DATE_TIME = 'Feb 03, 2013 @07:29PM';
+  COMPIL_DATE_TIME = 'Apr 11, 2013 @01:29PM';
 
 type
   TGlobalTranslationModule = class;
@@ -1128,9 +1128,15 @@ begin
 {$ENDIF}
 
   // Initialize the Toolbar
+{$IFDEF DEBUG}
+  WriteLn('Initialize Toolbar');
+{$ENDIF}
   ToolBarInitControl(Self, tbMain);
 
   // Initialize the Text Corrector Database
+{$IFDEF DEBUG}
+  WriteLn('Initialize Text Corrector Database');
+{$ENDIF}
   PreviousLoadedGameVersion := gvUndef;
   TextDatabaseCorrector := TTextDatabaseCorrector.Create;
   EnableOriginalSubtitlesFieldView := False;
@@ -1141,15 +1147,24 @@ begin
 
   // Create the control object for the GlobalTranslation module
   // This module is here to implements the "Global" tab.
+{$IFDEF DEBUG}
+  WriteLn('Initialize Global Translation Module');
+{$ENDIF}
   GlobalTranslation := TGlobalTranslationModule.Create;
 
   (*MultiTranslation := TMultiTranslationModule.Create;*)
 
   // Create the Subtitles Previewer
+{$IFDEF DEBUG}
+  WriteLn('Initialize Subtitles Previewer');
+{$ENDIF}
   Previewer := TSubtitlesPreviewer.Create(GetBitmapFontDatasDirectory);
   Previewer.OnWindowClosed := PreviewWindowClosedEvent;
 
   // Create the main object: SCNF Editor (Subtitles Editor)
+{$IFDEF DEBUG}
+  WriteLn('Initialize SCNF Editor');
+{$ENDIF}
   SCNFEditor := TSCNFEditor.Create;
   
   AutoSave := miAutoSave.Checked;
@@ -1188,6 +1203,10 @@ begin
   // CHARS LIST
   //----------------------------------------------------------------------------
 
+{$IFDEF DEBUG}
+  WriteLn('Initialize Characters Set Module');
+{$ENDIF}
+
   CanEnableCharsMod1 := IsCharsModAvailable(gvShenmue);
   CanEnableCharsMod2 := IsCharsModAvailable(gvShenmue2);
   miEnableCharsMod.Enabled := CanEnableCharsMod1 or CanEnableCharsMod2;
@@ -1207,6 +1226,10 @@ begin
   // NPC INFOS
   //----------------------------------------------------------------------------
 
+{$IFDEF DEBUG}
+  WriteLn('Initialize NPC Information Module');
+{$ENDIF}
+
   // Loading CharsID info
   SCNFEditor.NPCInfos.LoadFromFile(GetNPCInfoFile);
   if not SCNFEditor.NPCInfos.Loaded then begin
@@ -1219,12 +1242,21 @@ begin
   //----------------------------------------------------------------------------
   // LOADING CONFIG
   //----------------------------------------------------------------------------
+
+{$IFDEF DEBUG}
+  WriteLn('Load Configuration');
+{$ENDIF}
+
   LoadConfig;
 
   //----------------------------------------------------------------------------
   // DEBUG
   //----------------------------------------------------------------------------
-  InitApplicationReleaseType;  
+  InitApplicationReleaseType;
+
+{$IFDEF DEBUG}
+  WriteLn('Initialization Done');
+{$ENDIF}
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
