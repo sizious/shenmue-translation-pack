@@ -90,7 +90,7 @@ function RunNoWait(const TargetFileName: TFileName): Boolean;
 function RunAndWait(const TargetFileName: TFileName) : Boolean;
 function VariantToString(V: Variant): string;
 procedure WriteNullBlock(F: TFileStream; const Size: LongWord);
-procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
+procedure WriteNullTerminatedString(F: TFileStream; const S: string;
   const WriteNullEndChar: Boolean = True);
 {$IFDEF DEBUG}
 procedure WriteMemoryStreamToConsole(MS: TMemoryStream);
@@ -390,7 +390,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure WriteNullTerminatedString(var F: TFileStream; const S: string;
+procedure WriteNullTerminatedString(F: TFileStream; const S: string;
   const WriteNullEndChar: Boolean);
 var
   pStr: PChar;

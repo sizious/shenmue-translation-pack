@@ -3,7 +3,7 @@ unit SeqEdit;
 interface
 
 uses
-  Windows, SysUtils, Classes, SeqDB, FSParser, ChrCodec, BinHack;
+  Windows, SysUtils, Classes, SeqDB, FSParser, ChrCodec;
   
 type
   TSequenceDataHeader = record
@@ -100,7 +100,7 @@ type
     fOriginalHeaderSize: LongWord;
     fOriginalHeaderDataSize1: LongWord;
     fOriginalHeaderDataSize2: LongWord;
-    fBinaryHacker: TBinaryHacker;
+//    fBinaryHacker: TBinaryHacker;
     fStringPointersList: TList;
     fValuesToUpdateList: TList;
     fSequenceDatabase: TSequenceDatabase;
@@ -112,11 +112,13 @@ type
     fSubtitles: TSpecialSequenceSubtitlesList;
     fCharset: TShenmueCharsetCodec;
     fSequenceDatabaseIndex: Integer;
+    function GetSequenceItem: TSequenceDatabaseItem;
   protected
     procedure UpdateDumpedSceneFile;
-    property BinaryHacker: TBinaryHacker read fBinaryHacker;
+//    property BinaryHacker: TBinaryHacker read fBinaryHacker;
     property DumpedSceneInputFileName: TFileName read fDumpedSceneInputFileName;
     property SequenceDatabase: TSequenceDatabase read fSequenceDatabase;
+    property SequenceItem: TSequenceDatabaseItem read GetSequenceItem;
     property StringPointersList: TList read fStringPointersList;
     property ValuesToUpdateList: TList read fValuesToUpdateList;
   public
@@ -166,8 +168,8 @@ end;
 
 constructor TSpecialSequenceEditor.Create;
 begin
-  fBinaryHacker := TBinaryHacker.Create;
-  BinaryHacker.MakeBackup := False;
+//  fBinaryHacker := TBinaryHacker.Create;
+//  BinaryHacker.MakeBackup := False;
   fSequenceDatabase := TSequenceDatabase.Create;
   SevenZipExtract(GetApplicationDataDirectory + SEQINFO_DB,
     GetWorkingTempDirectory);
@@ -189,8 +191,15 @@ begin
   fFileSectionsList.Free;
   fCharset.Free;
   fSequenceDatabase.Free;
-  fBinaryHacker.Free;
+//  fBinaryHacker.Free;
   inherited;
+end;
+
+function TSpecialSequenceEditor.GetSequenceItem: TSequenceDatabaseItem;
+begin
+  Result := nil;
+  if fSequenceDatabaseIndex <> -1 then
+    Result := SequenceDatabase[fSequenceDatabaseIndex];
 end;
 
 function TSpecialSequenceEditor.LoadFromFile(
@@ -199,7 +208,6 @@ var
   Input: TFileStream;
   DumpedSceneInput: TFileStream;
   i, j: Integer;
-  SeqDbItem: TSequenceDatabaseItem;
 
 begin
 {$IFDEF DEBUG}
@@ -231,28 +239,26 @@ begin
       fSequenceDatabaseIndex := SequenceDatabase.IdentifyFile(DumpedSceneInput);
       Result := fSequenceDatabaseIndex <> -1;
       if Result then begin
-        SeqDbItem := SequenceDatabase[fSequenceDatabaseIndex];
-
         // The file was successfully opened
         fSourceFileName := FileName;
         fLoaded := True;
 
         // Loading string pointers...
-        for i := 0 to SeqDbItem.StringPointers.Count - 1 do
-          StringPointersList.Add(Pointer(SeqDbItem.StringPointers[i].StringPointer));
+        for i := 0 to SequenceItem.StringPointers.Count - 1 do
+          StringPointersList.Add(Pointer(SequenceItem.StringPointers[i].StringPointer));
 
         // Loading the Binary Hacker engine : place holders
-        BinaryHacker.PlaceHolders.Clear;
+        (*BinaryHacker.PlaceHolders.Clear;
         for i := 0 to SeqDbItem.PlaceHolders.Count - 1 do
           BinaryHacker.PlaceHolders.Add(
             SeqDbItem.PlaceHolders[i].Offset,
             SeqDbItem.PlaceHolders[i].Size
-          );
+          );*)
 
         // Setting original header values
-        fOriginalHeaderSize := SeqDbItem.OriginalHeaderValues.Size;
-        fOriginalHeaderDataSize1 := SeqDbItem.OriginalHeaderValues.DataSize1;
-        fOriginalHeaderDataSize2 := SeqDbItem.OriginalHeaderValues.DataSize2;
+        fOriginalHeaderSize := SequenceItem.OriginalHeaderValues.Size;
+        fOriginalHeaderDataSize1 := SequenceItem.OriginalHeaderValues.DataSize1;
+        fOriginalHeaderDataSize2 := SequenceItem.OriginalHeaderValues.DataSize2;
 
         // Calculating the beginning of the subtitles table
         DumpedSceneInput.Seek(Integer(StringPointersList[0]), soFromBeginning);
@@ -266,7 +272,7 @@ begin
         begin
           j := Subtitles.Add(Integer(StringPointersList[i]), DumpedSceneInput);
           Subtitles[j].BackupText.fInitialText :=
-            SeqDbItem.StringPointers[i].StringValue;
+            SequenceItem.StringPointers[i].StringValue;
         end;
       end; // Result
 
@@ -356,12 +362,12 @@ procedure TSpecialSequenceEditor.UpdateDumpedSceneFile;
 var
   OutputStream: TFileStream;
   i: Integer;
-  ExtraValue: LongWord;
+  StringOffset, ExtraValue: LongWord;
   Header: TSequenceDataHeader;
-  
+
 begin
   // Writing the new strings...
-  BinaryHacker.Strings.Clear;
+  (*BinaryHacker.Strings.Clear;
   for i := 0 to Subtitles.Count - 1 do
   begin
     BinaryHacker.Strings.Add(
@@ -369,17 +375,41 @@ begin
       SUBTITLE_DELIMITER + Subtitles[i].RawText
     );
   end;
-  ExtraValue := BinaryHacker.Execute(DumpedSceneInputFileName);
+  ExtraValue := BinaryHacker.Execute(DumpedSceneInputFileName);*)
+
 
   // Updating the Section Header
   OutputStream := TFileStream.Create(DumpedSceneInputFileName, fmOpenReadWrite);
   try
+    // Truncate the file
+    OutputStream.Size := fOriginalHeaderSize;
+
+    // Writing the new strings...
+    for i := 0 to Subtitles.Count - 1 do
+    begin
+      OutputStream.Seek(0, soFromEnd);
+      StringOffset := OutputStream.Position;
+      WriteNullTerminatedString(OutputStream, SUBTITLE_DELIMITER + Subtitles[i].RawText);
+      OutputStream.Seek(Integer(StringPointersList[i]), soFromBeginning);
+      OutputStream.Write(StringOffset, UINT32_SIZE);
+    end;
+
+    // Cleaning old place holders...
+    for i := 0 to SequenceItem.PlaceHolders.Count - 1 do
+    begin
+      OutputStream.Seek(SequenceItem.PlaceHolders[i].Offset, soFromBeginning);
+      WriteNullBlock(OutputStream, SequenceItem.PlaceHolders[i].Size);
+    end;
+      
+
+    // Updating the Section Header
     OutputStream.Seek(0, soFromBeginning);
     OutputStream.Read(Header, SizeOf(TSequenceDataHeader));
     OutputStream.Seek(0, soFromBeginning);
+    ExtraValue := OutputStream.Size - fOriginalHeaderSize;
     Header.Size := fOriginalHeaderSize + ExtraValue;
-//    Header.DataSize1 := fOriginalHeaderDataSize1 + ExtraValue;
-//    Header.DataSize2 := fOriginalHeaderDataSize2 + ExtraValue;
+    Header.DataSize1 := fOriginalHeaderDataSize1 + ExtraValue;
+    Header.DataSize2 := fOriginalHeaderDataSize2 + ExtraValue;
     OutputStream.Write(Header, SizeOf(TSequenceDataHeader));
   finally
     OutputStream.Free;
