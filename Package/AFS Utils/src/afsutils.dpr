@@ -18,10 +18,10 @@ uses
   search in 'search.pas' {frmSearch},
   xmlutil in 'engine\xmlutil.pas',
   searchutil in 'engine\searchutil.pas',
-  appver in '..\..\Common\appver.pas',
-  systools in '..\..\Common\systools.pas',
-  uitools in '..\..\Common\uitools.pas',
-  about in '..\..\Common\About\about.pas' {frmAbout};
+  appver in '..\..\..\Common\appver.pas',
+  systools in '..\..\..\Common\systools.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  uitools in '..\..\..\Common\uitools.pas';
 
 {$R *.res}
 

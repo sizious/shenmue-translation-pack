@@ -31,7 +31,31 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="RunParams">.\ *.* output.xml 1 s2_xb_eur</Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">1</VersionInfo><VersionInfo Name="Build">52</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Shentrad Team</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue Binary Translator</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.1.52</VersionInfoKeys><VersionInfoKeys Name="InternalName">Binary Editor</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2006-2013</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">binedit.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue Translation Pack</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys><VersionInfoKeys Name="Comments">http://shenmuesubs.sf.net/</VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="RunParams">.\ *.* output.xml 1 s2_xb_eur</Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">1</VersionInfo><VersionInfo Name="Build">53</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Shentrad Team</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue Binary Translator</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.1.53</VersionInfoKeys><VersionInfoKeys Name="InternalName">Binary Editor</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2006-2013</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">binedit.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue Translation Pack</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys><VersionInfoKeys Name="Comments">http://shenmuesubs.sf.net/</VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       
       
       
@@ -53,24 +77,24 @@
     <RcCompile Include="engine\lzmabin.rc">
       <Form>engine\lzmabin.res</Form>
     </RcCompile>
-    <DCCReference Include="..\..\..\Common\About\about.pas">
+    <DCCReference Include="..\..\..\..\Common\About\about.pas">
       <Form>frmAbout</Form>
     </DCCReference>
-    <DCCReference Include="..\..\..\Common\appver.pas" />
-    <DCCReference Include="..\..\..\Common\BugsMan\bugsmgr.pas">
+    <DCCReference Include="..\..\..\..\Common\appver.pas" />
+    <DCCReference Include="..\..\..\..\Common\BugsMan\bugsmgr.pas">
       <Form>frmBugsHandler</Form>
     </DCCReference>
-    <DCCReference Include="..\..\..\Common\DebugLog\debuglog.pas">
+    <DCCReference Include="..\..\..\..\Common\DebugLog\debuglog.pas">
       <Form>frmDebugLog</Form>
     </DCCReference>
-    <DCCReference Include="..\..\..\Common\filespec.pas" />
-    <DCCReference Include="..\..\..\Common\hashidx.pas" />
-    <DCCReference Include="..\..\..\Common\lzmadec.pas" />
-    <DCCReference Include="..\..\..\Common\SubsUtil\chrcodec.pas" />
-    <DCCReference Include="..\..\..\Common\systools.pas" />
-    <DCCReference Include="..\..\..\Common\uitools.pas" />
-    <DCCReference Include="..\..\..\Common\workdir.pas" />
-    <DCCReference Include="..\..\..\Common\xmlconf.pas" />
+    <DCCReference Include="..\..\..\..\Common\filespec.pas" />
+    <DCCReference Include="..\..\..\..\Common\hashidx.pas" />
+    <DCCReference Include="..\..\..\..\Common\lzmadec.pas" />
+    <DCCReference Include="..\..\..\..\Common\SubsUtil\chrcodec.pas" />
+    <DCCReference Include="..\..\..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\..\Common\uitools.pas" />
+    <DCCReference Include="..\..\..\..\Common\workdir.pas" />
+    <DCCReference Include="..\..\..\..\Common\xmlconf.pas" />
     <DCCReference Include="config.pas" />
     <DCCReference Include="engine\mkxmlbin.pas" />
     <DCCReference Include="main.pas">

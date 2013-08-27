@@ -15,11 +15,11 @@ uses
   seldir in 'seldir.pas' {frmSelectDir},
   texview in 'texview.pas' {frmTexPreview},
   common in 'engine\common.pas',
-  img2png in '..\..\Common\img2png.pas',
   tools in 'tools.pas',
   texprop in 'texprop.pas' {frmTexProp},
   about in 'about.pas' {frmAbout},
-  systools in '..\..\Common\systools.pas';
+  systools in '..\..\..\Common\systools.pas',
+  img2png in '..\..\..\Common\img2png.pas';
 
 {$R *.res}
 

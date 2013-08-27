@@ -29,31 +29,20 @@ uses
   iconsui in 'engine\multitrd\ui\iconsui.pas',
   multitrd in 'multitrd\multitrd.pas' {frmMultiTranslation},
   mtexec in 'multitrd\mtexec.pas',
-  systools in '..\..\Common\systools.pas',
   textdb in 'engine\textdb\textdb.pas',
   dbindex in 'engine\textdb\dbindex.pas',
   dbinlay in 'engine\textdb\dbinlay.pas',
   bugsmgr in 'bugsmgr.pas' {frmBugsHandler},
-  img2png in '..\..\Common\img2png.pas',
-  lzmadec in '..\..\Common\lzmadec.pas',
   dblzma in 'engine\textdb\dblzma.pas',
   npcinfo in 'engine\npc\npcinfo.pas',
   pakfexec in 'engine\npc\pakf\pakfexec.pas',
   pakfextr in 'engine\npc\pakf\pakfextr.pas',
   pakfutil in 'engine\npc\pakf\pakfutil.pas',
   npclist in 'engine\npc\npclist.pas',
-  imgtools in '..\..\Common\imgtools.pas',
   pakfmgr in 'engine\npc\pakf\pakfmgr.pas',
-  uitools in '..\..\Common\uitools.pas',
-  oldskool_font_mapper in '..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas',
-  oldskool_font_vcl in '..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
-  viewer in '..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
-  hashidx in '..\..\Common\hashidx.pas',
   srfnpcdb in 'engine\srfnpcdb.pas',
   srfscript in 'srfscript.pas' {frmCinematicsScript},
-  batchsrf in 'engine\batch\batchsrf.pas',
-  fileslst in '..\..\Common\fileslst.pas',
-  batchexe in '..\..\Common\batchexe.pas';
+  batchsrf in 'engine\batch\batchsrf.pas';
 
 {$R *.res}
 

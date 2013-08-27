@@ -9,20 +9,20 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   ipacmgr in 'engine\ipacmgr.pas',
-  systools in '..\..\Common\systools.pas',
   ipacutil in 'engine\ipacutil.pas',
-  gzipmgr in '..\..\Common\gzipmgr.pas',
   utils in 'utils.pas',
-  xmlconf in '..\..\Common\xmlconf.pas',
-  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
   fileprop in 'fileprop.pas' {frmProperties},
-  about in '..\..\Common\About\about.pas' {frmAbout},
-  uitools in '..\..\Common\uitools.pas',
   shell in 'shell.pas',
-  shellext in '..\..\Common\ShellExt\shellext.pas',
-  regshell in '..\..\Common\ShellExt\regshell.pas',
-  debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
-  appver in '..\..\Common\appver.pas';
+  systools in '..\..\..\Common\systools.pas',
+  xmlconf in '..\..\..\Common\xmlconf.pas',
+  uitools in '..\..\..\Common\uitools.pas',
+  debuglog in '..\..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
+  bugsmgr in '..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  gzipmgr in '..\..\..\Common\gzipmgr.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  regshell in '..\..\..\Common\ShellExt\regshell.pas',
+  shellext in '..\..\..\Common\ShellExt\shellext.pas',
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 
