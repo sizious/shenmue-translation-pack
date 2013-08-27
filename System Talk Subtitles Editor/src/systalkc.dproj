@@ -38,10 +38,6 @@
       
       
       
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">systalkc.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -52,10 +48,10 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <RcCompile Include="systalkc.rc">
-      <Form>systalkc.res</Form>
+      <Form>'systalkc.res'</Form>
     </RcCompile>
     <DCCReference Include="..\..\Common\appver.pas" />
     <DCCReference Include="..\..\Common\systools.pas" />
-    <DCCReference Include="engine\sncfedit.pas" />
+    <DCCReference Include="engine\scnfedit.pas" />
   </ItemGroup>
 </Project>

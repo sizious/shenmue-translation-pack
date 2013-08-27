@@ -183,7 +183,7 @@ object frmWarning: TfrmWarning
   object Label2: TLabel
     Left = 44
     Top = 31
-    Width = 330
+    Width = 329
     Height = 26
     Caption = 
       'This version of Cinematics Editor was entierely rewritten and in' +
@@ -207,7 +207,7 @@ object frmWarning: TfrmWarning
   object Label5: TLabel
     Left = 44
     Top = 147
-    Width = 330
+    Width = 297
     Height = 26
     Caption = 
       'If you have never used this editor before today, you aren'#39't conc' +
@@ -238,7 +238,6 @@ object frmWarning: TfrmWarning
     TabOrder = 1
   end
   object tCloseEnabler: TTimer
-    Interval = 5000
     OnTimer = tCloseEnablerTimer
     Left = 6
     Top = 148

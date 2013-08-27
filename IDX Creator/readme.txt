@@ -37,7 +37,7 @@ ___| |/ |/ / _ `/ __/ _ \/ / _ \/ _ `/_________________________________________
  BEWARE: 
 
  When switching from IDX Maker (Console) to IDX Creator (Win32 GUI), 
- please REBUILD (not compile).
+ please REBUILD (not only compile).
 
  You MUST recompile shared Units (located in "engine" directory).
 
@@ -52,7 +52,7 @@ ___/ /__/ __/ -_) _  / / __(_-<________________________________________________
    Manic
 
  Updating / Merging IDX Creator for Shenmue I & II / IDX Maker (console): 
-   [big_fury]SiZiOUS
+   SiZiOUS
 
  Website:
    http://shenmuesubs.sourceforge.net/

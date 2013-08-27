@@ -1,5 +1,7 @@
 program afsutils;
 
+{$R 'about\credits.res' 'about\credits.rc'}
+
 uses
   Windows,
   Forms,
@@ -15,7 +17,11 @@ uses
   charsutil in 'engine\charsutil.pas',
   search in 'search.pas' {frmSearch},
   xmlutil in 'engine\xmlutil.pas',
-  searchutil in 'engine\searchutil.pas';
+  searchutil in 'engine\searchutil.pas',
+  appver in '..\..\Common\appver.pas',
+  systools in '..\..\Common\systools.pas',
+  uitools in '..\..\Common\uitools.pas',
+  about in '..\..\Common\About\about.pas' {frmAbout};
 
 {$R *.res}
 
@@ -26,6 +32,7 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  Application.Title := 'Shenmue AFS Utils';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmProgress, frmProgress);
   Application.CreateForm(TfrmCreator, frmCreator);

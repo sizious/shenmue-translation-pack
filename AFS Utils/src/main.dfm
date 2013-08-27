@@ -24,16 +24,16 @@ object frmMain: TfrmMain
     Left = 8
     Top = 8
     Width = 153
-    Height = 403
+    Height = 408
     Anchors = [akLeft, akTop, akBottom]
-    Caption = 'Files list'
+    Caption = ' Files List: '
     TabOrder = 0
     DesignSize = (
       153
-      403)
+      408)
     object lblMainCount: TLabel
       Left = 19
-      Top = 373
+      Top = 378
       Width = 55
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -44,7 +44,7 @@ object frmMain: TfrmMain
       Left = 8
       Top = 16
       Width = 137
-      Height = 347
+      Height = 352
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       TabOrder = 0
@@ -52,7 +52,7 @@ object frmMain: TfrmMain
     end
     object editMainCount: TEdit
       Left = 80
-      Top = 370
+      Top = 375
       Width = 65
       Height = 21
       Anchors = [akLeft, akBottom]
@@ -76,13 +76,13 @@ object frmMain: TfrmMain
     Left = 168
     Top = 8
     Width = 377
-    Height = 403
+    Height = 408
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = 'Informations'
+    Caption = ' Informations: '
     TabOrder = 2
     DesignSize = (
       377
-      403)
+      408)
     object lblHeader: TLabel
       Left = 11
       Top = 27
@@ -106,7 +106,7 @@ object frmMain: TfrmMain
     end
     object lblFiles: TLabel
       Left = 11
-      Top = 217
+      Top = 220
       Width = 25
       Height = 13
       Anchors = [akLeft]
@@ -115,7 +115,7 @@ object frmMain: TfrmMain
     end
     object lblCurrentSize: TLabel
       Left = 11
-      Top = 349
+      Top = 354
       Width = 79
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -124,7 +124,7 @@ object frmMain: TfrmMain
     end
     object lblCurrentDate: TLabel
       Left = 11
-      Top = 373
+      Top = 378
       Width = 83
       Height = 13
       Anchors = [akLeft, akBottom]
@@ -168,7 +168,7 @@ object frmMain: TfrmMain
       Left = 136
       Top = 120
       Width = 233
-      Height = 219
+      Height = 224
       Anchors = [akLeft, akTop, akRight, akBottom]
       ItemHeight = 13
       MultiSelect = True
@@ -178,7 +178,7 @@ object frmMain: TfrmMain
     end
     object editCurrentSize: TEdit
       Left = 136
-      Top = 346
+      Top = 351
       Width = 233
       Height = 21
       Anchors = [akLeft, akRight, akBottom]
@@ -189,7 +189,7 @@ object frmMain: TfrmMain
     end
     object editCurrentDate: TEdit
       Left = 136
-      Top = 370
+      Top = 375
       Width = 233
       Height = 21
       Anchors = [akLeft, akRight]
@@ -204,6 +204,14 @@ object frmMain: TfrmMain
     Top = 32
     object File1: TMenuItem
       Caption = 'File'
+      object AFSCreator1: TMenuItem
+        Caption = '&New...'
+        ShortCut = 16462
+        OnClick = AFSCreator1Click
+      end
+      object N6: TMenuItem
+        Caption = '-'
+      end
       object Opensinglefile1: TMenuItem
         Caption = 'Open files...'
         ShortCut = 16463
@@ -231,50 +239,55 @@ object frmMain: TfrmMain
         Caption = '-'
       end
       object Exit1: TMenuItem
-        Caption = 'Exit'
-        ShortCut = 16472
+        Caption = 'Quit'
+        ShortCut = 16465
         OnClick = Exit1Click
       end
     end
     object Operations1: TMenuItem
-      Caption = 'Tools'
+      Caption = 'Edit'
       object Searchfilestoselect1: TMenuItem
-        Caption = 'Search files to select...'
+        Caption = 'Select files by search...'
         Enabled = False
         ShortCut = 16454
         OnClick = Searchfilestoselect1Click
       end
-      object N5: TMenuItem
-        Caption = '-'
-      end
       object Extractselectedfiles1: TMenuItem
         Caption = 'Extract selected files...'
         Enabled = False
+        ShortCut = 16453
         OnClick = Extractselectedfiles1Click
+      end
+      object N5: TMenuItem
+        Caption = '-'
       end
       object Extractallfiles1: TMenuItem
         Caption = 'Extract all files...'
         Enabled = False
+        ShortCut = 49221
         OnClick = Extractallfiles1Click
       end
+    end
+    object ools1: TMenuItem
+      Caption = 'Tools'
       object Massextraction1: TMenuItem
         Caption = 'Mass extraction...'
         Enabled = False
+        ShortCut = 113
         OnClick = Massextraction1Click
       end
-      object N3: TMenuItem
-        Caption = '-'
+      object Masscreation1: TMenuItem
+        Caption = 'Mass creation...'
+        ShortCut = 117
+        OnClick = Masscreation1Click
       end
-      object AFSCreator1: TMenuItem
-        Caption = 'AFS Creator'
-        OnClick = AFSCreator1Click
-      end
-      object N4: TMenuItem
-        Caption = '-'
-      end
+    end
+    object Options1: TMenuItem
+      Caption = '&Options'
       object SaveXMLlist1: TMenuItem
         Caption = 'Save XML files list at extraction'
         Checked = True
+        ShortCut = 119
         OnClick = SaveXMLlist1Click
       end
     end
@@ -282,6 +295,7 @@ object frmMain: TfrmMain
       Caption = 'Help'
       object About1: TMenuItem
         Caption = 'About...'
+        ShortCut = 123
         OnClick = About1Click
       end
     end

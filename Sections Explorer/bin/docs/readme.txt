@@ -52,5 +52,5 @@
                         alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
                         PlusTuta, Nerox92, Master Kyodai, yazgoo, the 
                         MetaGames-EU and Shenmue Dojo forums and everyone 
-                        supporting us.									
+                        supporting us.						
  _____________________________________________________________________[ EOF ]___

@@ -17,6 +17,8 @@
     <Projects Include="Nozomi Motorcycle Subtitles Editor\src\nzmbiked.dproj" />
     <Projects Include="Release Maker\Designer\src\rlzmaker.dproj" />
     <Projects Include="Release Maker\Runtime\src\rlzulock.dproj" />
+    <Projects Include="Sections Explorer\src\explorer.dproj" />
+    <Projects Include="Special Scenes Subtitles Editor\src\spcscned.dproj" />
     <Projects Include="SPR Utils\src\sprutils.dproj" />
     <Projects Include="System Talk Subtitles Editor\src\systalkc.dproj" />
     <Projects Include="VMU Screen Editor\src\vmulcded.dproj" />
@@ -171,14 +173,32 @@
   <Target Name="rlzmaker:Make">
     <MSBuild Projects="Release Maker\Designer\src\rlzmaker.dproj" Targets="Make" />
   </Target>
+  <Target Name="explorer">
+    <MSBuild Projects="Sections Explorer\src\explorer.dproj" Targets="" />
+  </Target>
+  <Target Name="explorer:Clean">
+    <MSBuild Projects="Sections Explorer\src\explorer.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="explorer:Make">
+    <MSBuild Projects="Sections Explorer\src\explorer.dproj" Targets="Make" />
+  </Target>
+  <Target Name="spcscned">
+    <MSBuild Projects="Special Scenes Subtitles Editor\src\spcscned.dproj" Targets="" />
+  </Target>
+  <Target Name="spcscned:Clean">
+    <MSBuild Projects="Special Scenes Subtitles Editor\src\spcscned.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="spcscned:Make">
+    <MSBuild Projects="Special Scenes Subtitles Editor\src\spcscned.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="idxwrite;idxmaker;mteditor;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;fontutil;notebked;binedit;systalkc;sfqsubed;scinsube;rlzulock;rlzmaker" />
+    <CallTarget Targets="idxwrite;idxmaker;mteditor;afsutils;ipacedit;sprutils;vmulcded;nzmbiked;fontutil;notebked;binedit;systalkc;sfqsubed;scinsube;rlzulock;rlzmaker;explorer;spcscned" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;mteditor:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;fontutil:Clean;notebked:Clean;binedit:Clean;systalkc:Clean;sfqsubed:Clean;scinsube:Clean;rlzulock:Clean;rlzmaker:Clean" />
+    <CallTarget Targets="idxwrite:Clean;idxmaker:Clean;mteditor:Clean;afsutils:Clean;ipacedit:Clean;sprutils:Clean;vmulcded:Clean;nzmbiked:Clean;fontutil:Clean;notebked:Clean;binedit:Clean;systalkc:Clean;sfqsubed:Clean;scinsube:Clean;rlzulock:Clean;rlzmaker:Clean;explorer:Clean;spcscned:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="idxwrite:Make;idxmaker:Make;mteditor:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;fontutil:Make;notebked:Make;binedit:Make;systalkc:Make;sfqsubed:Make;scinsube:Make;rlzulock:Make;rlzmaker:Make" />
+    <CallTarget Targets="idxwrite:Make;idxmaker:Make;mteditor:Make;afsutils:Make;ipacedit:Make;sprutils:Make;vmulcded:Make;nzmbiked:Make;fontutil:Make;notebked:Make;binedit:Make;systalkc:Make;sfqsubed:Make;scinsube:Make;rlzulock:Make;rlzmaker:Make;explorer:Make;spcscned:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
