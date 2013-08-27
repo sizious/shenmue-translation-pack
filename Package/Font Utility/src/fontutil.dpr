@@ -4,10 +4,10 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   fontmgr in 'engine\fontmgr.pas',
-  systools in '..\..\Common\systools.pas',
   fontexec in 'fontexec.pas',
-  uitools in '..\..\Common\uitools.pas',
-  appver in '..\..\Common\appver.pas';
+  systools in '..\..\..\Common\systools.pas',
+  uitools in '..\..\..\Common\uitools.pas',
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 

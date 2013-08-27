@@ -7,20 +7,20 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   memoedit in 'engine\memoedit.pas',
-  fsparser in '..\..\Common\fsparser.pas',
   strdeps in 'engine\strdeps.pas',
-  uitools in '..\..\Common\uitools.pas',
-  systools in '..\..\Common\systools.pas',
-  hashidx in '..\..\Common\hashidx.pas',
   filesel in 'filesel.pas' {frmFileSelection},
-  debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
-  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
-  xmlconf in '..\..\Common\xmlconf.pas',
-  about in '..\..\Common\About\about.pas' {frmAbout},
   config in 'config.pas',
   fileprop in 'fileprop.pas' {frmProperties},
-  filespec in '..\..\Common\filespec.pas',
-  appver in '..\..\Common\appver.pas';
+  fsparser in '..\..\..\Common\fsparser.pas',
+  systools in '..\..\..\Common\systools.pas',
+  hashidx in '..\..\..\Common\hashidx.pas',
+  filespec in '..\..\..\Common\filespec.pas',
+  debuglog in '..\..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
+  xmlconf in '..\..\..\Common\xmlconf.pas',
+  bugsmgr in '..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  uitools in '..\..\..\Common\uitools.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 

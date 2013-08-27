@@ -7,15 +7,15 @@ uses
   Forms,
   main in 'main.pas' {frmMain},
   lcdedit in 'engine\lcdedit.pas',
-  systools in '..\..\Common\systools.pas',
-  debuglog in '..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
-  xmlconf in '..\..\Common\xmlconf.pas',
   preview in 'preview.pas' {frmPreview},
-  uitools in '..\..\Common\uitools.pas',
   utils in 'utils.pas',
-  about in '..\..\Common\About\about.pas' {frmAbout},
-  bugsmgr in '..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
-  appver in '..\..\Common\appver.pas';
+  systools in '..\..\..\Common\systools.pas',
+  debuglog in '..\..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
+  xmlconf in '..\..\..\Common\xmlconf.pas',
+  bugsmgr in '..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  uitools in '..\..\..\Common\uitools.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  appver in '..\..\..\Common\appver.pas';
 
 {$R *.res}
 

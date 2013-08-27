@@ -48,10 +48,10 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <RcCompile Include="systalkc.rc">
-      <Form>'systalkc.res'</Form>
+      <Form>systalkc.res</Form>
     </RcCompile>
-    <DCCReference Include="..\..\Common\appver.pas" />
-    <DCCReference Include="..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\Common\appver.pas" />
+    <DCCReference Include="..\..\..\Common\systools.pas" />
     <DCCReference Include="engine\scnfedit.pas" />
   </ItemGroup>
 </Project>

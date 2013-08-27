@@ -13,7 +13,7 @@ uses
   xmlutils in 'engine\xmlutils.pas',
   s2idx in 'engine\s2idx.pas',
   s2idx_intf in 'engine\s2idx_intf.pas',
-  systools in '..\..\Common\systools.pas';
+  systools in '..\..\..\Common\systools.pas';
 
 {$R *.res}
 

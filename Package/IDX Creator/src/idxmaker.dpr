@@ -19,7 +19,7 @@ uses
   UIdxStruct in 'engine\UIdxStruct.pas',
   UIdxCreation in 'engine\UIdxCreation.pas',
   s1idx_intf in 'engine\s1idx_intf.pas',
-  systools in '..\..\Common\systools.pas';
+  systools in '..\..\..\Common\systools.pas';
 
 //------------------------------------------------------------------------------
 

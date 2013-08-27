@@ -7,8 +7,8 @@ program SysTalkC;
 uses
   SysUtils,
   scnfedit in 'engine\scnfedit.pas',
-  systools in '..\..\Common\systools.pas',
-  appver in '..\..\Common\appver.pas';
+  systools in '..\..\..\Common\systools.pas',
+  appver in '..\..\..\Common\appver.pas';
 
 procedure PrintUsage;
 var

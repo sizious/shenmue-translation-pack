@@ -9,19 +9,19 @@ uses
   main in 'main.pas' {frmMain},
   config in 'config.pas',
   mkxmlbin in 'engine\mkxmlbin.pas',
-  xmlconf in '..\..\..\Common\xmlconf.pas',
-  debuglog in '..\..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
-  bugsmgr in '..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
-  systools in '..\..\..\Common\systools.pas',
-  uitools in '..\..\..\Common\uitools.pas',
-  about in '..\..\..\Common\About\about.pas' {frmAbout},
-  filespec in '..\..\..\Common\filespec.pas',
   newproj in 'newproj.pas' {frmNewProject},
-  lzmadec in '..\..\..\Common\lzmadec.pas',
-  workdir in '..\..\..\Common\workdir.pas',
-  chrcodec in '..\..\..\Common\SubsUtil\chrcodec.pas',
-  hashidx in '..\..\..\Common\hashidx.pas',
-  appver in '..\..\..\Common\appver.pas';
+  debuglog in '..\..\..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
+  xmlconf in '..\..\..\..\Common\xmlconf.pas',
+  bugsmgr in '..\..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  filespec in '..\..\..\..\Common\filespec.pas',
+  systools in '..\..\..\..\Common\systools.pas',
+  chrcodec in '..\..\..\..\Common\SubsUtil\chrcodec.pas',
+  hashidx in '..\..\..\..\Common\hashidx.pas',
+  uitools in '..\..\..\..\Common\uitools.pas',
+  lzmadec in '..\..\..\..\Common\lzmadec.pas',
+  about in '..\..\..\..\Common\About\about.pas' {frmAbout},
+  workdir in '..\..\..\..\Common\workdir.pas',
+  appver in '..\..\..\..\Common\appver.pas';
 
 {$R *.res}
 
