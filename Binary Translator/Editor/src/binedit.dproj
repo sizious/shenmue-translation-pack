@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{0edc9254-9319-415d-b49e-0d310835f000}</ProjectGuid>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
     <DCC_DependencyCheckOutputName>..\bin\binedit.exe</DCC_DependencyCheckOutputName>
@@ -31,7 +31,11 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="RunParams">.\ *.* output.xml 1 s2_xb_eur</Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">1</VersionInfo><VersionInfo Name="Build">49</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS / Ayla</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue Binary Translator</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.1.49</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2006-2010</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="RunParams">.\ *.* output.xml 1 s2_xb_eur</Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">True</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">1</VersionInfo><VersionInfo Name="Build">52</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Shentrad Team</VersionInfoKeys><VersionInfoKeys Name="FileDescription">Shenmue Binary Translator</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.1.52</VersionInfoKeys><VersionInfoKeys Name="InternalName">Binary Editor</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">© Copyleft 2006-2013</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks">Shenmue is copyrighted SEGA © 1999, 2001</VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">binedit.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">Shenmue Translation Pack</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys><VersionInfoKeys Name="Comments">http://shenmuesubs.sf.net/</VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
+      
+      
+      
+      
       
       
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>

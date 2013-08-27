@@ -7,10 +7,6 @@ uses
   Dialogs, Menus, StdCtrls, ComCtrls, JvBaseDlg, JvSelectDirectory,
   JvBrowseFolder, StrUtils;
 
-const
-  APP_VERSION = '2.2';
-  COMPIL_DATE_TIME = 'January 14, 2010 @06:06PM';
-
 type
   TfrmMain = class(TForm)
     MainMenu1: TMainMenu;
@@ -27,9 +23,7 @@ type
     About1: TMenuItem;
     Extractselectedfiles1: TMenuItem;
     Extractallfiles1: TMenuItem;
-    N3: TMenuItem;
     AFSCreator1: TMenuItem;
-    N4: TMenuItem;
     SaveXMLlist1: TMenuItem;
     PopupMenu1: TPopupMenu;
     ppmExtractselectedfiles1: TMenuItem;
@@ -58,6 +52,10 @@ type
     JvBrowseFolder1: TJvBrowseForFolderDialog;
     Searchfilestoselect1: TMenuItem;
     N5: TMenuItem;
+    N6: TMenuItem;
+    Options1: TMenuItem;
+    ools1: TMenuItem;
+    Masscreation1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Opensinglefile1Click(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -76,6 +74,7 @@ type
     procedure Exit1Click(Sender: TObject);
     procedure Searchfilestoselect1Click(Sender: TObject);
     procedure SaveXMLlist1Click(Sender: TObject);
+    procedure Masscreation1Click(Sender: TObject);
   private
     { Déclarations privées }
     procedure ActivateFileOpsMenu(MenuEnabled: Boolean);
@@ -98,7 +97,7 @@ var
   frmMain: TfrmMain;
 
 implementation
-uses afsparser, afsextract, creator, search, searchutil;
+uses afsparser, afsextract, creator, search, searchutil, appver, about;
 {$R *.dfm}
 
 procedure TfrmMain.Clear;
@@ -315,13 +314,16 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   InitializeVars;
-  Caption := 'AFS Utils v' + APP_VERSION;
+  Caption := Application.Title + ' v' + GetApplicationVersion;
+  Constraints.MinHeight := Height;
+  Constraints.MinWidth := Width;
+  InitAboutBox(Application.Title, GetApplicationVersion);
   Clear;
 end;
 
 procedure TfrmMain.About1Click(Sender: TObject);
 begin
-  MsgBox('Version '+APP_VERSION+#13#10+'Created by Manic'+#13#10+COMPIL_DATE_TIME+#13#10+'Updated by [big_fury]SiZiOUS', 'Information', MB_ICONINFORMATION);
+  RunAboutBox;
 end;
 
 procedure TfrmMain.Searchfilestoselect1Click(Sender: TObject);
@@ -385,6 +387,11 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TfrmMain.Masscreation1Click(Sender: TObject);
+begin
+  frmCreator.RunMassCreation;
 end;
 
 procedure TfrmMain.Massextraction1Click(Sender: TObject);

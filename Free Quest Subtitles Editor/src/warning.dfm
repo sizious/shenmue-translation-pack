@@ -268,7 +268,6 @@ object frmWarning: TfrmWarning
     TabOrder = 1
   end
   object tCloseEnabler: TTimer
-    Interval = 5000
     OnTimer = tCloseEnablerTimer
     Left = 6
     Top = 148

@@ -2,10 +2,9 @@ object frmCreator: TfrmCreator
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
-  BorderStyle = bsSizeToolWin
   Caption = 'AFS Creator'
-  ClientHeight = 381
-  ClientWidth = 307
+  ClientHeight = 320
+  ClientWidth = 345
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,36 +17,36 @@ object frmCreator: TfrmCreator
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    307
-    381)
+    345
+    320)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 8
     Top = 8
-    Width = 291
-    Height = 342
+    Width = 329
+    Height = 285
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = 'Files list'
+    Caption = ' Files List : '
     TabOrder = 0
     DesignSize = (
-      291
-      342)
+      329
+      285)
     object lblFileCnt: TLabel
-      Left = 149
-      Top = 312
-      Width = 55
+      Left = 187
+      Top = 255
+      Width = 57
       Height = 13
       Anchors = [akRight, akBottom]
-      Caption = 'Files count:'
-      ExplicitLeft = 187
-      ExplicitTop = 259
+      Caption = 'Files Count:'
+      ExplicitLeft = 149
+      ExplicitTop = 312
     end
     object lbCreationList: TListBox
       Left = 8
       Top = 16
-      Width = 275
-      Height = 286
+      Width = 313
+      Height = 229
       Anchors = [akLeft, akTop, akRight, akBottom]
       ItemHeight = 13
       MultiSelect = True
@@ -55,8 +54,8 @@ object frmCreator: TfrmCreator
       TabOrder = 0
     end
     object editFileCnt: TEdit
-      Left = 210
-      Top = 309
+      Left = 248
+      Top = 252
       Width = 73
       Height = 21
       Anchors = [akRight, akBottom]
@@ -68,8 +67,8 @@ object frmCreator: TfrmCreator
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 364
-    Width = 307
+    Top = 303
+    Width = 345
     Height = 17
     Panels = <
       item

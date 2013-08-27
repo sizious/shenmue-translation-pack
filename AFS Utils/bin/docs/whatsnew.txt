@@ -1,9 +1,19 @@
-                              AFS Utils
+                            Shenmue AFS Utils
               ______ __                                  
              |      |  |--.---.-.-----.-----.-----.-----.
              |   ---|     |  _  |     |  _  |  -__|__ --|
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
+___                           __________________________________________________
+___| Version 2.3: 2013-08-DD |__________________________________________________
+
+UPDATED:
+- Main menu application complete redesign
+- Little tweaks in the code
+- The complete title of the application is now "Shenmue AFS Utils" (instead of
+  "AFS Utils")
+- Version information on the file
+- Code cleanup
 ___                           __________________________________________________
 ___| Version 2.2: 2010-01-14 |__________________________________________________
 

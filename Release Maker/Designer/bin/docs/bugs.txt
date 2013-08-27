@@ -1,0 +1,2 @@
+The 7-zip interface doesn't supports files bigger than 2GB.
+Split the files in that case.

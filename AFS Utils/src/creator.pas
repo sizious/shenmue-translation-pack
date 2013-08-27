@@ -61,6 +61,7 @@ type
     procedure QueueMassCreation(SourceDir: string);
   public
     { Déclarations publiques }
+    procedure RunMassCreation;
   end;
 
 var
@@ -80,6 +81,14 @@ begin
     strBuf := ExtractFileName(createMainList.GetFileName(i));
     lbCreationList.Items.Add(strBuf);
   end;
+end;
+
+procedure TfrmCreator.RunMassCreation;
+begin                      
+  JvBrowseFolder2.Title := 'Mass create from...';
+  JvBrowseFolder2.Options := [odStatusAvailable,odNewDialogStyle];
+  if JvBrowseFolder2.Execute then
+    QueueMassCreation(JvBrowseFolder2.Directory);
 end;
 
 procedure TfrmCreator.UpdateFileCount;
@@ -120,10 +129,7 @@ end;
 
 procedure TfrmCreator.Masscreation1Click(Sender: TObject);
 begin
-  JvBrowseFolder2.Title := 'Mass create from...';
-  JvBrowseFolder2.Options := [odStatusAvailable,odNewDialogStyle];
-  if JvBrowseFolder2.Execute then
-    QueueMassCreation(JvBrowseFolder2.Directory);
+  RunMassCreation;
 end;
 
 {$WARN SYMBOL_PLATFORM OFF}
@@ -250,6 +256,8 @@ end;
 
 procedure TfrmCreator.FormCreate(Sender: TObject);
 begin
+  Constraints.MinHeight := Height;
+  Constraints.MinWidth := Width;
   createMainList.InitializeVar;
   if not IsOptsInit then begin
     InitOptsVars;

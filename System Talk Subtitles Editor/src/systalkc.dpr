@@ -6,7 +6,7 @@ program SysTalkC;
 
 uses
   SysUtils,
-  sncfedit in 'engine\sncfedit.pas',
+  scnfedit in 'engine\scnfedit.pas',
   systools in '..\..\Common\systools.pas',
   appver in '..\..\Common\appver.pas';
 
