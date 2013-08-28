@@ -42,7 +42,18 @@ uses
   pakfmgr in 'engine\npc\pakf\pakfmgr.pas',
   srfnpcdb in 'engine\srfnpcdb.pas',
   srfscript in 'srfscript.pas' {frmCinematicsScript},
-  batchsrf in 'engine\batch\batchsrf.pas';
+  batchsrf in 'engine\batch\batchsrf.pas',
+  systools in '..\..\..\Common\systools.pas',
+  hashidx in '..\..\..\Common\hashidx.pas',
+  lzmadec in '..\..\..\Common\lzmadec.pas',
+  uitools in '..\..\..\Common\uitools.pas',
+  viewer in '..\..\..\Common\SubsUtil\Preview\viewer.pas' {frmSubsPreview},
+  oldskool_font_mapper in '..\..\..\Common\SubsUtil\Preview\oldskool_font_mapper.pas',
+  oldskool_font_vcl in '..\..\..\Common\SubsUtil\Preview\oldskool_font_vcl.pas',
+  fileslst in '..\..\..\Common\fileslst.pas',
+  batchexe in '..\..\..\Common\batchexe.pas',
+  imgtools in '..\..\..\Common\imgtools.pas',
+  img2png in '..\..\..\Common\img2png.pas';
 
 {$R *.res}
 

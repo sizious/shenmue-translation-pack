@@ -8,7 +8,17 @@ uses
   main in 'main.pas' {frmMain},
   config in 'config.pas',
   sectexpl in 'engine\sectexpl.pas',
-  sectutil in 'engine\sectutil.pas';
+  sectutil in 'engine\sectutil.pas',
+  fsparser in '..\..\..\Common\fsparser.pas',
+  systools in '..\..\..\Common\systools.pas',
+  hashidx in '..\..\..\Common\hashidx.pas',
+  workdir in '..\..\..\Common\workdir.pas',
+  bugsmgr in '..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler},
+  debuglog in '..\..\..\Common\DebugLog\debuglog.pas' {frmDebugLog},
+  xmlconf in '..\..\..\Common\xmlconf.pas',
+  appver in '..\..\..\Common\appver.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  uitools in '..\..\..\Common\uitools.pas';
 
 {$R *.res}
 
