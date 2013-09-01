@@ -63,6 +63,7 @@ procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
 function IsInArray(Source: array of string; S: string): Boolean;
 function IsInString(const SubStr, S: string): Boolean;
 function IsJapaneseString(const S: string): Boolean;
+function KillFile(const FileName: TFileName): Boolean;
 procedure LoadUnicodeTextFile(SL: TStringList; const FileName: TFileName);
 function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
@@ -115,6 +116,15 @@ const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
   NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+function KillFile(const FileName: TFileName): Boolean;
+begin
+  if FileExists(FileName) then
+    DeleteFile(FileName);
+  Result := not FileExists(FileName);
+end;
 
 //------------------------------------------------------------------------------
 
@@ -702,8 +712,12 @@ begin
   Result := True;
   ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
   StartupInfo.cb := SizeOf(StartupInfo);
+  
+{$IFDEF RELEASE}
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
   StartupInfo.wShowWindow := SW_HIDE;
+{$ENDIF}
+
   if CreateProcess(
     nil, PChar(TargetFileName), nil, nil, True, 0, nil, nil, StartupInfo,
     ProcessInformation
@@ -1019,7 +1033,7 @@ end; *)
 
 //------------------------------------------------------------------------------
 
-// to be fixed
+// to be fixed & improved
 function IsJapaneseString(const S: string): Boolean;
 var
   i: Integer;

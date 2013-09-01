@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'frmMain'
+  Caption = '%Dynamic Caption%'
   ClientHeight = 260
   ClientWidth = 429
   Color = clBtnFace
@@ -24,22 +24,23 @@ object frmMain: TfrmMain
     Width = 417
     Height = 2
   end
-  object Button5: TButton
+  object btnMake: TButton
     Left = 219
     Top = 231
     Width = 98
     Height = 25
     Caption = 'Make'
     TabOrder = 0
-    OnClick = Button5Click
+    OnClick = btnMakeClick
   end
-  object Button6: TButton
+  object btnQuit: TButton
     Left = 323
     Top = 231
     Width = 98
     Height = 25
     Caption = 'Quit'
     TabOrder = 1
+    OnClick = btnQuitClick
   end
   object GroupBox1: TGroupBox
     Left = 307
@@ -121,7 +122,7 @@ object frmMain: TfrmMain
     Height = 63
     Caption = ' Progression: '
     TabOrder = 5
-    object Label1: TLabel
+    object lblProgress: TLabel
       Left = 8
       Top = 17
       Width = 30
