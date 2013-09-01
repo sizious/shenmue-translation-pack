@@ -20,9 +20,10 @@ type
     Button2: TButton;
     Button1: TButton;
     GroupBox4: TGroupBox;
-    ProgressBar1: TProgressBar;
+    pbrCurrent: TProgressBar;
     lblProgress: TLabel;
     Label2: TLabel;
+    pbrTotal: TProgressBar;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
