@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = '%Dynamic Caption%'
-  ClientHeight = 260
+  ClientHeight = 275
   ClientWidth = 429
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,14 +19,14 @@ object frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel1: TBevel
-    Left = 4
-    Top = 223
-    Width = 417
+    Left = 8
+    Top = 239
+    Width = 413
     Height = 2
   end
   object btnMake: TButton
     Left = 219
-    Top = 231
+    Top = 247
     Width = 98
     Height = 25
     Caption = 'Make'
@@ -35,7 +35,7 @@ object frmMain: TfrmMain
   end
   object btnQuit: TButton
     Left = 323
-    Top = 231
+    Top = 247
     Width = 98
     Height = 25
     Caption = 'Quit'
@@ -119,7 +119,7 @@ object frmMain: TfrmMain
     Left = 8
     Top = 154
     Width = 413
-    Height = 63
+    Height = 79
     Caption = ' Progression: '
     TabOrder = 5
     object lblProgress: TLabel
@@ -129,12 +129,19 @@ object frmMain: TfrmMain
       Height = 13
       Caption = 'Idle...'
     end
-    object ProgressBar1: TProgressBar
+    object pbrCurrent: TProgressBar
       Left = 8
-      Top = 36
+      Top = 32
       Width = 396
       Height = 19
       TabOrder = 0
+    end
+    object pbrTotal: TProgressBar
+      Left = 8
+      Top = 52
+      Width = 396
+      Height = 19
+      TabOrder = 1
     end
   end
 end

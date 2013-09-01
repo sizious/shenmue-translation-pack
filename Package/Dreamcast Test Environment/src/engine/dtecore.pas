@@ -15,6 +15,41 @@ type
   // Virtual Drive Software Type
   TVirtualDriveKind = (vdkNone, vdkAlcohol120, vdkDaemonTools);
 
+  // Progression event
+  TProgressEvent = procedure(Sender: TObject; Value: Integer) of object;
+
+  TCoreProcessThread = class;
+  
+  // Thread for reading the memory of mkisofs
+  TMakeImageWatcherThread = class(TThread)
+  private
+    fOwner: TCoreProcessThread;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create; overload;    
+  end;
+
+  // Thread for running the process
+  TCoreProcessThread = class(TThread)
+  private
+    fBatchFileName: TFileName;
+    fErrOutputFileName: TFileName;
+    fStdOutputFileName: TFileName;
+    fData1FileName: TFileName;
+    fMakeImageWatcherThread: TMakeImageWatcherThread;
+    function CatchCommandOutput: string;
+    function ExecuteBinHack: Boolean;
+    procedure GenerateBatchFile(const Command: string);
+    procedure MakeImage;
+    procedure MakeImageWatcherThread_Terminate(Sender: TObject);
+    function RunCommand(const Command: string): string;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create; overload;
+  end;
+
   // Virtual Drive Settings
   TVirtualDriveSettings = class(TObject)
   private
@@ -42,12 +77,16 @@ type
   // Main Class
   TDreamcastImageMaker = class(TObject)
   private
+    fCoreProcessThread: TCoreProcessThread;
     fSettings: TDreamcastImageSettings;
+    fProgress: TProgressEvent;
+    procedure CoreProcessThread_Terminate(Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
     procedure Execute;
     property Settings: TDreamcastImageSettings read fSettings;
+    property OnProgress: TProgressEvent read fProgress write fProgress;
   end;
 
 implementation
@@ -56,40 +95,24 @@ uses
   JvJCLUtils, SysTools, UITools, WorkDir, ProcUtil;
 
 const
-  DATA1_FILENAME              = 'data1.iso';
-  SFILE_DC_BOOTSTRAP_HACKED   = 'IP.HAK';
-  SFILE_DC_BOOTSTRAP          = 'IP.BIN';
-  SFILE_DC_BOOT_BINARY        = '1ST_READ.BIN';
-  SOUTPUT_ERROR_TAG           = '*** ERROR OUTPUT ***';
+  SFILE_MKISOFS                   = 'mkisofs.exe';
+  SFILE_DATA1                     = 'data1.iso';
+  SFILE_DATA2                     = 'data2.iso';
+  SFILE_BOOTSTRAP_HACKED          = 'IP.HAK';
+  SFILE_BOOTSTRAP                 = 'IP.BIN';
+  SFILE_BOOT_BINARY               = '1ST_READ.BIN';
+  OUTPUT_ERROR_TAG                = '*** ERROR OUTPUT ***';
 
-  MKISOFS_PROGRESS_ADDRESS_XP = $0022B2D4;
-  MKISOFS_PROGRESS_ADDRESS = $0022B2AC;
-
-type
-  TMakeImageWatcherThread = class(TThread)
-  protected
-    procedure Execute; override;
-  end;
-
-  TCoreProcessThread = class(TThread)
-  private
-    fBatchFileName: TFileName;
-    fErrOutputFileName: TFileName;
-    fStdOutputFileName: TFileName;
-    fData1FileName: TFileName;
-    function CatchCommandOutput: string;
-    function ExecuteBinHack: Boolean;
-    procedure GenerateBatchFile(const Command: string);
-    function MakeImage: Boolean;
-    function RunCommand(const Command: string): string;
-  protected
-    constructor Create; overload;
-    procedure Execute; override;
-  end;
-
-//TProcessThread
+  MKISOFS_PROGRESS_ADDRESS_XP_32  = $0022B2D4;
+  MKISOFS_PROGRESS_ADDRESS_W7_32  = $0022B2AC;
+  MKISOFS_PROGRESS_ADDRESS_W7_64  = $0028B2AC;
 
 { TDreamcastImageMaker }
+
+procedure TDreamcastImageMaker.CoreProcessThread_Terminate(Sender: TObject);
+begin
+  fCoreProcessThread := nil;
+end;
 
 constructor TDreamcastImageMaker.Create;
 begin
@@ -104,10 +127,12 @@ end;
 
 procedure TDreamcastImageMaker.Execute;
 begin
-  with TCoreProcessThread.Create do
+  fCoreProcessThread := TCoreProcessThread.Create;
+  with fCoreProcessThread do
   begin
+    OnTerminate := CoreProcessThread_Terminate;
     Resume;
-  end;  
+  end;
 end;
 
 { TDreamcastImageSettings }
@@ -125,6 +150,12 @@ end;
 
 { TMakeImageWatcherThread }
 
+constructor TMakeImageWatcherThread.Create;
+begin
+  inherited Create(True);
+  FreeOnTerminate := True;
+end;
+
 procedure TMakeImageWatcherThread.Execute;
 const
   SE_DEBUG_NAME = 'SeDebugPrivilege';
@@ -135,32 +166,36 @@ var
   ProcessId,
   TokenHwnd: THandle;
   MkisofsProgressValue: Double;
-  lpLuid_Old, lpLuid: TOKEN_PRIVILEGES;
+  PreviousState, NewState: TOKEN_PRIVILEGES;
   ReturnLength: Cardinal;
   Address: Cardinal;
   
 begin
-  FreeOnTerminate := True;
+  // Setting the real address to lookup...
+  Address := MKISOFS_PROGRESS_ADDRESS_XP_32;
+  if IsWindowsVista then
+  begin
+    Address := MKISOFS_PROGRESS_ADDRESS_W7_32;
+    if Is64BitOS then
+      Address := MKISOFS_PROGRESS_ADDRESS_W7_64;
+  end;
 
-  Address := MKISOFS_PROGRESS_ADDRESS;
-  if not IsWindowsVista then
-    Address := MKISOFS_PROGRESS_ADDRESS_XP;
-
+  // Getting the value !
   if OpenProcessToken(GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, TokenHwnd) then
   begin
 
     try
 
       // Initializing...
-      if not LookupPrivilegeValue(nil, SE_DEBUG_NAME, lpLuid.Privileges[0].Luid) then
+      if not LookupPrivilegeValue(nil, SE_DEBUG_NAME, NewState.Privileges[0].Luid) then
         RaiseLastOSError
       else
       begin
-        lpLuid_Old := lpLuid;
-        lpLuid.PrivilegeCount := 1;
-        lpLuid.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
+        PreviousState := NewState;
+        NewState.PrivilegeCount := 1;
+        NewState.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
         ReturnLength := 0;
-        if not AdjustTokenPrivileges(TokenHwnd, False, lpLuid, SizeOf(lpLuid_Old), lpLuid_Old, ReturnLength) then
+        if not AdjustTokenPrivileges(TokenHwnd, False, NewState, SizeOf(PreviousState), PreviousState, ReturnLength) then
           RaiseLastOSError;
       end;
 
@@ -211,7 +246,7 @@ begin
       StdBuffer.LoadFromFile(fStdOutputFileName);
     if FileExists(fErrOutputFileName) then
       ErrBuffer.LoadFromFile(fErrOutputFileName);
-    StdBuffer.Add(SOUTPUT_ERROR_TAG);
+    StdBuffer.Add(OUTPUT_ERROR_TAG);
     StdBuffer.Append(ErrBuffer.Text);
 
     // Returning the buffer !
@@ -228,7 +263,7 @@ constructor TCoreProcessThread.Create;
 begin
   inherited Create(True);
   FreeOnTerminate := True;
-  fData1FileName := GetWorkingTempDirectory + DATA1_FILENAME;
+  fData1FileName := GetWorkingTempDirectory + SFILE_DATA1;
 end;
 
 procedure TCoreProcessThread.Execute;
@@ -250,8 +285,8 @@ var
 begin
   SourceDirectory := '.\';
 
-  MainBinaryFile := SourceDirectory + SFILE_DC_BOOT_BINARY;
-  BootstrapFile := SourceDirectory + SFILE_DC_BOOTSTRAP;
+  MainBinaryFile := SourceDirectory + SFILE_BOOT_BINARY;
+  BootstrapFile := SourceDirectory + SFILE_BOOTSTRAP;
 
   // Check if the 1ST_READ.BIN file exists
   if not FileExists(MainBinaryFile) then
@@ -262,28 +297,28 @@ begin
     raise EBinHackFileNotFound.CreateFmt('Unable to find the Boostrap File: "%s".', [BootstrapFile]);
 
   // Copy the 1ST_READ.BIN to the proper hacking location
-  TempMainBinaryFile := GetWorkingTempDirectory + SFILE_DC_BOOT_BINARY;
+  TempMainBinaryFile := GetWorkingTempDirectory + SFILE_BOOT_BINARY;
   CopyFile(MainBinaryFile, TempMainBinaryFile);
 
   // Copy the IP.BIN to the proper hacking location
-  TempBootstrapFile := GetWorkingTempDirectory + SFILE_DC_BOOTSTRAP;
+  TempBootstrapFile := GetWorkingTempDirectory + SFILE_BOOTSTRAP;
   CopyFile(BootstrapFile, TempBootstrapFile);
 
   // Execute the command
   Command := Format('(echo %s & echo %s & echo 45000) | binhack', [
-    SFILE_DC_BOOT_BINARY,
-    SFILE_DC_BOOTSTRAP_HACKED
+    SFILE_BOOT_BINARY,
+    SFILE_BOOTSTRAP_HACKED
   ]);
   RunCommand(Command);
 
   // Check the results
-  HackedBootstrapFile := GetWorkingTempDirectory + SFILE_DC_BOOTSTRAP_HACKED;
+  HackedBootstrapFile := GetWorkingTempDirectory + SFILE_BOOTSTRAP_HACKED;
   Result := FileExists(HackedBootstrapFile);
   if Result then  
   begin
     DeleteFile(TempMainBinaryFile);
     DeleteFile(TempBootstrapFile);
-    MoveFile(HackedBootstrapFile, SourceDirectory + SFILE_DC_BOOTSTRAP_HACKED);
+    MoveFile(HackedBootstrapFile, SourceDirectory + SFILE_BOOTSTRAP_HACKED);
   end else
     raise EBinHackFailed.Create('Sorry, the Binary Hacking process failed. Cannot continue.');
 end;
@@ -316,23 +351,31 @@ begin
   end;
 end;
 
-function TCoreProcessThread.MakeImage: Boolean;
+procedure TCoreProcessThread.MakeImage;
 var
   Command: string;
 
 begin
-  Command := Format('mkisofs -C 0,45000 -V %s -G "%s" -M data1.iso -duplicates-once -l -o data2.iso "%s"', [
+  Command := Format('mkisofs -C 0,45000 -V %s -G "%s" -M "%s" -duplicates-once -l -o data2.iso "%s"', [
     'SHENTEST',
-    SFILE_DC_BOOTSTRAP_HACKED,
+    SFILE_BOOTSTRAP_HACKED,
+    fData1FileName,
     GetApplicationDirectory + 'data'
   ]);
 
-  with TMakeImageWatcherThread.Create(True) do
+  fMakeImageWatcherThread := TMakeImageWatcherThread.Create;
+  with fMakeImageWatcherThread do
   begin
+    OnTerminate := MakeImageWatcherThread_Terminate;
     Resume;
   end;
 
   RunCommand(Command);
+end;
+
+procedure TCoreProcessThread.MakeImageWatcherThread_Terminate(Sender: TObject);
+begin
+  fMakeImageWatcherThread := nil;
 end;
 
 function TCoreProcessThread.RunCommand(const Command: string): string;

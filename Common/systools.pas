@@ -60,6 +60,7 @@ function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
+function Is64BitOS: Boolean;
 function IsInArray(Source: array of string; S: string): Boolean;
 function IsInString(const SubStr, S: string): Boolean;
 function IsJapaneseString(const S: string): Boolean;
@@ -116,6 +117,37 @@ const
   HEXADECIMAL_VALUES  = '0123456789ABCDEF';
   DATA_BASEDIR        = 'data';
   NULL_BUFFER_SIZE    = 512;
+
+//------------------------------------------------------------------------------
+
+function Is64BitOS: Boolean;
+type
+  TIsWow64Process = function(Handle: THandle; var IsWow64: BOOL): BOOL; stdcall;
+
+var
+  hKernel32: Integer;
+  IsWow64Process: TIsWow64Process;
+  IsWow64: BOOL;
+
+begin
+  // We can check if the operating system is 64-bit by checking whether
+  // we are running under Wow64 (we are 32-bit code). We must check if this
+  // function is implemented before we call it, because some older versions
+  // of kernel32.dll (eg. Windows 2000) don't know about it.
+  // See "IsWow64Process", http://msdn.microsoft.com/en-us/library/ms684139.aspx
+  Result := False;
+  hKernel32 := LoadLibrary('kernel32.dll');
+  if (hKernel32 = 0) then RaiseLastOSError;
+  @IsWow64Process := GetProcAddress(hkernel32, 'IsWow64Process');
+  if Assigned(IsWow64Process) then begin
+    IsWow64 := False;
+    if (IsWow64Process(GetCurrentProcess, IsWow64)) then begin
+      Result := IsWow64;
+    end
+    else RaiseLastOSError;
+  end;
+  FreeLibrary(hKernel32);
+end;
 
 //------------------------------------------------------------------------------
 
