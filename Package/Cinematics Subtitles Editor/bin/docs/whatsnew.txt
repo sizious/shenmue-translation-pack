@@ -5,14 +5,23 @@
              |______|__|__|___._|__|__|___  |_____|_____|
                                       |_____| What's new?
 ___                           __________________________________________________
+___| Version 2.5: 2013-11-17 |__________________________________________________
+
+ADDED:
+- Subtitles Importer: The legacy script file format ".TXT" is now back again.
+  You can import subtitles with the legacy ".TXT" format and/or the new ".XML"
+  format. This feature is available both in the single import or batch import.
+  Thanks kogami for asking this.
+___                           __________________________________________________
 ___| Version 2.4: 2013-04-11 |__________________________________________________
 
 FIXED:
 - An OLE exception was thrown when filepaths contains not English or French 
   characters. Because Delphi 2007 (the IDE used to create this application) 
   isn't Unicode, some non-standard characters, like Russian or some Spanish
-  characters cause the application to fail. Please move the package to another
-  location containing only ANSI characters, like "C:\SHENTRAD\".
+  characters cause the application to fail. If the problem still here, please 
+  move the package to another location containing only ANSI characters, 
+  like "C:\SHENTRAD\".
 
 UPDATED:
 - Code cleanup.
