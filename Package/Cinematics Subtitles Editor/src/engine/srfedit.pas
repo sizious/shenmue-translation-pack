@@ -50,7 +50,7 @@ type
     property Owner: TSRFSubtitlesList read fOwner;
   end;
 
-  TSRFImportFileFormat = (iffXML, iffText);
+  TSRFImportFileFormat = (iffUnknow, iffXML, iffText);
 
   TSRFSubtitlesList = class(TObject)
   private
@@ -63,6 +63,7 @@ type
   protected
     function Add: TSRFSubtitlesListItem;
     procedure Clear;
+    function DetectImportFormat(const FileName: TFileName): TSRFImportFileFormat;
     function ImportFromText(const FileName: TFileName): Boolean;
     function ImportFromXML(const FileName: TFileName): Boolean;
     procedure SwitchJapaneseEncoding(const FileName: TFileName);
@@ -70,9 +71,7 @@ type
     constructor Create(AOwner: TSRFEditor);
     destructor Destroy; override;
     function ExportToFile(const FileName: TFileName): Boolean;
-    function ImportFromFile(const FileName: TFileName;
-      FileFormat: TSRFImportFileFormat): Boolean; overload;
-    function ImportFromFile(const FileName: TFileName): Boolean; overload;
+    function ImportFromFile(const FileName: TFileName): Boolean;
     function TransformText(const Subtitle: string): string;
     property Count: Integer read GetCount;
     property DecodeText: Boolean read fDecodeText write fDecodeText;
@@ -332,6 +331,29 @@ begin
   inherited;
 end;
 
+function TSRFSubtitlesList.DetectImportFormat(
+  const FileName: TFileName): TSRFImportFileFormat;
+var
+  FS: TFileStream;
+  Buffer: Char;
+
+begin
+  FS := TFileStream.Create(FileName, fmOpenRead);
+  try
+    try
+      FS.Read(Buffer, 1);
+      if Buffer = '<' then
+        Result := iffXML
+      else
+        Result := iffText;
+    except
+      Result := iffUnknow;
+    end;
+  finally
+    FS.Free;
+  end;
+end;
+
 function TSRFSubtitlesList.ExportToFile(const FileName: TFileName): Boolean;
 var
   XMLRoot: IXMLDocument;
@@ -406,25 +428,23 @@ end;
 
 function TSRFSubtitlesList.GetJapaneseCharset: Boolean;
 begin
-// !!! THIS IS BIG SHIT I NEED TO FIX THIS !!!
+  // !!! THIS IS BIG SH*T I NEED TO FIX THIS !!!
   Result := False;
   if (Count > 0) then
     Result := IsJapaneseString(Items[0].RawText);
 end;
 
-function TSRFSubtitlesList.ImportFromFile(const FileName: TFileName;
-  FileFormat: TSRFImportFileFormat): Boolean;
+function TSRFSubtitlesList.ImportFromFile(const FileName: TFileName): Boolean;
+var
+  FileFormat: TSRFImportFileFormat;
+
 begin
   Result := False;
+  FileFormat := DetectImportFormat(FileName);
   case FileFormat of
     iffXML: Result := ImportFromXML(FileName);
     iffText: Result := ImportFromText(FileName);
   end;
-end;
-
-function TSRFSubtitlesList.ImportFromFile(const FileName: TFileName): Boolean;
-begin
-  Result := ImportFromFile(FileName, iffXML);
 end;
 
 function TSRFSubtitlesList.ImportFromText(const FileName: TFileName): Boolean;
@@ -441,15 +461,19 @@ begin
   SL := TStringList.Create;
   try
     LoadUnicodeTextFile(SL, FileName);
-    
-    // ImportFile[0]: Filename. Ignore this
+
+    // Check the filename in the header
+    if SL[0] <> ExtractFileName(Owner.SourceFileName) then Exit;
+
+    // Check the subtitles count
     SubsCount := StrToIntDef(SL[1], 0);
     if Count <> SubsCount then Exit;
 
     LinePtr := 2;
-    while LinePtr < SL.Count do begin
+    while LinePtr < SL.Count do
+    begin
       // Reading the entry
-      SubIndex := StrToIntDef(SL[LinePtr + 1], -1);
+      SubIndex := StrToIntDef(SL[LinePtr + 1], -1) - 1;
       CharID := SL[LinePtr + 2];
       SubtitleText := SL[LinePtr + 3];
 

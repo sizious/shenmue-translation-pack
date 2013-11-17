@@ -2048,8 +2048,9 @@ object frmMain: TfrmMain
   object odImport: TOpenDialog
     DefaultExt = 'XML'
     Filter = 
-      'XML Script Files (*.xml)|*.XML|Legacy Text Script Files (*.txt)|' +
-      '*.TXT|All Files (*.*)|*.*'
+      'All Supported Script Files (*.xml;*.txt)|*.XML;*.TXT|XML Script ' +
+      'Files (*.xml)|*.XML|Legacy Text Script Files (*.txt)|*.TXT|All F' +
+      'iles (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select the file to open...'
     Left = 12
@@ -2057,7 +2058,7 @@ object frmMain: TfrmMain
   end
   object pmFilesList: TPopupMenu
     Left = 12
-    Top = 112
+    Top = 116
     object miFileProperties2: TMenuItem
       Caption = '<Properties>'
     end
@@ -2101,7 +2102,7 @@ object frmMain: TfrmMain
   object bfdBatchExport: TJvBrowseForFolderDialog
     Title = 'Please select the target directory where to export files:'
     Left = 48
-    Top = 112
+    Top = 116
   end
   object sdExportFilesList: TSaveDialog
     DefaultExt = 'txt'
@@ -2109,6 +2110,6 @@ object frmMain: TfrmMain
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Export the files list to...'
     Left = 12
-    Top = 140
+    Top = 148
   end
 end

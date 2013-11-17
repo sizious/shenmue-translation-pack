@@ -64,6 +64,8 @@ begin
     // Build the output file
     AppendExtension := not SameText(SourceFile.Extension, '.srf');
     WorkFile := TargetDirectory + SourceFile.ExtractedFileName('.xml', AppendExtension);
+    if not FileExists(WorkFile) then
+      WorkFile := ChangeFileExt(WorkFile, '.txt');
 
     Result := irFailed;
     if not FileExists(WorkFile) then
