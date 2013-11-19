@@ -6,11 +6,12 @@ line decoder called "test.exe", and a Winamp plugin called "in_vgmstream".
 
 *********** IMPORTANT!! ***********
 --- needed files (for Windows)  ---
-Since Ogg Vorbis and MPEG audio are now supported, you will need to have
-libvorbis.dll and libmpg123-0.dll.
+Since Ogg Vorbis, MPEG audio, and G.722.1 are now supported, you will need to
+have libvorbis.dll, libmpg123-0.dll, and libg7221_decode.dll.
 You can get these from http://hcs64.com/files/vgmstream_external_dlls.zip
 
-Put libvorbis.dll and libmpg123-0.dll somewhere Windows can find them.
+Put libvorbis.dll, libmpg123-0.dll, and libg7221_decode.dll somewhere Windows
+can find them.
 For in_vgmstream this means in the directory with winamp.exe, or in a
 system directory. For test.exe this means in the same directory as test.exe,
 or in a system directory.
@@ -50,6 +51,7 @@ the most obvious way to identify files.
 PS2/PSX ADPCM:
 - .ads/.ss2
 - .ass
+- .ast
 - .bg00
 - .bmdx
 - .ccc
@@ -58,6 +60,7 @@ PS2/PSX ADPCM:
 - .enth
 - .fag
 - .filp
+- .gcm
 - .gms
 - .hgc1
 - .ikm
@@ -65,14 +68,15 @@ PS2/PSX ADPCM:
 - .ivb
 - .joe
 - .kces
+- .khv
 - .leg
 - .mcg
 - .mib, .mi4 (w/ or w/o .mih)
 - .mic
 - .mihb (merged mih+mib)
+- .msa
 - .msvp
 - .musc
-- .musx
 - .npsf
 - .pnb
 - .psh
@@ -82,10 +86,12 @@ PS2/PSX ADPCM:
 - .rws
 - .rxw
 - .snd
-- .seg
 - .sfs
 - .sl3
+- .smpl (w/ bad flags)
+- .ster
 - .str+.sth
+- .str (MGAV blocked)
 - .sts
 - .svag
 - .svs
@@ -103,16 +109,21 @@ PS2/PSX ADPCM:
 - .xa30
 
 GC/Wii DSP ADPCM:
+- .aaap
 - .agsc
 - .amts
 - .asr
 - .bns
+- .bo2
+- .capdsp
 - .cfn
+- .ddsp
 - .dsp
-  - standard, with dual file stereo
+  - standard, optional dual file stereo
   - RS03
   - Cstr
   - _lr.dsp
+  - MPDS
 - .gca
 - .gcm
 - .gsp+.gsp
@@ -127,6 +138,7 @@ GC/Wii DSP ADPCM:
 - .pdt
 - .sdt
 - .smp
+- .sns
 - .spt+.spd
 - .ssm
 - .stm/.dsp
@@ -138,6 +150,7 @@ GC/Wii DSP ADPCM:
 - .tydsp
 - .vjdsp
 - .waa, .wac, .wad, .wam
+- .was
 - .wsd
 - .wsi
 - .ydsp
@@ -149,8 +162,10 @@ PCM:
 - .asd (16 bit)
 - .baka (16 bit)
 - .bh2pcm (16 bit)
+- .dmsg (16 bit)
 - .gcsw (16 bit)
 - .gcw (16 bit)
+- .his (8 bit)
 - .int (16 bit)
 - .pcm (8 bit, 16 bit)
 - .kraw (16 bit)
@@ -161,6 +176,8 @@ PCM:
 - .sps (16 bit)
 - .str (16 bit)
 - .xss (16 bit)
+- .voi (16 bit)
+- .wb (16 bit)
 - .zsd (8 bit)
 
 Xbox IMA ADPCM:
@@ -173,15 +190,17 @@ Xbox IMA ADPCM:
 
 Yamaha ADPCM:
 - .adpcm
-- .dcs+.wav
+- .dcs+.dcsw
 - .str
 - .spsd
 
 IMA ADPCM:
+- .bar (IMA ADPCM)
 - .dvi (DVI IMA ADPCM)
 - .hwas (IMA ADPCM)
 - .idvi (DVI IMA ADPCM)
 - .ivaud (IMA ADPCM)
+- .myspd (IMA ADPCM)
 - .stma (DVI IMA ADPCM)
 - .strm (IMA ADPCM)
 
@@ -195,13 +214,15 @@ multi:
 - .emff (PSX APDCM, GC DSP ADPCM)
 - .fsb, .wii (PSX ADPCM, GC DSP ADPCM, Xbox IMA ADPCM)
 - .genh (lots)
+- .musx (PSX ADPCM, Xbox IMA ADPCM, DAT4 IMA ADPCM)
 - .nwa (16 bit PCM, NWA DPCM)
 - .psw (PSX ADPCM, GC DSP ADPCM)
 - .rwar, .rwav (GC DSP ADPCM, 8/16 bit PCM)
 - .rwsd (GC DSP ADPCM, 8/16 bit PCM)
-- .rsd (PSX ADPCM, 16 bit PCM, GC DSP ADPCM, Xbox IMA ADPCM)
+- .rsd (PSX ADPCM, 16 bit PCM, GC DSP ADPCM, Xbox IMA ADPCM, Radical ADPCM)
 - .rrds (NDS IMA ADPCM)
 - .sad (GC DSP ADPCM, NDS IMA ADPCM, Procyon Studios NDS ADPCM)
+- .seg (Xbox IMA ADPCM, PS2 ADPCM)
 - .sng, .asf, .str, .eam (EA/XA ADPCM or PSX ADPCM)
 - .strm (NDS IMA ADPCM, 8/16 bit PCM)
 - .ss7 (EACS IMA ADPCM, IMA ADPCM)
@@ -210,7 +231,7 @@ multi:
 - .wav, .lwav (unsigned 8 bit PCM, 16 bit PCM, GC DSP ADPCM, MS IMA ADPCM)
 
 etc:
-- .2dx (MS ADPCM)
+- .2dx9 (MS ADPCM)
 - .aax (CRI ADX ADPCM)
 - .acm (InterPlay ACM)
 - .adp (GC DTK ADPCM)
@@ -218,16 +239,23 @@ etc:
 - .afc (GC AFC ADPCM)
 - .ahx (MPEG-2 Layer II)
 - .aix (CRI ADX ADPCM)
-- .caf (Apple IMA4 ADPCM)
+- .baf (Blur ADPCM)
 - .bgw (FFXI PS-like ADPCM)
+- .bnsf (G.722.1)
+- .caf (Apple IMA4 ADPCM)
 - .de2 (MS ADPCM)
 - .kcey (EACS IMA ADPCM)
+- .lsf (LSF ADPCM)
 - .mwv (Level-5 0x555 ADPCM)
 - .ogg, .logg (Ogg Vorbis)
+- .p3d (Radical ADPCM)
 - .rsf (CCITT G.721 ADPCM)
 - .sab (Worms 4 soundpacks)
+- .s14/.sss (G.722.1)
 - .sc (Activision EXAKT SASSC DPCM)
+- .scd (MS ADPCM, MPEG Audio, 16 bit PCM)
 - .sd9 (MS ADPCM)
+- .smp (MS ADPCM)
 - .spw (FFXI PS-like ADPCM)
 - .stm renamed .ps2stm (DVI IMA ADPCM)
 - .str (SDX2 DPCM)

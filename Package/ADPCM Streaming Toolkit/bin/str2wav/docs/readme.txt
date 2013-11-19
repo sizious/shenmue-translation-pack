@@ -4,7 +4,6 @@
    |   _   |     \|   __ \      |   |   | |_     _|.-----.-----.|  |
 ___|       |  --  |    __/   ---|       |___|   |__|  _  |  _  ||  |____________
    |___|___|_____/|___|  |______|__|_|__|   |___|  |_____|_____||__|
- Version : 1.1                                                Date : 22 fev 2010
                      http://shenmuesubs.sourceforge.net/
       ___                  _      __  _         
      / _ \___ ___ ________(_)__  / /_(_)__  ___ 
@@ -39,9 +38,10 @@ __/ /_/ (_-</ _ `/ _ `/ -_)_____________________________________________________
     str2wav wazamakimono.str myfile.wav
   This will decode the "wazamakimono.str" file to the "myfile.wav".
 
-  A batch file was integrated. You can copy your .STR files to the ".\Input\"
-  directory, double-click on the "batch.cmd" file then retrieve your converted
-  files in the ".\Output\" directory.
+  A batch file was integrated, located in the "massconv" directory. 
+  You can copy your .STR files to the ".\input\" directory, double-click on 
+  the "massconv.cmd" file then retrieve your converted files in the ".\output\" 
+  directory.
 
   That's all folks.
      _____           ___ __    

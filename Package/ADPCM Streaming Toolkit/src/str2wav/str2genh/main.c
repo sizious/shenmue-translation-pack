@@ -1,6 +1,7 @@
 #include "genh.h"
 #include "utils.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void print_banner() {
 	printf("Shenmue Yamaha AICA ADPCM Stream to Generic Header converter\n");

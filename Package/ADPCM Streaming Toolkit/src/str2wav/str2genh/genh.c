@@ -51,12 +51,13 @@ int make_genh(FILE *infile, FILE *outfile) {
 }
 
 int check_stream_file_sign(FILE *infile) {
-	char sign[4];
+	char sign[5];
 	int pos = ftell(infile);
 	
 	fseek(infile, 0x0, SEEK_SET);
 	fread(sign, 1, sizeof(sign), infile);
-	fseek(infile, pos, SEEK_SET);
-	
+	fseek(infile, pos, SEEK_SET);	
+	sign[4] = '\0';
+		
 	return (strcmp(sign, NAOMI_SPSD_SIGN) == 0);
 }
