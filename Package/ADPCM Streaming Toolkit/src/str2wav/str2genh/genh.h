@@ -2,6 +2,7 @@
 #define __GENH__H__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "utils.h"
 
 #define NAOMI_SPSD_SIGN "SPSD"

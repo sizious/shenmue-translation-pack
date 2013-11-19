@@ -2,8 +2,8 @@
 #include <windows.h>
 
 1 VERSIONINFO
-FILEVERSION 0,1,0,0
-PRODUCTVERSION 0,1,0,0
+FILEVERSION 0,2,0,0
+PRODUCTVERSION 0,2,0,0
 FILEOS VOS_NT_WINDOWS32
 FILETYPE VFT_APP
 
@@ -13,15 +13,15 @@ BEGIN
 	BEGIN
 		BLOCK "040C04E4"
 		BEGIN
-			VALUE "Comments", "http://sbibuilder.shorturl.com/\0"
-			VALUE "CompanyName", "Created by [big_fury]SiZiOUS\0"
+			VALUE "Comments", "http://shenmuesubs.sf.net/\0"
+			VALUE "CompanyName", "Shentrad Team\0"
 			VALUE "FileDescription", "Shenmue Yamaha AICA ADPCM Stream to Generic Header Converter\0"
-			VALUE "FileVersion", "0.1.0.0"
+			VALUE "FileVersion", "0.2.0.0"
 			VALUE "InternalName", "str2genh.exe\0"
-			VALUE "LegalCopyright", "© Copyleft 2002, 2009\0"
+			VALUE "LegalCopyright", "© Copyleft 2006-2014\0"
 			VALUE "OriginalFilename", "str2genh.exe\0"
 			VALUE "ProductName", "STR2GENH\0"
-			VALUE "ProductVersion", "0.1.0.0"
+			VALUE "ProductVersion", "0.2.0.0"
 		END
 	END
 

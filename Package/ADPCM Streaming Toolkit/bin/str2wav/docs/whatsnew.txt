@@ -1,0 +1,28 @@
+                           ADPCM Streaming Toolkit
+              ______ __                                  
+             |      |  |--.---.-.-----.-----.-----.-----.
+             |   ---|     |  _  |     |  _  |  -__|__ --|
+             |______|__|__|___._|__|__|___  |_____|_____|
+                                      |_____| What's new?
+___                           __________________________________________________
+___| Version 1.2: 2010-01-14 |__________________________________________________
+
+FIXED:
+- Pack is now compatible 64-bit OS, like Windows 7 x64.
+
+UPDATED:
+- Directory structure is now compliant like the other tools.
+- The mass converter is now available in the "massconv" directory.
+- vgmstream binary updated from r717 to r1015.
+___                           __________________________________________________
+___| Version 1.1: 2010-02-22 |__________________________________________________
+
+ADDED:
+- "Mass Conversion" option
+
+FIXED:
+- Some minor bugs fixes
+___                            _________________________________________________
+___| Version 1.0: 2010-02-09 |__________________________________________________
+
+  First Public Release
