@@ -1,5 +1,5 @@
-rem @echo off
-set APPVERSION=1.1
+@echo off
+set APPVERSION=1.2
 set APPTITLE=Yamaha AICA ADPCM Stream to RIFF WAVE Mass Converter Version %APPVERSION%
 title %APPTITLE%
 echo %APPTITLE% 
