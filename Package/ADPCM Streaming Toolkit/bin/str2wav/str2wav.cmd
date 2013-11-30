@@ -1,5 +1,5 @@
 @echo off
-set APPVERSION=1.2
+set APPVERSION=1.3
 set APPTITLE=Yamaha AICA ADPCM Stream to Waveform Converter Ver.%APPVERSION% by The Shentrad Team
 title %APPTITLE%
 echo %APPTITLE%
