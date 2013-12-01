@@ -1,6 +1,6 @@
 1 VERSIONINFO
-FILEVERSION 1,1,2,0
-PRODUCTVERSION 1,1,2,0
+FILEVERSION 1,0,3,0
+PRODUCTVERSION 1,0,3,0
 FILEOS VOS_NT_WINDOWS32
 FILETYPE VFT_APP
 
@@ -12,12 +12,12 @@ BEGIN
 			VALUE "Comments", "http://shenmuesubs.sf.net/\0"
 			VALUE "CompanyName", "Shentrad Team\0"
 			VALUE "FileDescription", "Shenmue System Talk Subtitles Editor (Console Version)\0"
-			VALUE "FileVersion", "1.1.2.0\0"
+			VALUE "FileVersion", "1.0.3.0\0"
 			VALUE "InternalName", "SysTalk\0"
 			VALUE "LegalCopyright", "© Copyleft 2006-2013\0"
 			VALUE "OriginalFilename", "systalkc.exe\0"
 			VALUE "ProductName", "Shenmue Translation Pack\0"
-			VALUE "ProductVersion", "1.1\0"
+			VALUE "ProductVersion", "1.0\0"
 		END
 	END
 
