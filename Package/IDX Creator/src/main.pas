@@ -22,8 +22,8 @@ uses
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, AppEvnts;
 
 const
-  APP_VERSION = '2.2';
-  COMPIL_DATE_TIME = 'March 20, 2009 @00:01AM';
+  APP_VERSION = '2.3';
+  COMPIL_DATE_TIME = 'December 01, 2013 @05:41PM';
 
 type
   TGameVersion = (gvShenmue, gvShenmue2);
