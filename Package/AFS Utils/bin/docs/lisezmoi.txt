@@ -1,0 +1,55 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+___                     ________________________________________________________
+___| Shenmue AFS Utils |________________________________________________________
+
+  Cet outil permet d'ouvrir, de créer et d'éditer des paquets AFS. Les fichiers
+  AFS sont des archives comme celles de WinRAR mais sans compression.
+  Beaucoup de jeux utilisent ce format. L'intérêt principal est de rassembler
+  beaucoup de fichiers dans un seul gros (optimisation de lecture). Dans 
+  certains cas, un fichier index (IDX) est également présent avec le fichier
+  AFS.
+___               ______________________________________________________________
+___| UTiLiSATiON |______________________________________________________________
+
+  A chaque fois que vous verrez un fichier AFS dans le disque Shenmue, vous
+  pourrez l'ouvrir avec cet outil.
+  
+  A continuer...
+__         _____________________________________________________________________
+__| iNFOS |_____________________________________________________________________
+
+  N/A
+__           ___________________________________________________________________
+__| CONTACT |___________________________________________________________________
+
+  Cet outil fait parti du Shenmue Translation Pack.
+  
+  Page SourceForge du projet : http://shenmuesubs.sf.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (included)  
+  Groupe officiel Facebook   : http://www.facebook.com/groups/shenmuesubs/
+__           ___________________________________________________________________
+__| CREDiTS |___________________________________________________________________
+   
+  Code principal......: Manic
+  Code additionnel....: SiZiOUS
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo et toutes les personnes
+                        qui nous supportent.						
+_____________________________________________________________________[ EOF ]____

@@ -1,0 +1,53 @@
+
+      ..::  B R E A K I N G   T H E   L A N G U A G E   B A R R I E R ::..
+                 _______________________________________________
+                //           /     //    /           /          \
+               //     //____/     //    /    //     /           /
+              //_____      /     _     /    //_____/   ___     /
+             //    //     /     //    /          _//    //    /
+            //__________.//____//___.//_________/_/____//___./
+                / \__     __________  __________  ___________
+               /     \   //         \/          \/           \
+              /    _./  //   ___    //          /      /    //
+             /    /____//   /  /___//    ___   //     /    //
+            /          \   /      //    //    //    _/    //
+            \_________./__/      //____//___./\_________.//
+                                      |  S H E N T R A D  |
+___                       ______________________________________________________
+___| Shenmue IDX Creator |______________________________________________________
+
+  Cet outil permet de reconstruire les fichiers index (.IDX) pour des fichiers
+  AFS donnés.
+  
+  Il existe deux versions de ce programme :
+    - IDX Creator (Interface graphique)
+    - IDX Maker (Console)
+	
+  NOTE: VOUS N'AVEZ PAS BESOIN DE TOUCHER AU FICHIER HUMANS.IDX.
+___               ______________________________________________________________
+___| UTiLiSATiON |______________________________________________________________
+
+  (A faire)
+___         ____________________________________________________________________
+___| iNFOS |____________________________________________________________________
+
+  L'icône principale a été créée par AHA-Soft.
+___           __________________________________________________________________
+___| CONTACT |__________________________________________________________________
+
+  Cet outil fait parti de la suite Shenmue Translation Pack.
+  
+  Page du projet SourceForge : http://shenmuesubs.sourceforge.net/
+  Licence                    : http://www.gnu.org/licenses/gpl.html (incluse)
+  Groupe officiel Facebook   : http://www.facebook.com/groups/shenmuesubs/  
+___           __________________________________________________________________
+___| CREDiTS |__________________________________________________________________
+ 
+  Code principal......: Manic, SiZiOUS
+  Merci à.............: Manic, Shendream, Sadako, kogami-san, Dark_Neo, mimix, 
+                        Sunmingzhao, MagicSeb, Ayla, L@Cible, Ti Dragon, Hiei-,
+                        alphaphoenix55, FamilyGuy, Ryo Suzuki, IlDucci, 
+                        PlusTuta, Nerox92, Master Kyodai, yazgoo, les forums 
+                        MetaGames-EU et Shenmue Dojo, et à tous ceux qui nous
+                        supportent.						
+______________________________________________________________________[ FIN ]___
