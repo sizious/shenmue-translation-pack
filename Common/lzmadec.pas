@@ -128,7 +128,7 @@ end;
 function SevenZipClearEngine: Boolean;
 begin
   Result := False;
-  if FileExists(SevenZipDecExec) then
+  if (GetApplicationInstancesCount < 2) and FileExists(SevenZipDecExec) then
     Result := DeleteFile(SevenZipDecExec);
 end;
 
