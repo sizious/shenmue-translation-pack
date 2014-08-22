@@ -39,10 +39,10 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <RcCompile Include="engine\binaries.rc">
-      <Form>engine\binaries.res</Form>
+      <Form>'engine\binaries.res'</Form>
     </RcCompile>
     <RcCompile Include="engine\lzmabin.rc">
-      <Form>engine\lzmabin.res</Form>
+      <Form>'engine\lzmabin.res'</Form>
     </RcCompile>
     <DCCReference Include="..\..\..\Common\lzmadec.pas" />
     <DCCReference Include="..\..\..\Common\procutil.pas" />
@@ -50,9 +50,7 @@
     <DCCReference Include="..\..\..\Common\uitools.pas" />
     <DCCReference Include="..\..\..\Common\workdir.pas" />
     <DCCReference Include="..\..\..\Common\xmlconf.pas" />
-    <DCCReference Include="config.pas">
-      <Form>frmConfig</Form>
-    </DCCReference>
+    <DCCReference Include="config.pas" />
     <DCCReference Include="engine\dtecore.pas" />
     <DCCReference Include="engine\fastcopy.pas" />
     <DCCReference Include="main.pas">

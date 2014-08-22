@@ -11,14 +11,14 @@ uses
   main in 'main.pas' {frmMain},
   dtecore in 'engine\dtecore.pas',
   presets in 'presets.pas' {frmPresets},
-  config in 'config.pas' {frmConfig},
   systools in '..\..\..\Common\systools.pas',
   lzmadec in '..\..\..\Common\lzmadec.pas',
   workdir in '..\..\..\Common\workdir.pas',
   procutil in '..\..\..\Common\procutil.pas',
   uitools in '..\..\..\Common\uitools.pas',
   fastcopy in 'engine\fastcopy.pas',
-  xmlconf in '..\..\..\Common\xmlconf.pas';
+  xmlconf in '..\..\..\Common\xmlconf.pas',
+  config in 'config.pas';
 
 {$R *.res}
 
@@ -39,7 +39,6 @@ begin
   Application.Title := 'Shenmue Dreamcast Test Environment';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmPresets, frmPresets);
-  Application.CreateForm(TfrmConfig, frmConfig);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
