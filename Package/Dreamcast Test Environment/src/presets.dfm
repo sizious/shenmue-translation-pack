@@ -61,7 +61,7 @@ object frmPresets: TfrmPresets
     object Label3: TLabel
       Left = 8
       Top = 143
-      Width = 86
+      Width = 87
       Height = 13
       Caption = 'Output File Name:'
     end

@@ -33,9 +33,12 @@ type
   private
     { Déclarations privées }
     procedure ChangeQuitControlsState(State: Boolean);
+    procedure DreamcastImageMaker_OnProgress(Sender: TObject; Value: Integer);
+    procedure DreamcastImageMaker_OnStatus(Sender: TObject; Status: TMakeImageStatus);
     procedure InitializeEngineComponents;
     procedure ModulesInitialize;
     procedure ModulesFinalize;
+    procedure LoadPresets;
     procedure OnEngineComponentsInitializationTerminate(Sender: TObject);
     function GetProgressText: string;
     procedure SetProgressText(const Value: string);
@@ -83,9 +86,60 @@ begin
   btnMake.Enabled := State;
 end;
 
+procedure TfrmMain.DreamcastImageMaker_OnProgress(Sender: TObject;
+  Value: Integer);
+begin
+  pbrCurrent.Position := Value;
+end;
+
+procedure TfrmMain.DreamcastImageMaker_OnStatus(Sender: TObject;
+  Status: TMakeImageStatus);
+begin
+  pbrCurrent.Position := 0;
+  case Status of
+    misInitialize:
+      ProgressText := 'Initialization...';
+    misBinHacking:
+      ProgressText := 'Modifying the files...';
+    misPrepareImage:
+      ProgressText := 'Preparing the building of the image...';
+    misBuildDataTrack:
+      ProgressText := 'Building the data track...';
+    misMakeImage:
+      ProgressText := 'Making the image...';
+    misFinalize:
+      ProgressText := 'Finalization...';
+    misDone:
+    begin
+      ProgressText := 'Done!';
+      pbrCurrent.Position := pbrCurrent.Max;
+    end;
+  end;
+end;
+
 procedure TfrmMain.btnMakeClick(Sender: TObject);
 begin
-  DreamcastImageMaker.Execute;
+  with DreamcastImageMaker.Presets.Add do
+  begin
+    Name := 'test';
+    SourceDirectory := 'E:\Shenmue Translation Pack\Repository\Package\Dreamcast Test Environment\bin\data\';
+    OutputFileName := 'E:\Shenmue Translation Pack\Repository\Package\Dreamcast Test Environment\bin\SHENTEST.NRG';
+    VolumeName := 'SHENTEST';
+  end;
+  with DreamcastImageMaker.Settings.VirtualDrive do
+  begin
+    Drive := 'L';
+    Kind := vdkAlcohol;
+    FileName := 'C:\Program Files\Alcohol Soft\Alcohol 120\AxCmd.exe';
+  end;
+  with DreamcastImageMaker.Settings do
+  begin
+    Emulator := 'calc.exe';
+  end;
+  DreamcastImageMaker.Presets[0].Select;
+  DreamcastImageMaker.Options.AutoMount := True;
+  DreamcastImageMaker.Options.ExecuteEmulator := True;  
+//  DreamcastImageMaker.Execute;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -93,6 +147,7 @@ begin
   Caption := Application.Title;
   ChangeQuitControlsState(False);
   ModulesInitialize;
+  LoadPresets;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -117,6 +172,17 @@ begin
   end;
 end;
 
+procedure TfrmMain.LoadPresets;
+var
+  i: Integer;
+
+begin
+  for i := 0 to DreamcastImageMaker.Presets.Count - 1 do
+  begin
+    ListBox1.Items.Add(DreamcastImageMaker.Presets[i].Name);
+  end;
+end;
+
 procedure TfrmMain.ModulesFinalize;
 begin
   DreamcastImageMaker.Free;
@@ -124,12 +190,18 @@ end;
 
 procedure TfrmMain.ModulesInitialize;
 begin
+  // Initialize the engine itself
+  ProgressText := 'Initializing engine components...';
+
   // Initialize the components of the engine
   InitializeEngineComponents;
 
-  // Initialize the engine itself
-  ProgressText := 'Initializing engine components...';
   DreamcastImageMaker := TDreamcastImageMaker.Create;
+  with DreamcastImageMaker do
+  begin
+    OnStatus := DreamcastImageMaker_OnStatus;
+    OnProgress := DreamcastImageMaker_OnProgress;
+  end;
 end;
 
 procedure TfrmMain.OnEngineComponentsInitializationTerminate(Sender: TObject);

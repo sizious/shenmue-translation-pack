@@ -1,4 +1,4 @@
-program makedisc;
+program MakeDisc;
 
 
 
@@ -16,7 +16,9 @@ uses
   lzmadec in '..\..\..\Common\lzmadec.pas',
   workdir in '..\..\..\Common\workdir.pas',
   procutil in '..\..\..\Common\procutil.pas',
-  uitools in '..\..\..\Common\uitools.pas';
+  uitools in '..\..\..\Common\uitools.pas',
+  fastcopy in 'engine\fastcopy.pas',
+  xmlconf in '..\..\..\Common\xmlconf.pas';
 
 {$R *.res}
 

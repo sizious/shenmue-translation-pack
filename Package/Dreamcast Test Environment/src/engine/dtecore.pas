@@ -3,51 +3,145 @@ unit DTECore;
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms;
-  
+  Windows, SysUtils, Classes, Forms, ComCtrls, Messages;
+
 type
+  // Classes partial declarations
+  TDreamcastImageMaker = class;
+  TCoreProcessThread = class;
+  TDreamcastImagePresetItem = class;
+  TDreamcastImagePresetsList = class;
+  TVirtualDriveSettings = class;
+
   // Exceptions
   EMakeDisc = class(Exception);
   EBinHackFileNotFound = class(EMakeDisc);
   EBinHackFailed = class(EMakeDisc);
   EMakeDiscUnableToRunFile = class(EMakeDisc);
-
+  ENrgHeaderFailed = class(EMakeDisc);
+  EMakeImageFailed = class(EMakeDisc);
+  EDaemonToolsDriveInvalid = class(EMakeDisc);
+  EOutputFileCantBeWritten = class(EMakeDisc);
+  
   // Virtual Drive Software Type
-  TVirtualDriveKind = (vdkNone, vdkAlcohol120, vdkDaemonTools);
+  TVirtualDriveKind = (vdkNone, vdkAlcohol, vdkDaemonTools);
 
-  // Progression event
+  // Status Type
+  TMakeImageStatus = (misInitialize, misBinHacking, misPrepareImage, misBuildDataTrack,
+    misMakeImage, misFinalize, misDone);
+
+  // Current progress bar event (not "total progress bar")
   TProgressEvent = procedure(Sender: TObject; Value: Integer) of object;
 
-  TCoreProcessThread = class;
-  
+  // Status event
+  TStatusEvent = procedure(Sender: TObject; Status: TMakeImageStatus) of object;
+
   // Thread for reading the memory of mkisofs
   TMakeImageWatcherThread = class(TThread)
   private
+    fProgressStarted: Boolean;
     fOwner: TCoreProcessThread;
+    fProgressBegin: TNotifyEvent;
+    procedure InitializeProgressBar;
+    procedure FinalizeProgressBar;
+    procedure UpdateProgressBar(const Value: Double);
+    function GetDreamcastImageMakerOwner: TDreamcastImageMaker;
+    property Parent: TDreamcastImageMaker read GetDreamcastImageMakerOwner;
   protected
     procedure Execute; override;
   public
-    constructor Create; overload;    
+    constructor Create; overload;
+    property OnProgressBegin: TNotifyEvent read fProgressBegin write fProgressBegin;
+    property Owner: TCoreProcessThread read fOwner write fOwner;
   end;
 
   // Thread for running the process
   TCoreProcessThread = class(TThread)
   private
+    fVirtualDriveSettings: TvirtualDriveSettings;
+    fVirtualDriveID: string;
     fBatchFileName: TFileName;
     fErrOutputFileName: TFileName;
     fStdOutputFileName: TFileName;
     fData1FileName: TFileName;
+    fData2FileName: TFileName;
     fMakeImageWatcherThread: TMakeImageWatcherThread;
+    fOwner: TDreamcastImageMaker;
+    fException: Exception;
+    fPreset: TDreamcastImagePresetItem;
     function CatchCommandOutput: string;
-    function ExecuteBinHack: Boolean;
+    procedure CheckWritePermissions;
+    procedure DoHandleException;
+    procedure ExecuteBinHack;
+    procedure ExecuteEmulator;
+    procedure ExecuteNrgHeader;
+    procedure FastCopyFileCallback(const FileName: TFileName;
+      const CurrentSize, TotalSize: LongWord; var CanContinue: Boolean);
+    procedure InitializeVirtualDrive;      
+    procedure MergeTracks;
     procedure GenerateBatchFile(const Command: string);
-    procedure MakeImage;
+    function GetVirtualDriveLetter: string;
+    procedure HandleException;
+    procedure MakeDataTrack;
+    procedure MakeImageWatcherThread_ProgressBegin(Sender: TObject);
     procedure MakeImageWatcherThread_Terminate(Sender: TObject);
+    procedure MountImage;
+    procedure NotifyStatus(Status: TMakeImageStatus);
     function RunCommand(const Command: string): string;
+    procedure UnmountImage;
+    property VirtualDrive: TVirtualDriveSettings read fVirtualDriveSettings;
+    property VirtualDriveID: string read fVirtualDriveID;
   protected
     procedure Execute; override;
   public
     constructor Create; overload;
+    destructor Destroy; override;
+    property Owner: TDreamcastImageMaker read fOwner write fOwner;
+    property Preset: TDreamcastImagePresetItem read fPreset;
+  end;
+
+  // Image Preset Item
+  TDreamcastImagePresetItem = class(TObject)
+  private
+    fOwner: TDreamcastImagePresetsList;
+    fParent: TDreamcastImageMaker;
+    fName: string;
+    fSourceDirectory: TFileName;
+    fOutputFileName: TFileName;
+    fVolumeName: string;
+    procedure SetSourceDirectory(const Value: TFileName);
+  public
+    procedure Assign(Source: TDreamcastImagePresetItem);
+    procedure Select;
+    property Name: string read fName write fName;
+    property SourceDirectory: TFileName
+      read fSourceDirectory write SetSourceDirectory;
+    property OutputFileName: TFileName
+      read fOutputFileName write fOutputFileName;
+    property VolumeName: string read fVolumeName write fVolumeName;
+  end;
+
+  // Presets List Manager
+  TDreamcastImagePresetsList = class(TObject)
+  private
+    fCacheFileName: TFileName;
+    fOwner: TDreamcastImageMaker;
+    fList: TList;
+    function GetItem(Index: Integer): TDreamcastImagePresetItem;
+    function GetCount: Integer;
+  protected
+    function LoadFromFile(const FileName: TFileName): Boolean;
+    procedure SaveToFile(const FileName: TFileName);
+  public
+    constructor Create(AOwner: TDreamcastImageMaker);
+    destructor Destroy; override;
+    function Add: TDreamcastImagePresetItem;
+    procedure Clear;
+    procedure Delete(const Index: Integer);
+    procedure Select(const Index: Integer);
+    property Count: Integer read GetCount;
+    property Items[Index: Integer]: TDreamcastImagePresetItem
+      read GetItem; default;
   end;
 
   // Virtual Drive Settings
@@ -55,11 +149,11 @@ type
   private
     fDrive: Char;
     fKind: TVirtualDriveKind;
-    fDirectory: TFileName;
+    fFileName: TFileName;
   public
     property Drive: Char read fDrive write fDrive;
     property Kind: TVirtualDriveKind read fKind write fKind;
-    property Directory: TFileName read fDirectory write fDirectory;
+    property FileName: TFileName read fFileName write fFileName;
   end;
 
   // Settings Root
@@ -74,28 +168,52 @@ type
     property VirtualDrive: TVirtualDriveSettings read fVirtualDrive;
   end;
 
+  // Options
+  TDreamcastImageOptions = class(TObject)
+  private
+    fExecuteEmulator: Boolean;
+    fAutoMount: Boolean;
+  public
+    property AutoMount: Boolean read fAutoMount write fAutoMount;
+    property ExecuteEmulator: Boolean
+      read fExecuteEmulator write fExecuteEmulator;
+  end;
+
   // Main Class
   TDreamcastImageMaker = class(TObject)
   private
     fCoreProcessThread: TCoreProcessThread;
     fSettings: TDreamcastImageSettings;
     fProgress: TProgressEvent;
+    fStatus: TStatusEvent;
+    fPresets: TDreamcastImagePresetsList;
+    fSelectedPreset: TDreamcastImagePresetItem;
+    fOptions: TDreamcastImageOptions;
     procedure CoreProcessThread_Terminate(Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
+    procedure Abort;
     procedure Execute;
+    property Presets: TDreamcastImagePresetsList read fPresets;
     property Settings: TDreamcastImageSettings read fSettings;
+    property Options: TDreamcastImageOptions read fOptions;
     property OnProgress: TProgressEvent read fProgress write fProgress;
+    property OnStatus: TStatusEvent read fStatus write fStatus;
   end;
 
 implementation
 
 uses
-  JvJCLUtils, SysTools, UITools, WorkDir, ProcUtil;
+  IniFiles, Math, JvJCLUtils,
+  SysTools, UITools, WorkDir, ProcUtil, FastCopy;
 
 const
+  SFILE_NRGHEADER                 = 'nrghdr.exe';
+  SFILE_BINHACK                   = 'binhack.exe';
   SFILE_MKISOFS                   = 'mkisofs.exe';
+  SFILE_DATA0_LEADIN              = 'leadin.bin';
+  SFILE_DATA0_NRGHEADER           = 'nrghdr.bin';
   SFILE_DATA1                     = 'data1.iso';
   SFILE_DATA2                     = 'data2.iso';
   SFILE_BOOTSTRAP_HACKED          = 'IP.HAK';
@@ -103,11 +221,20 @@ const
   SFILE_BOOT_BINARY               = '1ST_READ.BIN';
   OUTPUT_ERROR_TAG                = '*** ERROR OUTPUT ***';
 
-  MKISOFS_PROGRESS_ADDRESS_XP_32  = $0022B2D4;
-  MKISOFS_PROGRESS_ADDRESS_W7_32  = $0022B2AC;
-  MKISOFS_PROGRESS_ADDRESS_W7_64  = $0028B2AC;
+  MKISOFS_PROGRESS_ADDRESS_XP     = $0022B2D4; // XP x86 and x64
+  MKISOFS_PROGRESS_ADDRESS_W7_32  = $0022B2AC; // Vista, 7, 8 and 8.1 x86
+  MKISOFS_PROGRESS_ADDRESS_W7_64  = $0028B2AC; // Vista, 7, 8 and 8.1 x64
+
+  MKISOFS_PROGRESS_VALUE_MIN      = 0;
+  MKISOFS_PROGRESS_VALUE_MAX      = 100;
 
 { TDreamcastImageMaker }
+
+procedure TDreamcastImageMaker.Abort;
+begin
+  if Assigned(fCoreProcessThread) then
+    fCoreProcessThread.Terminate;
+end;
 
 procedure TDreamcastImageMaker.CoreProcessThread_Terminate(Sender: TObject);
 begin
@@ -117,11 +244,17 @@ end;
 constructor TDreamcastImageMaker.Create;
 begin
   fSettings := TDreamcastImageSettings.Create;
+  fPresets := TDreamcastImagePresetsList.Create(Self);
+  fSelectedPreset := TDreamcastImagePresetItem.Create;
+  fOptions := TDreamcastImageOptions.Create;
 end;
 
 destructor TDreamcastImageMaker.Destroy;
 begin
   fSettings.Free;
+  fPresets.Free;
+  fSelectedPreset.Free;
+  fOptions.Free;
   inherited;
 end;
 
@@ -130,7 +263,9 @@ begin
   fCoreProcessThread := TCoreProcessThread.Create;
   with fCoreProcessThread do
   begin
+    Owner := Self;
     OnTerminate := CoreProcessThread_Terminate;
+    Preset.Assign(Self.fSelectedPreset);
     Resume;
   end;
 end;
@@ -154,6 +289,7 @@ constructor TMakeImageWatcherThread.Create;
 begin
   inherited Create(True);
   FreeOnTerminate := True;
+  fProgressStarted := False;
 end;
 
 procedure TMakeImageWatcherThread.Execute;
@@ -166,13 +302,17 @@ var
   ProcessId,
   TokenHwnd: THandle;
   MkisofsProgressValue: Double;
-  PreviousState, NewState: TOKEN_PRIVILEGES;
-  ReturnLength: Cardinal;
+  PreviousState,
+  NewState: TTokenPrivileges;
+  ReturnLength,
   Address: Cardinal;
   
 begin
+  // Initializing ProgressBar...
+  InitializeProgressBar;
+
   // Setting the real address to lookup...
-  Address := MKISOFS_PROGRESS_ADDRESS_XP_32;
+  Address := MKISOFS_PROGRESS_ADDRESS_XP;
   if IsWindowsVista then
   begin
     Address := MKISOFS_PROGRESS_ADDRESS_W7_32;
@@ -203,33 +343,101 @@ begin
       ProcessId := INVALID_HANDLE_VALUE;
       while ProcessId = INVALID_HANDLE_VALUE do
       begin
-        ProcessId := GetProcessIdByName('mkisofs.exe');
+        ProcessId := GetProcessIdByName(SFILE_MKISOFS);
       end;
 
       // Reading the mkisofs progress percentage
       ProcessHwnd := OpenProcess(PROCESS_VM_READ or PROCESS_VM_OPERATION, False, ProcessId);
-      while ProcessHwnd <> 0 do
+      while (ProcessHwnd <> 0) and (ProcessId <> INVALID_HANDLE_VALUE) do
       begin
         try
           ReadProcessMemory(ProcessHwnd, Ptr(Address),
             @MkisofsProgressValue, SizeOf(MkisofsProgressValue), Crap);
+{$IFDEF DEBUG}
           WriteLn(Format('%2.2f', [MkisofsProgressValue]));
+{$ENDIF}
+          // Updating on-screen ProgressBar
+          UpdateProgressBar(MkisofsProgressValue);
         finally
           CloseHandle(ProcessHwnd);
         end;
+        ProcessId := GetProcessIdByName(SFILE_MKISOFS);
         ProcessHwnd := OpenProcess(PROCESS_VM_READ, False, ProcessId);
       end;
 
     finally
       CloseHandle(TokenHwnd);
     end;
-    
+
   end;
 
-  WriteLn('END');
+  // Finalizing ProgressBar...
+  FinalizeProgressBar;
+
+{$IFDEF DEBUG}
+  WriteLn('MKISOFS Progress Done!');
+{$ENDIF}
+end;
+
+procedure TMakeImageWatcherThread.FinalizeProgressBar;
+begin
+  UpdateProgressBar(MKISOFS_PROGRESS_VALUE_MAX);
+end;
+
+function TMakeImageWatcherThread.GetDreamcastImageMakerOwner: TDreamcastImageMaker;
+begin
+  Result := Self.Owner.Owner;
+end;
+
+procedure TMakeImageWatcherThread.InitializeProgressBar;
+begin
+  UpdateProgressBar(MKISOFS_PROGRESS_VALUE_MIN);
+end;
+
+procedure TMakeImageWatcherThread.UpdateProgressBar(const Value: Double);
+var
+  ProgressValue: Integer;
+
+begin
+  ProgressValue := Ceil(Value);
+  if (ProgressValue > 1) then
+  begin
+    // For the ProgressBegin event
+    if not fProgressStarted then
+    begin
+      fProgressStarted := True;
+      if Assigned(OnProgressBegin) then
+        OnProgressBegin(Self);
+    end;
+
+    // For the current progress bar value
+    if Assigned(Parent.OnProgress) then
+      Parent.OnProgress(Parent, ProgressValue);
+  end;
 end;
 
 { TCoreProcessThread }
+
+procedure TCoreProcessThread.MountImage;
+var
+  Command: string;
+
+begin
+  if (VirtualDriveID <> '') and (Owner.Options.AutoMount) then
+  begin
+    Command := '';
+    case VirtualDrive.Kind of
+      vdkAlcohol:
+        Command := Format('"%s" %s: /M:"%s"', [VirtualDrive.FileName,
+          VirtualDriveID, Preset.OutputFileName]);
+      vdkDaemonTools:
+        Command := Format('"%s" -mount %s,"%s"', [VirtualDrive.FileName,
+          VirtualDriveID, Preset.OutputFileName]);
+    end;
+    if Command <> '' then
+      RunCommand(Command);
+  end;
+end;
 
 function TCoreProcessThread.CatchCommandOutput: string;
 var
@@ -259,22 +467,72 @@ begin
   KillFile(fErrOutputFileName);
 end;
 
+procedure TCoreProcessThread.CheckWritePermissions;
+begin
+  if not KillFile(Preset.OutputFileName) then
+    raise EOutputFileCantBeWritten.CreateFmt('Sorry, but the specified ' +
+      'output file location isn''t writable. Check if the specified location ' +
+      'exists, is writable (e.g. not a DVD-ROM drive) and you have the proper ' +
+      'rights (e.g. beware of UAC). File: "%s".', [Preset.OutputFileName]); 
+end;
+
 constructor TCoreProcessThread.Create;
 begin
   inherited Create(True);
   FreeOnTerminate := True;
+  fPreset := TDreamcastImagePresetItem.Create;
   fData1FileName := GetWorkingTempDirectory + SFILE_DATA1;
+  fData2FileName := GetWorkingTempDirectory + SFILE_DATA2;
+end;
+
+destructor TCoreProcessThread.Destroy;
+begin
+  fPreset.Free;
+  inherited Destroy;
+end;
+
+procedure TCoreProcessThread.DoHandleException;
+begin
+  // Cancel the mouse capture
+  if GetCapture <> 0 then
+    SendMessage(GetCapture, WM_CANCELMODE, 0, 0);
+    
+  // Now actually show the exception
+  if fException is Exception then
+    Application.ShowException(fException)
+  else
+    SysUtils.ShowException(fException, nil);
 end;
 
 procedure TCoreProcessThread.Execute;
 begin
-  ExecuteBinHack;
-  MakeImage;
+  fException := nil;
+  try
+    // Prepare the environment
+    NotifyStatus(misInitialize);
+    InitializeVirtualDrive;
+    UnmountImage;
+    CheckWritePermissions;
+    
+    // Build the selected preset
+    ExecuteBinHack;
+    MakeDataTrack;
+    MergeTracks;
+    ExecuteNrgHeader;
+    NotifyStatus(misDone);
+
+    // Mount the image (if needed)
+    MountImage;
+
+    // Run the Emulator (if needed)
+    ExecuteEmulator;
+  except
+    HandleException;
+  end;
 end;
 
-function TCoreProcessThread.ExecuteBinHack: Boolean;
+procedure TCoreProcessThread.ExecuteBinHack;
 var
-  SourceDirectory,
   HackedBootstrapFile,
   MainBinaryFile,
   BootstrapFile,
@@ -283,10 +541,11 @@ var
   Command: string;
   
 begin
-  SourceDirectory := '.\';
+  // Notify Bin Hacking Start...
+  NotifyStatus(misBinHacking);
 
-  MainBinaryFile := SourceDirectory + SFILE_BOOT_BINARY;
-  BootstrapFile := SourceDirectory + SFILE_BOOTSTRAP;
+  MainBinaryFile := Preset.SourceDirectory + SFILE_BOOT_BINARY;
+  BootstrapFile := Preset.SourceDirectory + SFILE_BOOTSTRAP;
 
   // Check if the 1ST_READ.BIN file exists
   if not FileExists(MainBinaryFile) then
@@ -305,22 +564,94 @@ begin
   CopyFile(BootstrapFile, TempBootstrapFile);
 
   // Execute the command
-  Command := Format('(echo %s & echo %s & echo 45000) | binhack', [
+  Command := Format('(echo %s & echo %s & echo 45000) | %s', [
     SFILE_BOOT_BINARY,
-    SFILE_BOOTSTRAP_HACKED
+    SFILE_BOOTSTRAP_HACKED,
+    SFILE_BINHACK
   ]);
   RunCommand(Command);
 
   // Check the results
   HackedBootstrapFile := GetWorkingTempDirectory + SFILE_BOOTSTRAP_HACKED;
-  Result := FileExists(HackedBootstrapFile);
-  if Result then  
+  if FileExists(HackedBootstrapFile) then
   begin
     DeleteFile(TempMainBinaryFile);
     DeleteFile(TempBootstrapFile);
-    MoveFile(HackedBootstrapFile, SourceDirectory + SFILE_BOOTSTRAP_HACKED);
+    MoveFile(HackedBootstrapFile, Preset.SourceDirectory + SFILE_BOOTSTRAP_HACKED);
   end else
     raise EBinHackFailed.Create('Sorry, the Binary Hacking process failed. Cannot continue.');
+end;
+
+procedure TCoreProcessThread.ExecuteEmulator;
+begin
+  if Owner.Options.ExecuteEmulator then
+  begin
+    RunCommand(Owner.Settings.Emulator);
+  end;
+end;
+
+procedure TCoreProcessThread.ExecuteNrgHeader;
+const
+  NRGHEADER_SUCCESS = 'Done!';
+  
+var
+  NrgHeader,
+  OutputDirectory: TFileName;
+  OutputBuffer,
+  Command: string;
+
+begin
+  // Running nrghdr
+  // The nrghdr program made by Indiket can only works with relative paths
+  NotifyStatus(misFinalize);
+
+  OutputDirectory := ExtractFilePath(Preset.OutputFileName);
+  NrgHeader := OutputDirectory + SFILE_NRGHEADER;
+  FastCopyFile(GetWorkingTempDirectory + SFILE_NRGHEADER, NrgHeader);
+
+  Command := Format('%s' + sLineBreak + 'cd "%s"' + sLineBreak + 'echo %s | %s', [
+    ExtractFileDrive(OutputDirectory),
+    OutputDirectory,
+    ExtractFileName(Preset.OutputFileName),
+    SFILE_NRGHEADER
+  ]);
+  OutputBuffer := RunCommand(Command);
+  KillFile(NrgHeader);
+
+  if not IsInString(NRGHEADER_SUCCESS, OutputBuffer) then
+    raise ENrgHeaderFailed.Create('Sorry, the Nero Header Hacking process failed. Cannot continue.');
+end;
+
+procedure TCoreProcessThread.FastCopyFileCallback(const FileName: TFileName;
+  const CurrentSize, TotalSize: LongWord; var CanContinue: Boolean);
+var
+  ProgressValue: Integer;
+
+begin
+  CanContinue := not Terminated;
+  ProgressValue := Round((CurrentSize / TotalSize) * 100);
+  if Assigned(Owner.OnProgress) then
+    Owner.OnProgress(Owner, ProgressValue);
+end;
+
+procedure TCoreProcessThread.MergeTracks;
+var
+  Data0LeadIn,
+  Data0NrgHeader: TFileName;
+  
+begin
+  // Copying files block in the following order:
+  // leadin + data1.iso + data2.iso + nrgheader
+  NotifyStatus(misMakeImage);
+  Data0LeadIn := GetWorkingTempDirectory + SFILE_DATA0_LEADIN;
+  Data0NrgHeader := GetWorkingTempDirectory + SFILE_DATA0_NRGHEADER;
+  FastCopyFile(Data0LeadIn, Preset.OutputFileName);
+  FastCopyFile(fData1FileName, Preset.OutputFileName, fcfmAppend);
+  FastCopyFile(fData2FileName, Preset.OutputFileName, fcfmAppend, FastCopyFileCallback);
+  FastCopyFile(Data0NrgHeader, Preset.OutputFileName, fcfmAppend);
+
+  // Deleting the temporary data image because it's now useless
+  KillFile(fData2FileName);
 end;
 
 procedure TCoreProcessThread.GenerateBatchFile(const Command: string);
@@ -351,31 +682,134 @@ begin
   end;
 end;
 
-procedure TCoreProcessThread.MakeImage;
+function TCoreProcessThread.GetVirtualDriveLetter: string;
 var
-  Command: string;
+  Command,
+  OutputBuffer: string;
+  i,
+  VirtualDrivesCount,
+  VirtualDriveIndex,
+  BaseLetterIndex: Integer;
+  Found: Boolean;
+  VirtualDriveLetter: Char;
 
 begin
-  Command := Format('mkisofs -C 0,45000 -V %s -G "%s" -M "%s" -duplicates-once -l -o data2.iso "%s"', [
-    'SHENTEST',
+  Result := '';
+  case VirtualDrive.Kind of
+    // Alcohol
+    vdkAlcohol:
+      // Very simple for Alcohol
+      Result := VirtualDrive.Drive;
+
+    // Daemon Tools
+    vdkDaemonTools:
+    begin
+      // For Deamon Tools, we need to translate the drive letter to the internal ID
+
+      // Base Letter
+      BaseLetterIndex := Ord('A');
+
+      // Get Virtual Drives Count
+      Command := Format('"%s" -get_count' + sLineBreak
+        + 'echo %%errorlevel%%', [VirtualDrive.FileName]);
+      OutputBuffer := Copy(RunCommand(Command), 1, 1);
+      VirtualDrivesCount := StrToIntDef(OutputBuffer, 0);
+
+      // Search the corresponding Virtual Drive
+      Found := False;
+      i := 0;
+      while (not Found) and (i < VirtualDrivesCount) do
+      begin
+        Command := Format('"%s" -get_letter %d' + sLineBreak
+          + 'echo %%errorlevel%%', [VirtualDrive.FileName, i]);
+        OutputBuffer := Trim(Left(sLineBreak, RunCommand(Command)));
+        VirtualDriveIndex := StrToIntDef(OutputBuffer, -1); // drive letter as number
+        if VirtualDriveIndex > -1 then
+        begin
+          Inc(VirtualDriveIndex, BaseLetterIndex); // to translate to uppercase letter
+          VirtualDriveLetter := Chr(VirtualDriveIndex);
+          Found := (VirtualDrive.Drive = VirtualDriveLetter);
+          if Found then Result := IntToStr(i); // If found, return the drive index
+        end;
+        Inc(i);
+      end;
+
+      // Return an exception if the specified drive isn't created by Daemon Tools
+      if Result = '' then
+        raise EDaemonToolsDriveInvalid.CreateFmt('Sorry, but the drive %s: ' +
+          'seems to be invalid for using with Deamon Tools.', [VirtualDrive.Drive]);
+    end;
+  end;
+end;
+
+procedure TCoreProcessThread.HandleException;
+begin
+  fException := Exception(ExceptObject);
+  try
+    // Don't show EAbort messages
+    if not (fException is EAbort) then
+      Synchronize(DoHandleException);
+  finally
+    fException := nil;
+  end;
+end;
+
+procedure TCoreProcessThread.InitializeVirtualDrive;
+begin
+  fVirtualDriveSettings := Owner.Settings.VirtualDrive;
+  fVirtualDriveID := GetVirtualDriveLetter;
+end;
+
+procedure TCoreProcessThread.MakeDataTrack;
+const
+  MKISOFS_FAILED = 'No such file or directory. Invalid node';
+
+var
+  Command,
+  OutputBuffer: string;
+
+begin
+  // Notify Prepare Image...
+  NotifyStatus(misPrepareImage);
+  
+  Command := Format('%s -C 0,45000 -V %s -G "%s" -M "%s" -duplicates-once -l -o "%s" "%s"', [
+    SFILE_MKISOFS,
+    Preset.VolumeName,
     SFILE_BOOTSTRAP_HACKED,
     fData1FileName,
-    GetApplicationDirectory + 'data'
+    fData2FileName,
+    ExcludeTrailingPathDelimiter(Preset.SourceDirectory)
   ]);
 
   fMakeImageWatcherThread := TMakeImageWatcherThread.Create;
   with fMakeImageWatcherThread do
   begin
+    Owner := Self;
+    OnProgressBegin := MakeImageWatcherThread_ProgressBegin;
     OnTerminate := MakeImageWatcherThread_Terminate;
     Resume;
   end;
 
-  RunCommand(Command);
+  OutputBuffer := RunCommand(Command);
+  if IsInString(MKISOFS_FAILED, OutputBuffer) then
+    raise EMakeImageFailed.CreateFmt('Unable to find source directory for ' +
+      'making the image: "%s".', [Preset.SourceDirectory]);
+end;
+
+procedure TCoreProcessThread.MakeImageWatcherThread_ProgressBegin(Sender: TObject);
+begin
+  NotifyStatus(misBuildDataTrack);
 end;
 
 procedure TCoreProcessThread.MakeImageWatcherThread_Terminate(Sender: TObject);
 begin
   fMakeImageWatcherThread := nil;
+end;
+
+procedure TCoreProcessThread.NotifyStatus(Status: TMakeImageStatus);
+begin
+  if Assigned(Owner.OnStatus) then
+    Owner.OnStatus(Owner, Status);
 end;
 
 function TCoreProcessThread.RunCommand(const Command: string): string;
@@ -400,7 +834,167 @@ begin
 {$ENDIF}
   end;
 
+{$IFDEF DEBUG}
+  WriteLn(
+    sLineBreak,
+    '### OUTPUT START ###', sLineBreak,
+    Command, sLineBreak,
+    Result, sLineBreak,
+    '### OUTPUT END ###',
+    sLineBreak
+  );
+{$ENDIF}
+
   SetCurrentDir(OriginalCurrentDir);
+end;
+
+procedure TCoreProcessThread.UnmountImage;
+var
+  Command: string;
+
+begin
+  if VirtualDriveID <> '' then
+  begin
+    Command := '';
+    case VirtualDrive.Kind of
+      vdkAlcohol:
+        Command := Format('"%s" %s: /U', [VirtualDrive.FileName,
+          VirtualDriveID]);
+      vdkDaemonTools:
+        Command := Format('"%s" -unmount %s', [VirtualDrive.FileName,
+          VirtualDriveID]);
+    end;
+    if Command <> '' then
+      RunCommand(Command);
+  end;
+end;
+
+{ TDreamcastImagePresetsList }
+
+function TDreamcastImagePresetsList.Add: TDreamcastImagePresetItem;
+begin
+  Result := TDreamcastImagePresetItem.Create;
+  Result.fOwner := Self;
+  Result.fParent := Self.fOwner;
+  fList.Add(Result);
+end;
+
+procedure TDreamcastImagePresetsList.Clear;
+var
+  i: Integer;
+
+begin
+  for i := 0 to fList.Count - 1 do
+    TDreamcastImagePresetItem(fList[i]).Free;
+  fList.Clear;
+end;
+
+constructor TDreamcastImagePresetsList.Create(AOwner: TDreamcastImageMaker);
+begin
+  fCacheFileName := GetApplicationDirectory + 'presets.ini';
+  fList := TList.Create;
+  fOwner := AOwner;
+  LoadFromFile(fCacheFileName);
+end;
+
+destructor TDreamcastImagePresetsList.Destroy;
+begin
+  SaveToFile(fCacheFileName);
+  Clear;
+  fList.Free;
+  inherited;
+end;
+
+function TDreamcastImagePresetsList.GetCount: Integer;
+begin
+  Result := fList.Count;
+end;
+
+function TDreamcastImagePresetsList.GetItem(
+  Index: Integer): TDreamcastImagePresetItem;
+begin
+  Result := TDreamcastImagePresetItem(fList[Index]);
+end;
+
+function TDreamcastImagePresetsList.LoadFromFile(
+  const FileName: TFileName): Boolean;
+var
+  IniFile: TIniFile;
+  i: Integer;
+  
+begin
+  Result := FileExists(FileName);
+  if Result then
+  begin
+    IniFile := TIniFile.Create(FileName);
+    try
+      for i := 0 to IniFile.ReadInteger('General', 'Count', 0) - 1 do
+        with Add do
+        begin
+          Name := IniFile.ReadString(IntToStr(i), 'Name', '');
+          SourceDirectory := IniFile.ReadString(IntToStr(i), 'SourceDirectory', '');
+          OutputFileName := IniFile.ReadString(IntToStr(i), 'OutputFileName', '');
+          VolumeName := IniFile.ReadString(IntToStr(i), 'VolumeName', '');
+        end;
+    finally
+      IniFile.Free;
+    end;
+  end;
+end;
+
+procedure TDreamcastImagePresetsList.SaveToFile(const FileName: TFileName);
+var
+  IniFile: TIniFile;
+  i: Integer;
+  Item: TDreamcastImagePresetItem;
+
+begin
+  IniFile := TIniFile.Create(FileName);
+  try
+    IniFile.WriteInteger('General', 'Count', Count);
+    for i := 0 to Count - 1 do
+    with IniFile do
+    begin
+      Item := Items[i];
+      WriteString(IntToStr(i), 'Name', Item.Name);
+      WriteString(IntToStr(i), 'SourceDirectory', Item.SourceDirectory);
+      WriteString(IntToStr(i), 'OutputFileName', Item.OutputFileName);
+      WriteString(IntToStr(i), 'VolumeName', Item.VolumeName);
+    end;
+  finally
+    IniFile.Free;
+  end;
+end;
+
+procedure TDreamcastImagePresetsList.Select(const Index: Integer);
+begin
+  Items[Index].Select;
+end;
+
+procedure TDreamcastImagePresetsList.Delete(const Index: Integer);
+begin
+  TDreamcastImagePresetItem(fList[Index]).Free;
+  fList.Delete(Index);
+end;
+
+{ TDreamcastImagePresetEntry }
+
+procedure TDreamcastImagePresetItem.Assign(Source: TDreamcastImagePresetItem);
+begin
+  Self.fName := Source.fName;
+  Self.fSourceDirectory := Source.fSourceDirectory;
+  Self.fOutputFileName := Source.fOutputFileName;
+  Self.fVolumeName := Source.fVolumeName;
+end;
+
+procedure TDreamcastImagePresetItem.Select;
+begin
+  fParent.fSelectedPreset.Assign(Self);
+end;
+
+procedure TDreamcastImagePresetItem.SetSourceDirectory(const Value: TFileName);
+begin
+  fSourceDirectory := IncludeTrailingPathDelimiter(Value);
 end;
 
 end.
