@@ -1,9 +1,9 @@
-object frmConfig: TfrmConfig
+object frmSettings: TfrmSettings
   Left = 0
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Settings'
-  ClientHeight = 300
+  ClientHeight = 295
   ClientWidth = 524
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -13,13 +13,22 @@ object frmConfig: TfrmConfig
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object PageControl1: TPageControl
-    Left = 5
-    Top = 8
-    Width = 513
-    Height = 245
+  object Bevel1: TBevel
+    Left = 4
+    Top = 259
+    Width = 517
+    Height = 2
+  end
+  object pclSettings: TPageControl
+    Left = 4
+    Top = 4
+    Width = 517
+    Height = 249
     ActivePage = TabSheet2
     TabOrder = 0
     object TabSheet2: TTabSheet
@@ -86,56 +95,60 @@ object frmConfig: TfrmConfig
           00000000000000000000000000000000000000008001000080010000C0030000
           F00F0000}
       end
-      object GroupBox2: TGroupBox
+      object gbxVD: TGroupBox
         Left = 8
         Top = 3
-        Width = 341
-        Height = 45
+        Width = 281
+        Height = 46
         Caption = ' Software Type : '
         TabOrder = 1
-        object RadioButton1: TRadioButton
+        object rdVDNone: TRadioButton
           Left = 8
           Top = 18
-          Width = 101
+          Width = 65
           Height = 17
           Caption = 'None'
           Checked = True
           TabOrder = 0
           TabStop = True
+          OnClick = rdVDNoneClick
         end
-        object RadioButton2: TRadioButton
-          Left = 115
+        object rdVDAlcohol: TRadioButton
+          Tag = 1
+          Left = 79
           Top = 18
-          Width = 106
+          Width = 93
           Height = 17
-          Caption = 'Alcohol 120%'
+          Caption = 'Alcohol Soft'
           TabOrder = 1
+          OnClick = rdVDNoneClick
         end
-        object RadioButton3: TRadioButton
-          Left = 229
+        object rdVDDaemon: TRadioButton
+          Tag = 2
+          Left = 178
           Top = 18
-          Width = 105
+          Width = 93
           Height = 17
           Caption = 'Daemon Tools'
           TabOrder = 2
+          OnClick = rdVDNoneClick
         end
       end
-      object GroupBox3: TGroupBox
+      object gbxVDFileName: TGroupBox
         Left = 8
         Top = 55
         Width = 489
         Height = 45
         Caption = ' Software Location : '
         TabOrder = 0
-        object Edit2: TEdit
+        object edtVDFileName: TEdit
           Left = 8
           Top = 16
           Width = 442
           Height = 21
           TabOrder = 0
-          Text = 'Edit1'
         end
-        object Button2: TButton
+        object btnVDFileNameBrowse: TButton
           Left = 456
           Top = 16
           Width = 25
@@ -144,31 +157,28 @@ object frmConfig: TfrmConfig
           TabOrder = 1
         end
       end
-      object GroupBox4: TGroupBox
-        Left = 355
+      object gbxVDLetter: TGroupBox
+        Left = 295
         Top = 3
-        Width = 142
-        Height = 45
+        Width = 202
+        Height = 46
         Caption = ' Virtual Drive : '
         TabOrder = 2
-        object ComboBox1: TComboBox
-          Left = 9
+        object cbxVDLetter: TJvDriveCombo
+          Left = 8
           Top = 16
-          Width = 124
-          Height = 21
-          ItemHeight = 13
+          Width = 185
+          Height = 22
+          DriveTypes = [dtCDROM]
+          Offset = 4
+          OnDriveChange = cbxVDLetterDriveChange
           TabOrder = 0
-          Text = 'ComboBox1'
         end
       end
     end
     object TabSheet1: TTabSheet
       Caption = 'nullDC'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label2: TLabel
         Left = 33
         Top = 137
@@ -266,13 +276,13 @@ object frmConfig: TfrmConfig
         Height = 45
         Caption = ' nullDC Dreamcast Emulator Location : '
         TabOrder = 0
-        object Edit1: TEdit
+        object edtEmulatorFileName: TEdit
           Left = 8
           Top = 16
           Width = 442
           Height = 21
           TabOrder = 0
-          Text = 'Edit1'
+          Text = 'edtEmulatorFileName'
         end
         object Button1: TButton
           Left = 456
@@ -284,5 +294,23 @@ object frmConfig: TfrmConfig
         end
       end
     end
+  end
+  object btnCancel: TButton
+    Left = 423
+    Top = 267
+    Width = 98
+    Height = 25
+    Caption = '&Cancel'
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object btnOK: TButton
+    Left = 319
+    Top = 267
+    Width = 98
+    Height = 25
+    Caption = '&OK'
+    ModalResult = 1
+    TabOrder = 2
   end
 end

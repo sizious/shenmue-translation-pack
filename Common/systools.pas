@@ -726,10 +726,9 @@ end;
 
 function RunNoWait(const TargetFileName: TFileName): Boolean;
 begin
-  Result := FileExists(TargetFileName);
-  if Result then
-    ShellExecute(Application.Handle, 'open', PChar(TargetFileName), '', '',
-      SW_SHOWNORMAL);
+
+  Result := ShellExecute(
+    Application.Handle, 'open', PChar(TargetFileName), '', '', SW_SHOWNORMAL) > 32;
 end;
 
 //------------------------------------------------------------------------------
