@@ -14,6 +14,7 @@ object frmMain: TfrmMain
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -42,80 +43,83 @@ object frmMain: TfrmMain
     TabOrder = 1
     OnClick = btnQuitClick
   end
-  object GroupBox1: TGroupBox
+  object gbxOptions: TGroupBox
     Left = 307
     Top = 2
     Width = 114
     Height = 57
     Caption = ' Options: '
     TabOrder = 2
-    object CheckBox1: TCheckBox
+    object cbxVirtualDriveEnabled: TCheckBox
       Left = 10
       Top = 14
       Width = 97
       Height = 17
       Caption = 'Auto-mount'
       TabOrder = 0
+      OnClick = cbxVirtualDriveEnabledClick
     end
-    object CheckBox2: TCheckBox
+    object cbxEmulatorEnabled: TCheckBox
       Left = 10
       Top = 33
       Width = 79
       Height = 17
       Caption = 'Run nullDC'
       TabOrder = 1
+      OnClick = cbxEmulatorEnabledClick
     end
   end
-  object GroupBox2: TGroupBox
+  object gbxPresets: TGroupBox
     Left = 8
     Top = 2
     Width = 293
     Height = 146
     Caption = ' Presets: '
     TabOrder = 3
-    object Label2: TLabel
+    object lblPresets: TLabel
       Left = 8
       Top = 15
       Width = 252
       Height = 13
       Caption = 'Select the preset to use, then click the Make button.'
     end
-    object ListBox1: TListBox
+    object lbxPresets: TListBox
       Left = 8
       Top = 34
       Width = 277
       Height = 103
       ItemHeight = 13
       TabOrder = 0
+      OnClick = lbxPresetsClick
     end
   end
-  object GroupBox3: TGroupBox
+  object gbxConfig: TGroupBox
     Left = 307
     Top = 65
     Width = 114
     Height = 83
     Caption = ' Configuration: '
     TabOrder = 4
-    object Button2: TButton
+    object btnPresets: TButton
       Left = 8
       Top = 17
       Width = 97
       Height = 25
       Caption = 'Presets...'
       TabOrder = 0
-      OnClick = Button2Click
+      OnClick = btnPresetsClick
     end
-    object Button1: TButton
+    object btnSettings: TButton
       Left = 9
       Top = 48
       Width = 96
       Height = 25
       Caption = 'Settings...'
       TabOrder = 1
-      OnClick = Button1Click
+      OnClick = btnSettingsClick
     end
   end
-  object GroupBox4: TGroupBox
+  object gbxProgress: TGroupBox
     Left = 8
     Top = 154
     Width = 413

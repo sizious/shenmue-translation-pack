@@ -18,7 +18,8 @@ uses
   uitools in '..\..\..\Common\uitools.pas',
   fastcopy in 'engine\fastcopy.pas',
   xmlconf in '..\..\..\Common\xmlconf.pas',
-  config in 'config.pas';
+  config in 'config.pas',
+  settings in 'settings.pas' {frmSettings};
 
 {$R *.res}
 
@@ -39,6 +40,7 @@ begin
   Application.Title := 'Shenmue Dreamcast Test Environment';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmPresets, frmPresets);
+  Application.CreateForm(TfrmSettings, frmSettings);
   {$IFDEF DEBUG}
   // Debug
   AppTitle := TApplication(Application).Title; // CodeGear IDE Workaround...
