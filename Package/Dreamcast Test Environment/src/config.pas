@@ -58,6 +58,9 @@ begin
     VirtualDrive.Kind := TVirtualDriveKind(ConfigFile.ReadInteger('virtualdrive', 'kind', 0));
     VirtualDrive.FileName := ConfigFile.ReadString('virtualdrive', 'filename', '');
   end;
+
+  // Update Options Controls on-screen
+  frmMain.UpdateOptionsControls;
 end;
 
 // Save Config

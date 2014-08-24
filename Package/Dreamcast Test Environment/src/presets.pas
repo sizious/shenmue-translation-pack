@@ -65,7 +65,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysTools, Main;
+  SysTools, UITools, Main;
 
 procedure TfrmPresets.btnAddClick(Sender: TObject);
 const
@@ -100,15 +100,21 @@ end;
 procedure TfrmPresets.btnOutputFileNameClick(Sender: TObject);
 begin
   with svdOutputFileName do
+  begin
+    FileName := edtOutputFileName.Text;
     if Execute then
       edtOutputFileName.Text := FileName;
+  end;
 end;
 
 procedure TfrmPresets.btnSourceDirectoryClick(Sender: TObject);
 begin
   with bfdSourceDirectory do
+  begin
+    Directory := edtSourceDirectory.Text;
     if Execute then
       edtSourceDirectory.Text := IncludeTrailingPathDelimiter(Directory);
+  end;
 end;
 
 procedure TfrmPresets.ChangeControlsState(State: Boolean);
@@ -155,18 +161,28 @@ end;
 
 procedure TfrmPresets.edtVolumeNameChange(Sender: TObject);
 begin
+  edtVolumeName.Text := StringReplace(edtVolumeName.Text, ' ', '_', [rfReplaceAll]);
+  if edtVolumeName.Tag <> 0 then
+  begin
+    edtVolumeName.SelectAll;
+    EditSetCaretEndPosition(edtVolumeName.Handle);
+    edtVolumeName.SelLength := 0;
+    edtVolumeName.Tag := 0;
+  end;
   SelectedItem.VolumeName := edtVolumeName.Text;
 end;
 
 procedure TfrmPresets.edtVolumeNameKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in [#8, '0'..'9', 'A'..'Z', 'a'..'z', '_', ' ']) then
-  begin
-    Key := #0;
-  end
+  if not (Key in [#8, ^Z, ^X, ^C, ^V, '0'..'9', 'A'..'Z', 'a'..'z', '_', ' ']) then
+    Key := #0
   else
-    if Key = ' ' then
-      Key := '_';
+  begin
+    case Key of
+      ' ': Key := '_';
+      ^V : edtVolumeName.Tag := 1;
+    end;
+  end;
 end;
 
 procedure TfrmPresets.FormCreate(Sender: TObject);

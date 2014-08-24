@@ -29,18 +29,18 @@ object frmSettings: TfrmSettings
     Top = 4
     Width = 517
     Height = 249
-    ActivePage = TabSheet2
+    ActivePage = tbsVirtualDrive
     TabOrder = 0
-    object TabSheet2: TTabSheet
+    object tbsVirtualDrive: TTabSheet
       Caption = 'Virtual Drive'
       ImageIndex = 1
       object Label1: TLabel
         Left = 33
         Top = 188
-        Width = 464
+        Width = 455
         Height = 26
         Caption = 
-          'If you have Alcohol 120% or Daemon Tools installed into your com' +
+          'If you have Alcohol Soft or Daemon Tools installed into your com' +
           'puter, this tool can mount the generated image for you in the vi' +
           'rtual drive specified here.'
         Font.Charset = DEFAULT_CHARSET
@@ -147,6 +147,7 @@ object frmSettings: TfrmSettings
           Width = 442
           Height = 21
           TabOrder = 0
+          OnChange = edtVDFileNameChange
         end
         object btnVDFileNameBrowse: TButton
           Left = 456
@@ -155,6 +156,7 @@ object frmSettings: TfrmSettings
           Height = 21
           Caption = '...'
           TabOrder = 1
+          OnClick = btnVDFileNameBrowseClick
         end
       end
       object gbxVDLetter: TGroupBox
@@ -171,22 +173,23 @@ object frmSettings: TfrmSettings
           Height = 22
           DriveTypes = [dtCDROM]
           Offset = 4
-          OnDriveChange = cbxVDLetterDriveChange
           TabOrder = 0
+          OnChange = cbxVDLetterChange
         end
       end
     end
-    object TabSheet1: TTabSheet
+    object tbsEmulator: TTabSheet
       Caption = 'nullDC'
       ImageIndex = 1
       object Label2: TLabel
         Left = 33
-        Top = 137
+        Top = 156
         Width = 455
         Height = 26
         Caption = 
           'If you have specified a valid Virtual Drive software in the prev' +
-          'ious tab, you can use the nullDC Dreamcast Emulator feature.'
+          'ious tab, you can use the nullDC Dreamcast Emulator feature. Thi' +
+          's allows you to run your image directly in the emulator.'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
@@ -197,7 +200,7 @@ object frmSettings: TfrmSettings
       end
       object Image2: TImage
         Left = 8
-        Top = 137
+        Top = 156
         Width = 16
         Height = 16
         Picture.Data = {
@@ -239,20 +242,6 @@ object frmSettings: TfrmSettings
           00000000000000000000000000000000000000008001000080010000C0030000
           F00F0000}
       end
-      object Label3: TLabel
-        Left = 33
-        Top = 169
-        Width = 277
-        Height = 13
-        Caption = 'This allows you to run your image directly in the emulator.'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        WordWrap = True
-      end
       object Label4: TLabel
         Left = 33
         Top = 188
@@ -269,11 +258,11 @@ object frmSettings: TfrmSettings
         ParentFont = False
         WordWrap = True
       end
-      object GroupBox1: TGroupBox
+      object gbxEmulator: TGroupBox
         Left = 8
         Top = 3
         Width = 489
-        Height = 45
+        Height = 46
         Caption = ' nullDC Dreamcast Emulator Location : '
         TabOrder = 0
         object edtEmulatorFileName: TEdit
@@ -282,14 +271,59 @@ object frmSettings: TfrmSettings
           Width = 442
           Height = 21
           TabOrder = 0
-          Text = 'edtEmulatorFileName'
+          OnChange = edtEmulatorFileNameChange
         end
-        object Button1: TButton
+        object btnEmulatorFileName: TButton
           Left = 456
           Top = 16
           Width = 25
           Height = 21
           Caption = '...'
+          TabOrder = 1
+          OnClick = btnEmulatorFileNameClick
+        end
+      end
+      object gbxEmulatorPatches: TGroupBox
+        Left = 8
+        Top = 55
+        Width = 489
+        Height = 90
+        Caption = ' nullDC Configuration Patches : '
+        TabOrder = 1
+        object Label3: TLabel
+          Left = 8
+          Top = 21
+          Width = 451
+          Height = 13
+          Caption = 
+            'The nullDC.cfg file must exist to use this feature (just launch ' +
+            'nullDC to create it).'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+          WordWrap = True
+        end
+        object cbxEmulatorAutoStart: TCheckBox
+          Left = 8
+          Top = 40
+          Width = 473
+          Height = 17
+          Caption = 'Auto Start the Game Emulation Process (Recommended)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+        end
+        object cbxEmulatorShowConsole: TCheckBox
+          Left = 8
+          Top = 63
+          Width = 473
+          Height = 17
+          Caption = 'Show the Debug Console of the Emulator (Highly recommended)'
+          Checked = True
+          State = cbChecked
           TabOrder = 1
         end
       end
@@ -312,5 +346,44 @@ object frmSettings: TfrmSettings
     Caption = '&OK'
     ModalResult = 1
     TabOrder = 2
+    OnClick = btnOKClick
+  end
+  object opdVDAlcohol: TJvOpenDialog
+    DefaultExt = 'exe'
+    Filter = 
+      'Alcohol Command Launcher (AxCmd.exe)|AxCmd.exe|Applications (*.e' +
+      'xe)|*.exe|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Title = 'Select the Alcohol Soft executable...'
+    Height = 447
+    Width = 563
+    Left = 4
+    Top = 264
+  end
+  object opdVDDaemon: TJvOpenDialog
+    DefaultExt = 'exe'
+    Filter = 
+      'Deamon Tools Launchers (Deamon.exe;DTLite.exe;DTPro.exe)|Deamon.' +
+      'exe;DTLite.exe;DTPro.exe|Applications (*.exe)|*.exe|All Files (*' +
+      '.*)|*.*'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Title = 'Select the Deamon Tools executable...'
+    Height = 447
+    Width = 563
+    Left = 36
+    Top = 264
+  end
+  object opdEmulator: TJvOpenDialog
+    DefaultExt = 'exe'
+    Filter = 
+      'nullDC Emulator (nullDC.exe;nullDC_Win32_Release-NoTrace.exe)|nu' +
+      'llDC.exe;nullDC_Win32_Release-NoTrace.exe|Applications (*.exe)|*' +
+      '.exe|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Title = 'Select the nullDC Emulator executable...'
+    Height = 447
+    Width = 563
+    Left = 68
+    Top = 264
   end
 end
