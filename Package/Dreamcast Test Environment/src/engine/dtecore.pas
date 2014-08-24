@@ -58,6 +58,8 @@ type
   // Thread for running the process
   TCoreProcessThread = class(TThread)
   private
+    fAutorunFileName: TFileName;
+    fIconFileName: TFileName;
     fSettings: TDreamcastImageSettings;
     fVirtualDriveID: string;
     fBatchFileName: TFileName;
@@ -69,8 +71,10 @@ type
     fOwner: TDreamcastImageMaker;
     fException: Exception;
     fPreset: TDreamcastImagePresetItem;
+    procedure AddImageWatermark;
     function CatchCommandOutput: string;
     procedure CheckWritePermissions;
+    procedure DeleteImageWatermark;
     procedure DoHandleException;
     procedure ExecuteBinHack;
     procedure ExecuteEmulator;
@@ -211,6 +215,8 @@ type
 
 implementation
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 uses
   IniFiles, Math, JvJCLUtils,
   SysTools, UITools, WorkDir, ProcUtil, FastCopy;
@@ -219,13 +225,15 @@ const
   SFILE_NRGHEADER                 = 'nrghdr.exe';
   SFILE_BINHACK                   = 'binhack.exe';
   SFILE_MKISOFS                   = 'mkisofs.exe';
-  SFILE_DATA0_LEADIN              = 'leadin.bin';
-  SFILE_DATA0_NRGHEADER           = 'nrghdr.bin';
+  SFILE_DATA0_LEADIN              = 'leadin.dat';
+  SFILE_DATA0_NRGHEADER           = 'nrghdr.dat';
   SFILE_DATA1                     = 'data1.iso';
   SFILE_DATA2                     = 'data2.iso';
   SFILE_BOOTSTRAP_HACKED          = 'IP.HAK';
   SFILE_BOOTSTRAP                 = 'IP.BIN';
   SFILE_BOOT_BINARY               = '1ST_READ.BIN';
+  SFILE_WMINF	                    = 'autorun.inf';
+  SFILE_WMICO                     = 'shentest.ico';
   OUTPUT_ERROR_TAG                = '*** ERROR OUTPUT ***';
 
   MKISOFS_PROGRESS_ADDRESS_XP     = $0022B2D4; // XP x86 and x64
@@ -479,6 +487,14 @@ begin
   end;
 end;
 
+procedure TCoreProcessThread.AddImageWatermark;
+begin
+  FastCopyFile(GetWorkingTempDirectory + SFILE_WMINF, fAutorunFileName);
+//  FileSetAttr(fAutorunFileName, faHidden or faSysFile);
+  FastCopyFile(GetWorkingTempDirectory + SFILE_WMICO, fIconFileName);
+//  FileSetAttr(fIconFileName, faHidden or faSysFile);
+end;
+
 function TCoreProcessThread.CatchCommandOutput: string;
 var
   StdBuffer,
@@ -524,6 +540,12 @@ begin
   fSettings := TDreamcastImageSettings.Create;
   fData1FileName := GetWorkingTempDirectory + SFILE_DATA1;
   fData2FileName := GetWorkingTempDirectory + SFILE_DATA2;
+end;
+
+procedure TCoreProcessThread.DeleteImageWatermark;
+begin
+  KillFile(fAutorunFileName);
+  KillFile(fIconFileName);
 end;
 
 destructor TCoreProcessThread.Destroy;
@@ -833,6 +855,8 @@ procedure TCoreProcessThread.InitializeSettings;
 begin
   Settings.Assign(Owner.Settings);
   fVirtualDriveID := GetVirtualDriveLetter;
+  fAutorunFileName := Preset.SourceDirectory + SFILE_WMINF;
+  fIconFileName := Preset.SourceDirectory + SFILE_WMICO;  
 end;
 
 procedure TCoreProcessThread.MakeDataTrack;
@@ -850,12 +874,17 @@ begin
     // Notify Prepare Image...
     NotifyStatus(misPrepareImage);
 
+    // Create Watermark
+    AddImageWatermark;
+
     Command := Format('%s -C 0,45000 -V %s -G "%s" -M "%s" -duplicates-once ' +
-      '-l -o "%s" "%s"', [
+      '-hidden %s -hidden %s -l -o "%s" "%s"', [
       SFILE_MKISOFS,
       Preset.VolumeName,
       SFILE_BOOTSTRAP_HACKED,
       fData1FileName,
+      SFILE_WMINF,
+      SFILE_WMICO,
       fData2FileName,
       ExcludeTrailingPathDelimiter(Preset.SourceDirectory)
     ]);
@@ -871,6 +900,9 @@ begin
 
     OutputBuffer := RunCommand(Command);
 
+    // Delete Watermark
+    DeleteImageWatermark;
+    
     // Check for errors
     if IsInString(MKISOFS_INVALID_SOURCE, OutputBuffer) then
       raise EMakeImageFailed.CreateFmt('Unable to find source directory for ' +

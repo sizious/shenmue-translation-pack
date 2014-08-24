@@ -4,6 +4,7 @@ program MakeDisc;
 
 {$R 'engine\binaries.res' 'engine\binaries.rc'}
 {$R 'engine\lzmabin.res' 'engine\lzmabin.rc'}
+{$R 'about\credits.res' 'about\credits.rc'}
 
 uses
   Windows,
@@ -19,7 +20,9 @@ uses
   fastcopy in 'engine\fastcopy.pas',
   xmlconf in '..\..\..\Common\xmlconf.pas',
   config in 'config.pas',
-  settings in 'settings.pas' {frmSettings};
+  settings in 'settings.pas' {frmSettings},
+  appver in '..\..\..\Common\appver.pas',
+  about in '..\..\..\Common\About\about.pas' {frmAbout};
 
 {$R *.res}
 

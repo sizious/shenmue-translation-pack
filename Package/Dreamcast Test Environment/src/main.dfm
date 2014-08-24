@@ -30,7 +30,7 @@ object frmMain: TfrmMain
     Top = 247
     Width = 98
     Height = 25
-    Caption = 'Make'
+    Caption = '&Make'
     TabOrder = 0
     OnClick = btnMakeClick
   end
@@ -39,7 +39,7 @@ object frmMain: TfrmMain
     Top = 247
     Width = 98
     Height = 25
-    Caption = 'Quit'
+    Caption = '&Quit'
     TabOrder = 1
     OnClick = btnQuitClick
   end
@@ -55,7 +55,7 @@ object frmMain: TfrmMain
       Top = 14
       Width = 97
       Height = 17
-      Caption = 'Auto-mount'
+      Caption = '&Auto-mount'
       TabOrder = 0
       OnClick = cbxVirtualDriveEnabledClick
     end
@@ -64,7 +64,7 @@ object frmMain: TfrmMain
       Top = 33
       Width = 79
       Height = 17
-      Caption = 'Run nullDC'
+      Caption = '&Run nullDC'
       TabOrder = 1
       OnClick = cbxEmulatorEnabledClick
     end
@@ -105,7 +105,7 @@ object frmMain: TfrmMain
       Top = 17
       Width = 97
       Height = 25
-      Caption = 'Presets...'
+      Caption = '&Presets...'
       TabOrder = 0
       OnClick = btnPresetsClick
     end
@@ -114,7 +114,7 @@ object frmMain: TfrmMain
       Top = 48
       Width = 96
       Height = 25
-      Caption = 'Settings...'
+      Caption = '&Settings...'
       TabOrder = 1
       OnClick = btnSettingsClick
     end
@@ -147,5 +147,14 @@ object frmMain: TfrmMain
       Height = 19
       TabOrder = 1
     end
+  end
+  object Button1: TButton
+    Left = 8
+    Top = 247
+    Width = 98
+    Height = 25
+    Caption = 'A&bout...'
+    TabOrder = 6
+    OnClick = Button1Click
   end
 end

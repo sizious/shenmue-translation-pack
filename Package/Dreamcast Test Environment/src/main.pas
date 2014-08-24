@@ -24,6 +24,7 @@ type
     lblProgress: TLabel;
     lblPresets: TLabel;
     pbrTotal: TProgressBar;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
     procedure btnPresetsClick(Sender: TObject);
@@ -34,6 +35,7 @@ type
     procedure cbxEmulatorEnabledClick(Sender: TObject);
     procedure lbxPresetsClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure Button1Click(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedPresetIndex: Integer;
@@ -44,7 +46,7 @@ type
     procedure DreamcastImageMaker_OnAbort(Sender: TObject);
     procedure DreamcastImageMaker_OnProgress(Sender: TObject; Value: Integer);
     procedure DreamcastImageMaker_OnStatus(Sender: TObject; Status: TMakeImageStatus);
-    procedure MakeImageProcessCancel;
+    procedure MakeImageProcessAbort;
     procedure MakeImageProcessExecute;
     procedure InitializeEngineComponents;
     procedure ModulesInitialize;
@@ -54,9 +56,11 @@ type
     function GetProgressText: string;
     procedure SetProgressText(const Value: string);
     procedure SetSelectedPresetIndex(const Value: Integer);
+    procedure UpdateEmulatorControlState;
   public
     { Déclarations publiques }
     function MsgBox(Text, Title: string; Flags: Integer): Integer;
+    procedure UpdateOptionsControls;
     property ProgressText: string read GetProgressText write SetProgressText;
     property SelectedPresetIndex: Integer
       read fSelectedPresetIndex write SetSelectedPresetIndex;
@@ -71,7 +75,8 @@ implementation
 {$R *.dfm}
 
 uses
-  SysTools, UITools, WorkDir, LZMADec, Config, Presets, Settings;
+  SysTools, UITools, WorkDir, LZMADec, AppVer, About,
+  Config, Presets, Settings;
 
 type
   TDreamcastImageInitializerThread = class(TThread)
@@ -87,7 +92,15 @@ end;
 procedure TfrmMain.btnSettingsClick(Sender: TObject);
 begin
   if frmSettings.ShowModal = mrOK then
+  begin
     DreamcastImageMaker.Settings.Assign(frmSettings.Settings);
+    UpdateOptionsControls;
+  end;
+end;
+
+procedure TfrmMain.Button1Click(Sender: TObject);
+begin
+  RunAboutBox;
 end;
 
 procedure TfrmMain.btnPresetsClick(Sender: TObject);
@@ -104,14 +117,20 @@ end;
 procedure TfrmMain.cbxVirtualDriveEnabledClick(Sender: TObject);
 begin
   DreamcastImageMaker.Settings.VirtualDrive.Enabled := cbxVirtualDriveEnabled.Checked;
+  UpdateEmulatorControlState;
 end;
 
 procedure TfrmMain.ChangeControlsState(State: Boolean);
 begin
   btnSettings.Enabled := State;
   btnPresets.Enabled := State;
-  cbxVirtualDriveEnabled.Enabled := State;
-  cbxEmulatorEnabled.Enabled := State;
+  if not State then
+  begin
+    cbxVirtualDriveEnabled.Enabled := False;
+    cbxEmulatorEnabled.Enabled := False;
+  end
+  else
+    UpdateOptionsControls;
   if State then
   begin
     btnMake.Tag := 0;
@@ -169,12 +188,13 @@ begin
     begin
       ProgressText := 'Done!';
       pbrCurrent.Position := pbrCurrent.Max;
+      pbrTotal.Position := pbrTotal.Max;
       ChangeControlsState(True);
     end;
   end;
 end;
 
-procedure TfrmMain.MakeImageProcessCancel;
+procedure TfrmMain.MakeImageProcessAbort;
 begin
   DreamcastImageMaker.Suspend;
   if MsgBox('Are you sure to abort the current process ?',
@@ -211,7 +231,7 @@ begin
   if btnMake.Tag = 0 then
     MakeImageProcessExecute
   else
-    MakeImageProcessCancel;
+    MakeImageProcessAbort;
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -220,13 +240,17 @@ begin
   begin
     CanClose := False;
     fCloseOnProcessRequest := True;
-    MakeImageProcessCancel;
+    MakeImageProcessAbort;
   end;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  Caption := Application.Title;
+  Caption := Application.Title + ' v' + GetApplicationVersion;
+{$IFDEF DEBUG}
+  Caption := Caption + ' *DEBUG*';
+{$ENDIF}
+  InitAboutBox(Application.Title, GetApplicationVersion, 'D.T.E.');
   ChangeQuitControlsState(False);
   pbrTotal.Max := Integer(High(TMakeImageStatus)) + 1;
   fButtonMakeCaption := btnMake.Caption;
@@ -273,7 +297,10 @@ begin
   begin
     lbxPresets.Items.Add(DreamcastImageMaker.Presets[i].Name);
   end;
-  SelectedPresetIndex := -1;
+  if DreamcastImageMaker.Presets.Count > 0 then
+    SelectedPresetIndex := 0
+  else
+    SelectedPresetIndex := -1;
 end;
 
 procedure TfrmMain.ModulesFinalize;
@@ -331,6 +358,24 @@ begin
   end
   else
     fSelectedPresetIndex := -1;
+end;
+
+procedure TfrmMain.UpdateEmulatorControlState;
+begin
+  cbxEmulatorEnabled.Enabled := (cbxEmulatorEnabled.Tag = 0)
+    and cbxVirtualDriveEnabled.Checked
+end;
+
+procedure TfrmMain.UpdateOptionsControls;
+begin
+  cbxVirtualDriveEnabled.Enabled :=
+    (DreamcastImageMaker.Settings.VirtualDrive.Kind <> vdkNone);
+
+  cbxEmulatorEnabled.Tag := 1;
+  if cbxVirtualDriveEnabled.Enabled
+    and (DreamcastImageMaker.Settings.Emulator.FileName <> '') then
+      cbxEmulatorEnabled.Tag := 0;
+  UpdateEmulatorControlState;
 end;
 
 { TDreamcastImageInitializer }
