@@ -42,6 +42,7 @@ type
     fProgressStarted: Boolean;
     fOwner: TCoreProcessThread;
     fProgressBegin: TNotifyEvent;
+    function GetMakeImageProcessAddress: LongWord;
     procedure InitializeProgressBar;
     procedure FinalizeProgressBar;
     procedure UpdateProgressBar(const Value: Double);
@@ -218,7 +219,7 @@ implementation
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  IniFiles, Math, JvJCLUtils,
+  IniFiles, Math, JvJCLUtils, JclSysInfo,
   SysTools, UITools, WorkDir, ProcUtil, FastCopy;
 
 const
@@ -236,11 +237,12 @@ const
   SFILE_WMICO                     = 'shentest.ico';
   OUTPUT_ERROR_TAG                = '*** ERROR OUTPUT ***';
 
-  MKISOFS_PROGRESS_ADDRESS_XP     = $0022B2D4; // XP x86 and x64
-  MKISOFS_PROGRESS_ADDRESS_W7_32  = $0022B2AC; // Vista, 7
+  MKISOFS_PROGRESS_ADDRESS_XP_32  = $0022B2D4; // XP x86
+  MKISOFS_PROGRESS_ADDRESS_XP_64  = $0022B2D4; // XP x64
+  MKISOFS_PROGRESS_ADDRESS_W7_32  = $0022B2AC; // 7 x86
   MKISOFS_PROGRESS_ADDRESS_W8_32  = $0023B29C; // 8 and 8.1 x86
-  MKISOFS_PROGRESS_ADDRESS_W7_64  = $0028B2AC; // Vista, 7
-  // 8 and 8.1 x64 ?
+  MKISOFS_PROGRESS_ADDRESS_W7_64  = $0028B2AC; // 7 x64
+  MKISOFS_PROGRESS_ADDRESS_W8_64  = $FFFFFFFF; // 8 and 8.1 x64
 
   MKISOFS_PROGRESS_VALUE_MIN      = 0;
   MKISOFS_PROGRESS_VALUE_MAX      = 100;
@@ -361,13 +363,7 @@ begin
   InitializeProgressBar;
 
   // Setting the real address to lookup...
-  Address := MKISOFS_PROGRESS_ADDRESS_XP;
-  if IsWindowsVista then
-  begin
-    Address := MKISOFS_PROGRESS_ADDRESS_W7_32;
-    if Is64BitOS then
-      Address := MKISOFS_PROGRESS_ADDRESS_W7_64;
-  end;
+  Address := GetMakeImageProcessAddress;
 
   // Getting the value !
   if OpenProcessToken(GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, TokenHwnd) then
@@ -436,6 +432,39 @@ end;
 function TMakeImageWatcherThread.GetDreamcastImageMakerOwner: TDreamcastImageMaker;
 begin
   Result := Self.Owner.Owner;
+end;
+
+function TMakeImageWatcherThread.GetMakeImageProcessAddress: LongWord;
+begin
+  Result := MKISOFS_PROGRESS_ADDRESS_XP_32;
+  if IsWindows64 then
+    // 64-bit
+    case GetWindowsVersion of
+      wvWinXP64:
+        Result := MKISOFS_PROGRESS_ADDRESS_XP_64;
+      wvWin7:
+        Result := MKISOFS_PROGRESS_ADDRESS_W7_64;
+      wvWin8:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_64;
+      wvWin81:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_64;
+      wvwin81RT:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_64; // I hope it's the same as regular Win8...
+    end
+  else
+    // 32-bit
+    case GetWindowsVersion of
+      wvWinXP:
+        Result := MKISOFS_PROGRESS_ADDRESS_XP_32;
+      wvWin7:
+        Result := MKISOFS_PROGRESS_ADDRESS_W7_32;
+      wvWin8:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
+      wvWin81:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
+      wvWin81RT:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
+    end;
 end;
 
 procedure TMakeImageWatcherThread.InitializeProgressBar;
@@ -595,7 +624,6 @@ begin
     MakeDataTrack;
     MergeTracks;
     ExecuteNrgHeader;
-    NotifyStatus(misDone);
 
     // Mount the image (if needed)
     MountImage;
@@ -614,7 +642,8 @@ begin
         Sleep(1000);
         Inc(i);
       end;
-    end;
+    end else
+      NotifyStatus(misDone); // Done !
   except
     HandleException;
   end;
