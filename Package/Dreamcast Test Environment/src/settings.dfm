@@ -1,6 +1,10 @@
 object frmSettings: TfrmSettings
   Left = 0
   Top = 0
+  Hint = 
+    'Enable or disable the nullDC debug console. Disabling this optio' +
+    'n can make the emulation faster, but nullDC errors will not be d' +
+    'isplayed anymore if disabled.'
   BorderStyle = bsDialog
   Caption = 'Settings'
   ClientHeight = 295
@@ -13,6 +17,7 @@ object frmSettings: TfrmSettings
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  ShowHint = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -100,6 +105,7 @@ object frmSettings: TfrmSettings
         Top = 3
         Width = 281
         Height = 46
+        Hint = 'Select the Virtual Drive software installed on your computer.'
         Caption = ' Software Type : '
         TabOrder = 1
         object rdVDNone: TRadioButton
@@ -146,6 +152,9 @@ object frmSettings: TfrmSettings
           Top = 16
           Width = 442
           Height = 21
+          Hint = 
+            'Input the Virtual Drive software executable. Depending on the so' +
+            'ftware vendor the executable to select will be different.'
           TabOrder = 0
           OnChange = edtVDFileNameChange
         end
@@ -171,6 +180,9 @@ object frmSettings: TfrmSettings
           Top = 16
           Width = 185
           Height = 22
+          Hint = 
+            'Select the Virtual Drive to use with this tool. Make sure the se' +
+            'lected virtual drive was created by the selected software!'
           DriveTypes = [dtCDROM]
           Offset = 4
           TabOrder = 0
@@ -270,6 +282,7 @@ object frmSettings: TfrmSettings
           Top = 16
           Width = 442
           Height = 21
+          Hint = 'Input the nullDC executable location.'
           TabOrder = 0
           OnChange = edtEmulatorFileNameChange
         end
@@ -311,7 +324,11 @@ object frmSettings: TfrmSettings
           Top = 40
           Width = 473
           Height = 17
-          Caption = 'Auto Start the Game Emulation Process (Recommended)'
+          Hint = 
+            'Starts the emulation of the mounted disc automatically after sta' +
+            'rting nullDC. This option can slightly improve the testing speed' +
+            '.'
+          Caption = 'Auto Start the Game Emulation Process (Highly recommended)'
           Checked = True
           State = cbChecked
           TabOrder = 0
@@ -321,7 +338,7 @@ object frmSettings: TfrmSettings
           Top = 63
           Width = 473
           Height = 17
-          Caption = 'Show the Debug Console of the Emulator (Highly recommended)'
+          Caption = 'Show the Debug Console of the Emulator'
           Checked = True
           State = cbChecked
           TabOrder = 1

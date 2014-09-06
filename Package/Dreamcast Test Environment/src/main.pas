@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, DTECore;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, BugsMgr, DTECore, AppEvnts;
 
 type
   TfrmMain = class(TForm)
@@ -24,7 +24,8 @@ type
     lblProgress: TLabel;
     lblPresets: TLabel;
     pbrTotal: TProgressBar;
-    Button1: TButton;
+    btnAbout: TButton;
+    aeMain: TApplicationEvents;
     procedure FormCreate(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
     procedure btnPresetsClick(Sender: TObject);
@@ -35,20 +36,25 @@ type
     procedure cbxEmulatorEnabledClick(Sender: TObject);
     procedure lbxPresetsClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure Button1Click(Sender: TObject);
+    procedure btnAboutClick(Sender: TObject);
+    procedure aeMainException(Sender: TObject; E: Exception);
   private
     { Déclarations privées }  
     fSelectedPresetIndex: Integer;
     fButtonMakeCaption: string;
     fCloseOnProcessRequest: Boolean;
+    procedure BugsHandlerQuitRequest(Sender: TObject);
     procedure ChangeControlsState(State: Boolean);
     procedure ChangeQuitControlsState(State: Boolean);
+    function CheckParameters: Boolean;
     procedure DreamcastImageMaker_OnAbort(Sender: TObject);
     procedure DreamcastImageMaker_OnProgress(Sender: TObject; Value: Integer);
     procedure DreamcastImageMaker_OnStatus(Sender: TObject; Status: TMakeImageStatus);
     procedure MakeImageProcessAbort;
     procedure MakeImageProcessExecute;
+    procedure InitBugsHandler;
     procedure InitializeEngineComponents;
+    procedure InitializeUserInterface;
     procedure ModulesInitialize;
     procedure ModulesFinalize;
     procedure LoadPresets;
@@ -68,6 +74,7 @@ type
 
 var
   frmMain: TfrmMain;
+  BugsHandler: TBugsHandlerInterface;  
   DreamcastImageMaker: TDreamcastImageMaker;
 
 implementation
@@ -98,7 +105,12 @@ begin
   end;
 end;
 
-procedure TfrmMain.Button1Click(Sender: TObject);
+procedure TfrmMain.BugsHandlerQuitRequest(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmMain.btnAboutClick(Sender: TObject);
 begin
   RunAboutBox;
 end;
@@ -148,6 +160,48 @@ begin
   SetCloseWindowButtonState(Self, State);
   btnQuit.Enabled := State;
   btnMake.Enabled := State;
+end;
+
+function TfrmMain.CheckParameters: Boolean;
+var
+  Preset: TDreamcastImagePresetItem;
+  MessagesText: TStringList;
+
+begin
+  try
+    Preset := DreamcastImageMaker.Presets[SelectedPresetIndex];
+    MessagesText := TStringList.Create;
+    try
+      // Check Source Directory existence
+      Result := DirectoryExists(Preset.SourceDirectory);
+      if not Result then
+        MessagesText.Add('- The Source Directory of the selected preset doesn''t exists.');
+
+      // Check if the 1ST_READ.BIN is in Source Directory
+      Result := FileExists(Preset.SourceDirectory + SFILE_BOOT_BINARY);
+      if not Result then
+        MessagesText.Add(Format('- The required Dreamcast file, "%s", wasn''t found.', [
+        SFILE_BOOT_BINARY]));
+
+      // Check if the IP.BIN is in Source Directory
+      Result := FileExists(Preset.SourceDirectory + SFILE_BOOTSTRAP);
+      if not Result then
+        MessagesText.Add(Format('- The required Dreamcast file, "%s", wasn''t found.', [
+        SFILE_BOOTSTRAP]));
+
+      // Final result
+      Result := MessagesText.Count = 0;
+      if not Result then
+        MsgBox(Format('%d error(s) was(were) found:%s%s',
+          [MessagesText.Count, WrapStr, MessagesText.Text]),
+          'Warning',
+          MB_ICONWARNING);
+    finally
+      MessagesText.Free;
+    end;
+  except
+    Result := False;
+  end;
 end;
 
 procedure TfrmMain.DreamcastImageMaker_OnAbort(Sender: TObject);
@@ -214,16 +268,26 @@ end;
 
 procedure TfrmMain.MakeImageProcessExecute;
 begin
-if SelectedPresetIndex <> -1 then
+  if SelectedPresetIndex <> -1 then
   begin
-    ChangeControlsState(False);
-    fCloseOnProcessRequest := False;
-    pbrTotal.Position := 0;
-    DreamcastImageMaker.Presets[SelectedPresetIndex].Select;
-    DreamcastImageMaker.Execute;
+    // Execute the process (if possible)
+    if CheckParameters then
+    begin
+      ChangeControlsState(False);
+      fCloseOnProcessRequest := False;
+      pbrTotal.Position := 0;
+      DreamcastImageMaker.Presets[SelectedPresetIndex].Select;
+      DreamcastImageMaker.Execute;
+    end;
   end
   else
     MsgBox('Please select a valid preset.', 'Warning', MB_ICONWARNING);
+end;
+
+procedure TfrmMain.aeMainException(Sender: TObject; E: Exception);
+begin
+  BugsHandler.Execute(Sender, E);
+  aeMain.CancelDispatch;
 end;
 
 procedure TfrmMain.btnMakeClick(Sender: TObject);
@@ -250,13 +314,10 @@ begin
 {$IFDEF DEBUG}
   Caption := Caption + ' *DEBUG*';
 {$ENDIF}
-  InitAboutBox(Application.Title, GetApplicationVersion, 'D.T.E.');
-  ChangeQuitControlsState(False);
-  pbrTotal.Max := Integer(High(TMakeImageStatus)) + 1;
-  fButtonMakeCaption := btnMake.Caption;
   ModulesInitialize;
   LoadPresets;
   LoadConfig;
+  InitializeUserInterface;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -270,8 +331,25 @@ begin
   Result := lblProgress.Caption;
 end;
 
+procedure TfrmMain.InitBugsHandler;
+begin
+  BugsHandler := TBugsHandlerInterface.Create;
+  try
+    BugsHandler.OnQuitRequest := BugsHandlerQuitRequest;
+    BugsHandler.LogSaveFeature := False;
+  except
+    on E: Exception do
+      MsgBox('Unable to initialize the Bugs Manager: ' + E.Message,
+      'Error',
+      MB_ICONERROR);
+  end;
+end;
+
 procedure TfrmMain.InitializeEngineComponents;
 begin
+  // Initialize the engine itself
+  ProgressText := 'Initializing engine components...';
+
   // Init of the LZMA module
   SevenZipInitEngine(GetWorkingTempDirectory);
 
@@ -280,6 +358,15 @@ begin
   begin
     OnTerminate := OnEngineComponentsInitializationTerminate;
   end;
+end;
+
+procedure TfrmMain.InitializeUserInterface;
+begin
+  DoubleBuffered := True;
+  InitAboutBox(Application.Title, GetApplicationVersion, 'DC Test Environment');
+  pbrTotal.Max := Integer(High(TMakeImageStatus)) + 1;
+  fButtonMakeCaption := btnMake.Caption;
+  ChangeQuitControlsState(False);
 end;
 
 procedure TfrmMain.lbxPresetsClick(Sender: TObject);
@@ -306,12 +393,13 @@ end;
 procedure TfrmMain.ModulesFinalize;
 begin
   DreamcastImageMaker.Free;
+  BugsHandler.Free;
 end;
 
 procedure TfrmMain.ModulesInitialize;
 begin
-  // Initialize the engine itself
-  ProgressText := 'Initializing engine components...';
+  // Init Bugs Handler
+  InitBugsHandler;
 
   // Initialize the components of the engine
   InitializeEngineComponents;
@@ -386,7 +474,6 @@ var
 
 begin
   FreeOnTerminate := True;
-
   BinariesFileName := GetWorkingTempFileName;
   ExtractFile('ENGINE', BinariesFileName);
   if FileExists(BinariesFileName) then

@@ -5,6 +5,10 @@ interface
 uses
   Windows, SysUtils, Classes, Forms, ComCtrls, Messages;
 
+const
+  SFILE_BOOTSTRAP   = 'IP.BIN';
+  SFILE_BOOT_BINARY = '1ST_READ.BIN';
+
 type
   // Classes partial declarations
   TDreamcastImageMaker = class;
@@ -225,24 +229,24 @@ uses
 const
   SFILE_NRGHEADER                 = 'nrghdr.exe';
   SFILE_BINHACK                   = 'binhack.exe';
+  SFILE_BOOTSTRAP_HACKED          = 'IP.HAK';  
   SFILE_MKISOFS                   = 'mkisofs.exe';
   SFILE_DATA0_LEADIN              = 'leadin.dat';
   SFILE_DATA0_NRGHEADER           = 'nrghdr.dat';
   SFILE_DATA1                     = 'data1.iso';
   SFILE_DATA2                     = 'data2.iso';
-  SFILE_BOOTSTRAP_HACKED          = 'IP.HAK';
-  SFILE_BOOTSTRAP                 = 'IP.BIN';
-  SFILE_BOOT_BINARY               = '1ST_READ.BIN';
   SFILE_WMINF	                    = 'autorun.inf';
   SFILE_WMICO                     = 'shentest.ico';
   OUTPUT_ERROR_TAG                = '*** ERROR OUTPUT ***';
 
   MKISOFS_PROGRESS_ADDRESS_XP_32  = $0022B2D4; // XP x86
-  MKISOFS_PROGRESS_ADDRESS_XP_64  = $0022B2D4; // XP x64
+  MKISOFS_PROGRESS_ADDRESS_VT_32  = $0022B2AC; // Vista x86
   MKISOFS_PROGRESS_ADDRESS_W7_32  = $0022B2AC; // 7 x86
   MKISOFS_PROGRESS_ADDRESS_W8_32  = $0023B29C; // 8 and 8.1 x86
+  MKISOFS_PROGRESS_ADDRESS_XP_64  = $0022B2D4; // XP x64
+  MKISOFS_PROGRESS_ADDRESS_VT_64  = $0027B2AC; // Vista x64
   MKISOFS_PROGRESS_ADDRESS_W7_64  = $0028B2AC; // 7 x64
-  MKISOFS_PROGRESS_ADDRESS_W8_64  = $FFFFFFFF; // 8 and 8.1 x64
+  MKISOFS_PROGRESS_ADDRESS_W8_64  = $0028B29C; // 8 and 8.1 x64
 
   MKISOFS_PROGRESS_VALUE_MIN      = 0;
   MKISOFS_PROGRESS_VALUE_MAX      = 100;
@@ -352,7 +356,8 @@ var
   Crap,
   ProcessId,
   TokenHwnd: THandle;
-  MkisofsProgressValue: Double;
+  MkisofsProgressValue,
+  MkisofsPreviousProgressValue: Double;
   PreviousState,
   NewState: TTokenPrivileges;
   ReturnLength,
@@ -365,63 +370,73 @@ begin
   // Setting the real address to lookup...
   Address := GetMakeImageProcessAddress;
 
-  // Getting the value !
-  if OpenProcessToken(GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, TokenHwnd) then
+  if Address <> 0 then
   begin
+    // Getting the value !
+    MkisofsPreviousProgressValue := 0;
+    if OpenProcessToken(GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, TokenHwnd) then
+    begin
 
-    try
+      try
 
-      // Initializing...
-      if not LookupPrivilegeValue(nil, SE_DEBUG_NAME, NewState.Privileges[0].Luid) then
-        RaiseLastOSError
-      else
-      begin
-        PreviousState := NewState;
-        NewState.PrivilegeCount := 1;
-        NewState.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
-        ReturnLength := 0;
-        if not AdjustTokenPrivileges(TokenHwnd, False, NewState, SizeOf(PreviousState), PreviousState, ReturnLength) then
-          RaiseLastOSError;
-      end;
-
-      // Getting the mkisofs Process Id
-      ProcessId := INVALID_HANDLE_VALUE;
-      while ProcessId = INVALID_HANDLE_VALUE do
-      begin
-        ProcessId := GetProcessIdByName(SFILE_MKISOFS);
-      end;
-
-      // Reading the mkisofs progress percentage
-      ProcessHwnd := OpenProcess(PROCESS_VM_READ or PROCESS_VM_OPERATION, False, ProcessId);
-      while (ProcessHwnd <> 0) and (ProcessId <> INVALID_HANDLE_VALUE) do
-      begin
-        try
-          ReadProcessMemory(ProcessHwnd, Ptr(Address),
-            @MkisofsProgressValue, SizeOf(MkisofsProgressValue), Crap);
-{$IFDEF DEBUG}
-          WriteLn(Format('%2.2f', [MkisofsProgressValue]));
-{$ENDIF}
-          // Updating on-screen ProgressBar
-          UpdateProgressBar(MkisofsProgressValue);
-        finally
-          CloseHandle(ProcessHwnd);
+        // Initializing...
+        if not LookupPrivilegeValue(nil, SE_DEBUG_NAME, NewState.Privileges[0].Luid) then
+          RaiseLastOSError
+        else
+        begin
+          PreviousState := NewState;
+          NewState.PrivilegeCount := 1;
+          NewState.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
+          ReturnLength := 0;
+          if not AdjustTokenPrivileges(TokenHwnd, False, NewState, SizeOf(PreviousState), PreviousState, ReturnLength) then
+            RaiseLastOSError;
         end;
-        ProcessId := GetProcessIdByName(SFILE_MKISOFS);
-        ProcessHwnd := OpenProcess(PROCESS_VM_READ, False, ProcessId);
+
+        // Getting the mkisofs Process Id
+        ProcessId := INVALID_HANDLE_VALUE;
+        while ProcessId = INVALID_HANDLE_VALUE do
+        begin
+          ProcessId := GetProcessIdByName(SFILE_MKISOFS);
+        end;
+
+        // Reading the mkisofs progress percentage
+        ProcessHwnd := OpenProcess(PROCESS_VM_READ or PROCESS_VM_OPERATION, False, ProcessId);
+        while (ProcessHwnd <> 0) and (ProcessId <> INVALID_HANDLE_VALUE) do
+        begin
+          try
+            ReadProcessMemory(ProcessHwnd, Ptr(Address),
+              @MkisofsProgressValue, SizeOf(MkisofsProgressValue), Crap);
+
+            if MkisofsProgressValue <> MkisofsPreviousProgressValue then
+            begin            
+              // Updating on-screen ProgressBar
+              UpdateProgressBar(MkisofsProgressValue);
+              MkisofsPreviousProgressValue := MkisofsProgressValue;
+{$IFDEF DEBUG}
+              WriteLn(Format('%2.2f', [MkisofsProgressValue]));
+{$ENDIF}              
+            end;
+            
+          finally
+            CloseHandle(ProcessHwnd);
+          end;
+          ProcessId := GetProcessIdByName(SFILE_MKISOFS);
+          ProcessHwnd := OpenProcess(PROCESS_VM_READ, False, ProcessId);
+        end;
+
+      finally
+        CloseHandle(TokenHwnd);
       end;
 
-    finally
-      CloseHandle(TokenHwnd);
     end;
 
-  end;
-
-  // Finalizing ProgressBar...
-  FinalizeProgressBar;
-
+    // Finalizing ProgressBar...
+    FinalizeProgressBar;
 {$IFDEF DEBUG}
-  WriteLn('MKISOFS Progress Done!');
+    WriteLn('MKISOFS Progress Done!');
 {$ENDIF}
+
+  end;
 end;
 
 procedure TMakeImageWatcherThread.FinalizeProgressBar;
@@ -435,34 +450,81 @@ begin
 end;
 
 function TMakeImageWatcherThread.GetMakeImageProcessAddress: LongWord;
+var
+  WindowsVersion: TWindowsVersion;
+
 begin
-  Result := MKISOFS_PROGRESS_ADDRESS_XP_32;
+  Result := 0;
+  WindowsVersion := GetWindowsVersion;
+
   if IsWindows64 then
     // 64-bit
-    case GetWindowsVersion of
+    case WindowsVersion of
+      // Windows XP x64
       wvWinXP64:
         Result := MKISOFS_PROGRESS_ADDRESS_XP_64;
+      wvWin2003:
+        Result := MKISOFS_PROGRESS_ADDRESS_XP_64;
+      wvWin2003R2:
+        Result := MKISOFS_PROGRESS_ADDRESS_XP_64;
+
+      // Windows Vista x64
+      wvWinVista:
+        Result := MKISOFS_PROGRESS_ADDRESS_VT_64;
+      wvWinServer2008:
+        Result := MKISOFS_PROGRESS_ADDRESS_VT_64;
+
+      // Windows 7 x64
       wvWin7:
         Result := MKISOFS_PROGRESS_ADDRESS_W7_64;
+      wvWinServer2008R2:
+        Result := MKISOFS_PROGRESS_ADDRESS_W7_64;        
+
+      // Windows 8 x64
       wvWin8:
         Result := MKISOFS_PROGRESS_ADDRESS_W8_64;
       wvWin81:
         Result := MKISOFS_PROGRESS_ADDRESS_W8_64;
       wvwin81RT:
         Result := MKISOFS_PROGRESS_ADDRESS_W8_64; // I hope it's the same as regular Win8...
+      wvWinServer2012:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_64;
+      wvWinServer2012R2:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_64;
     end
   else
     // 32-bit
-    case GetWindowsVersion of
+    case WindowsVersion of
+      // Windows XP
       wvWinXP:
         Result := MKISOFS_PROGRESS_ADDRESS_XP_32;
+      wvWin2003:
+        Result := MKISOFS_PROGRESS_ADDRESS_XP_32;
+      wvWin2003R2:
+        Result := MKISOFS_PROGRESS_ADDRESS_XP_32;
+
+      // Windows Vista
+      wvWinVista:
+        Result := MKISOFS_PROGRESS_ADDRESS_VT_32;
+      wvWinServer2008:
+        Result := MKISOFS_PROGRESS_ADDRESS_VT_32;
+
+      // Windows 7
       wvWin7:
         Result := MKISOFS_PROGRESS_ADDRESS_W7_32;
+      wvWinServer2008R2:
+        Result := MKISOFS_PROGRESS_ADDRESS_W7_32;
+
+      // Windows 8
       wvWin8:
         Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
       wvWin81:
         Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
       wvWin81RT:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
+      wvWinServer2012:
+        Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
+      wvWinServer2012R2:
         Result := MKISOFS_PROGRESS_ADDRESS_W8_32;
     end;
 end;
@@ -863,7 +925,7 @@ begin
       end;
 
       // Return an exception if the specified drive isn't created by Daemon Tools
-      if Result = '' then
+      if (Result = '') and (not Terminated) then
         raise EDaemonToolsDriveInvalid.CreateFmt('Sorry, but the drive %s: ' +
           'seems to be invalid for using with Deamon Tools.', [Settings.VirtualDrive.Drive]);
     end;
