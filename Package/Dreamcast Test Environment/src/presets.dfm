@@ -158,16 +158,6 @@ object frmPresets: TfrmPresets
     TabOrder = 4
     OnClick = btnCloseClick
   end
-  object svdOutputFileName: TJvSaveDialog
-    DefaultExt = 'nrg'
-    Filter = 'Nero Burning Rom Images (*.nrg)|*.nrg|All Files (*.*)|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Title = 'Save the Output FileName to:'
-    Height = 412
-    Width = 563
-    Left = 456
-    Top = 152
-  end
   object bfdSourceDirectory: TJvBrowseForFolderDialog
     Options = [odOnlyDirectory, odStatusAvailable, odNewDialogStyle]
     Title = 
@@ -175,5 +165,13 @@ object frmPresets: TfrmPresets
       'mage:'
     Left = 456
     Top = 112
+  end
+  object svdOutputFileName: TSaveDialog
+    DefaultExt = 'nrg'
+    Filter = 'Nero Burning Rom Images (*.nrg)|*.nrg|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Title = 'Save the output file to...'
+    Left = 456
+    Top = 152
   end
 end

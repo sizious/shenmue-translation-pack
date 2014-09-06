@@ -26,8 +26,8 @@ type
     btnDel: TButton;
     bvlMain: TBevel;
     btnClose: TButton;
-    svdOutputFileName: TJvSaveDialog;
     bfdSourceDirectory: TJvBrowseForFolderDialog;
+    svdOutputFileName: TSaveDialog;
     procedure FormShow(Sender: TObject);
     procedure lbxPresetsClick(Sender: TObject);
     procedure btnDelClick(Sender: TObject);
@@ -55,6 +55,7 @@ type
   public
     { Déclarations publiques }
     procedure Clear;
+    function MsgBox(Text, Caption: string; Flags: Integer): Integer;
   end;
 
 var
@@ -88,12 +89,22 @@ begin
 end;
 
 procedure TfrmPresets.btnDelClick(Sender: TObject);
+var
+  CanDo: Integer;
+
 begin
   if SelectedItemIndex <> -1 then
   begin
-    DreamcastImageMaker.Presets.Delete(SelectedItemIndex);
-    lbxPresets.Items.Delete(SelectedItemIndex);
-    Clear;
+    CanDo := MsgBox(
+      'Are you sure to delete the selected preset ?',
+      'Warning',
+      MB_ICONWARNING + MB_YESNO + MB_DEFBUTTON2);
+    if CanDo = IDYES then
+    begin
+      DreamcastImageMaker.Presets.Delete(SelectedItemIndex);
+      lbxPresets.Items.Delete(SelectedItemIndex);
+      Clear;
+    end;
   end;
 end;
 
@@ -234,6 +245,11 @@ begin
     edtOutputFileName.Text := Item.OutputFileName;
     edtSourceDirectory.Text := Item.SourceDirectory;
   end;
+end;
+
+function TfrmPresets.MsgBox(Text, Caption: string; Flags: Integer): Integer;
+begin
+  Result := MessageBoxA(Handle, PChar(Text), PChar(Caption), Flags);
 end;
 
 procedure TfrmPresets.SetSelectedItemIndex(const Value: Integer);

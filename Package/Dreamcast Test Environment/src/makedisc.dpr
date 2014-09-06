@@ -22,7 +22,8 @@ uses
   config in 'config.pas',
   settings in 'settings.pas' {frmSettings},
   appver in '..\..\..\Common\appver.pas',
-  about in '..\..\..\Common\About\about.pas' {frmAbout};
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  bugsmgr in '..\..\..\Common\BugsMan\bugsmgr.pas' {frmBugsHandler};
 
 {$R *.res}
 

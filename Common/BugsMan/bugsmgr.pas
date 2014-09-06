@@ -17,10 +17,14 @@ type
     procedure SetExceptionCallBack(const Value: TExceptionCallBack);
     procedure SetQuitRequest(const Value: TNotifyEvent);
     procedure SetSaveLogRequest(const Value: TNotifyEvent);
+    function GetLogSaveFeature: Boolean;
+    procedure SetLogSaveFeature(const Value: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
     procedure Execute(Sender: TObject; E: Exception);
+    property LogSaveFeature: Boolean
+      read GetLogSaveFeature write SetLogSaveFeature;
     property OnExceptionCallBack: TExceptionCallBack read
       fExceptionCallBack write SetExceptionCallBack;
     property OnSaveLogRequest: TNotifyEvent read fSaveLogRequest
@@ -194,6 +198,13 @@ end;
 
 //------------------------------------------------------------------------------
 
+function TBugsHandlerInterface.GetLogSaveFeature: Boolean;
+begin
+  Result := frmBugsHandler.bSaveDebugLog.Enabled;
+end;
+
+//------------------------------------------------------------------------------
+
 procedure TBugsHandlerInterface.SetExceptionCallBack(
   const Value: TExceptionCallBack);
 begin
@@ -201,7 +212,14 @@ begin
   if Assigned(OnExceptionCallBack) then
     frmBugsHandler.OnExceptionCallBack := OnExceptionCallBack;
 end;
- 
+
+//------------------------------------------------------------------------------
+
+procedure TBugsHandlerInterface.SetLogSaveFeature(const Value: Boolean);
+begin
+  frmBugsHandler.bSaveDebugLog.Enabled := Value;
+end;
+
 //------------------------------------------------------------------------------
 
 procedure TBugsHandlerInterface.SetQuitRequest(const Value: TNotifyEvent);

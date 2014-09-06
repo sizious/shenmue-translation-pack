@@ -148,13 +148,18 @@ object frmMain: TfrmMain
       TabOrder = 1
     end
   end
-  object Button1: TButton
+  object btnAbout: TButton
     Left = 8
     Top = 247
     Width = 98
     Height = 25
     Caption = 'A&bout...'
     TabOrder = 6
-    OnClick = Button1Click
+    OnClick = btnAboutClick
+  end
+  object aeMain: TApplicationEvents
+    OnException = aeMainException
+    Left = 116
+    Top = 240
   end
 end
