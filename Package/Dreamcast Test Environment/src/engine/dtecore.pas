@@ -974,7 +974,7 @@ begin
       '-hidden %s -hidden %s -l -o "%s" "%s"', [
       SFILE_MKISOFS,
       Preset.VolumeName,
-      SFILE_BOOTSTRAP_HACKED,
+      IncludeTrailingPathDelimiter(Preset.SourceDirectory) + SFILE_BOOTSTRAP_HACKED,
       fData1FileName,
       SFILE_WMINF,
       SFILE_WMICO,
