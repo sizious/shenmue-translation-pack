@@ -539,7 +539,12 @@ var
   ProgressValue: Integer;
 
 begin
-  ProgressValue := Ceil(Value);
+  try
+    ProgressValue := Ceil(Value);
+  except
+    ProgressValue := 0;
+  end;
+  
   if (ProgressValue > 1) then
   begin
     // For the ProgressBegin event
@@ -572,7 +577,7 @@ begin
         Command := Format('"%s" %s: /M:"%s"', [Settings.VirtualDrive.FileName,
           VirtualDriveID, Preset.OutputFileName]);
       vdkDaemonTools:
-        Command := Format('"%s" -mount %s,"%s"', [Settings.VirtualDrive.FileName,
+        Command := Format('"%s" -mount scsi, %s,"%s"', [Settings.VirtualDrive.FileName,
           VirtualDriveID, Preset.OutputFileName]);
     end;
     if Command <> '' then
@@ -805,7 +810,7 @@ begin
     KillFile(NrgHeader);
 
     if not IsInString(NRGHEADER_SUCCESS, OutputBuffer) then
-      raise ENrgHeaderFailed.Create('Sorry, the Nero Header Hacking process failed. Cannot continue.');
+      raise ENrgHeaderFailed.Create('Sorry, the Nero header hacking process failed. Cannot continue.');
   end;
 end;
 
@@ -894,13 +899,13 @@ begin
     // Daemon Tools
     vdkDaemonTools:
     begin
-      // For Deamon Tools, we need to translate the drive letter to the internal ID
+      // For Daemon Tools, we need to translate the drive letter to the internal ID
 
       // Base Letter
-      BaseLetterIndex := Ord('A');
+      BaseLetterIndex := Ord('A'); // could be stored in const but...
 
       // Get Virtual Drives Count
-      Command := Format('"%s" -get_count' + sLineBreak
+      Command := Format('"%s" -get_count scsi' + sLineBreak
         + 'echo %%errorlevel%%', [Settings.VirtualDrive.FileName]);
       OutputBuffer := Copy(RunCommand(Command), 1, 1);
       VirtualDrivesCount := StrToIntDef(OutputBuffer, 0);
@@ -910,7 +915,7 @@ begin
       i := 0;
       while (not Found) and (i < VirtualDrivesCount) do
       begin
-        Command := Format('"%s" -get_letter %d' + sLineBreak
+        Command := Format('"%s" -get_letter scsi, %d' + sLineBreak
           + 'echo %%errorlevel%%', [Settings.VirtualDrive.FileName, i]);
         OutputBuffer := Trim(Left(sLineBreak, RunCommand(Command)));
         VirtualDriveIndex := StrToIntDef(OutputBuffer, -1); // drive letter as number
@@ -926,8 +931,8 @@ begin
 
       // Return an exception if the specified drive isn't created by Daemon Tools
       if (Result = '') and (not Terminated) then
-        raise EDaemonToolsDriveInvalid.CreateFmt('Sorry, but the drive %s: ' +
-          'seems to be invalid for using with Deamon Tools.', [Settings.VirtualDrive.Drive]);
+        raise EDaemonToolsDriveInvalid.CreateFmt('Sorry, but the %s: drive ' +
+          'doesn''t seems to be a valid SCSI Daemon Tools virtual drive.', [Settings.VirtualDrive.Drive]);
     end;
   end;
 end;
@@ -1075,7 +1080,7 @@ begin
         Command := Format('"%s" %s: /U', [Settings.VirtualDrive.FileName,
           VirtualDriveID]);
       vdkDaemonTools:
-        Command := Format('"%s" -unmount %s', [Settings.VirtualDrive.FileName,
+        Command := Format('"%s" -unmount scsi, %s', [Settings.VirtualDrive.FileName,
           VirtualDriveID]);
     end;
     if Command <> '' then
