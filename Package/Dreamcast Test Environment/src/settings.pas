@@ -39,6 +39,7 @@ type
     cbxEmulatorAutoStart: TCheckBox;
     cbxEmulatorShowConsole: TCheckBox;
     Label3: TLabel;
+    Label5: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure rdVDNoneClick(Sender: TObject);

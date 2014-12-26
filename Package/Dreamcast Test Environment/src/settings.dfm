@@ -41,7 +41,7 @@ object frmSettings: TfrmSettings
       ImageIndex = 1
       object Label1: TLabel
         Left = 33
-        Top = 188
+        Top = 156
         Width = 455
         Height = 26
         Caption = 
@@ -58,7 +58,7 @@ object frmSettings: TfrmSettings
       end
       object Image1: TImage
         Left = 8
-        Top = 188
+        Top = 156
         Width = 16
         Height = 16
         Picture.Data = {
@@ -99,6 +99,22 @@ object frmSettings: TfrmSettings
           00000000F00F0000C00300008001000080010000000000000000000000000000
           00000000000000000000000000000000000000008001000080010000C0030000
           F00F0000}
+      end
+      object Label5: TLabel
+        Left = 33
+        Top = 188
+        Width = 455
+        Height = 39
+        Caption = 
+          'If you want to use Daemon Tools, please only use SCSI drives. DT' +
+          ' drives aren'#39't compatible with this tool.'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        WordWrap = True
       end
       object gbxVD: TGroupBox
         Left = 8

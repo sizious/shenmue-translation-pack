@@ -89,6 +89,7 @@ object frmMain: TfrmMain
       Width = 277
       Height = 103
       ItemHeight = 13
+      Sorted = True
       TabOrder = 0
       OnClick = lbxPresetsClick
     end
@@ -160,6 +161,30 @@ object frmMain: TfrmMain
   object aeMain: TApplicationEvents
     OnException = aeMainException
     Left = 116
+    Top = 240
+  end
+  object pmTrayIcon: TPopupMenu
+    Left = 180
+    Top = 240
+    object miOpen: TMenuItem
+      Caption = '&Open'
+      Default = True
+      OnClick = miOpenClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object miQuit: TMenuItem
+      Caption = 'Quit'
+      OnClick = miQuitClick
+    end
+  end
+  object tiTrayIcon: TJvTrayIcon
+    Active = True
+    IconIndex = 0
+    PopupMenu = pmTrayIcon
+    OnDblClick = tiTrayIconDblClick
+    Left = 148
     Top = 240
   end
 end

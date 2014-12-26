@@ -1,0 +1,26 @@
+                         Shenmue Font Utility
+              ______ __                                  
+             |      |  |--.---.-.-----.-----.-----.-----.
+             |   ---|     |  _  |     |  _  |  -__|__ --|
+             |______|__|__|___._|__|__|___  |_____|_____|
+                                      |_____| What's new?
+___                           __________________________________________________
+___| Version 2.0: 2014-12-26 |__________________________________________________
+    
+  The tool was COMPLETELY rewritten in Delphi.
+
+  Major features include:
+   * Presets: You can manage many profiles (i.e. 1 for each disc).
+   * Auto-mount: After the generation, images are mounted automatically.
+   * Emulation: If you enable the auto-mount option, the nullDC emulator can be
+                started.
+   * Tray icon: If you minimize the window, the program is hidden and put in the
+                tray icon (next to the timer shown in your taskbar).
+   
+  This tool was beta tested by many user through the official Facebook group,
+  that's why it isn't labeled as *beta* anymore. If bugs are found, the tool'll
+  be updated.
+___                           __________________________________________________
+___| Version 1.0: 2009-11-20 |__________________________________________________
+    
+- First release.

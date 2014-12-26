@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, BugsMgr, DTECore, AppEvnts;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, BugsMgr, DTECore, AppEvnts,
+  JvComponentBase, Menus, JvTrayIcon;
 
 type
   TfrmMain = class(TForm)
@@ -26,6 +27,11 @@ type
     pbrTotal: TProgressBar;
     btnAbout: TButton;
     aeMain: TApplicationEvents;
+    pmTrayIcon: TPopupMenu;
+    miOpen: TMenuItem;
+    N1: TMenuItem;
+    miQuit: TMenuItem;
+    tiTrayIcon: TJvTrayIcon;
     procedure FormCreate(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
     procedure btnPresetsClick(Sender: TObject);
@@ -38,6 +44,10 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure btnAboutClick(Sender: TObject);
     procedure aeMainException(Sender: TObject; E: Exception);
+    procedure miOpenClick(Sender: TObject);
+    procedure tiTrayIconDblClick(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure miQuitClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedPresetIndex: Integer;
@@ -175,7 +185,7 @@ begin
       // Check Source Directory existence
       Result := DirectoryExists(Preset.SourceDirectory);
       if not Result then
-        MessagesText.Add('- The Source Directory of the selected preset doesn''t exists.');
+        MessagesText.Add('- The source directory of the selected preset doesn''t exists.');
 
       // Check if the 1ST_READ.BIN is in Source Directory
       Result := FileExists(Preset.SourceDirectory + SFILE_BOOT_BINARY);
@@ -189,11 +199,16 @@ begin
         MessagesText.Add(Format('- The required Dreamcast file, "%s", wasn''t found.', [
         SFILE_BOOTSTRAP]));
 
+      // Check the destination directory, in order to know if we can write on it
+      Result := DirectoryExists(ExtractFilePath(Preset.OutputFileName));
+      if not Result then
+        MessagesText.Add('- The destination directory of the selected preset doesn''t exist.');
+
       // Final result
       Result := MessagesText.Count = 0;
       if not Result then
         MsgBox(Format('%d error(s) was(were) found:%s%s',
-          [MessagesText.Count, WrapStr, MessagesText.Text]),
+          [MessagesText.Count, sLineBreak, MessagesText.Text]),
           'Warning',
           MB_ICONWARNING);
     finally
@@ -367,23 +382,26 @@ begin
   pbrTotal.Max := Integer(High(TMakeImageStatus)) + 1;
   fButtonMakeCaption := btnMake.Caption;
   ChangeQuitControlsState(False);
+  tiTrayIcon.Hint := Caption;
 end;
 
 procedure TfrmMain.lbxPresetsClick(Sender: TObject);
 begin
-  SelectedPresetIndex := lbxPresets.ItemIndex;
+  SelectedPresetIndex := Integer(lbxPresets.Items.Objects[lbxPresets.ItemIndex]);
 end;
 
 procedure TfrmMain.LoadPresets;
 var
-  i: Integer;
+  i: Integer; //, SortedItemIndex
 
 begin
+  lbxPresets.Items.BeginUpdate;
   lbxPresets.Clear;
   for i := 0 to DreamcastImageMaker.Presets.Count - 1 do
   begin
-    lbxPresets.Items.Add(DreamcastImageMaker.Presets[i].Name);
+    lbxPresets.Items.AddObject(DreamcastImageMaker.Presets[i].Name, TObject(i))
   end;
+  lbxPresets.Items.EndUpdate;
   if DreamcastImageMaker.Presets.Count > 0 then
     SelectedPresetIndex := 0
   else
@@ -398,12 +416,13 @@ end;
 
 procedure TfrmMain.ModulesInitialize;
 begin
-  // Init Bugs Handler
+  // Initialize the Bugs Handler
   InitBugsHandler;
 
   // Initialize the components of the engine
   InitializeEngineComponents;
 
+  // Initialize the engine itself
   DreamcastImageMaker := TDreamcastImageMaker.Create;
   with DreamcastImageMaker do
   begin
@@ -424,6 +443,16 @@ begin
   ProgressText := '';
 end;
 
+procedure TfrmMain.miOpenClick(Sender: TObject);
+begin
+  tiTrayIcon.ShowApplication;
+end;
+
+procedure TfrmMain.miQuitClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TfrmMain.SetProgressText(const Value: string);
 var
   S: string;
@@ -442,10 +471,19 @@ begin
   if State then
   begin
     fSelectedPresetIndex := Value;
-    lbxPresets.ItemIndex := fSelectedPresetIndex;
   end
   else
     fSelectedPresetIndex := -1;
+{$IFDEF DEBUG}
+  if fSelectedPresetIndex <> -1 then
+    WriteLn('Selected: ', DreamcastImageMaker.Presets[fSelectedPresetIndex].Name);
+{$ENDIF}
+end;
+
+procedure TfrmMain.tiTrayIconDblClick(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  tiTrayIcon.ShowApplication;
 end;
 
 procedure TfrmMain.UpdateEmulatorControlState;
