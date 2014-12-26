@@ -72,8 +72,11 @@ procedure TfrmPresets.btnAddClick(Sender: TObject);
 const
   NEW_PRESET = '<New Preset>';
 
+var
+  NewIndex: Integer;
+
 begin
-  lbxPresets.Items.Add(NEW_PRESET);
+  NewIndex := lbxPresets.Items.Add(NEW_PRESET);
   with DreamcastImageMaker.Presets.Add do
   begin
     Name := NEW_PRESET;
@@ -81,6 +84,8 @@ begin
     SourceDirectory := GetApplicationDirectory;
     OutputFileName := GetApplicationDirectory + 'shentest.nrg';
   end;
+  lbxPresets.ItemIndex := NewIndex;
+  lbxPresetsClick(Self);
 end;
 
 procedure TfrmPresets.btnCloseClick(Sender: TObject);
@@ -211,12 +216,16 @@ var
   i: Integer;
 
 begin
+  lbxPresets.Items.BeginUpdate;
   lbxPresets.Clear;
   Clear;
   for i := 0 to DreamcastImageMaker.Presets.Count - 1 do
+  begin
     lbxPresets.Items.Add(DreamcastImageMaker.Presets[i].Name);
+  end;
   if lbxPresets.Items.Count > 0 then
     SelectedItemIndex := 0;
+  lbxPresets.Items.EndUpdate;
 end;
 
 function TfrmPresets.GetSelectedItem: TDreamcastImagePresetItem;
@@ -267,6 +276,10 @@ begin
   end
   else
     fSelectedItemIndex := -1;
+{$IFDEF DEBUG}
+  if fSelectedItemIndex <> -1 then
+    WriteLn('Selected: ', DreamcastImageMaker.Presets[fSelectedItemIndex].Name);
+{$ENDIF}
 end;
 
 end.

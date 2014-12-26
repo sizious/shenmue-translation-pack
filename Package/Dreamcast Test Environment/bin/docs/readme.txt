@@ -16,7 +16,7 @@
 									  
 ____________________The Shentrad Team Proudly Presents :________________________
 
-					Shenmue Dreamcast Test Environment                       									  
+	             Shenmue Dreamcast Test Environment	  
       ___                  _      __  _         
      / _ \___ ___ ________(_)__  / /_(_)__  ___ 
 ____/ // / -_|_-</ __/ __/ / _ \/ __/ / _ \/ _ \________________________________
@@ -66,11 +66,18 @@ __/ /_/ (_-</ _ `/ _ `/ -_)_____________________________________________________
   it can't be directly read by nullDC. You must use a Virtual Drive like 
   Alcohol 52%/120% or Daemon Tools and mount the "shentest.nrg" file on it.
   
-  To select the Virtual Drive on nullDC:
+  If you have set the virtual drive settings in the application, the tool
+  can auto-mount the generated image at the end of the process by checking
+  the appropriate option.
+
+  Alternatively, you can manullay select the Virtual Drive on nullDC:
     a. Run nullDC
     b. Select "File" > "Normal Boot"
     c. In the "Select Image File" dialog box, enter "X:\" where "X:" is the
        letter of the Virtual Drive.
+
+  After mounting the image, if the nullDC parameters are set, you can 
+  auto-start the emulation by checking the appropriate box in the main window.
   
   *****************************************************************************
   *           TO GIGABYTE MOTHERBOARD USERS WITH THE DES FEATURE:             * 
@@ -97,11 +104,13 @@ __/ /_/ (_-</ _ `/ _ `/ -_)_____________________________________________________
 ___/ /__/ __/ -_) _  / / __(_-<_________________________________________________
    \___/_/  \__/\_,_/_/\__/___/ III. CREDiTS
                          
- This pack was made by [big_fury]SiZiOUS from the SHENTRAD Team 
- My personal website is http://sbibuilder.shorturl.com/
+ This tool is part of the Shenmue Translation Pack made by the Shentrad Team.
+ Visit us at http://shenmuesubs.sf.net/.
  
- This test environment is based on the Selfboot DATA Pack v1.3 by FamilyGuy.
- Thanks to FamilyGuy, Xzyx987X, ECHELON, M$, Neoblast, Indiket, DarkFalz and 
- jj1odm.     
+ This test environment is based on the Selfboot Data/Data Pack v1.4 by 
+ FamilyGuy. All credits goes to FamilyGuy, Xzyx987X, ECHELON, M$, Neoblast, 
+ Indiket, DarkFalz and jj1odm for this nice and very fast image generation 
+ method.
 
+ FYI, my personal website is http://www.sizious.com/.
 _________________________________________________________________________/EOF/__

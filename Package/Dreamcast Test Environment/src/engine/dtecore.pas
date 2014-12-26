@@ -657,17 +657,25 @@ procedure TCoreProcessThread.DoHandleException;
 begin
   // Cancel the mouse capture
   if GetCapture <> 0 then
+  begin
     SendMessage(GetCapture, WM_CANCELMODE, 0, 0);
+  end;
     
   // Now actually show the exception
   if fException is Exception then
-    Application.ShowException(fException)
+  begin
+    Application.ShowException(fException);
+  end
   else
+  begin
     SysUtils.ShowException(fException, nil);
+  end;
 
   // Notifying the parent of the process is aborted.
   if Assigned(Owner.OnAbort) then
+  begin
     Owner.OnAbort(Owner);
+  end;
 end;
 
 procedure TCoreProcessThread.Execute;
