@@ -13,37 +13,33 @@
             /          \   /      //    //    //    _/    //
             \_________./__/      //____//___./\_________.//
                                       |  S H E N T R A D  |
- __                            ________________________________________________
- __| SHENMUE TRANSLATION PACK |________________________________________________
+___                            _________________________________________________
+___| SHENMUE TRANSLATION PACK |_________________________________________________
  
  Shenmue Translation pack is a set of tools created in order to translate the
  Shenmue game series in your own language.
   
- Games supported are :
+ Games supported are:
  - What's Shenmue (DC)
  - Shenmue (DC)
- - Shenmue 2 (DC)
- - Shenmue 2X (XBOX)
- __                      ______________________________________________________
- __| PACKAGiNG CONTENTS |______________________________________________________
+ - Shenmue 2 (DC/XBOX)
+___                      _______________________________________________________
+___| PACKAGiNG CONTENTS |_______________________________________________________
  
  Currently this pack contains a bunch of various tools :       
 
  * ADPCM Streaming Toolkit
    This toolkit was made to decode the Yamaha AICA ADPCM (.STR) to the RIFF 
    WAVE (.WAV) audio format. It isn't a required tool, but it can be useful to 
-   help the translation process.
+   help the translation process. Please note the AHX/ADX format is used too,
+   in that case you'll need the CRI SDK.
    
  * AFS Utils
    This tool allows opening, creating and editing AFS packages.
    
- * AiO Cinematics Subtitles Editor
+ * Cinematics Subtitles Editor
    This tool is the subtitles editor for SRF files which can be found in AFS
-   packages.
-   
- * AiO Free Quest Subtitles Editor
-   This tool is the subtitles editor for PAKS files inside the HUMANS.AFS
-   package.
+   packages. This format is used almost for cut scenes.  
 
  * Dreamcast Test Environment
    This tool was made to generate a Nero Burning Rom test image in order to 
@@ -53,6 +49,10 @@
  * Font Utility
    This additional tool was made to edit the in-game fonts (for the menus, 
    subtitles, etc.).
+
+ * Free Quest Subtitles Editor
+   This tool is the subtitles editor for PAKS files inside the HUMANS.AFS
+   package. This format is used almost for dialogues with NPC.
 
  * IDX Creator
    This stuff allows to re-create correct IDX files corresponding to each AFS.
@@ -67,19 +67,25 @@
  * Notebook Editor
    This editor is used to modify the in-game Notebook.
   
- * Nozomi Motorcycle Subtitles Editor
-   This special editor was made to translate the "Nozomi and the Motorcycle"
-   sequence at the end of the Shenmue DISC3. The subtitle format of this 
-   sequence was only found in this sequence.
+ * Release Maker
+   This program can create patchs release when you finish your translation
+   project.
+
+ * Sections Explorer
+   This tool was made to do deep analysis on various Shenmue data files.
    
  * SPR Utils
    This's an editor for SPR files.
+   
+ * System Talk Subtitles Editor   
+   This special subtitles editor was made in order to edit 'system subtitles'
+   like the dialog shown when it's time to go for sleep in the game.
 
  * VMU Screen Editor
    This tiny tool allow you to edit the LCD screen of the VMU, in order to 
    translate some actions (for example "Saving"...).
- __                  __________________________________________________________
- __| HOW TO COMPiLE |__________________________________________________________
+___                  ___________________________________________________________
+___| HOW TO COMPiLE |___________________________________________________________
  
  All tools were developed with the CodeGear Delphi RAD Studio 2007 IDE.
  
@@ -105,12 +111,12 @@
  * PNG Image
    http://?
    Please use the fixed version available in "/Tools/Libs/".
- __           _________________________________________________________________
- __| CREDiTS |_________________________________________________________________
+___           __________________________________________________________________
+___| CREDiTS |__________________________________________________________________
   
   Founder / Coder................: Manic
-  Coder / Additional tools.......: [big_fury]SiZiOUS (sbibuilder.shorturl.com)
+  Coder / Additional tools.......: [big_fury]SiZiOUS (www.sizious.com)
   Alpha/Beta test................: Shendream, Sadako, Hiei-, Kogami-san, ...
   Thanks flying to...............: To everyone supporting us.       
   URL............................: http://shenmuesubs.sourceforge.net/     
- _____________________________________________________________________[ EOF ]___
+______________________________________________________________________[ EOF ]____
