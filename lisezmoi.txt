@@ -13,8 +13,8 @@
             /          \   /      //    //    //    _/    //
             \_________./__/      //____//___./\_________.//
                                       |  S H E N T R A D  |
- __                            ________________________________________________
- __| SHENMUE TRANSLATION PACK |________________________________________________
+___                            _________________________________________________
+___| SHENMUE TRANSLATION PACK |_________________________________________________
  
  Shenmue Translation Pack est un ensemble d'outils permettant de traduire la 
  série des jeux Shenmue dans la langue de votre choix.
@@ -22,38 +22,39 @@
  Les jeux actuellement supportés sont :
  - What's Shenmue (DC)
  - Shenmue (DC)
- - Shenmue 2 (DC)
- - Shenmue 2X (XBOX)
- __                   _________________________________________________________
- __| CONTENU DU PACK |_________________________________________________________
+ - Shenmue II (DC/XBOX)
+___                   __________________________________________________________
+___| CONTENU DU PACK |__________________________________________________________
  
- Actuellement ce pack contient un panel d'outils divers et variés:
- 
+ Actuellement ce pack contient un panel d'outils divers et variés :
+
  * ADPCM Streaming Toolkit
    Cette boîte à outil est un bonus non nécessaire à la traduction du jeu,
    cependant, sa fonction peut être d'une grande aide. Elle permet de convertir
    le format audio Yamaha AICA ADPCM (.STR) vers le format RIFF WAVE (.WAV), 
-   ceci pour écouter les dialogues du jeu.
+   ceci pour écouter les dialogues du jeu. A noter que certains dialogues sont
+   au format AHX/ADX, dans ce cas le SDK de CRI est nécessaire.   
    
  * AFS Utils
    Cet outil permet l'ouverture, la création et l'édition des archives AFS.
    
- * AiO Cinematics Subtitles Editor
+ * Cinematics Subtitles Editor
    Il s'agit de l'éditeur des sous-titres proprement dit. Cet éditeur est pour
-   les sous-titres au format SRF, présent dans les archives AFS.
-   
- * AiO Free Quest Subtitles Editor
-   Cet éditeur est un éditeur de sous-titres dédié aux fichiers PAKS présent
-   dans l'archive HUMANS.AFS.
+   les sous-titres au format SRF, présent dans les archives AFS, utilisés 
+   notamment dans les cinématiques.
    
  * Dreamcast Test Environment
-   Cet outil permet de créer une image Nero Burning Rom de test prête à être 
-   lancée dans nullDC, via un lecteur virtuel.
+   Cet outil permet de rapidement créer une image Nero Burning Rom (.NRG) de 
+   test prête à être lancée dans nullDC, via un lecteur virtuel.
    
  * Font Utility
    Cet outil additionel a été créé afin de modifier les polices utilisées par
    le jeu (dans les menus, les sous-titres, etc.).
-
+   
+ * Free Quest Subtitles Editor
+   Cet éditeur est un éditeur de sous-titres dédié aux fichiers PAKS présent
+   dans l'archive HUMANS.AFS, utilisé notamment dans les dialogues avec les PNJ.
+   
  * IDX Creator
    IDX Creator permet de recréer les fichiers IDX qui vont de paire avec les
    fichiers AFS contenant les SRF traduits.
@@ -67,22 +68,28 @@
    certains sprites.
 
  * Notebook Editor
-   Ce programme permet de modifier le carnet utilisé dans le jeu.
-      
- * Nozomi Motorcycle Subtitles Editor
-   Cet éditeur est un éditeur spécial pour la cinématique "Nozomi and the 
-   Motorcycle" qui se lance à la fin du disque 3. Cette séquence est spéciale
-   car le format de sous-titres utilisé est très différent de tout le reste.
+   Ce programme permet de modifier le carnet utilisé dans le jeu.     
 
+ * Release Maker
+   C'est un outil permettant de créer des distributions de patchs.
+
+ * Sections Explorer
+   Ceci permet d'analyser d'une façon plus générique les fichiers Shenmue.   
+ 
  * SPR Utils
    Cet outil est un éditeur de sprites au format SPR.
+ 
+ * System Talk Subtitles Editor
+   Ce programme permet de traduire les sous-titres des dialogues système.
+   Il s'agit de dialogues lancés automatiquement par exemple lorsqu'il est
+   l'heure de se coucher dans le jeu.
  
  * VMU Screen Editor
    Ce petit éditeur permet de modifier les écrans affichés par le VMU de la 
    Dreamcast, dans le but de traduire certaines actions (comme par exemple 
    "Saving...").
- __                    ________________________________________________________
- __| COMMENT COMPiLER |________________________________________________________
+___                    _________________________________________________________
+___| COMMENT COMPiLER |_________________________________________________________
   
  Les outils ont entièrement été développés sous l'environnement CodeGear 
  Delphi RAD Studio 2007.
@@ -91,7 +98,7 @@
  
  Ouvrez le fichier situé à la racine "srcpack.groupproj" dans Delphi 2007.
  
- Composants additionnels requis pour la compilation:
+ Composants additionnels requis pour la compilation :
 
  * DCL
    http://sourceforge.net/projects/dclx/
@@ -109,12 +116,12 @@
  * PNG Image
    http://?
    Veuillez utiliser la version fixée disponible dans "/Tools/Libs/".
- __           _________________________________________________________________
- __| CREDiTS |_________________________________________________________________
+___           __________________________________________________________________
+___| CREDiTS |__________________________________________________________________
   
   Initiateur / Codeur............: Manic
-  Codeur / Outils additionnels...: [big_fury]SiZiOUS (sbibuilder.shorturl.com)
+  Codeur / Outils additionnels...: [big_fury]SiZiOUS (www.sizious.com)
   Alpha/Beta test................: Shendream, Sadako, Hiei-, Kogami-san, ...
   Merci..........................: A tous les membres qui nous suivent.  
   URL............................: http://shenmuesubs.sourceforge.net/
- _____________________________________________________________________[ EOF ]___
+______________________________________________________________________[ EOF ]___
