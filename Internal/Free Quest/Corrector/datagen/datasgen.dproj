@@ -34,36 +34,6 @@
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters><Parameters Name="RunParams">.\ *.* output.xml 1 dc_jap_wh</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">False</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1036</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Created by [big_fury]SiZiOUS</VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">datasgen.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -73,12 +43,18 @@
     <DelphiCompile Include="datasgen.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\..\src\engine\charscnt.pas" />
-    <DCCReference Include="..\..\..\src\engine\charslst.pas" />
-    <DCCReference Include="..\..\..\src\engine\common.pas" />
-    <DCCReference Include="..\..\..\src\engine\fileslst.pas" />
-    <DCCReference Include="..\..\..\src\engine\npc\npcinfo.pas" />
-    <DCCReference Include="..\..\..\src\engine\scnfedit.pas" />
-    <DCCReference Include="..\..\..\src\engine\scnfutil.pas" />
+    <RcCompile Include="lzmabin.rc">
+      <Form>lzmabin.res</Form>
+    </RcCompile>
+    <DCCReference Include="..\..\..\..\Common\hashidx.pas" />
+    <DCCReference Include="..\..\..\..\Common\lzmadec.pas" />
+    <DCCReference Include="..\..\..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\charscnt.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\charslst.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\common.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\npc\npcinfo.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\scnfedit.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\scnfutil.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\srfnpcdb.pas" />
   </ItemGroup>
 </Project>
