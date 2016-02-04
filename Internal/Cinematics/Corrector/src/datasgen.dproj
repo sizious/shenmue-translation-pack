@@ -35,20 +35,6 @@
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">datasgen.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -58,12 +44,18 @@
     <DelphiCompile Include="datasgen.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas" />
+    <RcCompile Include="lzmabin.rc">
+      <Form>lzmabin.res</Form>
+    </RcCompile>
     <DCCReference Include="..\..\..\..\Common\filespec.pas" />
     <DCCReference Include="..\..\..\..\Common\hashidx.pas" />
+    <DCCReference Include="..\..\..\..\Common\lzmadec.pas" />
     <DCCReference Include="..\..\..\..\Common\MD5\MD5Api.pas" />
     <DCCReference Include="..\..\..\..\Common\MD5\MD5Core.pas" />
     <DCCReference Include="..\..\..\..\Common\SubsUtil\chrcodec.pas" />
     <DCCReference Include="..\..\..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\..\Common\workdir.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfedit.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfkeydb.pas" />
   </ItemGroup>
 </Project>

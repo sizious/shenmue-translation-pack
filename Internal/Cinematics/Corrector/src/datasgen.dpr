@@ -4,6 +4,10 @@ program datasgen;
 
 // Don't forget to undef DEBUG_SCNFEDITOR in scnfedit.pas
 
+
+
+{$R 'lzmabin.res' 'lzmabin.rc'}
+
 uses
   Windows,
   SysUtils,
@@ -12,13 +16,16 @@ uses
   MSXMLDom,
   XMLDoc,
   ActiveX,
-  srfedit in '..\..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas',
   systools in '..\..\..\..\Common\systools.pas',
   chrcodec in '..\..\..\..\Common\SubsUtil\chrcodec.pas',
   hashidx in '..\..\..\..\Common\hashidx.pas',
   MD5Api in '..\..\..\..\Common\MD5\MD5Api.pas',
   MD5Core in '..\..\..\..\Common\MD5\MD5Core.pas',
-  filespec in '..\..\..\..\Common\filespec.pas';
+  filespec in '..\..\..\..\Common\filespec.pas',
+  srfkeydb in '..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfkeydb.pas',
+  workdir in '..\..\..\..\Common\workdir.pas',
+  lzmadec in '..\..\..\..\Common\lzmadec.pas',
+  srfedit in '..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfedit.pas';
 
 const
   OUTPUT_FILE_EXT = '.dbi';
@@ -36,7 +43,7 @@ var
   FileNamesRootNode,
   ContainerDiscsRootNode: IXMLNode;
 
-  GameVersion: TSRFGameVersion;
+  GameVersion: TGameVersion;
   Region: TGameRegion;
   PlatformVersion: TPlatformVersion;
 
@@ -128,13 +135,13 @@ procedure InitParameters;
   procedure DetermineGameInformation(Param: string);
   begin
     // game version
-    GameVersion := sgvUndef;
+    GameVersion := gvUndef;
     if IsInString('s1', param) then
-      GameVersion := sgvShenmue
+      GameVersion := gvShenmue
     else if IsInString('whats', param) then
-      GameVersion := sgvUndef // incorrect..
+      GameVersion := gvUndef // incorrect..
     else if IsInString('s2', param) then
-      GameVersion := sgvShenmue2;
+      GameVersion := gvShenmue2;
 
     // game region
     Region := prUndef;
@@ -199,7 +206,7 @@ begin
 
     HeaderNode := DBI_XMLDoc.DocumentElement.AddChild('HeaderInfo');
     Node := HeaderNode.AddChild('Version');
-    Node.NodeValue := SRFGameVersionToCodeString(GameVersion);
+    Node.NodeValue := GameVersionToCodeString(GameVersion);
     Node := HeaderNode.AddChild('Region');
     Node.NodeValue := GameRegionToCodeString(Region);
     Node := HeaderNode.AddChild('System');
@@ -272,7 +279,7 @@ begin
       // adding the file info
       InfoNode := TCD_XMLDoc.DocumentElement.AddChild('HeaderInfo');
       Node := InfoNode.AddChild('Version');
-      Node.NodeValue := SRFGameVersionToCodeString(GameVersion);
+      Node.NodeValue := GameVersionToCodeString(GameVersion);
       Node := InfoNode.AddChild('Region');
       Node.NodeValue := GameRegionToCodeString(Region);
       Node := InfoNode.AddChild('System');
