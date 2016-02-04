@@ -4,6 +4,8 @@ program datasgen;
 
 // Don't forget to undef DEBUG_SCNFEDITOR in scnfedit.pas
 
+{$R 'lzmabin.res' 'lzmabin.rc'}
+
 uses
   Windows,
   SysUtils,
@@ -12,13 +14,16 @@ uses
   MSXMLDom,
   XMLDoc,
   ActiveX,
-  charscnt in '..\..\..\src\engine\charscnt.pas',
-  charslst in '..\..\..\src\engine\charslst.pas',
-  common in '..\..\..\src\engine\common.pas',
-  fileslst in '..\..\..\src\engine\fileslst.pas',
-  scnfedit in '..\..\..\src\engine\scnfedit.pas',
-  scnfutil in '..\..\..\src\engine\scnfutil.pas',
-  npcinfo in '..\..\..\src\engine\npc\npcinfo.pas';
+  charslst in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\charslst.pas',
+  common in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\common.pas',
+  scnfutil in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\scnfutil.pas',
+  npcinfo in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\npc\npcinfo.pas',
+  charscnt in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\charscnt.pas',
+  systools in '..\..\..\..\Common\systools.pas',
+  scnfedit in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\scnfedit.pas',
+  srfnpcdb in '..\..\..\..\Packages\Free Quest Subtitles Editor\src\engine\srfnpcdb.pas',
+  hashidx in '..\..\..\..\Common\hashidx.pas',
+  lzmadec in '..\..\..\..\Common\lzmadec.pas';
 
 const
   OUTPUT_FILE_EXT = '.dbi';
