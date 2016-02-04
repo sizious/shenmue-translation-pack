@@ -1,4 +1,5 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{cdfaa05d-fd33-4538-9fa3-ce2540f8b429}</ProjectGuid>
     <MainSource>hashdb.dpr</MainSource>
@@ -63,6 +64,88 @@
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Composants Microsoft Office 2000 Sample Automation Server Wrapper</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Composants Microsoft Office XP Sample Automation Server Wrapper</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">hashdb.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -72,12 +155,19 @@
     <DelphiCompile Include="hashdb.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <RcCompile Include="lzmabin.rc">
+      <Form>lzmabin.res</Form>
+    </RcCompile>
     <DCCReference Include="..\..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas" />
     <DCCReference Include="..\..\..\..\Common\filespec.pas" />
     <DCCReference Include="..\..\..\..\Common\hashidx.pas" />
+    <DCCReference Include="..\..\..\..\Common\lzmadec.pas" />
     <DCCReference Include="..\..\..\..\Common\MD5\MD5Api.pas" />
     <DCCReference Include="..\..\..\..\Common\MD5\MD5Core.pas" />
     <DCCReference Include="..\..\..\..\Common\SubsUtil\chrcodec.pas" />
     <DCCReference Include="..\..\..\..\Common\systools.pas" />
+    <DCCReference Include="..\..\..\..\Common\workdir.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfedit.pas" />
+    <DCCReference Include="..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfkeydb.pas" />
   </ItemGroup>
 </Project>

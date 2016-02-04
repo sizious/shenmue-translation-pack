@@ -4,6 +4,8 @@ program hashdb;
 
 // Don't forget to undef DEBUG_SCNFEDITOR in scnfedit.pas
 
+{$R 'lzmabin.res' 'lzmabin.rc'}
+
 uses
   Windows,
   SysUtils,
@@ -15,14 +17,17 @@ uses
   ActiveX,
   filespec in '..\..\..\..\Common\filespec.pas',
   systools in '..\..\..\..\Common\systools.pas',
-  srfedit in '..\..\..\..\AiO Cinematics Subtitles Editor\src\engine\srfedit.pas',
+  srfedit in '..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfedit.pas',
+  srfkeydb in '..\..\..\..\Packages\Cinematics Subtitles Editor\src\engine\srfkeydb.pas',
   MD5Core in '..\..\..\..\Common\MD5\MD5Core.pas',
   MD5Api in '..\..\..\..\Common\MD5\MD5Api.pas',
   chrcodec in '..\..\..\..\Common\SubsUtil\chrcodec.pas',
-  hashidx in '..\..\..\..\Common\hashidx.pas';
+  hashidx in '..\..\..\..\Common\hashidx.pas',
+  workdir in '..\..\..\..\Common\workdir.pas',
+  lzmadec in '..\..\..\..\Common\lzmadec.pas';
 
 var
-  DBINumEntries, FilesCount, FileIndex: Integer;
+  DBINumEntries, FilesCount: Integer;
   AFSFileName, Filter, DiscNumber: string;
   SRFEditor: TSRFEditor;
   SR: TSearchRec;
@@ -43,7 +48,6 @@ var
 function UpdateDBI: Boolean;
 var
   sRegion, Key, SameMD5, SRFName, AFSName: string;
-  i: Integer;
   
 begin
   Result := False;
@@ -132,12 +136,10 @@ procedure InitParameters;
   end;
 
 begin
-  // <PKS_Folder> <Filter> <OutputFile> <DBI_Folder> <DiscNumber> <GameVersion>
+  // <PKS_Folder> <Filter> <DBI_OutputFile> <DiscNumber> <GameVersion> <AFS_FileName>
   try
     PKSDirectory := IncludeTrailingPathDelimiter(ParamStr(1));
     Filter := ParamStr(2);
-//    TCDOutputFile := ParamStr(3);
-//    FileIndex := StrToInt(ExtractFileName(ChangeFileExt(TCDOutputFile, '')));
     DBIOutputFile := ParamStr(3);
     DiscNumber := ParamStr(4);
     DetermineGameInformation(paramstr(5));
@@ -151,9 +153,6 @@ end;
 //------------------------------------------------------------------------------
 
 procedure InitDBI;
-var
-  HeaderNode: IXMLNode;
-  
 begin
   DBINumEntries := 0;
   
@@ -185,21 +184,30 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-{
+
 procedure ShowHelp;
+var
+  PgSpace: string;
+  i: Integer;
+
 begin
-  WriteLn('Shenmue Corrector Data Generator - INTERNAL TOOL', sLineBreak,
+  PgSpace := '';
+  for i := 0 to Length(PrgName) - 1 do
+    PgSpace := PgSpace + ' ';
+    
+  WriteLn('Shenmue HashDB Generator - INTERNAL TOOL', sLineBreak,
         sLineBreak,
         'Usage: ', sLineBreak,
-        '       ', PrgName, ' <PKS_Folder> <Filter> <OutputFile> <DBI_Folder> <DiscNumber> <GameVersion>', sLineBreak,
+        '       ', PrgName, ' <PKS_Folder> <Filter> <DBI_OutputFile> <DiscNumber> <GameVersion>', sLineBreak,
+        '       ', PgSpace, ' <AFS_FileName>', sLineBreak,
         sLineBreak,
         'Where: ', sLineBreak,
-        '       <PKS_Folder>  : The target directory which contains PKS files', sLineBreak,
-        '       <Filter>      : The filter for searching files (ie "*.*")', sLineBreak,
-        '       <OutputFile>  : The output TCD file, MUST BE A NUMBER', sLineBreak,
-        '       <DBI_Folder>  : The target directory where to store the output DBI', sLineBreak,
-        '       <DiscNumber>  : The disc number of the folder (ie "1")', sLineBreak,
-        '       <GameVersion> : The game version of the folder (see below)', sLineBreak,
+        '       <PKS_Folder>     : The target directory which contains PKS files', sLineBreak,
+        '       <Filter>         : The filter for searching files (ie "*.srf")', sLineBreak,
+        '       <DBI_OutputFile> : The output DBI file', sLineBreak,
+        '       <DiscNumber>     : The disc number of the folder (ie "1")', sLineBreak,
+        '       <GameVersion>    : The game version of the folder (see below)', sLineBreak,
+        '       <AFS_FileName>   : The AFS source filename', sLineBreak,
         sLineBreak,
         'Game Version values:', sLineBreak,
         '       whats         : What''s Shenmue JAP DC', sLineBreak,
@@ -210,11 +218,11 @@ begin
         '       s2_xb_eur     : Shenmue 2X PAL Xbox', sLineBreak,
         sLineBreak,
         'Example:', sLineBreak,
-        '       ', PrgName, ' .\db_root\disc1\ *.* 1.tcd .\db_root\ 1 s1_dc_eur'
+        '       ', PrgName, ' .\db_root\disc1\ *.srf output.dbi 1 s1_dc_eur'
   );
   ExitCode := 1;
 end;
-}
+
 //------------------------------------------------------------------------------
 
 begin
@@ -222,7 +230,7 @@ begin
 
   PrgName := ExtractFileName(ChangeFileExt(ParamStr(0), ''));
   if ParamCount < 6 then begin
-//    ShowHelp;
+    ShowHelp;
     Exit;
   end;
 
