@@ -13,6 +13,7 @@ uses
 
 type
   EBinaryHacker = class(Exception);
+  EIncorrectFileStream = class(EBinaryHacker);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,12 +159,13 @@ type
 
   TBinaryHacker = class
   private
-    fTargetFileStream: TFileStream;
     fPlaceHolders: TBHPlaceHolders;
     fStrings: TBHStrings;
     fMakeBackup: Boolean;
     procedure Initialize(OutputFileStream: TFileStream);
     procedure Finalize(OutputFileStream: TFileStream);
+  protected
+    function DoExecute(FileStream: TFileStream): LongWord;
   public
     // Constructor... (of course you know that)
     constructor Create;
@@ -174,7 +176,10 @@ type
     // Apply the patch on the 'FileName' file.
     // This is the main method of this class.
     // Returns the extra bytes written (if the file has grown, 0 if not)
-    function Execute(const FileName: TFileName): LongWord;
+    function Execute(const FileName: TFileName): LongWord; overload;
+
+    // Apply the patch directly on the TFileStream class.
+    function Execute(FileStream: TFileStream): LongWord; overload;
 
     // Set this to 'True' (default) if you wanna make a backup before patching
     // with the 'Execute' method.
@@ -218,23 +223,17 @@ begin
   inherited;
 end;
 
-function TBinaryHacker.Execute(const FileName: TFileName): LongWord;
+function TBinaryHacker.DoExecute(FileStream: TFileStream): LongWord;
 var
   i: Integer;
   Context: TPlaceHolderContext;
   StrOffset: LongWord;
   CurrentItem: TBHStringItem;
-
+  
 begin
-  // Making backup as requested
-  if MakeBackup then
-    CopyFile(FileName, ChangeFileExt(FileName, SBACKUP_EXT));
-
-  // Opening target file
-  fTargetFileStream := TFileStream.Create(FileName, fmOpenReadWrite);
   try
     // Initializing Engine
-    Initialize(fTargetFileStream);
+    Initialize(FileStream);
 
     // Writing each String... (starting with the biggest)
     for i := Strings.Count - 1 downto 0 do
@@ -249,21 +248,31 @@ begin
       Context := PlaceHolders.OpenStringWriteContext(CurrentItem.Size);
       try
         // Updating the string pointer
-        fTargetFileStream.Seek(CurrentItem.PointerOffset, soFromBeginning);
+        FileStream.Seek(CurrentItem.PointerOffset, soFromBeginning);
         StrOffset := Context.StringOffset;
         case CurrentItem.PointerOffsetMode of
           pomAdd: Inc(StrOffset, CurrentItem.PointerOffsetBaseAddress);
           pomSub: Dec(StrOffset, CurrentItem.PointerOffsetBaseAddress);
         end;
-        fTargetFileStream.Write(StrOffset, UINT32_SIZE);
+        FileStream.Write(StrOffset, UINT32_SIZE);
 
 {$IFDEF DEBUG}
         WriteLn('PtrOffset=', CurrentItem.PointerOffset, ', StrOffset=', StrOffset); 
 {$ENDIF}
 
-        // Writing the string
-        fTargetFileStream.Seek(Context.StringOffset, soFromBeginning);
-        WriteNullTerminatedString(fTargetFileStream, CurrentItem.StringValue);
+        // Positioning the file pointer at the correct location
+        FileStream.Seek(Context.StringOffset, soFromBeginning);
+
+        // If the GrowMethod is Designed and no PlaceHolder was found, this means
+        // that we need to increaze the file size at the specified location, to hold
+        // our new string.
+        // Note: If GrowMethod is gmEOF, no need to insert data, the data will be
+        //       directly appened to the file's end.
+        if (Context._PlaceHolderIndex = -1) and (PlaceHolders.GrowMethod = gmDesigned) then
+          InsertNullBlock(FileStream, Length(CurrentItem.StringValue) + 1);
+
+        // Write the string
+        WriteNullTerminatedString(FileStream, CurrentItem.StringValue);
 
 {$IFDEF DEBUG}
         WriteLn(' "', CurrentItem.StringValue, '"');
@@ -277,13 +286,57 @@ begin
     end;
 
     // Finalizing Engine
-    Finalize(fTargetFileStream);
+    Finalize(FileStream);
+  finally
+    // Return the number of bytes written in extra
+      Result := PlaceHolders.GetExtraBlocksSizeWritten;
+  end;
+end;
+
+function TBinaryHacker.Execute(FileStream: TFileStream): LongWord;
+var
+  BackupFileName: TFileName;
+  BackupFileStream: TFileStream;
+
+begin
+  // Making backup as requested
+  if MakeBackup then begin
+    BackupFileName := ChangeFileExt(FileStream.FileName, SBACKUP_EXT);
+    BackupFileStream := TFileStream.Create(BackupFileName, fmCreate);
+    try
+      BackupFileStream.CopyFrom(FileStream, 0);
+    finally
+      BackupFileStream.Free;
+    end;
+  end;
+
+  // Patching the file
+  try
+    Result := DoExecute(FileStream);
+  except
+    on Exception do
+      raise EIncorrectFileStream.Create('Unable to work with the supplied TFileStream. '
+        + 'Please check if the TFileStream Mode is set to fmOpenReadWrite');
+  end;
+end;
+
+function TBinaryHacker.Execute(const FileName: TFileName): LongWord;
+var
+  FileStream: TFileStream;
+  
+begin
+  // Making backup as requested
+  if MakeBackup then
+    CopyFile(FileName, ChangeFileExt(FileName, SBACKUP_EXT));
+
+  // Opening target file
+  FileStream := TFileStream.Create(FileName, fmOpenReadWrite);
+  try
+    // Patching the file
+    Result := DoExecute(FileStream);
   finally
     // Close the target file
-    fTargetFileStream.Free;
-
-    // Return the number of bytes written in extra
-    Result := PlaceHolders.GetExtraBlocksSizeWritten;
+    FileStream.Free;
   end;
 end;
 
