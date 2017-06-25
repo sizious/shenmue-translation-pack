@@ -15,6 +15,7 @@ type
   ESystemTools = class(Exception);
   EDataDirectoryNotFound = class(ESystemTools);
   EFourCCNotSameLengthAsString = class(ESystemTools);
+  EFileStreamNotReadable = class(ESystemTools);
 
   // Standard section header (used by many units, like FSParser)
   TSectionEntry = record
@@ -58,6 +59,8 @@ function GetTempFileName(FullPath: Boolean = True): TFileName;
 function GetXMLDocType(const XMLBuffer: string): string;
 function HexToInt(Hex: string): Integer;
 function HexToInt64(Hex: string): Int64;
+function InitializeFile(const FileName: TFileName; Overwrite: Boolean): Boolean;
+procedure InsertNullBlock(F: TFileStream; const Size: LongWord);
 procedure IntegerArrayToList(Source: array of Integer; var Destination: TList);
 procedure IntegerToArray(var Destination: array of Char; const Value: Integer);
 function Is64BitOS: Boolean;
@@ -70,6 +73,7 @@ function MoveFile(const ExistingFileName, NewFileName: TFileName): Boolean;
 function MoveTempFile(const TempFileName, DestFileName: TFileName;
   MakeBackup: Boolean): Boolean;
 function ParseStr(SubStr, S: string; n: Integer): string;
+function ParseTextToBoolean(const EncodedString: string): Boolean;
 procedure ParseTextToByteArray(const EncodedString: string;
   var Dest: TBytes);
 function ParseTextToString(const EncodedString: string): string;
@@ -222,6 +226,19 @@ begin
   SetLength(Dest, j);
   for i := 1 to j do
     Dest[i - 1] := Ord(Buf[i]);   
+end;
+
+//------------------------------------------------------------------------------
+
+function ParseTextToBoolean(const EncodedString: string): Boolean;
+var
+  Buf: string;
+  BufInt: Integer;
+
+begin
+  Buf := LowerCase(EncodedString);
+  BufInt := ParseTextToValue(EncodedString, 0);
+  Result := (Buf = 'true') or (Buf = 't') or (BufInt <> 0);
 end;
 
 //------------------------------------------------------------------------------
@@ -1193,6 +1210,57 @@ begin
     S:=copy(s, pos(substr, s)+length(substr), length(s)-pos(substr, s)+length(substr));
   end;
   result:=copy(s, 1, pos(substr, s)-1);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure InsertNullBlock(F: TFileStream; const Size: LongWord);
+var
+  MemoryStream: TMemoryStream;
+  CurrentPosition,
+  SizeToEnd: Int64;
+
+begin
+  CurrentPosition := F.Position;
+  MemoryStream := TMemoryStream.Create;
+  try
+    SizeToEnd := F.Size - CurrentPosition;
+    try
+      MemoryStream.Seek(0, soFromBeginning);
+      MemoryStream.CopyFrom(F, SizeToEnd);
+      F.Size := CurrentPosition;
+      WriteNullBlock(F, Size);
+      F.CopyFrom(MemoryStream, 0);
+    except
+      on EReadError do
+        raise EFileStreamNotReadable.Create('The supplied TFileStream was not opened with fmOpenReadWrite mode');
+    end;
+  finally
+    MemoryStream.Free;
+  end;
+
+  F.Seek(CurrentPosition, soFromBeginning);
+end;
+
+//------------------------------------------------------------------------------
+
+function InitializeFile(const FileName: TFileName; Overwrite: Boolean): Boolean;
+var
+  FileStream: TFileStream;
+
+begin
+  Result := False;
+  if not Overwrite and FileExists(FileName) then Exit;
+
+  KillFile(FileName);
+
+  FileStream := TFileStream.Create(FileName, fmCreate);
+  try
+    FileStream.Seek(0, soFromBeginning);
+    Result := True;
+  finally
+    FileStream.Free;
+  end;
 end;
 
 //------------------------------------------------------------------------------
