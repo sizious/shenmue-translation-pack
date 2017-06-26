@@ -26,7 +26,8 @@ uses
   lzmadec in '..\..\..\Common\lzmadec.pas',
   appver in '..\..\..\Common\appver.pas',
   uitools in '..\..\..\Common\uitools.pas',
-  about in '..\..\..\Common\About\about.pas' {frmAbout};
+  about in '..\..\..\Common\About\about.pas' {frmAbout},
+  binhack in '..\..\..\Common\binhack.pas';
 
 {$R *.res}
 

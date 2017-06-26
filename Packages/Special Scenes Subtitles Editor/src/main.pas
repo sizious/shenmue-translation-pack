@@ -69,6 +69,11 @@ type
     Label8: TLabel;
     eSubCount: TEdit;
     miDEBUG_TEST5: TMenuItem;
+    miImport: TMenuItem;
+    N8: TMenuItem;
+    miExport: TMenuItem;
+    odImportSubs: TOpenDialog;
+    sdExportSubs: TSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tbMainCustomDraw(Sender: TToolBar; const ARect: TRect;
@@ -99,6 +104,8 @@ type
     procedure miDEBUG_TEST3Click(Sender: TObject);
     procedure miDEBUG_TEST4Click(Sender: TObject);
     procedure miDEBUG_TEST5Click(Sender: TObject);
+    procedure miImportClick(Sender: TObject);
+    procedure miExportClick(Sender: TObject);
   private
     { Déclarations privées }  
     fSelectedSubtitleUI: TListItem;
@@ -133,12 +140,14 @@ type
     procedure PreviewerWindowClosed(Sender: TObject);
     function SaveFileOnDemand(CancelButton: Boolean): Boolean;
     procedure SetSelectedSubtitle(const Value: string);
+    procedure SetStatusReady;
     procedure SetStatusText(const Value: string);
     procedure SetDebugLogVisible(const Value: Boolean);
     procedure SetControlsStateFileOperations(State: Boolean);
     procedure SetControlsStateSaveOperation(State: Boolean);
     procedure SetFileModified(const Value: Boolean);
     procedure RefreshOldTextField;
+    function RefreshSubtitlesList(UpdateView: Boolean): Boolean;
     procedure RefreshSubtitleSelection;
     procedure UpdateFileModifiedState;
     procedure SetPreviewerVisible(const Value: Boolean);
@@ -333,6 +342,41 @@ begin
 {$ENDIF}
 end;
 
+procedure TfrmMain.miExportClick(Sender: TObject);
+begin
+  with sdExportSubs do begin
+    FileName := ChangeFileExt(ExtractFileName(SequenceEditor.SourceFileName), '.xml');
+    InitialDir := ExtractFilePath(SequenceEditor.SourceFileName);
+    if Execute then begin
+      SetStatusText('Exporting subtitles...');
+      SequenceEditor.Subtitles.ExportToFile(FileName);
+      DebugLog.AddLine(ltInformation, 'Subtitles was successfully exported from "'
+        + ExtractFileName(SequenceEditor.SourceFileName) + '" to the "' + FileName + '" file.');
+      SetStatusReady;
+    end;
+  end;
+end;
+
+procedure TfrmMain.miImportClick(Sender: TObject);
+begin
+  with odImportSubs do begin
+    if Execute then begin
+      SetStatusText('Importing subtitles...');
+      if SequenceEditor.Subtitles.ImportFromFile(FileName) then begin
+        RefreshSubtitlesList(True);
+        SetFileModified(True);
+        DebugLog.AddLine(ltInformation, 'Subtitles was successfully imported from the "' + FileName
+          + '" file to the "'+ ExtractFileName(SequenceEditor.SourceFileName)
+          + '" file.');
+      end
+      else begin
+        DebugLog.AddLine(ltWarning, 'Subtitles importation: Error » XML not valid for the current file.');
+      end;
+      SetStatusReady;
+    end;
+  end;
+end;
+
 procedure TfrmMain.FormActivate(Sender: TObject);
 begin
   aeMain.OnException := aeMainException;
@@ -472,6 +516,63 @@ begin
     lvSubsSelectItem(Self, fSelectedSubtitleUI, True);
 end;
 
+function TfrmMain.RefreshSubtitlesList;
+var
+  i, j: Integer;
+  ListItem: TListItem;
+
+begin
+  Result := SequenceEditor.Loaded;
+
+  // Filling the UI with the content
+  if Result then begin
+    // Display the subtitles count
+    eSubCount.Text := IntToStr(SequenceEditor.Subtitles.Count);
+
+    // Adding entries
+    for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
+      ListItem := nil;
+
+      // Checking if we must update the current view...
+      if UpdateView then
+        ListItem := lvSubs.FindData(0, Pointer(i), True, False); // finding the correct index
+
+      (*  If we ListItem = nil, it says that we don't have found the correct
+          Item index, or we opened a new file. So we'll create a new item
+          and prepare it to be updated. *)
+      if not Assigned(ListItem) then begin
+        ListItem := lvSubs.Items.Add;
+        ListItem.Caption := '';
+        j := 0;
+        repeat
+          ListItem.SubItems.Add('');
+          Inc(j);
+        until j = 2;
+      end;
+
+      // Updating the current item with the new values
+      with ListItem do
+        with SequenceEditor.Subtitles[i] do begin
+          Data := Pointer(i);
+          Caption := IntToStr(i);
+          SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
+          SubItems[1] := BR(SequenceEditor.Subtitles[i].BackupText.InitialText);
+        end;
+    end;
+
+    // Updating UI
+    if not UpdateView then begin
+      DebugLog.AddLine(ltInformation, 'Load successfully done for "'
+        + SequenceEditor.SourceFileName + '".');
+    end;
+    SetControlsStateFileOperations(True);
+
+    // Refreshing the view
+    RefreshSubtitleSelection;
+
+  end;
+end;
+
 function TfrmMain.GetSelectedSubtitle: string;
 begin
   Result := '';
@@ -556,11 +657,9 @@ begin
   end;
 end;
 
-procedure TfrmMain.LoadFile(FileName: TFileName);
+procedure TfrmMain.LoadFile;
 var
-  i, j: Integer;
   UpdateUI: Boolean;
-  ListItem: TListItem;
 
 begin
   // Extending filenames
@@ -576,65 +675,15 @@ begin
 
   // Updating UI
   StatusText := 'Loading file...';
-  Clear(UpdateUI);  
 
   // Loading the file
+  Clear(UpdateUI);
   if SequenceEditor.LoadFromFile(FileName) then begin
-
-    // Filling the UI with the content
-    if SequenceEditor.Loaded then begin
-
-      // Display the subtitles count
-      eSubCount.Text := IntToStr(SequenceEditor.Subtitles.Count);
-
-      // Adding entries
-      for i := 0 to SequenceEditor.Subtitles.Count - 1 do begin
-        ListItem := nil;
-
-        // Checking if we must update the current view...
-        if UpdateUI then
-          ListItem := lvSubs.FindData(0, Pointer(i), True, False); // finding the correct index
-
-        (*  If we ListItem = nil, it says that we don't have found the correct
-            Item index, or we opened a new file. So we'll create a new item
-            and prepare it to be updated. *)
-        if not Assigned(ListItem) then begin
-          ListItem := lvSubs.Items.Add;
-          ListItem.Caption := '';
-          j := 0;
-          repeat
-            ListItem.SubItems.Add('');
-            Inc(j);
-          until j = 2;
-        end;
-
-        // Updating the current item with the new values
-        with ListItem do
-          with SequenceEditor.Subtitles[i] do begin
-            Data := Pointer(i);
-            Caption := IntToStr(i);
-            SubItems[0] := BR(SequenceEditor.Subtitles[i].Text);
-            SubItems[1] := BR(SequenceEditor.Subtitles[i].BackupText.InitialText);
-          end;
-      end;                   
-
-      // Updating UI
-      if not UpdateUI then begin
-//        SetWindowTitleCaption(LcdEditor.SourceFileName);
-        DebugLog.AddLine(ltInformation, 'Load successfully done for "'
-          + SequenceEditor.SourceFileName + '".');
-      end;
-      SetControlsStateFileOperations(True);
-
-      // Refreshing the view
-      RefreshSubtitleSelection;
-
-    end else begin
-      StatusText := 'Nothing to edit !';
-      DebugLog.Report(ltInformation, 'This file is valid, but nothing to edit !',
+    if not RefreshSubtitlesList(UpdateUI) then begin
+      StatusText := 'Nothing to edit!';
+      DebugLog.Report(ltInformation, 'This file is valid, but nothing to edit!',
         'FileName: ' + FileName);
     end;
-
   end else
     DebugLog.Report(ltWarning, 'This file isn''t a supported NBIK sequence MAPINFO.BIN file.',
       'FileName: ' + FileName);
@@ -814,12 +863,12 @@ end;
 procedure TfrmMain.SetControlsStateFileOperations(State: Boolean);
 begin
   miClose.Enabled := State;
-(*  miImport.Enabled := State;
-  miImport2.Enabled := State;
-  tbImport.Enabled := State;
+  miImport.Enabled := State;
   miExport.Enabled := State;
+  (*miImport2.Enabled := State;
+  tbImport.Enabled := State;
   miExport2.Enabled := State;
-  tbExport.Enabled := State; *)
+  tbExport.Enabled := State;*)
   miReload.Enabled := State;
   tbReload.Enabled := State;
 end;
@@ -922,12 +971,23 @@ begin
   end;
 end;
 
+procedure TfrmMain.SetStatusReady;
+begin
+  SetStatusText('Ready');
+end;
+
 procedure TfrmMain.SetStatusText(const Value: string);
 begin
   if Value = '' then
     sbMain.Panels[2].Text := 'Ready'
   else
     sbMain.Panels[2].Text := Value;
+
+  if (sbMain.Panels[2].Text = 'Ready') then
+    Screen.Cursor := crDefault
+  else
+    Screen.Cursor := crAppStart;
+
   Application.ProcessMessages;
 end;
 
