@@ -13,6 +13,32 @@ uses
   SysTools, FileSpec;
 
 type
+  ESequenceDatabaseGeneric = class(Exception);
+
+  TExtraPointersListItem = class
+  private
+    fOffset: LongWord;
+    fInitialValue: LongWord;
+  public
+    property Offset: LongWord read fOffset;
+    property Value: LongWord read fInitialValue;    
+  end;
+
+  TExtraPointersList = class
+  private
+    fList: TList;
+    function Add(NewItem: TExtraPointersListItem): Integer;
+    procedure Clear;
+    function GetCount: Integer;
+    function GetItem(Index: Integer): TExtraPointersListItem;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property Count: Integer read GetCount;
+    property Items[Index: Integer]: TExtraPointersListItem
+      read GetItem; default;
+  end;
+
   TPlaceHoldersListItem = class
   private
     fSize: LongWord;
@@ -37,11 +63,29 @@ type
       read GetItem; default;
   end;
 
+  TMemoryInformation = class
+  private
+    fExpandable: Boolean;
+    fExtraPointersList: TExtraPointersList;
+    fPlaceHolders: TPlaceHoldersList;
+    fExpandablePlaceHolder: TPlaceHoldersListItem;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property Expandable: Boolean read fExpandable;
+    property ExpandablePlaceHolder: TPlaceHoldersListItem
+      read fExpandablePlaceHolder;
+    property ExtraPointers: TExtraPointersList read fExtraPointersList;
+    property PlaceHolders: TPlaceHoldersList read fPlaceHolders;
+  end;
+
   TStringPointersListItem = class
   private
     fStringPointer: LongWord;
     fStringValue: string;
+    fStringStartTag: string;
   public
+    property StringStartTag: string read fStringStartTag;
     property StringPointer: LongWord read fStringPointer;
     property StringValue: string read fStringValue;
   end;
@@ -91,7 +135,7 @@ type
     fDiscID: Byte;
     fSignature: TSequenceSignature;
     fStringPointersList: TStringPointersList;
-    fPlaceHolders: TPlaceHoldersList;
+    fMemoryInformation: TMemoryInformation;
   public
     constructor Create;
     destructor Destroy; override;
@@ -99,14 +143,14 @@ type
     property Game: TGameVersion read fGame;
     property OriginalHeaderValues: TSequenceOriginalHeaderValues
       read fOriginalHeaderValues;
+    property MemoryInformation: TMemoryInformation
+      read fMemoryInformation;
     property Platform: TPlatformVersion read fPlatform;
     property Region: TGameRegion read fRegion;
     property SequenceID: string read fSequenceID;
     property Signature: TSequenceSignature read fSignature;
     property StringPointers: TStringPointersList read
       fStringPointersList;
-    property PlaceHolders: TPlaceHoldersList read
-      fPlaceHolders;
   end;
 
   TSequenceDatabase = class
@@ -219,15 +263,19 @@ function TSequenceDatabase.LoadDatabase;
 var
   XMLDocument: IXMLDocument;
   i, j: Integer;
-  SequenceInfoNode: IXMLNode;
+  SequenceInfoNode, CurrentNode, CurrentSubNode: IXMLNode;
   SequenceInfoItem: TSequenceDatabaseItem;
-  NodeList: IXMLNodeList;
+  NodeList, SubNodeList: IXMLNodeList;
   StringPointerItem: TStringPointersListItem;
   PlaceHoldersItem: TPlaceHoldersListItem;
-
+  ExpandablePlaceHolderDetected,
+  ExpandablePlaceHolderDoubleEntryDetected: Boolean;
+  GenericStringStartTag, Buf: string;
+  ExtraPointersListItem: TExtraPointersListItem;
+  
 begin
   Result := FileExists(FileName);
-  if not Result then Exit;  
+  if not Result then Exit;
   XMLDocument := LoadXMLDocument(FileName);
   try
     fLoadedDatabase := FileName;
@@ -258,29 +306,88 @@ begin
             VariantToString(NodeList.FindNode('Platform').NodeValue));
 
           // Read 'StringPointers'
-          NodeList :=
-            SequenceInfoNode.ChildNodes.FindNode('StringPointers').ChildNodes;
+
+          // Extract StringStartTag if applicable
+          GenericStringStartTag := '';
+          CurrentNode := SequenceInfoNode.ChildNodes.FindNode('StringPointers');
+          Buf := VariantToString(CurrentNode.Attributes['StringStartTag']);
+          if Buf <> '' then
+          begin
+            GenericStringStartTag := ParseTextToString(Buf);
+          end;
+
+          // Read StringPointer table
+          NodeList := CurrentNode.ChildNodes;
           for j := 0 to NodeList.Count - 1 do
           begin
+            CurrentNode := NodeList[j];
             StringPointerItem := TStringPointersListItem.Create;
             StringPointerItem.fStringValue :=
-              NodeList[j].Attributes['String'];
+              CurrentNode.Attributes['String'];
             StringPointerItem.fStringPointer :=
-              ParseTextToValue(NodeList[j].NodeValue, 0);
+              ParseTextToValue(CurrentNode.NodeValue, 0);
+
+            // Handle String Start Tag.
+            Buf := VariantToString(CurrentNode.Attributes['StartTag']);
+            if Buf = '' then
+              Buf := GenericStringStartTag;
+            StringPointerItem.fStringStartTag := Buf;
+
             StringPointers.Add(StringPointerItem);
           end;
 
-          // Read 'PlaceHolders'
-          NodeList :=
-            SequenceInfoNode.ChildNodes.FindNode('PlaceHolders').ChildNodes;
-          for j := 0 to NodeList.Count - 1 do
-          begin
-            PlaceHoldersItem := TPlaceHoldersListItem.Create;
-            PlaceHoldersItem.fOffset :=
-              ParseTextToValue(NodeList[j].Attributes['Offset'], 0);
-            PlaceHoldersItem.fSize :=
-              ParseTextToValue(NodeList[j].Attributes['Size'], 0);
-            PlaceHolders.Add(PlaceHoldersItem);
+          // Read 'MemoryInformation' node
+          CurrentNode :=
+            SequenceInfoNode.ChildNodes.FindNode('MemoryInformation');
+
+          // Check if MemoryInformation is Expandable or not.
+          SequenceInfoItem.MemoryInformation.fExpandable :=
+            ParseTextToBoolean(VariantToString(CurrentNode.Attributes['Expandable']));
+
+          // If Expandable, then read ExpandablePlaceHolder and ExtraPointers if applicable
+          if SequenceInfoItem.MemoryInformation.Expandable then begin
+            // Read ExpandablePlaceHolder
+            CurrentSubNode := CurrentNode.ChildNodes.FindNode('ExpandablePlaceHolder');
+            with SequenceInfoItem.MemoryInformation.ExpandablePlaceHolder do begin
+              fSize := ParseTextToValue(CurrentSubNode.Attributes['Size'], 0);
+              fOffset := ParseTextToValue(CurrentSubNode.NodeValue, 0);
+            end;
+
+            // Read ExtraPointers if possible
+            CurrentSubNode := CurrentNode.ChildNodes.FindNode('ExtraPointers');
+            if Assigned(CurrentSubNode) then
+            begin
+              SubNodeList := CurrentSubNode.ChildNodes;
+              if Assigned(SubNodeList) then
+                for j := 0 to SubNodeList.Count - 1 do begin
+                  ExtraPointersListItem := TExtraPointersListItem.Create;
+                  with ExtraPointersListItem do begin
+                    fOffset := ParseTextToValue(SubNodeList[j].NodeValue, 0);
+                    fInitialValue := ParseTextToValue(SubNodeList[j].Attributes['Value'], 0);
+                  end;
+                  SequenceInfoItem.MemoryInformation.ExtraPointers.Add(
+                    ExtraPointersListItem
+                  );
+                end;
+            end;
+
+          end else begin
+            // MemoryInformation is NOT Expandable
+
+            raise ESequenceDatabaseGeneric.Create('NEED TO BE TESTED!');
+            
+            NodeList := CurrentNode.ChildNodes.FindNode('PlaceHolders').ChildNodes;
+            for j := 0 to NodeList.Count - 1 do
+            begin
+              CurrentNode := NodeList[j];
+              PlaceHoldersItem := TPlaceHoldersListItem.Create;
+              PlaceHoldersItem.fOffset :=
+                ParseTextToValue(CurrentNode.Attributes['Offset'], 0);
+              PlaceHoldersItem.fSize :=
+                ParseTextToValue(CurrentNode.NodeValue, 0);
+              SequenceInfoItem.MemoryInformation.PlaceHolders.Add(PlaceHoldersItem);
+            end;
+            
           end;
 
           // Read 'OriginalHeaderValues'
@@ -294,6 +401,7 @@ begin
           end;
 
           // Read 'SpecificCharset' don't know if it really needed or not
+          // ...
                     
         end;
 
@@ -323,16 +431,16 @@ constructor TSequenceDatabaseItem.Create;
 begin
   fSignature := TSequenceSignature.Create;
   fStringPointersList := TStringPointersList.Create;
-  fPlaceHolders := TPlaceHoldersList.Create;
   fOriginalHeaderValues := TSequenceOriginalHeaderValues.Create;
+  fMemoryInformation := TMemoryInformation.Create;
 end;
 
 destructor TSequenceDatabaseItem.Destroy;
 begin
   fSignature.Free;
   fStringPointersList.Free;
-  fPlaceHolders.Free;
   fOriginalHeaderValues.Free;
+  fMemoryInformation.Free;
   inherited;
 end;
 
@@ -412,6 +520,62 @@ end;
 function TPlaceHoldersList.GetItem;
 begin
   Result := TPlaceHoldersListItem(fList.Items[Index]);
+end;
+
+{ TExtraPointersList }
+
+function TExtraPointersList.Add;
+begin
+  Result := fList.Add(Pointer(NewItem));
+end;
+
+procedure TExtraPointersList.Clear;
+var
+  i: Integer;
+
+begin
+  for i := 0 to fList.Count - 1 do
+    Items[i].Free;
+  fList.Clear;
+end;
+
+constructor TExtraPointersList.Create;
+begin
+  fList := TList.Create;
+end;
+
+destructor TExtraPointersList.Destroy;
+begin
+  Clear;
+  fList.Free;
+  inherited;
+end;
+
+function TExtraPointersList.GetCount;
+begin
+  Result := fList.Count;
+end;
+
+function TExtraPointersList.GetItem;
+begin
+  Result := TExtraPointersListItem(fList.Items[Index]);
+end;
+
+{ TMemoryInformation }
+
+constructor TMemoryInformation.Create;
+begin
+  fExtraPointersList := TExtraPointersList.Create;
+  fPlaceHolders := TPlaceHoldersList.Create;
+  fExpandablePlaceHolder := TPlaceHoldersListItem.Create;
+end;
+
+destructor TMemoryInformation.Destroy;
+begin
+  fExtraPointersList.Free;
+  fPlaceHolders.Free;
+  fExpandablePlaceHolder.Free;
+  inherited;
 end;
 
 initialization
